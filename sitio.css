@@ -1,0 +1,43 @@
+/* PETO — sitio público petofinanzas. Marca: verde #35c184 sobre negro #0a0f0d. */
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#0a0f0d;color:#e8f0ec;line-height:1.6}
+a{color:#35c184}
+.wrap{max-width:920px;margin:0 auto;padding:0 1.2rem 3rem}
+header.site{display:flex;align-items:center;gap:.8rem;padding:1.1rem 0;flex-wrap:wrap}
+header.site img{width:48px;height:48px;border-radius:12px}
+header.site .brand{font-size:1.35rem;font-weight:800;letter-spacing:.02em;color:#e8f0ec;text-decoration:none}
+header.site nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap;align-items:center}
+header.site nav a{color:#cfe3d8;text-decoration:none;font-size:.98rem}
+header.site nav a:hover{color:#35c184}
+.btn{display:inline-block;background:#35c184;color:#06231a;font-weight:700;text-decoration:none;padding:.7rem 1.3rem;border-radius:12px;border:none;cursor:pointer;font-size:1rem}
+.btn:hover{background:#2cab73}
+.btn.ghost{background:transparent;color:#35c184;border:1.5px solid #35c184}
+.hero{padding:1.6rem 0 1rem;text-align:left}
+.hero h1{font-size:2.2rem;line-height:1.15;margin:.4rem 0 .8rem}
+.hero h1 .verde{color:#35c184}
+.hero p.sub{font-size:1.12rem;color:#c4d8cc;max-width:640px}
+.hero img.banner{width:100%;border-radius:16px;margin:1.4rem 0 .4rem;border:1px solid #22332b}
+.cta-row{display:flex;gap:.8rem;flex-wrap:wrap;margin:1.2rem 0}
+section{margin-top:2.6rem}
+h2{color:#35c184;font-size:1.45rem;margin:.2rem 0 1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.card{background:#101915;border:1px solid #22332b;border-radius:16px;padding:1.2rem 1.1rem}
+.card h3{margin:.2rem 0 .5rem;font-size:1.08rem}
+.card p{color:#c4d8cc;margin:.2rem 0 .8rem;font-size:.97rem}
+.card .emoji{font-size:1.6rem}
+.muted{color:#9db4a9}
+.big{font-size:2rem;font-weight:800;color:#35c184}
+form.calc{background:#101915;border:1px solid #22332b;border-radius:16px;padding:1.3rem 1.2rem;max-width:560px}
+form.calc label{display:block;margin:.9rem 0 .3rem;font-weight:600}
+form.calc input,form.calc select{width:100%;padding:.65rem .7rem;border-radius:10px;border:1px solid #2c463a;background:#0a0f0d;color:#e8f0ec;font-size:1rem}
+form.calc .btn{margin-top:1.2rem;width:100%}
+.resultado{margin-top:1.3rem;background:#0e2019;border:1px solid #2c463a;border-radius:12px;padding:1rem 1.1rem;display:none;max-width:560px}
+.resultado.visible{display:block}
+.resultado .cifra{font-size:1.7rem;font-weight:800;color:#35c184}
+.error{color:#ff9c9c;font-weight:600}
+table.turnos{border-collapse:collapse;margin-top:.8rem;width:100%;max-width:560px}
+table.turnos th,table.turnos td{border:1px solid #2c463a;padding:.45rem .7rem;text-align:left}
+table.turnos th{color:#35c184}
+footer.site{border-top:1px solid #22332b;margin-top:3.2rem;padding:1.4rem 0 .4rem;color:#9db4a9;font-size:.95rem}
+footer.site a{color:#cfe3d8}
+.crumb{font-size:.95rem;margin-top:1rem}

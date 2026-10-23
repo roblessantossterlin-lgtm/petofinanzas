@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de san / tanda gratis — PETO · petofinanzas</title>
+<meta name="description" content="Calcula el fondo de cada turno de tu san o tanda según el aporte, la frecuencia y el número de participantes, con el calendario de entregas. Gratis, sin registro.">
+<link rel="icon" href="../../logo.png">
+<link rel="stylesheet" href="../../sitio.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <img src="../../logo.png" alt="Logo de PETO">
+    <a class="brand" href="../../">PETO</a>
+    <nav>
+      <a href="../deudas/">Deudas</a>
+      <a href="../gasto-diario/">Gasto diario</a>
+      <a class="btn" href="../../app/">Probar gratis</a>
+    </nav>
+  </header>
+
+  <p class="crumb"><a href="../../">Inicio</a> › Calculadoras › San / tanda</p>
+  <h1 style="font-size:1.9rem">Calculadora de san / tanda</h1>
+  <p class="muted" style="max-width:560px">El san (tanda, cundina, susu) funciona así: todos aportan lo mismo cada ronda y en cada turno una persona recibe el fondo completo. Haz tus números aquí.</p>
+
+  <form class="calc" id="form-san">
+    <label for="s-aporte">Aporte de cada participante por ronda ($)</label>
+    <input id="s-aporte" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 100" required>
+    <label for="s-frecuencia">¿Cada cuánto se aporta?</label>
+    <select id="s-frecuencia">
+      <option value="semanal">Semanal</option>
+      <option value="quincenal">Quincenal</option>
+      <option value="mensual">Mensual</option>
+    </select>
+    <label for="s-participantes">Número de participantes</label>
+    <input id="s-participantes" type="number" min="2" step="1" inputmode="numeric" placeholder="Ej. 10" required>
+    <label for="s-inicio">Fecha del primer turno (opcional)</label>
+    <input id="s-inicio" type="date">
+    <button class="btn" type="submit">Calcular</button>
+  </form>
+  <div class="resultado" id="s-resultado"></div>
+
+  <div class="cta-row">
+    <a class="btn" href="../../app/">Llevar esto en PETO</a>
+    <a class="btn ghost" href="../../">Volver a la portada</a>
+  </div>
+
+  <footer class="site">
+    <p>PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
+  </footer>
+</div>
+<script src="../calculadoras.js"></script>
+</body>
+</html>

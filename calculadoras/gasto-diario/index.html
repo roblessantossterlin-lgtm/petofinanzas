@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de gasto diario gratis — PETO · petofinanzas</title>
+<meta name="description" content="Descubre cuánto puedes gastar por día sin pasarte de tu presupuesto del mes: la misma fórmula que PETO muestra en tu pantalla principal. Gratis, sin registro.">
+<link rel="icon" href="../../logo.png">
+<link rel="stylesheet" href="../../sitio.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <img src="../../logo.png" alt="Logo de PETO">
+    <a class="brand" href="../../">PETO</a>
+    <nav>
+      <a href="../deudas/">Deudas</a>
+      <a href="../san/">San / tanda</a>
+      <a class="btn" href="../../app/">Probar gratis</a>
+    </nav>
+  </header>
+
+  <p class="crumb"><a href="../../">Inicio</a> › Calculadoras › Gasto diario</p>
+  <h1 style="font-size:1.9rem">¿Cuánto puedes gastar hoy?</h1>
+  <p class="muted" style="max-width:560px">La fórmula es simple: lo que te queda del presupuesto, dividido entre los días que faltan del mes (contando hoy). Es el mismo número que PETO te muestra cada mañana.</p>
+
+  <form class="calc" id="form-diario">
+    <label for="g-presupuesto">Tu presupuesto para este mes ($)</label>
+    <input id="g-presupuesto" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 3000" required>
+    <label for="g-gastado">Lo que ya gastaste este mes ($)</label>
+    <input id="g-gastado" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 1000" required>
+    <label for="g-dia">¿Qué día del mes es hoy?</label>
+    <input id="g-dia" type="number" min="1" max="31" step="1" inputmode="numeric" required>
+    <label for="g-dias-mes">¿Cuántos días tiene este mes?</label>
+    <input id="g-dias-mes" type="number" min="28" max="31" step="1" inputmode="numeric" required>
+    <button class="btn" type="submit">Calcular</button>
+  </form>
+  <div class="resultado" id="g-resultado"></div>
+
+  <div class="cta-row">
+    <a class="btn" href="../../app/">Llevar esto en PETO</a>
+    <a class="btn ghost" href="../../">Volver a la portada</a>
+  </div>
+
+  <footer class="site">
+    <p>PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
+  </footer>
+</div>
+<script src="../calculadoras.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de deudas gratis — PETO · petofinanzas</title>
+<meta name="description" content="Calcula en cuántos meses saldas una deuda según el monto, el interés anual y tu pago mensual, y cuánto pagarás de intereses. Gratis, sin registro.">
+<link rel="icon" href="../../logo.png">
+<link rel="stylesheet" href="../../sitio.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <img src="../../logo.png" alt="Logo de PETO">
+    <a class="brand" href="../../">PETO</a>
+    <nav>
+      <a href="../san/">San / tanda</a>
+      <a href="../gasto-diario/">Gasto diario</a>
+      <a class="btn" href="../../app/">Probar gratis</a>
+    </nav>
+  </header>
+
+  <p class="crumb"><a href="../../">Inicio</a> › Calculadoras › Deudas</p>
+  <h1 style="font-size:1.9rem">Calculadora de deudas</h1>
+  <p class="muted" style="max-width:560px">Escribe cuánto debes, el interés anual y lo que puedes pagar cada mes. Te decimos cuándo terminas y cuánto te cuesta la deuda en intereses.</p>
+
+  <form class="calc" id="form-deuda">
+    <label for="d-monto">¿Cuánto debes? ($)</label>
+    <input id="d-monto" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 1500" required>
+    <label for="d-interes">Interés anual (%)</label>
+    <input id="d-interes" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 24" required>
+    <label for="d-pago">¿Cuánto puedes pagar al mes? ($)</label>
+    <input id="d-pago" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 100" required>
+    <button class="btn" type="submit">Calcular</button>
+  </form>
+  <div class="resultado" id="d-resultado"></div>
+
+  <div class="cta-row">
+    <a class="btn" href="../../app/">Llevar esto en PETO</a>
+    <a class="btn ghost" href="../../">Volver a la portada</a>
+  </div>
+
+  <footer class="site">
+    <p>PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
+  </footer>
+</div>
+<script src="../calculadoras.js"></script>
+</body>
+</html>
