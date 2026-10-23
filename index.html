@@ -11,105 +11,204 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="logo.png" alt="Logo de PETO">
+    <img src="logo.png" alt="Logo de PETO" data-i18n-attr="alt:alt_logo">
     <a class="brand" href="./">PETO</a>
     <nav>
-      <a href="#calculadoras">Calculadoras</a>
-      <a href="#podcast">Podcast</a>
-      <a href="privacidad/">Privacidad</a>
-      <a class="btn" href="app/">Probar gratis</a>
+      <a href="#calculadoras" data-i18n="nav_calc">Calculadoras</a>
+      <a href="#podcast" data-i18n="nav_podcast">Podcast</a>
+      <a href="privacidad/" data-i18n="nav_priv">Privacidad</a>
+      <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
+        <button type="button" data-lang-btn="es">ES</button>
+        <button type="button" data-lang-btn="it">IT</button>
+      </span>
+      <a class="btn" href="app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
   <div class="hero">
-    <h1>Tu dinero bajo control,<br><span class="verde">sin complicaciones.</span></h1>
-    <p class="sub">PETO es la app de control de gastos pensada para la vida real: sueldo semanal, pagos fijos, el san con la familia y las deudas que quieres cerrar. Cada día te dice con un solo número <strong>cuánto puedes gastar hoy</strong> sin pasarte de tu presupuesto.</p>
+    <h1 data-i18n="hero_h1">Tu dinero bajo control,<br><span class="verde">sin complicaciones.</span></h1>
+    <p class="sub" data-i18n="hero_sub">PETO es la app de control de gastos pensada para la vida real: sueldo semanal, pagos fijos, el san con la familia y las deudas que quieres cerrar. Cada día te dice con un solo número <strong>cuánto puedes gastar hoy</strong> sin pasarte de tu presupuesto.</p>
     <div class="cta-row">
-      <a class="btn" href="app/">Probar gratis</a>
-      <a class="btn ghost" href="app/">Ver la app</a>
+      <a class="btn" href="app/" data-i18n="btn_probar">Probar gratis</a>
+      <a class="btn ghost" href="app/" data-i18n="btn_ver">Ver la app</a>
     </div>
-    <img class="banner" src="portada.png" alt="PETO — Control de gastos">
-    <p class="muted">Gratis. Sin anuncios. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.</p>
+    <img class="banner" src="portada.png" alt="PETO — Control de gastos" data-i18n-attr="alt:alt_banner">
+    <p class="muted" data-i18n="hero_nota">Gratis. Sin anuncios. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.</p>
   </div>
 
   <section id="que-es">
-    <h2>Qué hace PETO por ti</h2>
+    <h2 data-i18n="que_h2">Qué hace PETO por ti</h2>
     <div class="grid">
       <div class="card">
         <div class="emoji">📅</div>
-        <h3>«Hoy puedes gastar $X»</h3>
-        <p>Al abrir la app ves un solo número: lo que te queda del mes dividido entre los días que faltan. Si hoy no te pasas, el mes cierra bien.</p>
+        <h3 data-i18n="c1_t">«Hoy puedes gastar $X»</h3>
+        <p data-i18n="c1_p">Al abrir la app ves un solo número: lo que te queda del mes dividido entre los días que faltan. Si hoy no te pasas, el mes cierra bien.</p>
       </div>
       <div class="card">
         <div class="emoji">🧮</div>
-        <h3>Presupuestos que se entienden</h3>
-        <p>Reparte tu ingreso por categorías con la regla 25/10/55/10 o ajústala a tu manera. PETO te avisa antes de que una categoría se pase.</p>
+        <h3 data-i18n="c2_t">Presupuestos que se entienden</h3>
+        <p data-i18n="c2_p">Reparte tu ingreso por categorías con la regla 25/10/55/10 o ajústala a tu manera. PETO te avisa antes de que una categoría se pase.</p>
       </div>
       <div class="card">
         <div class="emoji">🔄</div>
-        <h3>Tu san o tanda, en orden</h3>
-        <p>Lleva los turnos, quién ya pagó y cuándo te toca a ti. El ahorro en grupo deja de ser un cuaderno perdido.</p>
+        <h3 data-i18n="c3_t">Tu san o tanda, en orden</h3>
+        <p data-i18n="c3_p">Lleva los turnos, quién ya pagó y cuándo te toca a ti. El ahorro en grupo deja de ser un cuaderno perdido.</p>
       </div>
       <div class="card">
         <div class="emoji">💳</div>
-        <h3>Deudas con plan de salida</h3>
-        <p>Registra tus deudas, mira cuánto pagas de intereses y sigue tu avance hasta saldar cada una.</p>
+        <h3 data-i18n="c4_t">Deudas con plan de salida</h3>
+        <p data-i18n="c4_p">Registra tus deudas, mira cuánto pagas de intereses y sigue tu avance hasta saldar cada una.</p>
       </div>
       <div class="card">
         <div class="emoji">🔔</div>
-        <h3>Pagos fijos que no se te olvidan</h3>
-        <p>Renta, teléfono, streaming, el san… PETO te recuerda cada pago antes de que venza, no después de que rebota.</p>
+        <h3 data-i18n="c5_t">Pagos fijos que no se te olvidan</h3>
+        <p data-i18n="c5_p">Renta, teléfono, streaming, el san… PETO te recuerda cada pago antes de que venza, no después de que rebota.</p>
       </div>
       <div class="card">
         <div class="emoji">🔐</div>
-        <h3>Privado y sincronizado</h3>
-        <p>Entra con tu huella o tu PIN. Con tu cuenta en la nube, lo mismo que anotas en el teléfono lo ves aquí en la web.</p>
+        <h3 data-i18n="c6_t">Privado y sincronizado</h3>
+        <p data-i18n="c6_p">Entra con tu huella o tu PIN. Con tu cuenta en la nube, lo mismo que anotas en el teléfono lo ves aquí en la web.</p>
       </div>
     </div>
     <div class="cta-row">
-      <a class="btn" href="app/">Crear mi cuenta gratis</a>
+      <a class="btn" href="app/" data-i18n="btn_crear">Crear mi cuenta gratis</a>
     </div>
   </section>
 
   <section id="calculadoras">
-    <h2>Calculadoras gratis</h2>
-    <p class="muted">Sin registrarte y sin descargar nada. Haz tus números aquí y, si te gusta, llévalos vivos en PETO.</p>
+    <h2 data-i18n="calc_h2">Calculadoras gratis</h2>
+    <p class="muted" data-i18n="calc_sub">Sin registrarte y sin descargar nada. Haz tus números aquí y, si te gusta, llévalos vivos en PETO.</p>
     <div class="grid">
       <div class="card">
         <div class="emoji">💳</div>
-        <h3>Calculadora de deudas</h3>
-        <p>Escribe cuánto debes, el interés y tu pago mensual: te decimos en cuántos meses sales y cuánto pagas de intereses.</p>
-        <a class="btn ghost" href="calculadoras/deudas/">Calcular mi deuda</a>
+        <h3 data-i18n="cc1_t">Calculadora de deudas</h3>
+        <p data-i18n="cc1_p">Escribe cuánto debes, el interés y tu pago mensual: te decimos en cuántos meses sales y cuánto pagas de intereses.</p>
+        <a class="btn ghost" href="calculadoras/deudas/" data-i18n="cc1_btn">Calcular mi deuda</a>
       </div>
       <div class="card">
         <div class="emoji">🔄</div>
-        <h3>Calculadora de san / tanda</h3>
-        <p>Aporte, frecuencia y participantes: calcula el fondo de cada turno y el calendario completo de entregas.</p>
-        <a class="btn ghost" href="calculadoras/san/">Calcular mi san</a>
+        <h3 data-i18n="cc2_t">Calculadora de san / tanda</h3>
+        <p data-i18n="cc2_p">Aporte, frecuencia y participantes: calcula el fondo de cada turno y el calendario completo de entregas.</p>
+        <a class="btn ghost" href="calculadoras/san/" data-i18n="cc2_btn">Calcular mi san</a>
       </div>
       <div class="card">
         <div class="emoji">📅</div>
-        <h3>Calculadora de gasto diario</h3>
-        <p>Tu presupuesto del mes y lo que ya gastaste: descubre cuánto puedes gastar por día sin pasarte.</p>
-        <a class="btn ghost" href="calculadoras/gasto-diario/">Calcular mi día</a>
+        <h3 data-i18n="cc3_t">Calculadora de gasto diario</h3>
+        <p data-i18n="cc3_p">Tu presupuesto del mes y lo que ya gastaste: descubre cuánto puedes gastar por día sin pasarte.</p>
+        <a class="btn ghost" href="calculadoras/gasto-diario/" data-i18n="cc3_btn">Calcular mi día</a>
       </div>
     </div>
   </section>
 
   <section id="podcast">
-    <h2>🎙️ Finanzas Personales, el podcast</h2>
+    <h2 data-i18n="pod_h2">🎙️ Finanzas Personales, el podcast</h2>
     <div class="card">
-      <h3>Finanzas Personales — con Lucía y Marco</h3>
-      <p>El podcast en español de la familia PETO: episodios cortos, de unos 5 minutos, con un tema de dinero por día y un paso concreto para aplicarlo hoy mismo. Fondo de emergencia, salir de deudas, auditar suscripciones, subir tu crédito y más, explicado sin palabras raras.</p>
+      <h3 data-i18n="pod_t">Finanzas Personales — con Lucía y Marco</h3>
+      <p data-i18n="pod_p">El podcast en español de la familia PETO: episodios cortos, de unos 5 minutos, con un tema de dinero por día y un paso concreto para aplicarlo hoy mismo. Fondo de emergencia, salir de deudas, auditar suscripciones, subir tu crédito y más, explicado sin palabras raras.</p>
       <!-- FALTA: URL pública del podcast. Cuando el podcast tenga página pública (Spotify/Apple/RSS), enlazarla aquí con un botón «Escuchar el podcast». Hoy los episodios se entregan por el chat y no hay enlace público verificado. -->
-      <p class="muted">Muy pronto podrás escucharlo desde aquí.</p>
+      <p class="muted" data-i18n="pod_pronto">Muy pronto podrás escucharlo desde aquí.</p>
     </div>
   </section>
 
   <footer class="site">
-    <p>PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · Contacto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a></p>
-    <p>Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.</p>
+    <p data-i18n="foot_1">PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · Contacto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a></p>
+    <p data-i18n="foot_2">Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.</p>
   </footer>
 </div>
+<script>
+window.PETO_TEXTOS = {
+  es: {
+    __title: 'PETO — Control de gastos, presupuestos y tu san bajo control',
+    __desc: 'PETO es tu app gratuita de control de gastos: presupuestos por categoría, pagos fijos con avisos, tu san o tanda, calculadora de deudas y un número claro cada día: cuánto puedes gastar hoy. En tu teléfono y en la web, con la misma cuenta.',
+    alt_logo: 'Logo de PETO',
+    alt_banner: 'PETO — Control de gastos',
+    nav_calc: 'Calculadoras',
+    nav_podcast: 'Podcast',
+    nav_priv: 'Privacidad',
+    btn_probar: 'Probar gratis',
+    btn_ver: 'Ver la app',
+    btn_crear: 'Crear mi cuenta gratis',
+    hero_h1: 'Tu dinero bajo control,<br><span class="verde">sin complicaciones.</span>',
+    hero_sub: 'PETO es la app de control de gastos pensada para la vida real: sueldo semanal, pagos fijos, el san con la familia y las deudas que quieres cerrar. Cada día te dice con un solo número <strong>cuánto puedes gastar hoy</strong> sin pasarte de tu presupuesto.',
+    hero_nota: 'Gratis. Sin anuncios. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.',
+    que_h2: 'Qué hace PETO por ti',
+    c1_t: '«Hoy puedes gastar $X»',
+    c1_p: 'Al abrir la app ves un solo número: lo que te queda del mes dividido entre los días que faltan. Si hoy no te pasas, el mes cierra bien.',
+    c2_t: 'Presupuestos que se entienden',
+    c2_p: 'Reparte tu ingreso por categorías con la regla 25/10/55/10 o ajústala a tu manera. PETO te avisa antes de que una categoría se pase.',
+    c3_t: 'Tu san o tanda, en orden',
+    c3_p: 'Lleva los turnos, quién ya pagó y cuándo te toca a ti. El ahorro en grupo deja de ser un cuaderno perdido.',
+    c4_t: 'Deudas con plan de salida',
+    c4_p: 'Registra tus deudas, mira cuánto pagas de intereses y sigue tu avance hasta saldar cada una.',
+    c5_t: 'Pagos fijos que no se te olvidan',
+    c5_p: 'Renta, teléfono, streaming, el san… PETO te recuerda cada pago antes de que venza, no después de que rebota.',
+    c6_t: 'Privado y sincronizado',
+    c6_p: 'Entra con tu huella o tu PIN. Con tu cuenta en la nube, lo mismo que anotas en el teléfono lo ves aquí en la web.',
+    calc_h2: 'Calculadoras gratis',
+    calc_sub: 'Sin registrarte y sin descargar nada. Haz tus números aquí y, si te gusta, llévalos vivos en PETO.',
+    cc1_t: 'Calculadora de deudas',
+    cc1_p: 'Escribe cuánto debes, el interés y tu pago mensual: te decimos en cuántos meses sales y cuánto pagas de intereses.',
+    cc1_btn: 'Calcular mi deuda',
+    cc2_t: 'Calculadora de san / tanda',
+    cc2_p: 'Aporte, frecuencia y participantes: calcula el fondo de cada turno y el calendario completo de entregas.',
+    cc2_btn: 'Calcular mi san',
+    cc3_t: 'Calculadora de gasto diario',
+    cc3_p: 'Tu presupuesto del mes y lo que ya gastaste: descubre cuánto puedes gastar por día sin pasarte.',
+    cc3_btn: 'Calcular mi día',
+    pod_h2: '🎙️ Finanzas Personales, el podcast',
+    pod_t: 'Finanzas Personales — con Lucía y Marco',
+    pod_p: 'El podcast en español de la familia PETO: episodios cortos, de unos 5 minutos, con un tema de dinero por día y un paso concreto para aplicarlo hoy mismo. Fondo de emergencia, salir de deudas, auditar suscripciones, subir tu crédito y más, explicado sin palabras raras.',
+    pod_pronto: 'Muy pronto podrás escucharlo desde aquí.',
+    foot_1: 'PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · Contacto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a>',
+    foot_2: 'Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.'
+  },
+  it: {
+    __title: 'PETO — Controllo delle spese, budget e il tuo san sotto controllo',
+    __desc: 'PETO è la tua app gratuita per il controllo delle spese: budget per categoria, pagamenti fissi con avvisi, il tuo san o tanda, calcolatore di debiti e un numero chiaro ogni giorno: quanto puoi spendere oggi. Sul tuo telefono e sul web, con lo stesso account.',
+    alt_logo: 'Logo di PETO',
+    alt_banner: 'PETO — Controllo delle spese',
+    nav_calc: 'Calcolatori',
+    nav_podcast: 'Podcast',
+    nav_priv: 'Privacy',
+    btn_probar: 'Prova gratis',
+    btn_ver: 'Vedi l\'app',
+    btn_crear: 'Crea il mio account gratis',
+    hero_h1: 'I tuoi soldi sotto controllo,<br><span class="verde">senza complicazioni.</span>',
+    hero_sub: 'PETO è l\'app per il controllo delle spese pensata per la vita reale: stipendio settimanale, pagamenti fissi, il san con la famiglia e i debiti che vuoi chiudere. Ogni giorno ti dice con un solo numero <strong>quanto puoi spendere oggi</strong> senza sforare il tuo budget.',
+    hero_nota: 'Gratis. Senza pubblicità. I tuoi dati viaggiano cifrati e l\'app funziona sul tuo telefono e qui sul web con lo stesso account.',
+    que_h2: 'Cosa fa PETO per te',
+    c1_t: '«Oggi puoi spendere $X»',
+    c1_p: 'Quando apri l\'app vedi un solo numero: quello che ti resta del mese diviso per i giorni che mancano. Se oggi non lo superi, il mese si chiude bene.',
+    c2_t: 'Budget che si capiscono',
+    c2_p: 'Dividi il tuo reddito per categorie con la regola 25/10/55/10 o regolala a modo tuo. PETO ti avvisa prima che una categoria sfori.',
+    c3_t: 'Il tuo san o tanda, in ordine',
+    c3_p: 'Tieni traccia dei turni, di chi ha già pagato e di quando tocca a te. Il risparmio di gruppo smette di essere un quaderno perso.',
+    c4_t: 'Debiti con un piano di uscita',
+    c4_p: 'Registra i tuoi debiti, guarda quanti interessi paghi e segui i tuoi progressi fino a estinguerli uno a uno.',
+    c5_t: 'Pagamenti fissi che non dimentichi',
+    c5_p: 'Affitto, telefono, streaming, il san… PETO ti ricorda ogni pagamento prima che scada, non dopo che viene respinto.',
+    c6_t: 'Privato e sincronizzato',
+    c6_p: 'Accedi con l\'impronta digitale o il PIN. Con il tuo account nel cloud, quello che annoti sul telefono lo vedi anche qui sul web.',
+    calc_h2: 'Calcolatori gratuiti',
+    calc_sub: 'Senza registrarti e senza scaricare nulla. Fai i tuoi conti qui e, se ti piace, portali con te dentro PETO.',
+    cc1_t: 'Calcolatore di debiti',
+    cc1_p: 'Scrivi quanto devi, l\'interesse e il tuo pagamento mensile: ti diciamo in quanti mesi ne esci e quanti interessi paghi.',
+    cc1_btn: 'Calcola il mio debito',
+    cc2_t: 'Calcolatore di san / tanda',
+    cc2_p: 'Contributo, frequenza e partecipanti: calcola il fondo di ogni turno e il calendario completo delle consegne.',
+    cc2_btn: 'Calcola il mio san',
+    cc3_t: 'Calcolatore di spesa giornaliera',
+    cc3_p: 'Il tuo budget del mese e quello che hai già speso: scopri quanto puoi spendere al giorno senza sforare.',
+    cc3_btn: 'Calcola la mia giornata',
+    pod_h2: '🎙️ Finanzas Personales, il podcast',
+    pod_t: 'Finanzas Personales — con Lucía e Marco',
+    pod_p: 'Il podcast in spagnolo della famiglia PETO: episodi brevi, di circa 5 minuti, con un tema di denaro al giorno e un passo concreto da applicare oggi stesso. Fondo di emergenza, uscire dai debiti, controllare gli abbonamenti, migliorare il tuo punteggio di credito e altro ancora, spiegato senza parole difficili.',
+    pod_pronto: 'Molto presto potrai ascoltarlo da qui.',
+    foot_1: 'PETO — Controllo delle spese · <a href="privacidad/">Informativa sulla privacy</a> · <a href="app/">Apri l\'app web</a> · Contatto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a>',
+    foot_2: 'Fatto con la regola di casa: il risparmio non si calcola da solo — sei tu ad annotare il tuo risparmio reale.'
+  }
+};
+</script>
+<script src="i18n.js"></script>
 </body>
 </html>

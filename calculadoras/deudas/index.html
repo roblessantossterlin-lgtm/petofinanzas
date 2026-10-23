@@ -11,39 +11,90 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="../../logo.png" alt="Logo de PETO">
+    <img src="../../logo.png" alt="Logo de PETO" data-i18n-attr="alt:alt_logo">
     <a class="brand" href="../../">PETO</a>
     <nav>
-      <a href="../san/">San / tanda</a>
-      <a href="../gasto-diario/">Gasto diario</a>
-      <a class="btn" href="../../app/">Probar gratis</a>
+      <a href="../san/" data-i18n="nav_san">San / tanda</a>
+      <a href="../gasto-diario/" data-i18n="nav_diario">Gasto diario</a>
+      <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
+        <button type="button" data-lang-btn="es">ES</button>
+        <button type="button" data-lang-btn="it">IT</button>
+      </span>
+      <a class="btn" href="../../app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
-  <p class="crumb"><a href="../../">Inicio</a> › Calculadoras › Deudas</p>
-  <h1 style="font-size:1.9rem">Calculadora de deudas</h1>
-  <p class="muted" style="max-width:560px">Escribe cuánto debes, el interés anual y lo que puedes pagar cada mes. Te decimos cuándo terminas y cuánto te cuesta la deuda en intereses.</p>
+  <p class="crumb" data-i18n="crumb"><a href="../../">Inicio</a> › Calculadoras › Deudas</p>
+  <h1 style="font-size:1.9rem" data-i18n="h1">Calculadora de deudas</h1>
+  <p class="muted" style="max-width:560px" data-i18n="intro">Escribe cuánto debes, el interés anual y lo que puedes pagar cada mes. Te decimos cuándo terminas y cuánto te cuesta la deuda en intereses.</p>
 
   <form class="calc" id="form-deuda">
-    <label for="d-monto">¿Cuánto debes? ($)</label>
-    <input id="d-monto" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 1500" required>
-    <label for="d-interes">Interés anual (%)</label>
-    <input id="d-interes" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 24" required>
-    <label for="d-pago">¿Cuánto puedes pagar al mes? ($)</label>
-    <input id="d-pago" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 100" required>
-    <button class="btn" type="submit">Calcular</button>
+    <label for="d-monto" data-i18n="d_monto_l">¿Cuánto debes? ($)</label>
+    <input id="d-monto" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 1500" data-i18n-attr="placeholder:ph_1500" required>
+    <label for="d-interes" data-i18n="d_interes_l">Interés anual (%)</label>
+    <input id="d-interes" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 24" data-i18n-attr="placeholder:ph_24" required>
+    <label for="d-pago" data-i18n="d_pago_l">¿Cuánto puedes pagar al mes? ($)</label>
+    <input id="d-pago" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 100" data-i18n-attr="placeholder:ph_100" required>
+    <button class="btn" type="submit" data-i18n="btn_calc">Calcular</button>
   </form>
   <div class="resultado" id="d-resultado"></div>
 
   <div class="cta-row">
-    <a class="btn" href="../../app/">Llevar esto en PETO</a>
-    <a class="btn ghost" href="../../">Volver a la portada</a>
+    <a class="btn" href="../../app/" data-i18n="btn_llevar">Llevar esto en PETO</a>
+    <a class="btn ghost" href="../../" data-i18n="btn_volver">Volver a la portada</a>
   </div>
 
   <footer class="site">
-    <p>PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
+    <p data-i18n="foot">PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
   </footer>
 </div>
+<script>
+window.PETO_TEXTOS = {
+  es: {
+    __title: 'Calculadora de deudas gratis — PETO · petofinanzas',
+    __desc: 'Calcula en cuántos meses saldas una deuda según el monto, el interés anual y tu pago mensual, y cuánto pagarás de intereses. Gratis, sin registro.',
+    alt_logo: 'Logo de PETO',
+    nav_san: 'San / tanda',
+    nav_diario: 'Gasto diario',
+    btn_probar: 'Probar gratis',
+    crumb: '<a href="../../">Inicio</a> › Calculadoras › Deudas',
+    h1: 'Calculadora de deudas',
+    intro: 'Escribe cuánto debes, el interés anual y lo que puedes pagar cada mes. Te decimos cuándo terminas y cuánto te cuesta la deuda en intereses.',
+    d_monto_l: '¿Cuánto debes? ($)',
+    d_interes_l: 'Interés anual (%)',
+    d_pago_l: '¿Cuánto puedes pagar al mes? ($)',
+    ph_1500: 'Ej. 1500',
+    ph_24: 'Ej. 24',
+    ph_100: 'Ej. 100',
+    btn_calc: 'Calcular',
+    btn_llevar: 'Llevar esto en PETO',
+    btn_volver: 'Volver a la portada',
+    foot: 'PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a>'
+  },
+  it: {
+    __title: 'Calcolatore di debiti gratuito — PETO · petofinanzas',
+    __desc: 'Calcola in quanti mesi estingui un debito in base all\'importo, all\'interesse annuale e al tuo pagamento mensile, e quanti interessi pagherai. Gratis, senza registrazione.',
+    alt_logo: 'Logo di PETO',
+    nav_san: 'San / tanda',
+    nav_diario: 'Spesa giornaliera',
+    btn_probar: 'Prova gratis',
+    crumb: '<a href="../../">Home</a> › Calcolatori › Debiti',
+    h1: 'Calcolatore di debiti',
+    intro: 'Scrivi quanto devi, l\'interesse annuale e quanto puoi pagare ogni mese. Ti diciamo quando finisci e quanto ti costa il debito in interessi.',
+    d_monto_l: 'Quanto devi? ($)',
+    d_interes_l: 'Interesse annuale (%)',
+    d_pago_l: 'Quanto puoi pagare al mese? ($)',
+    ph_1500: 'Es. 1500',
+    ph_24: 'Es. 24',
+    ph_100: 'Es. 100',
+    btn_calc: 'Calcola',
+    btn_llevar: 'Porta tutto in PETO',
+    btn_volver: 'Torna alla home',
+    foot: 'PETO — Controllo delle spese · <a href="../../privacidad/">Informativa sulla privacy</a> · <a href="../../app/">Apri l\'app web</a>'
+  }
+};
+</script>
+<script src="../../i18n.js"></script>
 <script src="../calculadoras.js"></script>
 </body>
 </html>

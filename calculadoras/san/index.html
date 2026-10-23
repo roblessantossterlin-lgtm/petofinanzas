@@ -11,45 +11,102 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="../../logo.png" alt="Logo de PETO">
+    <img src="../../logo.png" alt="Logo de PETO" data-i18n-attr="alt:alt_logo">
     <a class="brand" href="../../">PETO</a>
     <nav>
-      <a href="../deudas/">Deudas</a>
-      <a href="../gasto-diario/">Gasto diario</a>
-      <a class="btn" href="../../app/">Probar gratis</a>
+      <a href="../deudas/" data-i18n="nav_deudas">Deudas</a>
+      <a href="../gasto-diario/" data-i18n="nav_diario">Gasto diario</a>
+      <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
+        <button type="button" data-lang-btn="es">ES</button>
+        <button type="button" data-lang-btn="it">IT</button>
+      </span>
+      <a class="btn" href="../../app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
-  <p class="crumb"><a href="../../">Inicio</a> › Calculadoras › San / tanda</p>
-  <h1 style="font-size:1.9rem">Calculadora de san / tanda</h1>
-  <p class="muted" style="max-width:560px">El san (tanda, cundina, susu) funciona así: todos aportan lo mismo cada ronda y en cada turno una persona recibe el fondo completo. Haz tus números aquí.</p>
+  <p class="crumb" data-i18n="crumb"><a href="../../">Inicio</a> › Calculadoras › San / tanda</p>
+  <h1 style="font-size:1.9rem" data-i18n="h1">Calculadora de san / tanda</h1>
+  <p class="muted" style="max-width:560px" data-i18n="intro">El san (tanda, cundina, susu) funciona así: todos aportan lo mismo cada ronda y en cada turno una persona recibe el fondo completo. Haz tus números aquí.</p>
 
   <form class="calc" id="form-san">
-    <label for="s-aporte">Aporte de cada participante por ronda ($)</label>
-    <input id="s-aporte" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 100" required>
-    <label for="s-frecuencia">¿Cada cuánto se aporta?</label>
+    <label for="s-aporte" data-i18n="s_aporte_l">Aporte de cada participante por ronda ($)</label>
+    <input id="s-aporte" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 100" data-i18n-attr="placeholder:ph_100" required>
+    <label for="s-frecuencia" data-i18n="s_freq_l">¿Cada cuánto se aporta?</label>
     <select id="s-frecuencia">
-      <option value="semanal">Semanal</option>
-      <option value="quincenal">Quincenal</option>
-      <option value="mensual">Mensual</option>
+      <option value="semanal" data-i18n="opt_semanal">Semanal</option>
+      <option value="quincenal" data-i18n="opt_quincenal">Quincenal</option>
+      <option value="mensual" data-i18n="opt_mensual">Mensual</option>
     </select>
-    <label for="s-participantes">Número de participantes</label>
-    <input id="s-participantes" type="number" min="2" step="1" inputmode="numeric" placeholder="Ej. 10" required>
-    <label for="s-inicio">Fecha del primer turno (opcional)</label>
+    <label for="s-participantes" data-i18n="s_part_l">Número de participantes</label>
+    <input id="s-participantes" type="number" min="2" step="1" inputmode="numeric" placeholder="Ej. 10" data-i18n-attr="placeholder:ph_10" required>
+    <label for="s-inicio" data-i18n="s_inicio_l">Fecha del primer turno (opcional)</label>
     <input id="s-inicio" type="date">
-    <button class="btn" type="submit">Calcular</button>
+    <button class="btn" type="submit" data-i18n="btn_calc">Calcular</button>
   </form>
   <div class="resultado" id="s-resultado"></div>
 
   <div class="cta-row">
-    <a class="btn" href="../../app/">Llevar esto en PETO</a>
-    <a class="btn ghost" href="../../">Volver a la portada</a>
+    <a class="btn" href="../../app/" data-i18n="btn_llevar">Llevar esto en PETO</a>
+    <a class="btn ghost" href="../../" data-i18n="btn_volver">Volver a la portada</a>
   </div>
 
   <footer class="site">
-    <p>PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
+    <p data-i18n="foot">PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
   </footer>
 </div>
+<script>
+window.PETO_TEXTOS = {
+  es: {
+    __title: 'Calculadora de san / tanda gratis — PETO · petofinanzas',
+    __desc: 'Calcula el fondo de cada turno de tu san o tanda según el aporte, la frecuencia y el número de participantes, con el calendario de entregas. Gratis, sin registro.',
+    alt_logo: 'Logo de PETO',
+    nav_deudas: 'Deudas',
+    nav_diario: 'Gasto diario',
+    btn_probar: 'Probar gratis',
+    crumb: '<a href="../../">Inicio</a> › Calculadoras › San / tanda',
+    h1: 'Calculadora de san / tanda',
+    intro: 'El san (tanda, cundina, susu) funciona así: todos aportan lo mismo cada ronda y en cada turno una persona recibe el fondo completo. Haz tus números aquí.',
+    s_aporte_l: 'Aporte de cada participante por ronda ($)',
+    s_freq_l: '¿Cada cuánto se aporta?',
+    opt_semanal: 'Semanal',
+    opt_quincenal: 'Quincenal',
+    opt_mensual: 'Mensual',
+    s_part_l: 'Número de participantes',
+    s_inicio_l: 'Fecha del primer turno (opcional)',
+    ph_100: 'Ej. 100',
+    ph_10: 'Ej. 10',
+    btn_calc: 'Calcular',
+    btn_llevar: 'Llevar esto en PETO',
+    btn_volver: 'Volver a la portada',
+    foot: 'PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a>'
+  },
+  it: {
+    __title: 'Calcolatore di san / tanda gratuito — PETO · petofinanzas',
+    __desc: 'Calcola il fondo di ogni turno del tuo san o tanda in base al contributo, alla frequenza e al numero di partecipanti, con il calendario delle consegne. Gratis, senza registrazione.',
+    alt_logo: 'Logo di PETO',
+    nav_deudas: 'Debiti',
+    nav_diario: 'Spesa giornaliera',
+    btn_probar: 'Prova gratis',
+    crumb: '<a href="../../">Home</a> › Calcolatori › San / tanda',
+    h1: 'Calcolatore di san / tanda',
+    intro: 'Il san (tanda, cundina, susu) funziona così: tutti versano la stessa cifra a ogni turno e a ogni giro una persona riceve l\'intero fondo. Fai i tuoi conti qui.',
+    s_aporte_l: 'Contributo di ogni partecipante per turno ($)',
+    s_freq_l: 'Ogni quanto si versa?',
+    opt_semanal: 'Settimanale',
+    opt_quincenal: 'Ogni due settimane',
+    opt_mensual: 'Mensile',
+    s_part_l: 'Numero di partecipanti',
+    s_inicio_l: 'Data del primo turno (facoltativo)',
+    ph_100: 'Es. 100',
+    ph_10: 'Es. 10',
+    btn_calc: 'Calcola',
+    btn_llevar: 'Porta tutto in PETO',
+    btn_volver: 'Torna alla home',
+    foot: 'PETO — Controllo delle spese · <a href="../../privacidad/">Informativa sulla privacy</a> · <a href="../../app/">Apri l\'app web</a>'
+  }
+};
+</script>
+<script src="../../i18n.js"></script>
 <script src="../calculadoras.js"></script>
 </body>
 </html>

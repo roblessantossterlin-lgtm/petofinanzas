@@ -11,41 +11,92 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="../../logo.png" alt="Logo de PETO">
+    <img src="../../logo.png" alt="Logo de PETO" data-i18n-attr="alt:alt_logo">
     <a class="brand" href="../../">PETO</a>
     <nav>
-      <a href="../deudas/">Deudas</a>
-      <a href="../san/">San / tanda</a>
-      <a class="btn" href="../../app/">Probar gratis</a>
+      <a href="../deudas/" data-i18n="nav_deudas">Deudas</a>
+      <a href="../san/" data-i18n="nav_san">San / tanda</a>
+      <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
+        <button type="button" data-lang-btn="es">ES</button>
+        <button type="button" data-lang-btn="it">IT</button>
+      </span>
+      <a class="btn" href="../../app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
-  <p class="crumb"><a href="../../">Inicio</a> › Calculadoras › Gasto diario</p>
-  <h1 style="font-size:1.9rem">¿Cuánto puedes gastar hoy?</h1>
-  <p class="muted" style="max-width:560px">La fórmula es simple: lo que te queda del presupuesto, dividido entre los días que faltan del mes (contando hoy). Es el mismo número que PETO te muestra cada mañana.</p>
+  <p class="crumb" data-i18n="crumb"><a href="../../">Inicio</a> › Calculadoras › Gasto diario</p>
+  <h1 style="font-size:1.9rem" data-i18n="h1">¿Cuánto puedes gastar hoy?</h1>
+  <p class="muted" style="max-width:560px" data-i18n="intro">La fórmula es simple: lo que te queda del presupuesto, dividido entre los días que faltan del mes (contando hoy). Es el mismo número que PETO te muestra cada mañana.</p>
 
   <form class="calc" id="form-diario">
-    <label for="g-presupuesto">Tu presupuesto para este mes ($)</label>
-    <input id="g-presupuesto" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 3000" required>
-    <label for="g-gastado">Lo que ya gastaste este mes ($)</label>
-    <input id="g-gastado" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 1000" required>
-    <label for="g-dia">¿Qué día del mes es hoy?</label>
+    <label for="g-presupuesto" data-i18n="g_pres_l">Tu presupuesto para este mes ($)</label>
+    <input id="g-presupuesto" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 3000" data-i18n-attr="placeholder:ph_3000" required>
+    <label for="g-gastado" data-i18n="g_gast_l">Lo que ya gastaste este mes ($)</label>
+    <input id="g-gastado" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 1000" data-i18n-attr="placeholder:ph_1000" required>
+    <label for="g-dia" data-i18n="g_dia_l">¿Qué día del mes es hoy?</label>
     <input id="g-dia" type="number" min="1" max="31" step="1" inputmode="numeric" required>
-    <label for="g-dias-mes">¿Cuántos días tiene este mes?</label>
+    <label for="g-dias-mes" data-i18n="g_dias_l">¿Cuántos días tiene este mes?</label>
     <input id="g-dias-mes" type="number" min="28" max="31" step="1" inputmode="numeric" required>
-    <button class="btn" type="submit">Calcular</button>
+    <button class="btn" type="submit" data-i18n="btn_calc">Calcular</button>
   </form>
   <div class="resultado" id="g-resultado"></div>
 
   <div class="cta-row">
-    <a class="btn" href="../../app/">Llevar esto en PETO</a>
-    <a class="btn ghost" href="../../">Volver a la portada</a>
+    <a class="btn" href="../../app/" data-i18n="btn_llevar">Llevar esto en PETO</a>
+    <a class="btn ghost" href="../../" data-i18n="btn_volver">Volver a la portada</a>
   </div>
 
   <footer class="site">
-    <p>PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
+    <p data-i18n="foot">PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a></p>
   </footer>
 </div>
+<script>
+window.PETO_TEXTOS = {
+  es: {
+    __title: 'Calculadora de gasto diario gratis — PETO · petofinanzas',
+    __desc: 'Descubre cuánto puedes gastar por día sin pasarte de tu presupuesto del mes: la misma fórmula que PETO muestra en tu pantalla principal. Gratis, sin registro.',
+    alt_logo: 'Logo de PETO',
+    nav_deudas: 'Deudas',
+    nav_san: 'San / tanda',
+    btn_probar: 'Probar gratis',
+    crumb: '<a href="../../">Inicio</a> › Calculadoras › Gasto diario',
+    h1: '¿Cuánto puedes gastar hoy?',
+    intro: 'La fórmula es simple: lo que te queda del presupuesto, dividido entre los días que faltan del mes (contando hoy). Es el mismo número que PETO te muestra cada mañana.',
+    g_pres_l: 'Tu presupuesto para este mes ($)',
+    g_gast_l: 'Lo que ya gastaste este mes ($)',
+    g_dia_l: '¿Qué día del mes es hoy?',
+    g_dias_l: '¿Cuántos días tiene este mes?',
+    ph_3000: 'Ej. 3000',
+    ph_1000: 'Ej. 1000',
+    btn_calc: 'Calcular',
+    btn_llevar: 'Llevar esto en PETO',
+    btn_volver: 'Volver a la portada',
+    foot: 'PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a>'
+  },
+  it: {
+    __title: 'Calcolatore di spesa giornaliera gratuito — PETO · petofinanzas',
+    __desc: 'Scopri quanto puoi spendere al giorno senza sforare il tuo budget del mese: la stessa formula che PETO mostra nella tua schermata principale. Gratis, senza registrazione.',
+    alt_logo: 'Logo di PETO',
+    nav_deudas: 'Debiti',
+    nav_san: 'San / tanda',
+    btn_probar: 'Prova gratis',
+    crumb: '<a href="../../">Home</a> › Calcolatori › Spesa giornaliera',
+    h1: 'Quanto puoi spendere oggi?',
+    intro: 'La formula è semplice: quello che ti resta del budget, diviso per i giorni che mancano alla fine del mese (contando oggi). È lo stesso numero che PETO ti mostra ogni mattina.',
+    g_pres_l: 'Il tuo budget per questo mese ($)',
+    g_gast_l: 'Quello che hai già speso questo mese ($)',
+    g_dia_l: 'Che giorno del mese è oggi?',
+    g_dias_l: 'Quanti giorni ha questo mese?',
+    ph_3000: 'Es. 3000',
+    ph_1000: 'Es. 1000',
+    btn_calc: 'Calcola',
+    btn_llevar: 'Porta tutto in PETO',
+    btn_volver: 'Torna alla home',
+    foot: 'PETO — Controllo delle spese · <a href="../../privacidad/">Informativa sulla privacy</a> · <a href="../../app/">Apri l\'app web</a>'
+  }
+};
+</script>
+<script src="../../i18n.js"></script>
 <script src="../calculadoras.js"></script>
 </body>
 </html>
