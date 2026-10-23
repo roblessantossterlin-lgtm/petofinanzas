@@ -1,0 +1,25 @@
+/* PETO Web — ajustes de presentación solo para el navegador.
+   Se carga DESPUÉS de styles.css (que es el de la app, sin tocar). */
+
+/* Pastilla «🌐 Web» en la cabecera (la pone web.js). */
+.web-pill{
+  display:inline-block;margin-left:.5rem;padding:.08rem .55rem;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent-dark);
+  font-size:.78rem;font-weight:700;vertical-align:middle;
+}
+.app-title{display:inline-block;vertical-align:middle}
+
+/* Barra «hay una versión nueva» (la pone web.js). */
+.sw-update-bar{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:1.1rem;z-index:90;
+  display:flex;align-items:center;gap:.8rem;
+  background:var(--card);color:var(--ink);border:1px solid var(--accent);border-radius:999px;
+  padding:.5rem .6rem .5rem 1.1rem;box-shadow:0 4px 14px rgba(0,0,0,.3);font-weight:600;
+  max-width:calc(100vw - 2rem);
+}
+
+/* En pantallas anchas la web respira más que el teléfono. */
+@media (min-width:900px){
+  .view,.app-header,.app-footer{max-width:860px}
+  .menu-list{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;align-items:start}
+}

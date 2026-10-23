@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b6e4f">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="description" content="PETO Web: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
+<title>PETO — Web</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+
+<!-- ============ PANTALLA DE BLOQUEO (PIN) ============ -->
+<section id="view-lock" class="view lock-view" hidden>
+  <div class="lock-card">
+    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO">
+    <h1>PETO</h1>
+    <p class="muted" data-i18n="lock_prompt">Escribe tu PIN para entrar.</p>
+    <form id="lock-form" autocomplete="off">
+      <label class="sr-only" for="lock-pin" data-i18n="lock_pin_label">PIN</label>
+      <input id="lock-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+             class="pin-input" placeholder="••••" autocomplete="off">
+      <p id="lock-error" class="error" role="alert" hidden data-i18n="lock_err">PIN incorrecto. Inténtalo de nuevo.</p>
+      <button type="submit" class="btn btn-primary btn-big" data-i18n="lock_enter">Entrar</button>
+    </form>
+    <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
+    <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
+  </div>
+</section>
+
+<!-- ============ BIENVENIDA / PRIMER USO ============ -->
+<section id="view-onboarding" class="view" hidden>
+  <div class="onboarding-card">
+    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO">
+    <h1 data-i18n="ob_title">¡Bienvenido a PETO!</h1>
+    <p><span data-i18n="ob_intro_1">Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.</span>
+       <strong data-i18n="ob_intro_2">Con tu cuenta en la nube.</strong>
+       <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
+    <form id="onboarding-form" autocomplete="off">
+      <label for="ob-name" data-i18n="ob_name_label">¿Cómo te llamas?</label>
+      <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre" required>
+      <label for="ob-pin" data-i18n="ob_pin_label">Crea un PIN de seguridad (opcional)</label>
+      <input id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
+             data-i18n-ph="ob_pin_ph" placeholder="4 a 6 números, o déjalo vacío">
+      <label for="ob-pin2" data-i18n="ob_pin2_label">Repite el PIN</label>
+      <input id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
+             data-i18n-ph="ob_pin2_ph" placeholder="Repite el PIN">
+      <p id="ob-error" class="error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
+    </form>
+    <p class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app-shell" hidden>
+
+  <header class="app-header">
+    <button id="btn-menu" class="btn-menu" type="button" data-i18n-aria="menu_open_aria" aria-label="Abrir menú" aria-expanded="false">☰</button>
+    <div class="header-text">
+      <p id="greeting" class="greeting">Hola</p>
+      <h1 class="app-title">PETO</h1>
+    </div>
+    <button id="btn-privacy" class="btn-menu" type="button" data-i18n-aria="privacy_hide" aria-label="Ocultar montos">👁</button>
+    <button id="btn-lock-now" class="btn btn-ghost" type="button" hidden data-i18n="lock_btn">Bloquear</button>
+  </header>
+
+  <!-- ======= MENÚ LATERAL (botón ☰) ======= -->
+  <div id="menu-drawer-wrap" hidden>
+    <div id="menu-backdrop" class="menu-backdrop"></div>
+    <aside id="menu-drawer" class="menu-drawer">
+      <div class="drawer-head">
+        <div>
+          <p class="drawer-brand">PETO</p>
+          <p id="drawer-user" class="muted small"></p>
+        </div>
+        <button id="btn-menu-close" class="btn btn-ghost" type="button" data-i18n-aria="menu_close_aria" aria-label="Cerrar menú">✕</button>
+      </div>
+      <nav id="drawer-list" class="drawer-list" aria-label="Menú"></nav>
+    </aside>
+  </div>
+
+  <!-- ======= INICIO ======= -->
+  <main id="view-home" class="view">
+    <div id="home-banners"></div>
+
+    <section class="summary-strip" aria-label="Resumen del mes">
+      <button id="tile-available" class="summary-item" type="button" data-i18n-aria="tile_available_aria" aria-label="Dinero disponible: ir a Mis cuentas">
+        <span class="summary-label" data-i18n="tile_available">Dinero disponible</span>
+        <span id="sum-available" class="summary-value">$0.00</span>
+        <span class="summary-go" aria-hidden="true">›</span>
+      </button>
+      <button id="tile-savings" class="summary-item" type="button" data-i18n-aria="tile_savings_aria" aria-label="Ahorros del mes: ir a Ahorros">
+        <span class="summary-label" data-i18n="tile_savings">Ahorros del mes</span>
+        <span id="sum-savings" class="summary-value">$0.00</span>
+        <span id="sum-savings-goal" class="summary-sub" hidden></span>
+        <span class="summary-go" aria-hidden="true">›</span>
+      </button>
+      <button id="tile-debts" class="summary-item" type="button" data-i18n-aria="tile_debts_aria" aria-label="Deudas pendientes: ir a Mis deudas">
+        <span class="summary-label" data-i18n="tile_debts">Deudas pendientes</span>
+        <span id="sum-debts" class="summary-value">$0.00</span>
+        <span class="summary-go" aria-hidden="true">›</span>
+      </button>
+    </section>
+
+    <div class="quick-tiles">
+      <button id="tile-incomes" class="summary-item" type="button" data-i18n-aria="tile_incomes_aria" aria-label="Ingresos: ir a Ingresos semanales">
+        <span class="summary-label" data-i18n="tile_incomes">💵 Ingresos</span>
+        <span id="sum-incomes" class="summary-value">$0.00</span>
+        <span class="summary-go" aria-hidden="true">›</span>
+      </button>
+      <button id="tile-expenses" class="summary-item" type="button" data-i18n-aria="tile_expenses_aria" aria-label="Gastos: ir a Gastos del mes">
+        <span class="summary-label" data-i18n="tile_expenses">🧾 Gastos</span>
+        <span id="sum-expenses" class="summary-value">$0.00</span>
+        <span class="summary-go" aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <section class="card spend-card">
+      <span class="summary-label" data-i18n="spend_title">¿Cuánto puedes gastar hoy?</span>
+      <span id="spend-today" class="spend-value">—</span>
+      <span id="spend-today-note" class="muted small"></span>
+    </section>
+
+    <section id="home-insights" class="card" hidden></section>
+
+    <h2 class="menu-heading" data-i18n="home_menu_heading">¿Qué quieres ver?</h2>
+    <nav id="menu-list" class="menu-list" aria-label="Lista de opciones"></nav>
+  </main>
+
+  <!-- ======= GASTOS ======= -->
+  <main id="view-gastos" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_gastos">Gastos del mes</h2>
+    <div class="month-nav">
+      <button id="exp-prev" class="btn btn-ghost" type="button" data-i18n-aria="month_prev_aria" aria-label="Mes anterior">‹</button>
+      <span id="exp-month-label" class="month-label"></span>
+      <button id="exp-next" class="btn btn-ghost" type="button" data-i18n-aria="month_next_aria" aria-label="Mes siguiente">›</button>
+    </div>
+    <p class="total-line"><span data-i18n="exp_total_label">Total del mes:</span> <strong id="exp-total">$0.00</strong></p>
+
+    <form id="expense-form" class="card form-card" autocomplete="off">
+      <h3 id="expense-form-title">Nuevo gasto</h3>
+      <input type="hidden" id="exp-id">
+      <label for="exp-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="exp-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
+      <div class="form-actions">
+        <button id="exp-voice" type="button" class="btn btn-secondary" data-i18n="voice_btn">🎤 Dictar</button>
+      </div>
+      <p id="exp-voice-status" class="muted small" aria-live="polite"></p>
+      <label for="exp-category" data-i18n="category_label">Categoría</label>
+      <select id="exp-category" required></select>
+      <label for="exp-date" data-i18n="date_label">Fecha</label>
+      <input id="exp-date" type="date" required>
+      <label for="exp-note" data-i18n="note_label">Nota (opcional)</label>
+      <input id="exp-note" type="text" maxlength="120" data-i18n-ph="exp_note_ph" placeholder="¿En qué fue?">
+      <label class="toggle-row">
+        <span data-i18n="biz_label">Es de mi negocio</span>
+        <input type="checkbox" id="exp-biz">
+      </label>
+      <label for="exp-photo" data-i18n="exp_photo_label">Foto del recibo (opcional)</label>
+      <input id="exp-photo" type="file" accept="image/*">
+      <img id="exp-photo-preview" class="receipt-preview" alt="" hidden>
+      <div class="form-actions">
+        <button id="exp-photo-remove" type="button" class="btn btn-ghost btn-small" hidden data-i18n="exp_photo_remove">Quitar foto</button>
+      </div>
+      <p id="exp-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="exp_save">Guardar gasto</button>
+        <button id="exp-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+
+    <ul id="expense-list" class="item-list"></ul>
+    <p id="expense-empty" class="empty-state" hidden data-i18n="exp_empty">Todavía no hay gastos en este mes. Registra el primero con el formulario de arriba. 👍</p>
+  </main>
+
+  <!-- ======= INGRESOS ======= -->
+  <main id="view-ingresos" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_ingresos">Ingresos semanales</h2>
+    <p class="muted" data-i18n="inc_intro">El ahorro no se calcula solo: tú anotas cuánto ahorraste de verdad en cada ingreso. La app solo te sugiere una cantidad según tu porcentaje de Ajustes.</p>
+
+    <form id="income-form" class="card form-card" autocomplete="off">
+      <h3 id="income-form-title">Nuevo ingreso</h3>
+      <input type="hidden" id="inc-id">
+      <label for="inc-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="inc-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
+      <div class="form-actions">
+        <button id="inc-voice" type="button" class="btn btn-secondary" data-i18n="voice_btn">🎤 Dictar</button>
+      </div>
+      <p id="inc-voice-status" class="muted small" aria-live="polite"></p>
+      <label id="inc-savings-label" for="inc-savings">Ahorro ($)</label>
+      <input id="inc-savings" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <p class="muted small" data-i18n="inc_savings_help">Sugerencia según tu porcentaje de ahorro — cámbialo por lo que realmente ahorraste. Puedes poner $0.</p>
+      <label for="inc-date" data-i18n="date_label">Fecha</label>
+      <input id="inc-date" type="date" required>
+      <label for="inc-note" data-i18n="note_label">Nota (opcional)</label>
+      <input id="inc-note" type="text" maxlength="120" data-i18n-ph="inc_note_ph" placeholder="¿De dónde vino?">
+      <label class="toggle-row">
+        <span data-i18n="biz_label">Es de mi negocio</span>
+        <input type="checkbox" id="inc-biz">
+      </label>
+      <p id="inc-split-preview" class="split-preview" aria-live="polite"></p>
+      <p id="inc-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="inc_save">Guardar ingreso</button>
+        <button id="inc-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+
+    <ul id="income-list" class="item-list"></ul>
+    <p id="income-empty" class="empty-state" hidden data-i18n="inc_empty">Todavía no hay ingresos registrados. Agrega tu primer ingreso y anota cuánto ahorraste de él. 💪</p>
+  </main>
+
+  <!-- ======= AHORROS ======= -->
+  <main id="view-ahorros" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_ahorros">Ahorros</h2>
+    <p class="muted"><span data-i18n="sav_intro_1">Aquí ves cada cantidad que ahorraste, una por una. También puedes agregar un ahorro suelto,</span> <strong data-i18n="sav_intro_2">sin que venga de un ingreso</strong><span data-i18n="sav_intro_3">, con el formulario de abajo. Si borras un ahorro, solo se borra esa cantidad:</span> <strong data-i18n="sav_intro_4">el ingreso se queda igual</strong><span data-i18n="sav_intro_5">.</span></p>
+
+    <div id="goal-card" class="card goal-card"></div>
+
+    <form id="goal-form" class="card form-card" autocomplete="off" hidden>
+      <h3 id="goal-form-title">Crear meta</h3>
+      <label for="goal-name" data-i18n="goal_name_label">Nombre de la meta</label>
+      <input id="goal-name" type="text" maxlength="60" data-i18n-ph="goal_name_ph" placeholder="Ej.: Fondo de emergencia">
+      <label for="goal-target" data-i18n="goal_target_label">Cantidad meta ($)</label>
+      <input id="goal-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+      <p id="goal-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="goal-submit" type="submit" class="btn btn-primary">Crear meta</button>
+        <button id="goal-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+
+    <div id="challenge-card" class="card"></div>
+
+    <form id="challenge-form" class="card form-card" autocomplete="off">
+      <label for="chal-target" data-i18n="chal_target_label">Meta semanal de ahorro ($)</label>
+      <input id="chal-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="20.00">
+      <p id="chal-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-secondary" data-i18n="chal_save">Guardar meta semanal</button>
+      </div>
+    </form>
+
+    <h3 data-i18n="goals_title">Otras metas</h3>
+    <div id="goals-list"></div>
+    <p id="goals-empty" class="empty-state" hidden></p>
+    <form id="goal2-form" class="card form-card" autocomplete="off">
+      <label for="goal2-name" data-i18n="goal_name_label">Nombre de la meta</label>
+      <input id="goal2-name" type="text" maxlength="60" data-i18n-ph="goal_name_ph" placeholder="Ej.: Fondo de emergencia">
+      <label for="goal2-target" data-i18n="goal_target_label">Cantidad meta ($)</label>
+      <input id="goal2-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+      <p id="goal2-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-secondary" data-i18n="goal2_create">Crear meta</button>
+      </div>
+    </form>
+
+    <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
+    <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
+
+    <form id="savings-form" class="card form-card" autocomplete="off">
+      <h3 data-i18n="sav_form_title">Agregar ahorro</h3>
+      <label for="sav-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="sav-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
+      <label for="sav-date" data-i18n="date_label">Fecha</label>
+      <input id="sav-date" type="date" required>
+      <label for="sav-note" data-i18n="note_label">Nota (opcional)</label>
+      <input id="sav-note" type="text" maxlength="120" data-i18n-ph="sav_note_ph" placeholder="¿Para qué es este ahorro?">
+      <p id="sav-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="sav_save">Guardar ahorro</button>
+      </div>
+    </form>
+
+    <ul id="savings-list" class="item-list"></ul>
+    <p id="savings-empty" class="empty-state" hidden data-i18n="sav_empty">Todavía no tienes ahorros anotados. Agrega uno con el formulario de arriba, o anota el ahorro de un ingreso cuando lo registres y aparecerá aquí. 🌱</p>
+  </main>
+
+  <!-- ======= RESUMEN (GRÁFICAS) ======= -->
+  <main id="view-resumen" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_resumen">Resumen</h2>
+    <div class="month-nav">
+      <button id="res-prev" class="btn btn-ghost" type="button" data-i18n-aria="month_prev_aria" aria-label="Mes anterior">‹</button>
+      <span id="res-month-label" class="month-label"></span>
+      <button id="res-next" class="btn btn-ghost" type="button" data-i18n-aria="month_next_aria" aria-label="Mes siguiente">›</button>
+    </div>
+    <h3 data-i18n="res_cats_title">Gastos por categoría</h3>
+    <div id="chart-cats"></div>
+    <p id="chart-cats-empty" class="empty-state" hidden data-i18n="res_cats_empty">No hay gastos en este mes.</p>
+    <h3 data-i18n="res_summary_title">Ingresos vs Gastos vs Ahorros</h3>
+    <div id="chart-summary"></div>
+    <p id="chart-summary-empty" class="empty-state" hidden data-i18n="res_summary_empty">Todavía no hay movimientos en este mes.</p>
+    <h3 data-i18n="rep_title">Informe del mes</h3>
+    <div id="biz-card" class="card report-card" hidden></div>
+    <div id="report-card" class="card report-card"></div>
+    <button id="btn-report-png" type="button" class="btn btn-secondary" data-i18n="rep_download">Descargar imagen</button>
+    <button id="btn-share-report" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
+  </main>
+
+  <!-- ======= BUSCAR ======= -->
+  <main id="view-buscar" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_buscar">Buscar movimientos</h2>
+    <div class="card form-card">
+      <label for="search-text" data-i18n="search_label">Buscar</label>
+      <input id="search-text" type="search" data-i18n-ph="search_ph" placeholder="Nota, categoría o cantidad…">
+      <label for="search-month" data-i18n="search_month_label">Mes (vacío = todos)</label>
+      <input id="search-month" type="month">
+      <label for="search-type" data-i18n="search_type_label">Tipo</label>
+      <select id="search-type">
+        <option value="todos" data-i18n="type_all">Todos</option>
+        <option value="gastos" data-i18n="type_gastos">Gastos</option>
+        <option value="ingresos" data-i18n="type_ingresos">Ingresos</option>
+        <option value="ahorros" data-i18n="type_ahorros">Ahorros</option>
+      </select>
+    </div>
+    <ul id="search-results" class="item-list"></ul>
+    <p id="search-empty" class="empty-state" hidden data-i18n="search_empty">Sin resultados.</p>
+  </main>
+
+  <!-- ======= PRESUPUESTO ======= -->
+  <main id="view-presupuesto" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_presupuesto">Presupuesto por categoría</h2>
+    <p class="muted" data-i18n="bud_intro">Pon un límite mensual por categoría y mira cuánto llevas gastado.</p>
+    <ul id="budget-list" class="item-list"></ul>
+
+    <form id="category-form" class="card form-card" autocomplete="off">
+      <h3 data-i18n="cat_form_title">Categoría personalizada</h3>
+      <label for="cat-name" data-i18n="cat_name_label">Nombre de la categoría</label>
+      <input id="cat-name" type="text" maxlength="30" data-i18n-ph="cat_name_ph" placeholder="Ej.: Mascotas" required>
+      <p id="cat-error" class="error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-secondary" data-i18n="cat_save">Agregar categoría</button>
+    </form>
+  </main>
+
+  <!-- ======= PAGOS FIJOS ======= -->
+  <main id="view-pagos" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_pagos">Pagos fijos</h2>
+    <p class="muted" data-i18n="fix_intro">Pagos que se repiten cada mes: renta, teléfono, suscripciones…</p>
+
+    <form id="fixed-form" class="card form-card" autocomplete="off">
+      <h3 id="fixed-form-title">Nuevo pago fijo</h3>
+      <input type="hidden" id="fix-id">
+      <label for="fix-name" data-i18n="name_label">Nombre</label>
+      <input id="fix-name" type="text" maxlength="60" data-i18n-ph="fix_name_ph" placeholder="Ej.: Renta" required>
+      <label for="fix-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="fix-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
+      <label for="fix-day" data-i18n="fix_day_label">Día del mes</label>
+      <input id="fix-day" type="number" min="1" max="31" step="1" required placeholder="1 – 31">
+      <p id="fix-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="fix_save">Guardar pago fijo</button>
+        <button id="fix-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+
+    <ul id="fixed-list" class="item-list"></ul>
+    <p id="fixed-empty" class="empty-state" hidden data-i18n="fix_empty">No tienes pagos fijos todavía.</p>
+  </main>
+
+  <!-- ======= CUENTAS ======= -->
+  <main id="view-cuentas" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_cuentas">Mis cuentas</h2>
+
+    <form id="account-form" class="card form-card" autocomplete="off">
+      <h3 id="account-form-title">Nueva cuenta</h3>
+      <input type="hidden" id="acc-id">
+      <label for="acc-name" data-i18n="name_label">Nombre</label>
+      <input id="acc-name" type="text" maxlength="60" data-i18n-ph="acc_name_ph" placeholder="Ej.: Efectivo, Banco, Ahorros" required>
+      <label for="acc-balance" data-i18n="acc_balance_label">Saldo ($)</label>
+      <input id="acc-balance" type="number" inputmode="decimal" min="-9999999" max="9999999" step="0.01" required placeholder="0.00">
+      <p id="acc-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="acc_save">Guardar cuenta</button>
+        <button id="acc-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+
+    <ul id="account-list" class="item-list"></ul>
+    <p id="account-empty" class="empty-state" hidden data-i18n="acc_empty">No tienes cuentas todavía. Agrega una para ver tu dinero disponible en el resumen.</p>
+  </main>
+
+  <!-- ======= DEUDAS ======= -->
+  <main id="view-deudas" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_deudas">Mis deudas</h2>
+
+    <form id="debt-form" class="card form-card" autocomplete="off">
+      <h3 id="debt-form-title">Nueva deuda</h3>
+      <input type="hidden" id="debt-id">
+      <label for="debt-name" data-i18n="name_label">Nombre</label>
+      <input id="debt-name" type="text" maxlength="60" data-i18n-ph="debt_name_ph" placeholder="Ej.: Tarjeta, Préstamo" required>
+      <label for="debt-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="debt-amount" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" required placeholder="0.00">
+      <label for="debt-interest" data-i18n="debt_interest_label">Interés anual % (opcional)</label>
+      <input id="debt-interest" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="0">
+      <label for="debt-minpay" data-i18n="debt_minpay_label">Pago mínimo mensual $ (opcional)</label>
+      <input id="debt-minpay" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <label for="debt-status" data-i18n="debt_status_label">Estado</label>
+      <select id="debt-status">
+        <option value="pendiente" data-i18n="debt_status_pending">Pendiente</option>
+        <option value="pagada" data-i18n="debt_status_paid">Pagada</option>
+      </select>
+      <p id="debt-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="debt_save">Guardar deuda</button>
+        <button id="debt-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+
+    <ul id="debt-list" class="item-list"></ul>
+    <p id="debt-empty" class="empty-state" hidden data-i18n="debt_empty">No tienes deudas registradas. 🎉</p>
+
+    <section class="card form-card">
+      <h3 data-i18n="calc_title">Calculadora de deudas</h3>
+      <p class="muted small" data-i18n="calc_intro">Compara dos planes para salir de deudas: pagar primero la más pequeña (bola de nieve) o la de mayor interés (avalancha). Cada mes pagas los mínimos de todas y el resto va a la deuda objetivo.</p>
+      <label for="calc-budget" data-i18n="calc_budget_label">¿Cuánto puedes pagar al mes en total a deudas? ($)</label>
+      <input id="calc-budget" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+      <p id="calc-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="calc-run" type="button" class="btn btn-primary" data-i18n="calc_run">Calcular</button>
+      </div>
+      <p id="calc-note" class="muted small" hidden></p>
+      <div id="calc-results"></div>
+    </section>
+  </main>
+
+  <!-- ======= MI SAN ======= -->
+  <!-- ======= REMESAS ======= -->
+  <main id="view-remesas" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_remesas">Remesas</h2>
+    <p class="muted" data-i18n="rem_intro">El dinero que envías a tu gente: cuánto salió en dólares y cuánto llegó en pesos.</p>
+    <p id="rem-total" class="total-line"></p>
+
+    <form id="remittance-form" class="card form-card" autocomplete="off">
+      <h3 id="remittance-form-title">Guardar remesa</h3>
+      <input type="hidden" id="rem-id">
+      <label for="rem-amount" data-i18n="rem_usd_label">Cantidad enviada ($ USD)</label>
+      <input id="rem-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
+      <label for="rem-rate" data-i18n="rem_rate_label">Tasa (pesos por $1)</label>
+      <input id="rem-rate" type="number" inputmode="decimal" min="0.01" max="999999" step="0.01" required placeholder="58.50">
+      <label for="rem-recipient" data-i18n="rem_recipient_label">¿Para quién?</label>
+      <input id="rem-recipient" type="text" maxlength="60" placeholder="Ej.: Mami">
+      <label for="rem-date" data-i18n="date_label">Fecha</label>
+      <input id="rem-date" type="date" required>
+      <label for="rem-note" data-i18n="note_label">Nota (opcional)</label>
+      <input id="rem-note" type="text" maxlength="120">
+      <p id="rem-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="rem_save">Guardar remesa</button>
+      </div>
+    </form>
+
+    <ul id="remittance-list" class="item-list"></ul>
+    <p id="remittance-empty" class="empty-state" hidden data-i18n="rem_empty">No tienes remesas registradas.</p>
+  </main>
+
+  <main id="view-san" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_san">Mi san</h2>
+
+    <div id="san-create-wrap">
+      <p class="muted" data-i18n="san_intro">Un san (tanda) es un círculo de ahorro: cada semana todos aportan y una persona recibe el total, por turnos.</p>
+      <form id="san-form" class="card form-card" autocomplete="off">
+        <h3 data-i18n="san_form_title">Crear un san</h3>
+        <label for="san-name" data-i18n="san_name_label">Nombre del san</label>
+        <input id="san-name" type="text" maxlength="60" data-i18n-ph="san_name_ph" placeholder="Ej.: San de la familia">
+        <label for="san-amount" data-i18n="san_aporte_label">Aporte por turno ($)</label>
+        <input id="san-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+        <label data-i18n="san_participants_label">Participantes (en orden de turno)</label>
+        <div class="budget-input-row">
+          <input id="san-pname" type="text" maxlength="40" data-i18n-ph="san_pname_ph" placeholder="Nombre del participante">
+          <button id="san-add-participant" type="button" class="btn btn-secondary" data-i18n="san_add_participant">Agregar</button>
+        </div>
+        <ul id="san-draft-list" class="item-list"></ul>
+        <p id="san-draft-empty" class="muted small" data-i18n="san_draft_empty">Todavía no agregas participantes.</p>
+        <p id="san-error" class="error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" data-i18n="san_create_btn">Crear san</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="san-active-wrap" hidden>
+      <section class="card">
+        <h3 id="san-title"></h3>
+        <p id="san-progress" class="total-line"></p>
+        <p id="san-aporte-line" class="muted"></p>
+        <p id="san-total-line"></p>
+        <p id="san-finished-note" class="muted" hidden data-i18n="san_finished_note">Todas las semanas se completaron. Puedes borrar este san y crear uno nuevo.</p>
+        <div id="san-current">
+          <p id="san-receiver-line" class="total-line"></p>
+          <p id="san-week-collected" class="muted"></p>
+          <h3 data-i18n="san_paid_title">¿Quién ya pagó esta semana?</h3>
+          <div id="san-paid-list"></div>
+          <div class="form-actions">
+            <button id="san-advance" type="button" class="btn btn-primary" data-i18n="san_advance">Marcar semana completa</button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="san-new" type="button" class="btn btn-secondary" hidden data-i18n="san_new_btn">Crear un san nuevo</button>
+          <button id="btn-share-san" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
+          <button id="san-delete" type="button" class="btn btn-ghost" data-i18n="san_delete">Borrar san</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ======= AJUSTES ======= -->
+  <main id="view-ajustes" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_ajustes">Ajustes y personalización</h2>
+
+    <form id="settings-form" class="card form-card" autocomplete="off">
+      <h3 data-i18n="set_profile">Tu perfil</h3>
+      <label for="set-name" data-i18n="set_name_label">Tu nombre</label>
+      <input id="set-name" type="text" maxlength="40">
+      <label for="set-textsize" data-i18n="set_textsize_label">Tamaño del texto</label>
+      <select id="set-textsize">
+        <option value="normal" data-i18n="textsize_normal">Normal</option>
+        <option value="grande" data-i18n="textsize_large">Grande</option>
+      </select>
+      <label for="set-lang" data-i18n="set_lang_label">Idioma / Language</label>
+      <select id="set-lang">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+      </select>
+      <label for="set-theme" data-i18n="set_theme_label">Tema</label>
+      <select id="set-theme">
+        <option value="claro" data-i18n="theme_light">Claro</option>
+        <option value="oscuro" data-i18n="theme_dark">Oscuro</option>
+        <option value="auto" data-i18n="theme_auto">Automático (según el sistema)</option>
+      </select>
+      <label for="set-accent" data-i18n="set_accent_label">Color principal</label>
+      <select id="set-accent">
+        <option value="verde" data-i18n="accent_verde">Verde</option>
+        <option value="azul" data-i18n="accent_azul">Azul</option>
+        <option value="morado" data-i18n="accent_morado">Morado</option>
+        <option value="naranja" data-i18n="accent_naranja">Naranja</option>
+      </select>
+
+      <h3 data-i18n="set_reminders_title">Recordatorios</h3>
+      <label for="set-payday" data-i18n="set_payday_label">Día de cobro</label>
+      <select id="set-payday"></select>
+      <label class="toggle-row">
+        <span data-i18n="set_reminders_label">Recordatorios en Inicio</span>
+        <input type="checkbox" id="set-reminders">
+      </label>
+      <label class="toggle-row">
+        <span data-i18n="set_notif_label">Notificaciones con la app cerrada</span>
+        <input type="checkbox" id="set-notifications">
+      </label>
+      <p class="muted small" data-i18n="set_notif_help">Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO esté cerrada.</p>
+      <label class="toggle-row">
+        <span data-i18n="set_autofixed_label">Registrar pagos fijos automáticamente</span>
+        <input type="checkbox" id="set-autofixed">
+      </label>
+      <p class="muted small" data-i18n="set_autofixed_help">Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.</p>
+
+      <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
+      <p class="muted small" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
+      <div id="cloud-signedout">
+        <label for="cloud-email" data-i18n="cloud_email">Correo electrónico</label>
+        <input id="cloud-email" type="email" autocomplete="email" maxlength="120">
+        <label for="cloud-pass" data-i18n="cloud_pass">Contraseña</label>
+        <input id="cloud-pass" type="password" autocomplete="current-password" maxlength="72">
+        <div class="form-actions">
+          <button id="btn-cloud-signin" type="button" class="btn btn-primary" data-i18n="cloud_signin">Entrar</button>
+          <button id="btn-cloud-signup" type="button" class="btn btn-secondary" data-i18n="cloud_signup">Crear cuenta</button>
+        </div>
+      </div>
+      <div id="cloud-signedin" hidden>
+        <p class="total-line" id="cloud-who"></p>
+        <p class="muted small" id="cloud-sync-status"></p>
+        <div class="form-actions">
+          <button id="btn-cloud-sync" type="button" class="btn btn-secondary" data-i18n="cloud_sync_now">Sincronizar ahora</button>
+          <button id="btn-cloud-signout" type="button" class="btn btn-ghost" data-i18n="cloud_signout">Cerrar sesión</button>
+          <button id="btn-cloud-wipe" type="button" class="btn btn-ghost" data-i18n="cloud_wipe">Borrar mis datos de la nube</button>
+        </div>
+      </div>
+      <p id="cloud-status" class="muted small" aria-live="polite"></p>
+      <p id="cloud-error" class="error" role="alert" hidden></p>
+
+      <h3 data-i18n="set_split_title">Reparto sugerido de ingresos (%)</h3>
+      <p class="muted small" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
+      <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
+      <input id="split-ahorro" type="number" min="0" max="100" step="1" required>
+      <label for="split-negocio" data-i18n="split_negocio">Negocio</label>
+      <input id="split-negocio" type="number" min="0" max="100" step="1" required>
+      <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
+      <input id="split-gastos" type="number" min="0" max="100" step="1" required>
+      <label for="split-familia" data-i18n="split_familia">Familia</label>
+      <input id="split-familia" type="number" min="0" max="100" step="1" required>
+      <p id="set-error" class="error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-primary" data-i18n="set_save">Guardar ajustes</button>
+    </form>
+
+    <section class="card form-card">
+      <h3 data-i18n="set_sections_title">Secciones visibles</h3>
+      <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
+      <div id="section-toggles"></div>
+    </section>
+
+    <section class="card form-card">
+      <h3 data-i18n="set_pin_title">Seguridad (PIN)</h3>
+      <p id="pin-status" class="muted small"></p>
+      <form id="pin-form" autocomplete="off">
+        <label for="pin-current" data-i18n="pin_current_label">PIN actual (si ya tienes uno)</label>
+        <input id="pin-current" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
+        <label for="pin-new" data-i18n="pin_new_label">PIN nuevo (vacío = quitar el PIN)</label>
+        <input id="pin-new" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
+        <p id="pin-error" class="error" role="alert" hidden></p>
+        <button type="submit" class="btn btn-secondary" data-i18n="pin_update">Actualizar PIN</button>
+      </form>
+      <label class="toggle-row">
+        <span data-i18n="set_bio_label">Desbloqueo con huella</span>
+        <input type="checkbox" id="set-biometric">
+      </label>
+      <p class="muted small" data-i18n="set_bio_help">Entra con tu huella además del PIN (necesitas tener un PIN activo).</p>
+    </section>
+
+    <section class="card form-card">
+      <h3 data-i18n="set_data_title">Tus datos</h3>
+      <p class="muted small" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
+      <div class="form-actions">
+        <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Exportar copia (JSON)</button>
+        <label class="btn btn-ghost file-label"><span data-i18n="data_import">Importar copia</span>
+          <input id="file-import" type="file" accept="application/json,.json" hidden>
+        </label>
+      </div>
+      <p id="data-error" class="error" role="alert" hidden></p>
+      <label for="backup-pass" data-i18n="backup_pass_label">Contraseña de la copia cifrada</label>
+      <input id="backup-pass" type="password" autocomplete="off" data-i18n-ph="backup_pass_ph" placeholder="Mínimo 4 caracteres">
+      <div class="form-actions">
+        <button id="btn-export-enc" type="button" class="btn btn-secondary" data-i18n="data_export_enc">Exportar copia cifrada</button>
+      </div>
+      <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
+      <hr>
+      <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
+    </section>
+  </main>
+
+  <footer class="app-footer muted small" data-i18n="footer">
+    PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono
+  </footer>
+
+  <button id="fab-add" class="fab" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">+</button>
+
+  <div id="quick-chooser" class="chooser" hidden>
+    <div class="chooser-card">
+      <h3 data-i18n="quick_title">¿Qué quieres agregar?</h3>
+      <button id="quick-expense" type="button" class="btn btn-primary btn-big" data-i18n="quick_expense">🧾 Gasto</button>
+      <button id="quick-income" type="button" class="btn btn-primary btn-big" data-i18n="quick_income">💵 Ingreso</button>
+      <button id="quick-savings" type="button" class="btn btn-primary btn-big" data-i18n="quick_savings">🐷 Ahorro</button>
+      <button id="quick-cancel" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="undo-toast" class="undo-toast" hidden>
+    <span data-i18n="undo_done">Hecho</span>
+    <button id="undo-btn" type="button" class="btn btn-small btn-secondary" data-i18n="undo_btn">Deshacer</button>
+  </div>
+
+  <div id="photo-overlay" class="photo-overlay" hidden>
+    <img id="photo-overlay-img" alt="">
+    <button id="photo-overlay-close" type="button" class="btn btn-secondary" data-i18n="photo_close">Cerrar</button>
+  </div>
+</div>
+
+<script src="vendor/supabase.js"></script>
+<script src="web.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
