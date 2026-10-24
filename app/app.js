@@ -1,12 +1,18 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 21) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 24) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT). La lógica es la misma; lo específico de
    navegador vive en web.js y web.css. Al actualizar la app hay que
    re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 23-oct-2026 con la Compilación 21: Fases 1, 3 y 4,
-   presupuesto compartido real (SHARED_LIVE) y borrado de cuenta. */
+   Sincronizado el 24-oct-2026 con la Compilación 24: tema
+   claro/oscuro automático según el dispositivo (Compilación 23),
+   Play Billing presente pero inactivo en web (sin el plugin, PETO
+   Pro no se compra desde el navegador) y el bloque 1 del Paquete 3:
+   tutorial de bienvenida en 3 pasos, alertas de presupuesto al
+   80 %/100 % con cobertura ampliada, racha de días anotando, metas
+   de ahorro con asignación de ahorros, gráfico de tendencia e
+   invitación a reseñar en Google Play tras el primer informe. */
 /* ============================================================
    PETO v0.1
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -18,7 +24,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 21'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 24'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -51,13 +57,14 @@ function defaultData() {
       lang: 'es',
       payday: null,
       reminders: true,
-      theme: 'claro',
+      theme: 'auto',
       accent: 'verde',
       autoFixed: true,
       notifications: false,
       biometric: false,
       pro: false,
       proWaitlist: false,
+      reviewPromptDone: false,
       challengeTargetCents: 2000,
       split: { ahorro: 25, negocio: 10, gastos: 55, familia: 10 },
       sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true },
@@ -233,7 +240,8 @@ function validateData(raw) {
   d.settings.biometric = s.biometric === true;
   d.settings.pro = s.pro === true;
   d.settings.proWaitlist = s.proWaitlist === true;
-  d.settings.theme = (s.theme === 'oscuro' || s.theme === 'auto') ? s.theme : 'claro';
+  d.settings.reviewPromptDone = s.reviewPromptDone === true;
+  d.settings.theme = (s.theme === 'claro' || s.theme === 'oscuro' || s.theme === 'auto') ? s.theme : 'auto';
   d.settings.accent = ['verde', 'azul', 'morado', 'naranja'].includes(s.accent) ? s.accent : 'verde';
   const chalTarget = cleanCents(s.challengeTargetCents, false);
   d.settings.challengeTargetCents = chalTarget > 0 ? chalTarget : 2000;
@@ -266,7 +274,12 @@ function validateData(raw) {
   });
   d.savings = arr(raw.savings).filter((x) => x && typeof x === 'object').map((x) => ({
     id: cleanId(x.id), amountCents: cleanCents(x.amountCents, false),
-    date: cleanDate(x.date), note: cleanText(x.note, 120)
+    date: cleanDate(x.date), note: cleanText(x.note, 120),
+    /* Meta a la que está asignado el ahorro (Paquete 3). Los datos
+       viejos no traen goalId: quedan en null = ahorro general. La
+       limpieza contra las metas existentes va al final de esta
+       función, cuando d.goals ya está saneado. */
+    goalId: (typeof x.goalId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.goalId)) ? x.goalId : null
   }));
   d.savingsGoal = cleanSavingsGoal(raw.savingsGoal);
   d.san = cleanSan(raw.san);
@@ -325,6 +338,10 @@ function validateData(raw) {
       if (/^\d{4}-\d{2}\|.+\|\d{2,3}$/.test(k) && raw.alertsSent[k] === true) d.alertsSent[k] = true;
     }
   }
+  /* Un ahorro asignado a una meta que ya no existe vuelve a ser
+     ahorro general: nunca se pierde el dinero, solo la etiqueta. */
+  const goalIds = new Set(d.goals.map((g) => g.id));
+  for (const s of d.savings) if (s.goalId && !goalIds.has(s.goalId)) s.goalId = null;
   return d;
 }
 
@@ -362,6 +379,9 @@ es: {
   backup_need_pass: 'Escribe la contraseña de la copia cifrada antes de importarla.',
   backup_err_pass: 'No se pudo abrir la copia: contraseña incorrecta o archivo dañado.',
   share_btn: 'Compartir resumen', share_copied: 'Resumen copiado. Pégalo donde quieras.',
+  review_title: '¿Te gusta PETO?',
+  review_text: 'Si PETO te ayuda a cuidar tu dinero, una reseña en Google Play nos ayuda muchísimo a llegar a más personas. ¡Gracias!',
+  review_yes: '⭐ Calificar en Google Play', review_no: 'Ahora no',
   share_report_title: 'Mi resumen PETO',
   notif_fixed_title: 'Pago fijo mañana', notif_fixed_today: 'Pago fijo hoy', notif_fixed_body: '{name} · {amount}',
   notif_weekly_title: 'Tu semana en PETO', notif_weekly_body: 'Anota tus gastos e ingresos de la semana para no perder el hilo.',
@@ -484,6 +504,7 @@ es: {
   sav_intro_4: 'el ingreso se queda igual', sav_intro_5: '.',
   sav_total_label: 'Total ahorrado:', sav_month_label: 'Ahorrado este mes:',
   sav_form_title: 'Agregar ahorro', sav_note_ph: '¿Para qué es este ahorro?', sav_save: 'Guardar ahorro',
+  sav_goal_label: 'Asignar a una meta (opcional)', sav_goal_none: 'Sin meta · ahorro general',
   sav_empty: 'Todavía no tienes ahorros anotados.\nAgrega uno con el formulario de arriba, o anota el ahorro de un ingreso cuando lo registres y aparecerá aquí. 🌱',
   sav_from_title: 'Ahorro del {date}', sav_from_sub: 'De un ingreso de {amount}',
   sav_manual_title: 'Ahorro agregado', sav_manual_sub: 'Manual · agregado el {date}',
@@ -569,6 +590,13 @@ es: {
   ob_pin_label: 'Crea un PIN de seguridad (opcional)', ob_pin_ph: '4 a 6 números, o déjalo vacío',
   ob_pin2_label: 'Repite el PIN', ob_pin2_ph: 'Repite el PIN', ob_start: 'Empezar',
   ob_note: 'Podrás cambiar el PIN cuando quieras en Ajustes.',
+  ob_tour1_title: 'Anota un gasto en segundos',
+  ob_tour1_text: 'Toca el botón +, escribe la cantidad y la categoría. Nada más: tu gasto queda registrado al instante.',
+  ob_tour2_title: '¿Cuánto puedes gastar hoy?',
+  ob_tour2_text: 'PETO reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.',
+  ob_tour3_title: 'Tu cuenta en la nube (opcional)',
+  ob_tour3_text: 'Si quieres, crea una cuenta gratis para ver tus datos también en la web. Sin cuenta, todo queda solo en tu teléfono.',
+  ob_tour_next: 'Siguiente', ob_tour_skip: 'Saltar', ob_tour_go: '¡Vamos!',
   ob_err_name: 'Escribe tu nombre para empezar.', ob_err_pin_format: 'El PIN debe tener de 4 a 6 números.',
   ob_err_pin_mismatch: 'Los dos PIN no coinciden.',
   set_theme_label: 'Tema', theme_light: 'Claro', theme_dark: 'Oscuro', theme_auto: 'Automático (según el sistema)',
@@ -584,8 +612,11 @@ es: {
   chal_progress: 'Esta semana: {have} de {target}', chal_done: '🎉 ¡Reto de esta semana cumplido!',
   chal_streak_one: 'Racha: 1 semana cumplida', chal_streak_many: 'Racha: {n} semanas cumplidas',
   chal_streak_zero: 'Racha: 0 semanas. ¡Esta puede ser la primera!',
+  streak_one: '🔥 1 día seguido anotando', streak_many: '🔥 {n} días seguidos anotando',
   chal_target_label: 'Meta semanal de ahorro ($)', chal_save: 'Guardar meta semanal',
   rep_title: 'Informe del mes', rep_download: 'Descargar imagen', rep_share_image: 'Compartir imagen',
+  trend_title: 'Tendencia de gasto', trend_weeks: 'Semanas de este mes', trend_week: 'Semana {n}',
+  trend_empty: 'Todavía no hay gastos para mostrar la tendencia.',
   rep_income: 'Ingresos', rep_expenses: 'Gastos', rep_savings: 'Ahorros',
   rep_top_cat: 'Categoría mayor', rep_top3: 'Top 3 categorías', rep_goal: 'Meta de ahorro', rep_none: 'Sin movimientos',
   calc_title: 'Calculadora de deudas',
@@ -689,6 +720,9 @@ en: {
   backup_need_pass: 'Type the encrypted backup password before importing it.',
   backup_err_pass: 'Could not open the backup: wrong password or damaged file.',
   share_btn: 'Share summary', share_copied: 'Summary copied. Paste it anywhere.',
+  review_title: 'Do you like PETO?',
+  review_text: 'If PETO helps you look after your money, a review on Google Play helps us a lot to reach more people. Thank you!',
+  review_yes: '⭐ Rate on Google Play', review_no: 'Not now',
   share_report_title: 'My PETO summary',
   notif_fixed_title: 'Fixed payment tomorrow', notif_fixed_today: 'Fixed payment today', notif_fixed_body: '{name} · {amount}',
   notif_weekly_title: 'Your week in PETO', notif_weekly_body: 'Log this week’s expenses and income to stay on track.',
@@ -811,6 +845,7 @@ en: {
   sav_intro_4: 'the income stays the same', sav_intro_5: '.',
   sav_total_label: 'Total saved:', sav_month_label: 'Saved this month:',
   sav_form_title: 'Add a saving', sav_note_ph: 'What is this saving for?', sav_save: 'Save saving',
+  sav_goal_label: 'Assign to a goal (optional)', sav_goal_none: 'No goal · general savings',
   sav_empty: 'No savings noted yet.\nAdd one with the form above, or note the savings of an income when you log it and it will show up here. 🌱',
   sav_from_title: 'Saving from {date}', sav_from_sub: 'From an income of {amount}',
   sav_manual_title: 'Added saving', sav_manual_sub: 'Manual · added on {date}',
@@ -896,6 +931,13 @@ en: {
   ob_pin_label: 'Create a security PIN (optional)', ob_pin_ph: '4 to 6 digits, or leave it empty',
   ob_pin2_label: 'Repeat the PIN', ob_pin2_ph: 'Repeat the PIN', ob_start: 'Get started',
   ob_note: 'You can change the PIN anytime in Settings.',
+  ob_tour1_title: 'Log an expense in seconds',
+  ob_tour1_text: 'Tap the + button, enter the amount and the category. That is all: your expense is saved right away.',
+  ob_tour2_title: 'How much can you spend today?',
+  ob_tour2_text: 'PETO spreads your budget across the days left in the month and tells you one single number: what you can spend today without going over.',
+  ob_tour3_title: 'Your cloud account (optional)',
+  ob_tour3_text: 'If you want, create a free account to see your data on the web too. Without an account, everything stays only on your phone.',
+  ob_tour_next: 'Next', ob_tour_skip: 'Skip', ob_tour_go: 'Let’s go!',
   ob_err_name: 'Enter your name to get started.', ob_err_pin_format: 'The PIN must be 4 to 6 digits.',
   ob_err_pin_mismatch: 'The two PINs do not match.',
   set_theme_label: 'Theme', theme_light: 'Light', theme_dark: 'Dark', theme_auto: 'Automatic (system)',
@@ -911,8 +953,11 @@ en: {
   chal_progress: 'This week: {have} of {target}', chal_done: '🎉 This week\'s challenge is complete!',
   chal_streak_one: 'Streak: 1 week completed', chal_streak_many: 'Streak: {n} weeks completed',
   chal_streak_zero: 'Streak: 0 weeks. This can be the first!',
+  streak_one: '🔥 1 day logging in a row', streak_many: '🔥 {n} days logging in a row',
   chal_target_label: 'Weekly savings target ($)', chal_save: 'Save weekly target',
   rep_title: 'Monthly report', rep_download: 'Download image', rep_share_image: 'Share image',
+  trend_title: 'Spending trend', trend_weeks: 'Weeks in this month', trend_week: 'Week {n}',
+  trend_empty: 'No expenses yet to show the trend.',
   rep_income: 'Income', rep_expenses: 'Expenses', rep_savings: 'Savings',
   rep_top_cat: 'Top category', rep_top3: 'Top 3 categories', rep_goal: 'Savings goal', rep_none: 'No activity',
   calc_title: 'Debt payoff calculator',
@@ -1038,6 +1083,10 @@ it: {
   backup_err_pass: 'Non è stato possibile aprire la copia: password errata o file danneggiato.',
   share_btn: 'Condividi il riepilogo',
   share_copied: 'Riepilogo copiato. Incollalo dove vuoi.',
+  review_title: 'Ti piace PETO?',
+  review_text: 'Se PETO ti aiuta a prenderti cura dei tuoi soldi, una recensione su Google Play ci aiuta moltissimo a raggiungere più persone. Grazie!',
+  review_yes: '⭐ Valuta su Google Play',
+  review_no: 'Non ora',
   share_report_title: 'Il mio riepilogo PETO',
   notif_fixed_title: 'Pagamento fisso domani',
   notif_fixed_today: 'Pagamento fisso oggi',
@@ -1249,6 +1298,8 @@ it: {
   sav_form_title: 'Aggiungi risparmio',
   sav_note_ph: 'Per cosa è questo risparmio?',
   sav_save: 'Salva risparmio',
+  sav_goal_label: 'Assegna a un obiettivo (facoltativo)',
+  sav_goal_none: 'Senza obiettivo · risparmio generale',
   sav_empty: 'Non hai ancora risparmi annotati.\nAggiungine uno con il modulo qui sopra, oppure annota il risparmio di un’entrata quando la registri e apparirà qui. 🌱',
   sav_from_title: 'Risparmio del {date}',
   sav_from_sub: 'Da un’entrata di {amount}',
@@ -1422,6 +1473,15 @@ it: {
   ob_pin2_ph: 'Ripeti il PIN',
   ob_start: 'Inizia',
   ob_note: 'Potrai cambiare il PIN quando vuoi nelle Impostazioni.',
+  ob_tour1_title: 'Annota una spesa in pochi secondi',
+  ob_tour1_text: 'Tocca il pulsante +, scrivi l’importo e la categoria. Nient’altro: la spesa viene registrata subito.',
+  ob_tour2_title: 'Quanto puoi spendere oggi?',
+  ob_tour2_text: 'PETO divide il tuo budget tra i giorni rimasti del mese e ti mostra un solo numero: quanto puoi spendere oggi senza esagerare.',
+  ob_tour3_title: 'Il tuo account nel cloud (facoltativo)',
+  ob_tour3_text: 'Se vuoi, crea un account gratuito per vedere i tuoi dati anche sul web. Senza account, tutto resta solo sul tuo telefono.',
+  ob_tour_next: 'Avanti',
+  ob_tour_skip: 'Salta',
+  ob_tour_go: 'Andiamo!',
   ob_err_name: 'Scrivi il tuo nome per iniziare.',
   ob_err_pin_format: 'Il PIN deve avere da 4 a 6 numeri.',
   ob_err_pin_mismatch: 'I due PIN non coincidono.',
@@ -1460,11 +1520,17 @@ it: {
   chal_streak_one: 'Serie: 1 settimana completata',
   chal_streak_many: 'Serie: {n} settimane completate',
   chal_streak_zero: 'Serie: 0 settimane. Questa può essere la prima!',
+  streak_one: '🔥 1 giorno di fila annotando',
+  streak_many: '🔥 {n} giorni di fila annotando',
   chal_target_label: 'Obiettivo settimanale di risparmio ($)',
   chal_save: 'Salva obiettivo settimanale',
   rep_title: 'Resoconto del mese',
   rep_download: 'Scarica immagine',
   rep_share_image: 'Condividi immagine',
+  trend_title: 'Andamento delle spese',
+  trend_weeks: 'Settimane di questo mese',
+  trend_week: 'Settimana {n}',
+  trend_empty: 'Nessuna spesa ancora per mostrare l’andamento.',
   rep_income: 'Entrate',
   rep_expenses: 'Spese',
   rep_savings: 'Risparmi',
@@ -1703,7 +1769,7 @@ function showView(name) {
   if (name === 'ahorros') renderSavings();
   if (name === 'buscar') renderSearch();
   if (name === 'resumen') renderResumen();
-  if (name === 'presupuesto') renderBudgets();
+  if (name === 'presupuesto') { renderBudgets(); checkBudgetAlerts(); }
   if (name === 'pagos') renderFixed();
   if (name === 'cuentas') renderAccounts();
   if (name === 'deudas') renderDebts();
@@ -1984,6 +2050,31 @@ function renderSpendToday() {
   }
 }
 
+/* ---------------- Racha de días anotando (Paquete 3) ----------------
+   Días consecutivos con al menos un movimiento registrado (gasto,
+   ingreso o ahorro suelto). La racha sigue viva si el último día con
+   movimiento es hoy o ayer: nadie anota siempre a la misma hora y la
+   racha no debe morir mientras duermes. Sin movimientos: 0. */
+function recordingStreak() {
+  if (!db) return 0;
+  const days = new Set();
+  for (const e of db.expenses) days.add(e.date);
+  for (const i of db.incomes) days.add(i.date);
+  for (const s of db.savings) days.add(s.date);
+  let cursor = todayStr();
+  if (!days.has(cursor)) cursor = addDaysStr(cursor, -1);
+  let streak = 0;
+  while (days.has(cursor)) { streak++; cursor = addDaysStr(cursor, -1); }
+  return streak;
+}
+function renderStreak() {
+  const pill = document.getElementById('home-streak');
+  if (!pill) return;
+  const n = recordingStreak();
+  pill.hidden = n < 1;
+  if (n >= 1) pill.textContent = n === 1 ? t('streak_one') : t('streak_many', { n: n });
+}
+
 function renderHome() {
   const key = currentMonthKey();
   document.getElementById('sum-available').textContent = fmt(availableMoney(key));
@@ -2008,6 +2099,7 @@ function renderHome() {
   }
   renderBanners();
   renderSpendToday();
+  renderStreak();
   renderInsights();
   document.getElementById('greeting').textContent =
     db.settings.name ? t('greeting') + ', ' + db.settings.name : t('greeting');
@@ -2301,15 +2393,36 @@ function allSavingsTotal() {
   const standalone = db.savings.reduce((t, s) => t + s.amountCents, 0);
   return fromIncomes + standalone;
 }
+/* Selector de meta del formulario de ahorro (Paquete 3): la primera
+   opción es «sin meta» (ahorro general, como siempre); el resto son
+   las metas múltiples vivas. Se repuebla en cada dibujo porque las
+   metas pueden nacer o borrarse sin salir de la vista. */
+function fillSavingsGoalSelect() {
+  const sel = document.getElementById('sav-goal');
+  if (!sel) return;
+  const prev = sel.value;
+  clearNode(sel);
+  const none = el('option', null, t('sav_goal_none'));
+  none.value = '';
+  sel.appendChild(none);
+  for (const g of db.goals) {
+    const opt = el('option', null, g.name);
+    opt.value = g.id;
+    sel.appendChild(opt);
+  }
+  if (prev && db.goals.some((g) => g.id === prev)) sel.value = prev;
+}
 function resetSavingsForm() {
   document.getElementById('savings-form').reset();
   document.getElementById('sav-date').value = todayStr();
+  fillSavingsGoalSelect();
   showError('sav-error', '');
 }
 function renderSavings() {
   renderGoal();
   renderChallenge();
   renderGoals();
+  fillSavingsGoalSelect();
   const rows = [];
   for (const item of db.incomes) {
     if ((item.savingsCents || 0) > 0) rows.push({ kind: 'ingreso', date: item.date, item: item });
@@ -2334,7 +2447,7 @@ function renderSavings() {
       li.appendChild(el('span', 'item-amount', fmt(item.savingsCents)));
       acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
         beginUndo();
-        db.savings.push({ id: uid(), amountCents: item.savingsCents, date: todayStr(), note: item.note });
+        db.savings.push({ id: uid(), amountCents: item.savingsCents, date: todayStr(), note: item.note, goalId: null });
         save(); renderSavings(); showUndoToast();
       }));
       acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
@@ -2346,11 +2459,13 @@ function renderSavings() {
     } else {
       main.appendChild(el('div', 'item-title', item.note ? item.note : t('sav_manual_title')));
       main.appendChild(el('div', 'item-sub', t('sav_manual_sub', { date: prettyDate(item.date) })));
+      const assignedGoal = item.goalId ? db.goals.find((g) => g.id === item.goalId) : null;
+      if (assignedGoal) main.appendChild(el('div', 'item-sub', '🎯 ' + assignedGoal.name));
       li.appendChild(main);
       li.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
       acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
         beginUndo();
-        db.savings.push({ id: uid(), amountCents: item.amountCents, date: todayStr(), note: item.note });
+        db.savings.push({ id: uid(), amountCents: item.amountCents, date: todayStr(), note: item.note, goalId: item.goalId || null });
         save(); renderSavings(); showUndoToast();
       }));
       acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
@@ -2371,8 +2486,11 @@ function onSavingsSubmit(ev) {
   const date = cleanDate(document.getElementById('sav-date').value);
   const note = cleanText(document.getElementById('sav-note').value, 120);
   if (db.savings.length >= MAX_ITEMS) { showError('sav-error', t('err_limit_savings')); return; }
+  const goalSel = document.getElementById('sav-goal');
+  const wantedGoal = goalSel ? goalSel.value : '';
+  const goalId = db.goals.some((g) => g.id === wantedGoal) ? wantedGoal : null;
   beginUndo();
-  db.savings.push({ id: uid(), amountCents: cents, date, note });
+  db.savings.push({ id: uid(), amountCents: cents, date, note, goalId });
   save(); resetSavingsForm(); renderSavings(); showUndoToast();
 }
 
@@ -2498,6 +2616,81 @@ function renderResumen() {
     sumBox.appendChild(chartBarRow(t('chart_savings'), fmt(savings), Math.round(savings / max * 100)));
   }
   renderReport();
+  renderTrend();
+}
+
+/* ---------------- TENDENCIA (Paquete 3) ----------------
+   Los datos van separados del dibujo: los últimos 6 meses terminando
+   en el mes visible (totales de gasto) y las semanas lunes–domingo
+   de ese mes (solo las que caen dentro del mes cuentan gasto). */
+function trendData(key) {
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const k = shiftMonth(key, -i);
+    const p = k.split('-');
+    const label = new Intl.DateTimeFormat(localeTag(), { month: 'short' })
+      .format(new Date(Number(p[0]), Number(p[1]) - 1, 1));
+    months.push({ key: k, label: label, cents: sumCents(monthExpenses(k)) });
+  }
+  const byWeek = {};
+  for (const e of monthExpenses(key)) {
+    const ws = weekStartOf(e.date);
+    byWeek[ws] = (byWeek[ws] || 0) + e.amountCents;
+  }
+  const starts = [];
+  const lastDay = key + '-' + String(daysInMonth(key)).padStart(2, '0');
+  let cursor = weekStartOf(key + '-01');
+  while (cursor <= lastDay) { starts.push(cursor); cursor = addDaysStr(cursor, 7); }
+  const weeks = starts.map((ws, i) => ({ start: ws, n: i + 1, cents: byWeek[ws] || 0 }));
+  return { months: months, weeks: weeks };
+}
+/* Barras de los 6 meses en un lienzo, con los colores del tema activo
+   (canvasPalette): acento para las barras, tinta para los montos y
+   tono suave para los nombres de mes. Sin contexto 2d no se dibuja
+   nada y la vista sigue con las barras CSS de las semanas. */
+function drawTrendCanvas(canvas, months) {
+  const ctx = canvas.getContext && canvas.getContext('2d');
+  if (!ctx) return;
+  const P = canvasPalette();
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const max = Math.max.apply(null, months.map((m) => m.cents).concat([1]));
+  const base = H - 30, top = 30;
+  const slot = W / months.length;
+  const bw = Math.min(64, slot * 0.55);
+  ctx.textAlign = 'center';
+  months.forEach((m, i) => {
+    const cx = slot * i + slot / 2;
+    const h = Math.max(2, Math.round((base - top) * m.cents / max));
+    ctx.fillStyle = P.header;
+    ctx.fillRect(cx - bw / 2, base - h, bw, h);
+    ctx.fillStyle = P.ink;
+    ctx.font = 'bold 15px sans-serif';
+    ctx.fillText('$' + Math.round(m.cents / 100), cx, base - h - 8);
+    ctx.fillStyle = P.muted;
+    ctx.font = '14px sans-serif';
+    ctx.fillText(m.label, cx, base + 20);
+  });
+  ctx.fillStyle = P.muted;
+  ctx.fillRect(0, base + 1, W, 1);
+}
+function renderTrend() {
+  const canvas = document.getElementById('trend-canvas');
+  const weeksBox = document.getElementById('trend-weeks');
+  if (!canvas || !weeksBox) return;
+  const data = trendData(chartMonth);
+  const has = data.months.some((m) => m.cents > 0);
+  const emptyEl = document.getElementById('trend-empty');
+  if (emptyEl) emptyEl.hidden = has;
+  canvas.hidden = !has;
+  if (has) drawTrendCanvas(canvas, data.months);
+  clearNode(weeksBox);
+  const maxW = Math.max.apply(null, data.weeks.map((w) => w.cents).concat([0]));
+  for (const w of data.weeks) {
+    weeksBox.appendChild(chartBarRow(
+      t('trend_week', { n: w.n }), fmt(w.cents),
+      maxW > 0 ? Math.round(w.cents / maxW * 100) : 0));
+  }
 }
 
 /* ---------------- PRESUPUESTO ---------------- */
@@ -3134,16 +3327,17 @@ function buildSanOrgCanvas() {
   canvas.width = 800; canvas.height = height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
-  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 800, height);
-  ctx.fillStyle = '#0b6e4f'; ctx.fillRect(0, 0, 800, 96);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
+  const P = canvasPalette();
+  ctx.fillStyle = P.bg; ctx.fillRect(0, 0, 800, height);
+  ctx.fillStyle = P.header; ctx.fillRect(0, 0, 800, 96);
+  ctx.fillStyle = P.headerText; ctx.font = 'bold 34px sans-serif';
   ctx.fillText(t('app_title'), 40, 58);
-  ctx.fillStyle = '#1c2733'; ctx.font = 'bold 28px sans-serif';
+  ctx.fillStyle = P.ink; ctx.font = 'bold 28px sans-serif';
   ctx.fillText(org.name, 40, 148);
   ctx.font = '24px sans-serif';
   let y = 200;
   for (const line of lines) {
-    ctx.fillStyle = '#1c2733'; ctx.fillText(line, 40, y);
+    ctx.fillStyle = P.ink; ctx.fillText(line, 40, y);
     y += 46;
   }
   return canvas;
@@ -3195,7 +3389,7 @@ function renderSettings() {
   document.getElementById('set-name').value = db.settings.name;
   document.getElementById('set-textsize').value = db.settings.textSize;
   document.getElementById('set-lang').value = lang();
-  document.getElementById('set-theme').value = db.settings.theme || 'claro';
+  document.getElementById('set-theme').value = db.settings.theme || 'auto';
   document.getElementById('set-accent').value = db.settings.accent || 'verde';
   const paydaySel = document.getElementById('set-payday');
   clearNode(paydaySel);
@@ -3671,6 +3865,7 @@ function onCsvApply() {
   document.getElementById('csv-preview').hidden = true;
   renderExpenses();
   renderIncomes();
+  checkBudgetAlerts();
   showUndoToast();
   window.alert(t('csv_done', { n: n }));
 }
@@ -4028,6 +4223,7 @@ function onShareReport() {
   if (d.topCat) lines.push(t('rep_top_cat') + ': ' + catName(d.topCat) + ' · ' + fmtMoney(d.topAmt));
   if (d.goal) lines.push(t('rep_goal') + ' · ' + d.goal.name + ': ' + d.goal.pct + '%');
   shareText(t('share_report_title'), lines.join('\n'));
+  maybeAskReview();
 }
 function onShareSan() {
   if (!db.san) return;
@@ -4284,22 +4480,45 @@ function checkBudgetAlerts() {
 }
 
 /* --- Metas múltiples (sobres con aporte manual) --- */
+/* Lo acumulado en una meta = lo apartado en su sobre (savedCents, con
+   los botones de agregar/quitar de la tarjeta) MÁS los ahorros sueltos
+   que la persona asignó a la meta al anotarlos (Paquete 3). Son dos
+   fuentes que nunca se solapan: un ahorro asignado sigue contando en
+   el total de ahorros de la app, y el sobre es solo una etiqueta de
+   apartado; aquí solo se SUMAN para mostrar el progreso. */
+function goalAccumulated(g) {
+  let total = g.savedCents || 0;
+  for (const s of db.savings) if (s.goalId === g.id) total += s.amountCents;
+  return total;
+}
+let goal2EditingId = null;
+function resetGoal2Form() {
+  const form = document.getElementById('goal2-form');
+  if (form) form.reset();
+  goal2EditingId = null;
+  const submit = document.getElementById('goal2-submit');
+  if (submit) submit.textContent = t('goal2_create');
+  const cancel = document.getElementById('goal2-cancel-edit');
+  if (cancel) cancel.hidden = true;
+  showError('goal2-error', '');
+}
 function renderGoals() {
   const list = document.getElementById('goals-list');
   if (!list) return;
   clearNode(list);
   document.getElementById('goals-empty').hidden = db.goals.length > 0;
   for (const g of db.goals) {
+    const acc = goalAccumulated(g);
     const card = el('div', 'card goal-extra');
-    const pct = Math.min(100, Math.floor(g.savedCents / g.targetCents * 100));
+    const pct = Math.min(100, Math.floor(acc / g.targetCents * 100));
     card.appendChild(el('h4', null, g.name));
-    card.appendChild(el('p', 'total-line', fmt(g.savedCents) + ' / ' + fmt(g.targetCents) + ' · ' + pct + '%'));
+    card.appendChild(el('p', 'total-line', fmt(acc) + ' / ' + fmt(g.targetCents) + ' · ' + pct + '%'));
     const bar = el('div', 'budget-bar goal-bar');
     const fill = el('div', 'budget-fill');
     fill.style.width = pct + '%';
     bar.appendChild(fill);
     card.appendChild(bar);
-    if (g.savedCents >= g.targetCents) card.appendChild(el('p', 'goal-done', t('goal_done')));
+    if (acc >= g.targetCents) card.appendChild(el('p', 'goal-done', t('goal_done')));
     const row = el('div', 'form-actions');
     const amt = document.createElement('input');
     amt.type = 'number'; amt.min = '0.01'; amt.step = '0.01'; amt.placeholder = '0.00';
@@ -4308,6 +4527,15 @@ function renderGoals() {
     row.appendChild(amt);
     row.appendChild(actionButton(t('goal_add'), 'btn-secondary', () => moveGoalMoney(g.id, amt, 1)));
     row.appendChild(actionButton(t('goal_take'), 'btn-ghost', () => moveGoalMoney(g.id, amt, -1)));
+    row.appendChild(actionButton(t('goal_edit'), 'btn-ghost', () => {
+      goal2EditingId = g.id;
+      document.getElementById('goal2-name').value = g.name;
+      document.getElementById('goal2-target').value = (g.targetCents / 100).toFixed(2);
+      document.getElementById('goal2-submit').textContent = t('goal_save_btn');
+      document.getElementById('goal2-cancel-edit').hidden = false;
+      showError('goal2-error', '');
+      document.getElementById('goal2-name').focus();
+    }));
     row.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
       if (!window.confirm(t('goal_delete_confirm', { name: g.name }))) return;
       beginUndo();
@@ -4333,11 +4561,19 @@ function onGoal2Submit(ev) {
   const target = parseAmount(document.getElementById('goal2-target').value, false);
   if (!name) { showError('goal2-error', t('err_name')); return; }
   if (target === null) { showError('goal2-error', t('err_amount')); return; }
+  /* Editar una meta conserva su id y lo acumulado: los ahorros
+     asignados la siguen por id, no por nombre. */
+  if (goal2EditingId) {
+    const g = db.goals.find((x) => x.id === goal2EditingId);
+    if (g) { beginUndo(); g.name = name; g.targetCents = target; save(); showUndoToast(); }
+    resetGoal2Form();
+    renderSavings();
+    return;
+  }
   if (db.goals.length >= 20) { showError('goal2-error', t('err_limit_goals')); return; }
   db.goals.push({ id: uid(), name: name, targetCents: target, savedCents: 0 });
   save();
-  document.getElementById('goal2-form').reset();
-  showError('goal2-error', '');
+  resetGoal2Form();
   renderSavings();
 }
 
@@ -5072,13 +5308,44 @@ function onSharedLeave() {
 
 /* ---------------- Tema (claro / oscuro / automático + color) ----------
    El tema se aplica con atributos data-theme / data-accent en <html> y
-   variables CSS: claro, oscuro o automático (prefers-color-scheme). */
+   variables CSS: claro, oscuro o automático (prefers-color-scheme).
+   El valor por defecto es «auto»: la app sigue el modo claro/oscuro
+   del dispositivo sin que la persona toque nada. */
 function applyTheme() {
   const de = document.documentElement;
-  const theme = (db && db.settings && db.settings.theme) || 'claro';
+  const theme = (db && db.settings && db.settings.theme) || 'auto';
   const accent = (db && db.settings && db.settings.accent) || 'verde';
   if (de.dataset) { de.dataset.theme = theme; de.dataset.accent = accent; }
   if (de.setAttribute) { de.setAttribute('data-theme', theme); de.setAttribute('data-accent', accent); }
+}
+/* Si el sistema cambia entre claro y oscuro con la app abierta, la CSS
+   reacciona sola por la media query; este listener reaplica el tema
+   para que todo lo calculado por código siga al nuevo esquema sin
+   recargar la app. */
+try {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    const schemeMql = window.matchMedia('(prefers-color-scheme: dark)');
+    const onSchemeChange = () => { applyTheme(); };
+    if (schemeMql.addEventListener) schemeMql.addEventListener('change', onSchemeChange);
+    else if (schemeMql.addListener) schemeMql.addListener(onSchemeChange);
+  }
+} catch (e) { /* sin matchMedia: el tema automático se aplica al abrir la app */ }
+/* Paleta para dibujar por código (lienzo del informe mensual y del
+   organizador de san): sale de las variables CSS del tema ACTIVO en
+   ese momento —esquema claro/oscuro y color de acento elegidos— para
+   que la imagen compartida se vea como la app. Si las variables no se
+   pueden leer, respalda con la paleta clara de siempre. */
+function canvasPalette() {
+  const p = { bg: '#ffffff', header: '#0b6e4f', headerText: '#ffffff', ink: '#1c2733', muted: '#5d6b7a' };
+  try {
+    const cs = window.getComputedStyle(document.documentElement);
+    const read = (name) => (cs.getPropertyValue(name) || '').trim();
+    if (read('--card')) p.bg = read('--card');
+    if (read('--accent')) p.header = read('--accent');
+    if (read('--ink')) p.ink = read('--ink');
+    if (read('--muted')) p.muted = read('--muted');
+  } catch (e) { /* sin CSS disponible: paleta clara de respaldo */ }
+  return p;
 }
 
 /* ---------------- Deshacer (una sola acción) ----------------
@@ -5110,6 +5377,7 @@ function onUndo() {
   applyTheme();
   applyTextSize();
   resetExpenseForm(); resetIncomeForm(); resetSavingsForm(); resetGoalForm();
+  resetGoal2Form();
   resetFixedForm(); resetAccountForm(); resetDebtForm();
   showView(currentView);
 }
@@ -5307,28 +5575,29 @@ function buildReportCanvas() {
   canvas.width = 800; canvas.height = height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
-  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 800, height);
-  ctx.fillStyle = '#0b6e4f'; ctx.fillRect(0, 0, 800, 96);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
+  const P = canvasPalette();
+  ctx.fillStyle = P.bg; ctx.fillRect(0, 0, 800, height);
+  ctx.fillStyle = P.header; ctx.fillRect(0, 0, 800, 96);
+  ctx.fillStyle = P.headerText; ctx.font = 'bold 34px sans-serif';
   ctx.fillText(t('app_title'), 40, 58);
-  ctx.fillStyle = '#1c2733'; ctx.font = 'bold 30px sans-serif';
+  ctx.fillStyle = P.ink; ctx.font = 'bold 30px sans-serif';
   ctx.fillText(d.month, 40, 150);
   ctx.font = '26px sans-serif';
   let y = 210;
   for (const line of mainLines) {
-    ctx.fillStyle = '#5d6b7a'; ctx.fillText(line[0], 40, y);
-    ctx.fillStyle = '#1c2733'; ctx.fillText(line[1], 420, y);
+    ctx.fillStyle = P.muted; ctx.fillText(line[0], 40, y);
+    ctx.fillStyle = P.ink; ctx.fillText(line[1], 420, y);
     y += 52;
   }
   if (top.length) {
     y += 28;
-    ctx.fillStyle = '#1c2733'; ctx.font = 'bold 25px sans-serif';
+    ctx.fillStyle = P.ink; ctx.font = 'bold 25px sans-serif';
     ctx.fillText(t('rep_top3'), 40, y);
     ctx.font = '25px sans-serif';
     y += 48;
     top.forEach((c, i) => {
-      ctx.fillStyle = '#5d6b7a'; ctx.fillText((i + 1) + '. ' + catName(c.cat), 40, y);
-      ctx.fillStyle = '#1c2733'; ctx.fillText(fmtMoney(c.amt), 420, y);
+      ctx.fillStyle = P.muted; ctx.fillText((i + 1) + '. ' + catName(c.cat), 40, y);
+      ctx.fillStyle = P.ink; ctx.fillText(fmtMoney(c.amt), 420, y);
       y += 46;
     });
   }
@@ -5351,6 +5620,7 @@ function downloadReportPng() {
     if (canvas.toBlob) canvas.toBlob((blob) => { if (blob) finish(URL.createObjectURL(blob)); });
     else if (canvas.toDataURL) finish(canvas.toDataURL('image/png'));
   } catch (e) { /* sin lienzo disponible: no pasa nada */ }
+  maybeAskReview();
 }
 /* Comparte el informe como IMAGEN (Fase 1): Web Share con archivos
    cuando el sistema lo permite (WhatsApp y demás); si compartir
@@ -5369,6 +5639,7 @@ async function shareReportPng() {
       if (navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title: t('share_report_title') });
+          maybeAskReview();
           return;
         } catch (e) {
           if (e && e.name === 'AbortError') return; /* canceló: nada más */
@@ -5380,18 +5651,58 @@ async function shareReportPng() {
   downloadReportPng();
 }
 
+/* ---------------- Invitación a reseñar (Paquete 3) ----------------
+   Tras generar el informe mensual (compartirlo o descargarlo), UNA
+   sola vez en la vida de la app sale una tarjeta amable en Resumen
+   invitando a calificar en Google Play. Aceptar o descartar apaga la
+   invitación para siempre (settings.reviewPromptDone, persistido):
+   nada de ventanas repetidas ni de insistir. */
+const REVIEW_URL = 'https://play.google.com/store/apps/details?id=app.peto';
+function maybeAskReview() {
+  if (!db || db.settings.reviewPromptDone) return;
+  renderReviewCard();
+}
+function renderReviewCard() {
+  const card = document.getElementById('review-card');
+  if (!card) return;
+  clearNode(card);
+  card.hidden = false;
+  card.appendChild(el('h3', null, t('review_title')));
+  card.appendChild(el('p', 'muted', t('review_text')));
+  const row = el('div', 'form-actions');
+  const yes = el('a', 'btn btn-primary', t('review_yes'));
+  yes.href = REVIEW_URL;
+  yes.target = '_blank';
+  yes.rel = 'noopener';
+  yes.addEventListener('click', answerReview);
+  row.appendChild(yes);
+  row.appendChild(actionButton(t('review_no'), 'btn-ghost', answerReview));
+  card.appendChild(row);
+}
+function answerReview() {
+  if (!db) return;
+  db.settings.reviewPromptDone = true;
+  save();
+  const card = document.getElementById('review-card');
+  if (card) { card.hidden = true; clearNode(card); }
+}
+
 /* ---------------- PETO PRO (Fase 4) ----------------------------------
    Qué incluye Pro (PLAN-IDEAS, Fase 4): nube sin límites, informe
    avanzado, presupuesto compartido y modo organizador de san. Lo
    básico sigue gratis. Precio fijado por Sterlin (23-oct-2026):
    $1.99/mes.
-   ESTADO DE LA FACTURACIÓN EN ESTA COMPILACIÓN: todavía NO hay
-   plugin de Google Play Billing. La compra real requiere que la app
-   esté publicada en una pista de Play Console con la suscripción
-   PRO_PRODUCT_ID creada a $1.99/mes (paso de tienda, aparte). Por
-   eso la pantalla de Pro se presenta como «muy pronto» y ofrece una
-   lista de espera LOCAL (settings.proWaitlist): nadie puede pagar
-   todavía y NADA se simula como si fuera una compra real.
+   ESTADO DE LA FACTURACIÓN (actualizado 24-oct-2026): el plugin de
+   Google Play Billing YA está integrado en el proyecto y cableado
+   en la capa PetoBilling (ver abajo): capacitor-plugin-cdv-purchase
+   13.19.1, con Billing Library 9. Lo que falta es de tienda, no de
+   código: crear la suscripción PRO_PRODUCT_ID a $1.99/mes en Play
+   Console y verificar el cobro en una pista de prueba con una
+   compilación que lleve el plugin (pasos en pro-billing/NOTAS.md).
+   Hasta esa verificación, la pantalla de Pro se sigue presentando
+   como «muy pronto» con su lista de espera LOCAL
+   (settings.proWaitlist) y NADA se simula como si fuera una compra
+   real: sin puente nativo, PetoBilling.available queda en false.
    El estado Pro vive en settings.pro y SOLO lo enciende la capa de
    facturación (PetoBilling) cuando Play confirme la suscripción.
    EXCEPCIÓN DE PRUEBA CERRADA (decisión de Sterlin, 23-oct-2026):
@@ -5410,16 +5721,152 @@ function isPro() {
   return PETO_PRO_OPEN_TEST || !!(db && db.settings && db.settings.pro === true);
 }
 /* === CAPA DE FACTURACIÓN — único punto de integración con la tienda ==
-   Para activar la compra real hay que: (1) publicar la app en Play
-   Console y crear la suscripción PRO_PRODUCT_ID a $1.99/mes;
-   (2) integrar el plugin de facturación en el proyecto nativo;
-   (3) implementar purchase()/restore() aquí con ese plugin y, tras la
-   confirmación de Play, poner settings.pro = true + save() y
-   renderProCard(). Ninguna otra parte de la app habla con la tienda. */
+   Ninguna otra parte de la app habla con la tienda: todo pasa por
+   este objeto. Plugin: capacitor-plugin-cdv-purchase 13.19.1
+   (puente nativo propio de Capacitor, sin capa Cordova; en Android
+   usa Google Play Billing Library 9.0.0 y su manifiesto aporta el
+   permiso com.android.vending.BILLING). Su núcleo JS va vendored en
+   vendor/cdv-purchase.js y expone el global CdvPurchase; el puente
+   nativo se registra como Capacitor.Plugins.PurchasePlugin, el mismo
+   patrón capPlugin() del resto de plugins de la app.
+   Inicialización PEREZOSA: la tienda solo se abre cuando algo la
+   necesita (purchase(), restore(), productInfo() o el refresco de
+   arranque, que a su vez no hace nada si el puente no está).
+   Sin validador de servidor: verify() confirma con los recibos
+   LOCALES del dispositivo (sin validator, el plugin usa los recibos
+   locales), coherente con que PETO no manda datos a terceros. El
+   estado Pro SOLO lo escribe _sync(), desde el owned confirmado por
+   la tienda tras el ciclo approved → verify → finish (finish es lo
+   que reconoce la suscripción ante Play: sin él, Play la reembolsa
+   a los 3 días). Un pago diferido (pending) NO concede Pro.
+   En web y en la versión de prueba el puente no existe: available
+   queda en false y purchase()/restore() devuelven
+   billing_no_disponible sin tocar el estado. */
 const PetoBilling = {
-  available: false, /* ← true solo cuando Play Billing esté integrado */
-  async purchase() { return { ok: false, reason: 'billing_no_disponible' }; },
-  async restore() { return { ok: false, reason: 'billing_no_disponible' }; }
+  available: false, /* true solo si el puente respondió y la tienda abrió */
+  _initPromise: null,
+
+  /* Plataforma de tienda según la plataforma Capacitor actual. */
+  _platform(C) {
+    const p = (window.Capacitor && typeof window.Capacitor.getPlatform === 'function')
+      ? window.Capacitor.getPlatform() : 'web';
+    if (p === 'android') return C.Platform.GOOGLE_PLAY;
+    if (p === 'ios') return C.Platform.APPLE_APPSTORE;
+    return null;
+  },
+
+  /* El núcleo JS + el puente nativo, o null si no están (web/prueba). */
+  _bridge() {
+    try {
+      const C = window.CdvPurchase;
+      if (!C || !C.store) return null;
+      if (!capPlugin('PurchasePlugin')) return null;
+      if (!this._platform(C)) return null;
+      return C;
+    } catch (e) { return null; }
+  },
+
+  /* Escribe settings.pro SOLO desde el estado confirmado por la tienda. */
+  _sync() {
+    const C = window.CdvPurchase;
+    if (!C || !db) return false;
+    const product = C.store.get(PRO_PRODUCT_ID, this._platform(C));
+    const ownedNow = product ? !!C.store.owned(product) : false;
+    if (!!db.settings.pro !== ownedNow) {
+      db.settings.pro = ownedNow;
+      save();
+    }
+    renderProCard();
+    return ownedNow;
+  },
+
+  _listen(C) {
+    C.store.when()
+      .approved((transaction) => { transaction.verify(); })
+      .verified((receipt) => { receipt.finish(); })
+      .finished(() => { this._sync(); })
+      .receiptUpdated(() => { this._sync(); })
+      .pending(() => { /* pago diferido: no conceder hasta approved */ });
+    C.store.error(() => { /* errores de tienda: no tocar el estado Pro */ });
+  },
+
+  /* Abre la tienda una sola vez; true si quedó operativa. */
+  _ensureInit() {
+    if (!this._initPromise) {
+      this._initPromise = (async () => {
+        const C = this._bridge();
+        if (!C) { this.available = false; return false; }
+        try {
+          const platform = this._platform(C);
+          this._listen(C);
+          C.store.register([{
+            id: PRO_PRODUCT_ID,
+            type: C.ProductType.PAID_SUBSCRIPTION,
+            platform
+          }]);
+          const errors = await C.store.initialize([platform]);
+          if (errors && errors.length) { this.available = false; return false; }
+          this.available = true;
+          this._sync();
+          return true;
+        } catch (e) {
+          this.available = false;
+          return false;
+        }
+      })();
+    }
+    return this._initPromise;
+  },
+
+  /* Refresco de estado (arranque nativo); sin puente no hace nada. */
+  async refresh() {
+    if (!this._bridge()) return false;
+    return this._ensureInit();
+  },
+
+  /* Consulta del producto en la tienda (título y precio localizados). */
+  async productInfo() {
+    if (!(await this._ensureInit())) return null;
+    const C = window.CdvPurchase;
+    const product = C.store.get(PRO_PRODUCT_ID, this._platform(C));
+    if (!product) return null;
+    const phases = product.pricing && product.pricing.phases;
+    const phase = phases && phases.length ? phases[0] : null;
+    return {
+      id: product.id,
+      title: product.title || '',
+      priceText: phase ? (phase.price || '') : '',
+      currency: phase ? (phase.currency || '') : ''
+    };
+  },
+
+  async purchase() {
+    if (!(await this._ensureInit())) return { ok: false, reason: 'billing_no_disponible' };
+    const C = window.CdvPurchase;
+    const store = C.store;
+    const product = store.get(PRO_PRODUCT_ID, this._platform(C));
+    if (!product) return { ok: false, reason: 'producto_no_disponible' };
+    if (store.owned(product)) { this._sync(); return { ok: true, already: true }; }
+    const offer = product.getOffer();
+    if (!offer) return { ok: false, reason: 'producto_no_disponible' };
+    let err = null;
+    try { err = await offer.order(); } catch (e) { err = e; }
+    if (err) return { ok: false, reason: 'compra_no_completada', code: err.code || null };
+    /* approved → verify → finish corre en los listeners; el estado
+       final llega por finished/receiptUpdated. Se sincroniza ya lo
+       que la tienda confirme en este momento. */
+    return this._sync() ? { ok: true } : { ok: true, pending: true };
+  },
+
+  async restore() {
+    if (!(await this._ensureInit())) return { ok: false, reason: 'billing_no_disponible' };
+    const store = window.CdvPurchase.store;
+    let err = null;
+    try { err = await store.restorePurchases(); } catch (e) { err = e; }
+    if (err) return { ok: false, reason: 'restore_error', code: err.code || null };
+    const ownedNow = this._sync();
+    return { ok: ownedNow, restored: ownedNow };
+  }
 };
 /* Muro de pago: las funciones Pro llaman requirePro() antes de abrir;
    sin Pro se muestra la pantalla de venta y no se ejecuta nada más. */
@@ -5470,11 +5917,11 @@ function onProWaitlist() {
   renderProPaywall();
   renderProCard();
 }
-/* Botón de compra — SOLO existirá cuando PetoBilling.available sea
-   true (la UI de esta compilación no lo muestra). No finge resultados:
-   si la facturación no está disponible, no toca el estado Pro. */
+/* Botón de compra — la UI lo mostrará cuando la facturación esté
+   verificada en Play (ver pro-billing/NOTAS.md). No finge resultados:
+   purchase() inicializa la tienda de forma perezosa y, si la
+   facturación no está disponible, no toca el estado Pro. */
 async function onProBuy() {
-  if (!PetoBilling.available) return { ok: false, reason: 'billing_no_disponible' };
   const r = await PetoBilling.purchase();
   if (r && r.ok) { renderProCard(); hideProPaywall(); }
   return r;
@@ -5734,6 +6181,37 @@ async function onLockSubmit(ev) {
 }
 
 /* ---------------- Bienvenida ---------------- */
+/* Recorrido de 3 pasos sobre el formulario de bienvenida (Paquete 3):
+   se ve una sola vez en la vida de la app, porque la bienvenida misma
+   solo aparece cuando settings.onboarded es false. Es saltable en
+   cualquier paso y no guarda estado propio: al terminar (o saltar),
+   el formulario queda a la vista como siempre. */
+let obTourStep = 1;
+function renderObTour() {
+  const tour = document.getElementById('ob-tour');
+  if (!tour || tour.hidden) return;
+  tour.querySelectorAll('.ob-step').forEach((n) => {
+    n.hidden = Number(n.getAttribute('data-ob-step')) !== obTourStep;
+  });
+  const dots = document.getElementById('ob-tour-dots');
+  if (dots) dots.textContent = [1, 2, 3].map((i) => (i === obTourStep ? '●' : '○')).join(' ');
+  const next = document.getElementById('ob-tour-next');
+  if (next) next.textContent = t(obTourStep >= 3 ? 'ob_tour_go' : 'ob_tour_next');
+  const skip = document.getElementById('ob-tour-skip');
+  if (skip) skip.hidden = obTourStep >= 3;
+}
+function obTourSkip() {
+  const tour = document.getElementById('ob-tour');
+  if (tour) tour.hidden = true;
+  const name = document.getElementById('ob-name');
+  if (name) name.focus();
+}
+function obTourNext() {
+  if (obTourStep >= 3) { obTourSkip(); return; }
+  obTourStep++;
+  renderObTour();
+}
+
 async function onOnboardingSubmit(ev) {
   ev.preventDefault();
   const name = cleanText(document.getElementById('ob-name').value, 40);
@@ -5759,6 +6237,10 @@ async function onOnboardingSubmit(ev) {
 function wireEvents() {
   document.getElementById('lock-form').addEventListener('submit', onLockSubmit);
   document.getElementById('onboarding-form').addEventListener('submit', onOnboardingSubmit);
+  const obTourNextBtn = document.getElementById('ob-tour-next');
+  if (obTourNextBtn) obTourNextBtn.addEventListener('click', obTourNext);
+  const obTourSkipBtn = document.getElementById('ob-tour-skip');
+  if (obTourSkipBtn) obTourSkipBtn.addEventListener('click', obTourSkip);
   const obLangSel = document.getElementById('ob-lang');
   if (obLangSel) obLangSel.addEventListener('change', (ev) => {
     db.settings.lang = ['es', 'en', 'it'].includes(ev.target.value) ? ev.target.value : 'es';
@@ -5891,6 +6373,7 @@ function wireEvents() {
   document.getElementById('btn-share-org').addEventListener('click', onShareSanOrg);
   document.getElementById('btn-share-org-img').addEventListener('click', shareSanOrgPng);
   document.getElementById('goal2-form').addEventListener('submit', onGoal2Submit);
+  document.getElementById('goal2-cancel-edit').addEventListener('click', () => { resetGoal2Form(); });
   document.getElementById('btn-menu-close').addEventListener('click', closeMenu);
   document.getElementById('menu-backdrop').addEventListener('click', closeMenu);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
@@ -5955,6 +6438,7 @@ function init() {
     document.getElementById('app-shell').hidden = true;
     document.getElementById('view-lock').hidden = true;
     document.getElementById('view-onboarding').hidden = false;
+    renderObTour();
     const obLangBoot = document.getElementById('ob-lang');
     if (obLangBoot) obLangBoot.value = lang();
     return;
@@ -5965,6 +6449,12 @@ function init() {
 
 init();
 cloudBoot();
+
+/* PETO Pro: refresco perezoso del estado de facturación al arrancar.
+   PetoBilling.refresh() no hace nada si el puente nativo de compras
+   no está presente (web, prueba o compilaciones sin el plugin), y si
+   la tienda no responde deja intacto el estado Pro guardado. */
+PetoBilling.refresh().catch(() => { /* sin tienda, la app sigue igual */ });
 
 /* PWA: el service worker solo cachea los archivos de la propia app. */
 /* --- Service worker SOLO en web; en la app nativa es un peligro ---

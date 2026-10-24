@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b6e4f">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b6e4f">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11171d">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="description" content="PETO Finanzas: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
 <title>PETO Finanzas — Web</title>
@@ -30,7 +32,7 @@
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 21</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 24</p>
   </div>
 </section>
 
@@ -42,6 +44,28 @@
     <p><span data-i18n="ob_intro_1">Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.</span>
        <strong data-i18n="ob_intro_2">Con tu cuenta en la nube.</strong>
        <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
+    <div id="ob-tour">
+      <div class="ob-step" data-ob-step="1">
+        <p class="ob-step-icon" aria-hidden="true">🧾</p>
+        <h2 data-i18n="ob_tour1_title">Anota un gasto en segundos</h2>
+        <p data-i18n="ob_tour1_text">Toca el botón +, escribe la cantidad y la categoría. Nada más: tu gasto queda registrado al instante.</p>
+      </div>
+      <div class="ob-step" data-ob-step="2" hidden>
+        <p class="ob-step-icon" aria-hidden="true">💸</p>
+        <h2 data-i18n="ob_tour2_title">¿Cuánto puedes gastar hoy?</h2>
+        <p data-i18n="ob_tour2_text">PETO reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.</p>
+      </div>
+      <div class="ob-step" data-ob-step="3" hidden>
+        <p class="ob-step-icon" aria-hidden="true">☁️</p>
+        <h2 data-i18n="ob_tour3_title">Tu cuenta en la nube (opcional)</h2>
+        <p data-i18n="ob_tour3_text">Si quieres, crea una cuenta gratis para ver tus datos también en la web. Sin cuenta, todo queda solo en tu teléfono.</p>
+      </div>
+      <div class="ob-tour-nav">
+        <button id="ob-tour-skip" type="button" class="btn btn-ghost" data-i18n="ob_tour_skip">Saltar</button>
+        <span id="ob-tour-dots" class="ob-dots" aria-hidden="true">● ○ ○</span>
+        <button id="ob-tour-next" type="button" class="btn btn-secondary" data-i18n="ob_tour_next">Siguiente</button>
+      </div>
+    </div>
     <form id="onboarding-form" autocomplete="off">
       <label for="ob-name" data-i18n="ob_name_label">¿Cómo te llamas?</label>
       <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre" required>
@@ -134,6 +158,8 @@
       <div id="spend-today-left" class="muted small"></div>
       <span id="spend-today-note" class="muted small"></span>
     </section>
+
+    <div id="home-streak" class="streak-pill" hidden></div>
 
     <section id="home-insights" class="card" hidden></section>
 
@@ -289,7 +315,8 @@
       <input id="goal2-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
       <p id="goal2-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
-        <button type="submit" class="btn btn-secondary" data-i18n="goal2_create">Crear meta</button>
+        <button id="goal2-submit" type="submit" class="btn btn-secondary" data-i18n="goal2_create">Crear meta</button>
+        <button id="goal2-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
       </div>
     </form>
 
@@ -304,6 +331,8 @@
       <input id="sav-date" type="date" required>
       <label for="sav-note" data-i18n="note_label">Nota (opcional)</label>
       <input id="sav-note" type="text" maxlength="120" data-i18n-ph="sav_note_ph" placeholder="¿Para qué es este ahorro?">
+      <label for="sav-goal" data-i18n="sav_goal_label">Asignar a una meta (opcional)</label>
+      <select id="sav-goal"></select>
       <p id="sav-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" data-i18n="sav_save">Guardar ahorro</button>
@@ -329,12 +358,18 @@
     <h3 data-i18n="res_summary_title">Ingresos vs Gastos vs Ahorros</h3>
     <div id="chart-summary"></div>
     <p id="chart-summary-empty" class="empty-state" hidden data-i18n="res_summary_empty">Todavía no hay movimientos en este mes.</p>
+    <h3 data-i18n="trend_title">Tendencia de gasto</h3>
+    <canvas id="trend-canvas" width="640" height="200"></canvas>
+    <p id="trend-empty" class="empty-state" hidden data-i18n="trend_empty">Todavía no hay gastos para mostrar la tendencia.</p>
+    <h3 data-i18n="trend_weeks">Semanas de este mes</h3>
+    <div id="trend-weeks"></div>
     <h3 data-i18n="rep_title">Informe del mes</h3>
     <div id="biz-card" class="card report-card" hidden></div>
     <div id="report-card" class="card report-card"></div>
     <button id="btn-report-png" type="button" class="btn btn-secondary" data-i18n="rep_download">Descargar imagen</button>
     <button id="btn-report-share-img" type="button" class="btn btn-secondary" data-i18n="rep_share_image">Compartir imagen</button>
     <button id="btn-share-report" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
+    <div id="review-card" class="card" hidden></div>
     <h3 data-i18n="adv_title">Informe avanzado</h3>
     <p class="muted small" data-i18n="adv_note">Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.</p>
     <div id="adv-card" class="card report-card" hidden></div>
@@ -794,7 +829,7 @@
       <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 21</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 24</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
