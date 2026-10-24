@@ -109,6 +109,19 @@
     </div>
   </section>
 
+  <section id="prueba">
+    <h2 data-i18n="tst_h2">🧪 Prueba PETO antes que nadie</h2>
+    <p class="muted" data-i18n="tst_sub">PETO entra en prueba cerrada en Google Play (Android) antes de su lanzamiento. Las plazas son limitadas y participar es gratis: déjanos tu correo y te escribimos en cuanto haya una plaza para ti.</p>
+    <form class="calc" id="form-testers">
+      <label for="tst-nombre" data-i18n="tst_nombre_l">Tu nombre (opcional)</label>
+      <input id="tst-nombre" type="text" autocomplete="name" placeholder="Ej. María" data-i18n-attr="placeholder:tst_nombre_ph">
+      <label for="tst-email" data-i18n="tst_email_l">Tu correo</label>
+      <input id="tst-email" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" data-i18n-attr="placeholder:tst_email_ph" required>
+      <button class="btn" type="submit" data-i18n="tst_btn">Quiero probarla</button>
+    </form>
+    <div class="resultado" id="tst-resultado"></div>
+  </section>
+
   <footer class="site">
     <p data-i18n="foot_1">PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · Contacto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a></p>
     <p data-i18n="foot_2">Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.</p>
@@ -159,7 +172,17 @@ window.PETO_TEXTOS = {
     pod_p: 'El podcast en español de la familia PETO: episodios cortos, de unos 5 minutos, con un tema de dinero por día y un paso concreto para aplicarlo hoy mismo. Fondo de emergencia, salir de deudas, auditar suscripciones, subir tu crédito y más, explicado sin palabras raras.',
     pod_btn: 'Escuchar el podcast',
     foot_1: 'PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · Contacto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a>',
-    foot_2: 'Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.'
+    foot_2: 'Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.',
+    tst_h2: '🧪 Prueba PETO antes que nadie',
+    tst_sub: 'PETO entra en prueba cerrada en Google Play (Android) antes de su lanzamiento. Las plazas son limitadas y participar es gratis: déjanos tu correo y te escribimos en cuanto haya una plaza para ti.',
+    tst_nombre_l: 'Tu nombre (opcional)',
+    tst_nombre_ph: 'Ej. María',
+    tst_email_l: 'Tu correo',
+    tst_email_ph: 'tucorreo@ejemplo.com',
+    tst_btn: 'Quiero probarla',
+    tst_ok: '¡Ya estás en la lista! Te escribiremos cuando abra la prueba.',
+    tst_dup: 'Ese correo ya está en la lista.',
+    tst_err: 'No se pudo guardar tu correo. Inténtalo de nuevo en un momento.'
   },
   it: {
     __title: 'PETO — Controllo delle spese, budget e il tuo san sotto controllo',
@@ -204,10 +227,95 @@ window.PETO_TEXTOS = {
     pod_p: 'Il podcast in spagnolo della famiglia PETO: episodi brevi, di circa 5 minuti, con un tema di denaro al giorno e un passo concreto da applicare oggi stesso. Fondo di emergenza, uscire dai debiti, controllare gli abbonamenti, migliorare il tuo punteggio di credito e altro ancora, spiegato senza parole difficili.',
     pod_btn: 'Ascolta il podcast',
     foot_1: 'PETO — Controllo delle spese · <a href="privacidad/">Informativa sulla privacy</a> · <a href="app/">Apri l\'app web</a> · Contatto: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a>',
-    foot_2: 'Fatto con la regola di casa: il risparmio non si calcola da solo — sei tu ad annotare il tuo risparmio reale.'
+    foot_2: 'Fatto con la regola di casa: il risparmio non si calcola da solo — sei tu ad annotare il tuo risparmio reale.',
+    tst_h2: '🧪 Prova PETO prima di tutti',
+    tst_sub: 'PETO entra in test chiuso su Google Play (Android) prima del lancio. I posti sono limitati e partecipare è gratis: lasciaci la tua email e ti scriveremo appena c\'è un posto per te.',
+    tst_nombre_l: 'Il tuo nome (facoltativo)',
+    tst_nombre_ph: 'Es. Maria',
+    tst_email_l: 'La tua email',
+    tst_email_ph: 'nome@esempio.com',
+    tst_btn: 'Voglio provarla',
+    tst_ok: 'Sei nella lista! Ti scriveremo quando si apre il test.',
+    tst_dup: 'Questa email è già nella lista.',
+    tst_err: 'Non è stato possibile salvare la tua email. Riprova tra un momento.'
+  },
+  /* Inglés: el selector del sitio es ES/IT; las claves de la sección de
+     testers quedan listas por si se activa el inglés. */
+  en: {
+    tst_h2: '🧪 Try PETO before anyone else',
+    tst_sub: 'PETO is entering closed testing on Google Play (Android) before launch. Spots are limited and joining is free: leave your email and we\'ll write to you as soon as a spot opens for you.',
+    tst_nombre_l: 'Your name (optional)',
+    tst_nombre_ph: 'E.g. Maria',
+    tst_email_l: 'Your email',
+    tst_email_ph: 'you@example.com',
+    tst_btn: 'I want to try it',
+    tst_ok: 'You\'re on the list! We\'ll email you when testing opens.',
+    tst_dup: 'That email is already on the list.',
+    tst_err: 'We couldn\'t save your email. Please try again in a moment.'
   }
 };
 </script>
 <script src="i18n.js"></script>
+<script>
+/* Formulario de testers (sección #prueba): inserta el correo en Supabase,
+   tabla tester_signups. La llave anónima es pública a propósito: con RLS
+   solo permite INSERT en esa tabla (nadie puede leer la lista por la API).
+   Sin recarga de página; los mensajes salen en el idioma activo del sitio. */
+(function () {
+  'use strict';
+  var SUPABASE_URL = 'https://sboldltkywwjnslairlg.supabase.co';
+  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNib2xkbHRreXd3am5zbGFpcmxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3MTk1NzEsImV4cCI6MjEwODI5NTU3MX0.MuG3mn6X_GY0Q6YzI14VfWjrxKySjapH7GA5u2DPPe4';
+  var form = document.getElementById('form-testers');
+  if (!form) return;
+  var caja = document.getElementById('tst-resultado');
+
+  function texto(clave) {
+    var lang = (window.PETO_idioma && window.PETO_idioma()) || 'es';
+    var d = (window.PETO_TEXTOS && window.PETO_TEXTOS[lang]) || {};
+    if (d[clave] != null) return d[clave];
+    var es = (window.PETO_TEXTOS && window.PETO_TEXTOS.es) || {};
+    return es[clave] || '';
+  }
+
+  function mostrar(msg, esError) {
+    caja.innerHTML = '';
+    var p = document.createElement('p');
+    if (esError) p.className = 'error';
+    p.textContent = msg;
+    caja.appendChild(p);
+    caja.classList.add('visible');
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var nombre = document.getElementById('tst-nombre').value.trim();
+    var email = document.getElementById('tst-email').value.trim().toLowerCase();
+    if (!email) return;
+    var datos = { email: email, source: 'web' };
+    if (nombre) datos.name = nombre;
+    fetch(SUPABASE_URL + '/rest/v1/tester_signups', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(datos)
+    }).then(function (resp) {
+      if (resp.status === 201) {
+        form.reset();
+        mostrar(texto('tst_ok'), false);
+      } else if (resp.status === 409) {
+        mostrar(texto('tst_dup'), false);
+      } else {
+        mostrar(texto('tst_err'), true);
+      }
+    }).catch(function () {
+      mostrar(texto('tst_err'), true);
+    });
+  });
+})();
+</script>
 </body>
 </html>
