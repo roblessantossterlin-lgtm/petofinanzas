@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6e4f">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
-<meta name="description" content="PETO Web: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
-<title>PETO — Web</title>
+<meta name="description" content="PETO Finanzas: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
+<title>PETO Finanzas — Web</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -30,6 +30,7 @@
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 21</p>
   </div>
 </section>
 
@@ -44,6 +45,12 @@
     <form id="onboarding-form" autocomplete="off">
       <label for="ob-name" data-i18n="ob_name_label">¿Cómo te llamas?</label>
       <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre" required>
+      <label for="ob-lang" data-i18n="set_lang_label">Idioma / Language</label>
+      <select id="ob-lang">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="it">Italiano</option>
+      </select>
       <label for="ob-pin" data-i18n="ob_pin_label">Crea un PIN de seguridad (opcional)</label>
       <input id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
              data-i18n-ph="ob_pin_ph" placeholder="4 a 6 números, o déjalo vacío">
@@ -124,6 +131,7 @@
     <section class="card spend-card">
       <span class="summary-label" data-i18n="spend_title">¿Cuánto puedes gastar hoy?</span>
       <span id="spend-today" class="spend-value">—</span>
+      <div id="spend-today-left" class="muted small"></div>
       <span id="spend-today-note" class="muted small"></span>
     </section>
 
@@ -178,6 +186,27 @@
 
     <ul id="expense-list" class="item-list"></ul>
     <p id="expense-empty" class="empty-state" hidden data-i18n="exp_empty">Todavía no hay gastos en este mes. Registra el primero con el formulario de arriba. 👍</p>
+
+    <section class="card form-card" id="csv-card">
+      <h3 data-i18n="csv_title">Importar estado de cuenta (CSV)</h3>
+      <p class="muted small" data-i18n="csv_help">Sube el archivo CSV de tu banco y revisa todo en una vista previa antes de importar: nada se guarda hasta que confirmes.</p>
+      <label for="csv-file" data-i18n="csv_file_label">Archivo CSV del banco</label>
+      <input id="csv-file" type="file" accept=".csv,text/csv,text/plain">
+      <div id="csv-preview" hidden>
+        <p class="total-line" data-i18n="csv_preview_title">Vista previa de la importación</p>
+        <p id="csv-summary" class="muted small"></p>
+        <div class="form-actions">
+          <button id="csv-all" type="button" class="btn btn-ghost btn-small" data-i18n="csv_all">Marcar todos</button>
+          <button id="csv-none" type="button" class="btn btn-ghost btn-small" data-i18n="csv_none">Desmarcar todos</button>
+        </div>
+        <ul id="csv-rows" class="item-list"></ul>
+        <p id="csv-error" class="error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button id="csv-apply" type="button" class="btn btn-primary" data-i18n="csv_apply">Importar seleccionados</button>
+          <button id="csv-cancel" type="button" class="btn btn-ghost" data-i18n="csv_cancel">Cancelar importación</button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ======= INGRESOS ======= -->
@@ -304,7 +333,13 @@
     <div id="biz-card" class="card report-card" hidden></div>
     <div id="report-card" class="card report-card"></div>
     <button id="btn-report-png" type="button" class="btn btn-secondary" data-i18n="rep_download">Descargar imagen</button>
+    <button id="btn-report-share-img" type="button" class="btn btn-secondary" data-i18n="rep_share_image">Compartir imagen</button>
     <button id="btn-share-report" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
+    <h3 data-i18n="adv_title">Informe avanzado</h3>
+    <p class="muted small" data-i18n="adv_note">Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.</p>
+    <div id="adv-card" class="card report-card" hidden></div>
+    <button id="btn-adv-open" type="button" class="btn btn-secondary" data-i18n="adv_open_btn">Ver informe avanzado</button>
+    <button id="btn-adv-csv" type="button" class="btn btn-secondary" data-i18n="adv_export_csv" hidden>Exportar mes en CSV</button>
   </main>
 
   <!-- ======= BUSCAR ======= -->
@@ -451,8 +486,22 @@
       <input type="hidden" id="rem-id">
       <label for="rem-amount" data-i18n="rem_usd_label">Cantidad enviada ($ USD)</label>
       <input id="rem-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
-      <label for="rem-rate" data-i18n="rem_rate_label">Tasa (pesos por $1)</label>
+      <label for="rem-currency" data-i18n="rem_currency_label">Moneda de destino</label>
+      <select id="rem-currency">
+        <option value="DOP">DOP · Peso dominicano (RD$)</option>
+        <option value="MXN">MXN · Peso mexicano</option>
+        <option value="COP">COP · Peso colombiano</option>
+        <option value="GTQ">GTQ · Quetzal guatemalteco</option>
+        <option value="HNL">HNL · Lempira hondureño</option>
+        <option value="PEN">PEN · Sol peruano</option>
+        <option value="EUR">EUR · Euro</option>
+        <option value="BRL">BRL · Real brasileño</option>
+        <option value="CLP">CLP · Peso chileno</option>
+        <option value="ARS">ARS · Peso argentino</option>
+      </select>
+      <label for="rem-rate" id="rem-rate-label">Tasa (DOP por $1)</label>
       <input id="rem-rate" type="number" inputmode="decimal" min="0.01" max="999999" step="0.01" required placeholder="58.50">
+      <p id="rem-rate-hint" class="muted small"></p>
       <label for="rem-recipient" data-i18n="rem_recipient_label">¿Para quién?</label>
       <input id="rem-recipient" type="text" maxlength="60" placeholder="Ej.: Mami">
       <label for="rem-date" data-i18n="date_label">Fecha</label>
@@ -467,6 +516,7 @@
 
     <ul id="remittance-list" class="item-list"></ul>
     <p id="remittance-empty" class="empty-state" hidden data-i18n="rem_empty">No tienes remesas registradas.</p>
+    <section id="rem-totals" class="card" hidden></section>
   </main>
 
   <main id="view-san" class="view" hidden>
@@ -518,6 +568,58 @@
         </div>
       </section>
     </div>
+
+    <section class="card" id="org-section">
+      <h3><span data-i18n="org_title">Modo organizador de san</span> ⭐ <span data-i18n="pro_tag">PRO</span></h3>
+      <p class="muted small" data-i18n="org_intro">Organiza la tanda de todo el grupo: turnos con fecha, marca quién ya pagó en cada ronda y comparte el estado con el grupo.</p>
+      <div id="org-locked">
+        <p class="muted" data-i18n="org_pro_note">El modo organizador es una función de PETO Pro.</p>
+        <button id="btn-org-pro" type="button" class="btn btn-secondary" data-i18n="pro_btn_see">Ver PETO Pro</button>
+      </div>
+      <div id="org-main" hidden>
+        <div id="org-create-wrap">
+          <form id="org-form" autocomplete="off">
+            <h4 data-i18n="org_form_title">Crear san del grupo</h4>
+            <label for="org-name" data-i18n="san_name_label">Nombre del san</label>
+            <input id="org-name" type="text" maxlength="60" data-i18n-ph="san_name_ph" placeholder="Ej.: San de la familia">
+            <label for="org-amount" data-i18n="san_aporte_label">Aporte por turno ($)</label>
+            <input id="org-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+            <label for="org-freq" data-i18n="org_freq_label">Frecuencia de las rondas</label>
+            <select id="org-freq">
+              <option value="semanal" data-i18n="org_freq_semanal">Semanal</option>
+              <option value="quincenal" data-i18n="org_freq_quincenal">Quincenal (cada 2 semanas)</option>
+              <option value="mensual" data-i18n="org_freq_mensual">Mensual</option>
+            </select>
+            <label for="org-start" data-i18n="org_start_label">Fecha de la primera ronda</label>
+            <input id="org-start" type="date">
+            <label data-i18n="san_participants_label">Participantes (en orden de turno)</label>
+            <div class="budget-input-row">
+              <input id="org-pname" type="text" maxlength="40" data-i18n-ph="san_pname_ph" placeholder="Nombre del participante">
+              <button id="org-add-participant" type="button" class="btn btn-secondary" data-i18n="san_add_participant">Agregar</button>
+            </div>
+            <ul id="org-draft-list" class="item-list"></ul>
+            <p id="org-draft-empty" class="muted small" data-i18n="san_draft_empty">Todavía no agregas participantes.</p>
+            <p id="org-error" class="error" role="alert" hidden></p>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" data-i18n="org_create_btn">Crear san organizado</button>
+            </div>
+          </form>
+        </div>
+        <div id="org-active-wrap" hidden>
+          <h4 id="org-title-line"></h4>
+          <p id="org-meta-line" class="muted"></p>
+          <p id="org-total-line" class="total-line"></p>
+          <div id="org-rounds"></div>
+          <h4 data-i18n="org_totals_title">Aportes por participante</h4>
+          <ul id="org-totals" class="item-list"></ul>
+          <div class="form-actions">
+            <button id="btn-share-org" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
+            <button id="btn-share-org-img" type="button" class="btn btn-secondary" data-i18n="rep_share_image">Compartir imagen</button>
+            <button id="org-delete" type="button" class="btn btn-ghost" data-i18n="org_delete">Borrar san organizado</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ======= AJUSTES ======= -->
@@ -538,6 +640,7 @@
       <select id="set-lang">
         <option value="es">Español</option>
         <option value="en">English</option>
+        <option value="it">Italiano</option>
       </select>
       <label for="set-theme" data-i18n="set_theme_label">Tema</label>
       <select id="set-theme">
@@ -591,6 +694,9 @@
           <button id="btn-cloud-signout" type="button" class="btn btn-ghost" data-i18n="cloud_signout">Cerrar sesión</button>
           <button id="btn-cloud-wipe" type="button" class="btn btn-ghost" data-i18n="cloud_wipe">Borrar mis datos de la nube</button>
         </div>
+        <div class="form-actions">
+          <button id="btn-cloud-delete" type="button" class="btn btn-danger" data-i18n="cloud_delete">Eliminar mi cuenta</button>
+        </div>
       </div>
       <p id="cloud-status" class="muted small" aria-live="polite"></p>
       <p id="cloud-error" class="error" role="alert" hidden></p>
@@ -613,6 +719,42 @@
       <h3 data-i18n="set_sections_title">Secciones visibles</h3>
       <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
       <div id="section-toggles"></div>
+    </section>
+
+    <section class="card form-card" id="pro-card">
+      <h3>⭐ <span data-i18n="pro_title">PETO Pro</span></h3>
+      <p class="muted small" data-i18n="pro_card_text">La nube sin límites, el informe avanzado, el presupuesto compartido y el modo organizador de san.</p>
+      <p id="pro-status" class="total-line"></p>
+      <div class="form-actions">
+        <button id="btn-pro-open" type="button" class="btn btn-secondary" data-i18n="pro_btn_see">Ver PETO Pro</button>
+      </div>
+    </section>
+
+    <section class="card form-card" id="shared-card">
+      <h3 data-i18n="shared_title">Presupuesto compartido</h3>
+      <p class="muted small" id="shared-note" data-i18n="shared_preview_note">🔧 Vista previa del diseño: todavía no se conecta con otras cuentas. Sirve para probar cómo se verá crear un hogar, unirse con un código y ver los miembros.</p>
+      <div id="shared-none">
+        <label for="shared-name" data-i18n="shared_create_label">Nombre del hogar</label>
+        <input id="shared-name" type="text" maxlength="60">
+        <div class="form-actions">
+          <button id="btn-shared-create" type="button" class="btn btn-secondary" data-i18n="shared_create_btn">Crear hogar</button>
+        </div>
+        <label for="shared-code" data-i18n="shared_join_label">Código de invitación</label>
+        <input id="shared-code" type="text" maxlength="6" autocomplete="off">
+        <div class="form-actions">
+          <button id="btn-shared-join" type="button" class="btn btn-secondary" data-i18n="shared_join_btn">Unirme con código</button>
+        </div>
+      </div>
+      <div id="shared-in" hidden>
+        <p class="total-line" id="shared-household-name"></p>
+        <p class="muted" id="shared-household-code"></p>
+        <p class="total-line" data-i18n="shared_members_title">Miembros</p>
+        <ul id="shared-members" class="item-list"></ul>
+        <div class="form-actions">
+          <button id="btn-shared-leave" type="button" class="btn btn-ghost" data-i18n="shared_leave_btn">Salir del hogar</button>
+        </div>
+      </div>
+      <p id="shared-error" class="error" role="alert" hidden></p>
     </section>
 
     <section class="card form-card">
@@ -652,6 +794,7 @@
       <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
     </section>
+    <p class="muted small build-label" id="settings-build-label">Compilación 21</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
@@ -667,6 +810,28 @@
       <button id="quick-income" type="button" class="btn btn-primary btn-big" data-i18n="quick_income">💵 Ingreso</button>
       <button id="quick-savings" type="button" class="btn btn-primary btn-big" data-i18n="quick_savings">🐷 Ahorro</button>
       <button id="quick-cancel" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="bio-offer" class="chooser" hidden>
+    <div class="chooser-card">
+      <h3 data-i18n="bio_offer_title">¿Desbloquear con tu huella?</h3>
+      <p class="muted" data-i18n="bio_offer_text">Acabas de crear tu PIN. Si quieres, puedes entrar a PETO con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?</p>
+      <p id="bio-offer-error" class="error" role="alert" hidden></p>
+      <button id="bio-offer-yes" type="button" class="btn btn-primary btn-big" data-i18n="bio_offer_yes">Sí, activar la huella</button>
+      <button id="bio-offer-no" type="button" class="btn btn-ghost" data-i18n="bio_offer_no">Ahora no</button>
+    </div>
+  </div>
+
+  <div id="pro-paywall" class="chooser" hidden>
+    <div class="chooser-card">
+      <h3 data-i18n="pro_wall_title">Esto es de PETO Pro ⭐</h3>
+      <p id="pro-price-line" class="total-line"></p>
+      <ul id="pro-benefits" class="item-list"></ul>
+      <p class="muted" data-i18n="pro_coming_text">La compra dentro de la app llega con el lanzamiento en Google Play. Mientras tanto puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar Pro por $1.99 al mes.</p>
+      <button id="pro-waitlist-btn" type="button" class="btn btn-primary btn-big" data-i18n="pro_waitlist_btn">Anotarme en la lista de espera</button>
+      <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
+      <button id="pro-close" type="button" class="btn btn-ghost" data-i18n="pro_close">Ahora no</button>
     </div>
   </div>
 

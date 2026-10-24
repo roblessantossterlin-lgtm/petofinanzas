@@ -1,9 +1,12 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de www/app.js con textos adaptados a la web (cuenta en la
-   nube y sincronización en vez de «solo en tu teléfono»). La lógica
-   es la misma; lo específico de navegador vive en web.js y web.css.
-   Al actualizar www/app.js hay que re-copiar y re-aplicar estos
-   textos (ver LEEME.md). */
+   Copia de app.js (raíz, Compilación 21) con textos adaptados a la
+   web (cuenta en la nube y sincronización en vez de «solo en tu
+   teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
+   ob_intro_3 en ES/EN/IT). La lógica es la misma; lo específico de
+   navegador vive en web.js y web.css. Al actualizar la app hay que
+   re-copiar y re-aplicar estos textos (ver LEEME.md).
+   Sincronizado el 23-oct-2026 con la Compilación 21: Fases 1, 3 y 4,
+   presupuesto compartido real (SHARED_LIVE) y borrado de cuenta. */
 /* ============================================================
    PETO v0.1
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -15,6 +18,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
+const BUILD_LABEL = 'Compilación 21'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -52,6 +56,8 @@ function defaultData() {
       autoFixed: true,
       notifications: false,
       biometric: false,
+      pro: false,
+      proWaitlist: false,
       challengeTargetCents: 2000,
       split: { ahorro: 25, negocio: 10, gastos: 55, familia: 10 },
       sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true },
@@ -68,6 +74,7 @@ function defaultData() {
     remittances: [],
     alertsSent: {},
     san: null,
+    sanOrg: null,
     budgets: {},
     fixed: [],
     accounts: [],
@@ -123,6 +130,13 @@ function cleanRate(value) {
   if (!Number.isFinite(n)) return 0;
   return Math.round(Math.max(0, Math.min(100, n)) * 100) / 100;
 }
+/* Monedas destino de remesa (Fase 3). Lo viejo sin moneda = DOP, que era
+   la única destino posible; cualquier código fuera de la lista cae a DOP. */
+const REM_CURRENCIES = ['DOP', 'MXN', 'COP', 'GTQ', 'HNL', 'PEN', 'EUR', 'BRL', 'CLP', 'ARS'];
+function cleanCurrency(value) {
+  const c = cleanText(value, 3).toUpperCase();
+  return REM_CURRENCIES.includes(c) ? c : 'DOP';
+}
 const MAX_PHOTO_CHARS = 1000000;
 /* Foto de recibo: solo se acepta un dataURL de imagen con tope de tamaño. */
 function cleanPhoto(value) {
@@ -163,6 +177,34 @@ function cleanSan(raw) {
   if (currentWeek > participants.length) currentWeek = participants.length;
   return { name: name, aporteCents: aporte, participants: participants, weeks: weeks, currentWeek: currentWeek };
 }
+/* San ORGANIZADO (Fase 4, función Pro): la tanda de TODO el grupo.
+   Estructura hermana del san personal: participantes en orden de
+   turno y una ronda por participante; cada ronda trae fecha porque
+   el san guarda startDate y frecuencia (semanal/quincenal/mensual),
+   y los pagos se marcan por ronda. Vive solo en el db local. */
+const ORG_FREQUENCIES = ['semanal', 'quincenal', 'mensual'];
+function cleanSanOrg(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const name = cleanText(raw.name, 60);
+  const aporte = cleanCents(raw.aporteCents, false);
+  if (!name || aporte <= 0) return null;
+  const frequency = ORG_FREQUENCIES.includes(raw.frequency) ? raw.frequency : 'semanal';
+  const startDate = cleanDate(raw.startDate);
+  const participants = (Array.isArray(raw.participants) ? raw.participants : [])
+    .map((p) => cleanText(p, 40)).filter((p) => p).slice(0, 52);
+  if (participants.length === 0) return null;
+  const srcRounds = Array.isArray(raw.rounds) ? raw.rounds : [];
+  const rounds = participants.map((unused, i) => {
+    const paid = {};
+    const src = srcRounds[i];
+    if (src && typeof src === 'object' && src.paid && typeof src.paid === 'object') {
+      for (const p of participants) if (src.paid[p] === true) paid[p] = true;
+    }
+    return { paid: paid };
+  });
+  return { name: name, aporteCents: aporte, frequency: frequency, startDate: startDate, participants: participants, rounds: rounds };
+}
+
 function validateData(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const d = defaultData();
@@ -182,13 +224,15 @@ function validateData(raw) {
   d.settings.pinSalt = (typeof s.pinSalt === 'string' && /^[0-9a-f]{32}$/.test(s.pinSalt)) ? s.pinSalt : null;
   d.settings.pinHash = (typeof s.pinHash === 'string' && /^[0-9a-f]{64}$/.test(s.pinHash)) ? s.pinHash : null;
   if (!d.settings.pinSalt || !d.settings.pinHash) { d.settings.pinSalt = null; d.settings.pinHash = null; }
-  d.settings.lang = s.lang === 'en' ? 'en' : 'es';
+  d.settings.lang = (s.lang === 'en' || s.lang === 'it') ? s.lang : 'es';
   d.settings.payday = (typeof s.payday === 'number' && Number.isFinite(s.payday) &&
     Math.trunc(s.payday) >= 0 && Math.trunc(s.payday) <= 6) ? Math.trunc(s.payday) : null;
   d.settings.reminders = s.reminders !== false;
   d.settings.autoFixed = s.autoFixed !== false;
   d.settings.notifications = s.notifications === true;
   d.settings.biometric = s.biometric === true;
+  d.settings.pro = s.pro === true;
+  d.settings.proWaitlist = s.proWaitlist === true;
   d.settings.theme = (s.theme === 'oscuro' || s.theme === 'auto') ? s.theme : 'claro';
   d.settings.accent = ['verde', 'azul', 'morado', 'naranja'].includes(s.accent) ? s.accent : 'verde';
   const chalTarget = cleanCents(s.challengeTargetCents, false);
@@ -226,6 +270,7 @@ function validateData(raw) {
   }));
   d.savingsGoal = cleanSavingsGoal(raw.savingsGoal);
   d.san = cleanSan(raw.san);
+  d.sanOrg = cleanSanOrg(raw.sanOrg);
   if (raw.budgets && typeof raw.budgets === 'object' && !Array.isArray(raw.budgets)) {
     for (const k of Object.keys(raw.budgets)) {
       const cat = cleanText(k, 30);
@@ -271,6 +316,7 @@ function validateData(raw) {
     id: cleanId(x.id), date: cleanDate(x.date),
     usdCents: cleanCents(x.usdCents, false),
     rateCents: Math.max(1, Math.min(1000000, Math.trunc(Number(x.rateCents)) || 0)),
+    currency: cleanCurrency(x.currency),
     recipient: cleanText(x.recipient, 60), note: cleanText(x.note, 120)
   })).filter((x) => x.rateCents > 0);
   d.alertsSent = {};
@@ -283,12 +329,12 @@ function validateData(raw) {
 }
 
 /* ---------------- Utilidades ---------------- */
-/* ---------------- Idioma (ES/EN) ----------------
+/* ---------------- Idioma (ES/EN/IT) ----------------
    Todo texto visible pasa por t() o por data-i18n en el HTML. Los datos
    guardados (categorías, nombres) nunca se traducen: solo la interfaz. */
 const I18N = {
 es: {
-  app_title: 'PETO — Web', back: '← Todas las opciones', greeting: 'Hola', lock_btn: 'Bloquear',
+  app_title: 'PETO Finanzas', back: '← Todas las opciones', greeting: 'Hola', lock_btn: 'Bloquear',
   home_menu_heading: '¿Qué quieres ver?',
   group_daily: 'Día a día', group_plan: 'Planificación', group_accounts: 'Cuentas y compromisos', group_yourapp: 'Tu app',
   sec_gastos: 'Gastos del mes', sec_ingresos: 'Ingresos semanales', sec_ahorros: 'Ahorros', sec_resumen: 'Resumen',
@@ -303,6 +349,11 @@ es: {
   bio_failed: 'La huella no se pudo verificar. Escribe tu PIN.',
   bio_unavailable: 'La huella no está disponible en este teléfono. Escribe tu PIN.',
   bio_not_enrolled: 'Este teléfono no tiene ninguna huella registrada. Regístrala en los ajustes del teléfono o escribe tu PIN.',
+  bio_offer_title: '¿Desbloquear con tu huella?',
+  bio_offer_text: 'Acabas de crear tu PIN. Si quieres, puedes entrar a PETO con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?',
+  bio_offer_yes: 'Sí, activar la huella',
+  bio_offer_no: 'Ahora no',
+  bio_activated: 'Listo: el desbloqueo con huella quedó activado.',
   fix_auto_suffix: '(pago fijo automático)',
   backup_pass_label: 'Contraseña de la copia cifrada', backup_pass_ph: 'Mínimo 4 caracteres',
   data_export_enc: 'Exportar copia cifrada',
@@ -315,10 +366,38 @@ es: {
   notif_fixed_title: 'Pago fijo mañana', notif_fixed_today: 'Pago fijo hoy', notif_fixed_body: '{name} · {amount}',
   notif_weekly_title: 'Tu semana en PETO', notif_weekly_body: 'Anota tus gastos e ingresos de la semana para no perder el hilo.',
   sec_remesas: 'Remesas', key_remesas: 'Enviado este mes: {amount}',
-  rem_intro: 'El dinero que envías a tu gente: cuánto salió en dólares y cuánto llegó en pesos.',
-  rem_usd_label: 'Cantidad enviada ($ USD)', rem_rate_label: 'Tasa (pesos por $1)', rem_recipient_label: '¿Para quién?',
-  rem_dop_label: 'Llega (RD$)', rem_save: 'Guardar remesa', rem_empty: 'No tienes remesas registradas.',
-  rem_total_month: 'Este mes: {usd} → {dop}', rem_delete_confirm: '¿Borrar la remesa a {name}?',
+  rem_intro: 'El dinero que envías a tu gente: cuánto salió en dólares y cuánto llegó en su moneda.',
+  rem_usd_label: 'Cantidad enviada ($ USD)', rem_rate_label: 'Tasa ({cur} por $1)', rem_recipient_label: '¿Para quién?',
+  rem_currency_label: 'Moneda de destino', rem_arrives_label: 'Llega',
+  rem_rate_suggested: 'Última tasa que usaste para {cur}: {rate}. Quedó puesta; cámbiala si hoy es otra.',
+  rem_month_sent: 'Este mes enviaste {usd}', rem_totals_title: 'Totales por moneda (todo el historial)',
+  rem_total_row: '{usd} enviados → {amount} recibidos · {n} envíos',
+  rem_save: 'Guardar remesa', rem_empty: 'No tienes remesas registradas.',
+  rem_delete_confirm: '¿Borrar la remesa a {name}?',
+  csv_title: 'Importar estado de cuenta (CSV)',
+  csv_help: 'Sube el archivo CSV de tu banco y revisa todo en una vista previa antes de importar: nada se guarda hasta que confirmes.',
+  csv_file_label: 'Archivo CSV del banco', csv_preview_title: 'Vista previa de la importación',
+  csv_summary: '{total} movimientos · {dups} duplicados (excluidos) · {sel} para importar',
+  csv_dup_badge: 'Duplicado', csv_income_badge: 'Ingreso', csv_expense_badge: 'Gasto',
+  csv_all: 'Marcar todos', csv_none: 'Desmarcar todos',
+  csv_apply: 'Importar seleccionados', csv_cancel: 'Cancelar importación',
+  csv_done: 'Se importaron {n} movimientos. ✅',
+  csv_none_selected: 'No marcaste ningún movimiento para importar.',
+  csv_err_parse: 'No se pudo leer ese archivo como CSV. Revisa que sea el estado de cuenta en formato CSV.',
+  csv_err_headers: 'No encontré las columnas de fecha y monto en ese archivo.',
+  csv_err_big: 'Ese archivo es demasiado grande para importarlo.',
+  csv_err_empty: 'Ese archivo no trae movimientos que se puedan importar.',
+  shared_title: 'Presupuesto compartido',
+  shared_preview_note: '🔧 Vista previa del diseño: todavía no se conecta con otras cuentas. Sirve para probar cómo se verá crear un hogar, unirse con un código y ver los miembros.',
+  shared_create_label: 'Nombre del hogar', shared_create_btn: 'Crear hogar',
+  shared_join_label: 'Código de invitación', shared_join_btn: 'Unirme con código',
+  shared_members_title: 'Miembros', shared_code_label: 'Código para invitar: {code}',
+  shared_role_dueno: 'Dueño/a', shared_role_admin: 'Admin', shared_role_miembro: 'Miembro', shared_role_lector: 'Solo lectura',
+  shared_you: 'Tú', shared_host: 'Anfitrión/a',
+  shared_leave_btn: 'Salir del hogar', shared_leave_confirm: '¿Salir de este hogar? (vista previa)',
+  shared_err_name: 'Escribe un nombre para el hogar.', shared_err_code: 'El código tiene 6 letras o números.',
+  shared_created: 'Hogar creado (vista previa). ✅', shared_joined: 'Te uniste al hogar (vista previa). ✅',
+  shared_household_fallback: 'Hogar compartido',
   privacy_hide: 'Ocultar montos', privacy_show: 'Mostrar montos',
   ins_title: '💡 Ideas de tu dinero', ins_cat_up: '{cat} subió {pct}% vs el mes pasado ({from} → {to}).',
   ins_pace_down: 'Vas más tranquilo: tu ritmo de gasto bajó {pct}% vs el mes pasado.',
@@ -350,6 +429,11 @@ es: {
   cloud_err_generic: 'Algo falló con la nube. Revisa tu internet e inténtalo de nuevo.',
   cloud_conflict: 'Hay datos distintos en la nube y en este teléfono. ¿Quieres bajar los de la nube y reemplazar los de este teléfono? (Cancelar = subir los de este teléfono)',
   cloud_wipe_confirm: '¿Borrar TODOS tus datos de la nube? Lo de este teléfono se queda como está.',
+  cloud_delete: 'Eliminar mi cuenta',
+  cloud_delete_confirm1: '¿Eliminar tu cuenta de PETO? Se borra tu cuenta, tu copia de datos en la nube y los hogares compartidos que sean tuyos. Los datos de ESTE teléfono se quedan aquí, sin borrarse (puedes borrarlos en Ajustes). No se puede deshacer.',
+  cloud_delete_confirm2: 'Última confirmación: ¿eliminar tu cuenta para siempre?',
+  cloud_deleted: 'Tu cuenta fue eliminada.',
+  cloud_delete_err_auth: 'Tu sesión ya no es válida. Entra de nuevo e inténtalo otra vez.',
   cloud_unavailable: 'La nube no está disponible en esta versión.',
   key_settings: 'Nombre, reparto, texto, secciones, PIN',
   footer: 'PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono',
@@ -367,7 +451,11 @@ es: {
   banner_payday: 'Hoy es día de cobro: registra tu ingreso y tu ahorro.',
   banner_dues_title: 'Pagos por vencer:', banner_due_item: '{name} (día {day})', banner_close: 'Cerrar aviso',
   spend_title: '¿Cuánto puedes gastar hoy?',
-  spend_note: 'Esto es lo que puedes gastar hoy sin pasarte.', spend_hint: 'Registra un ingreso para calcularlo.',
+  spend_note: 'Esto es lo que puedes gastar hoy sin pasarte.',
+  spend_guide: 'Crea tu primer presupuesto por categoría y aquí verás cuánto puedes gastar cada día.',
+  spend_left: 'Te quedan {amount} para los {days} días que faltan del mes.',
+  spend_left_one: 'Te queda {amount} para hoy, el último día del mes.',
+  spend_over: 'Ya alcanzaste el presupuesto del mes.', spend_over_by: 'Te pasaste por {amount}.',
   'cat_Renta': 'Renta', 'cat_Comida': 'Comida', 'cat_Comida fuera': 'Comida fuera', 'cat_Gasolina': 'Gasolina',
   'cat_Transporte': 'Transporte', 'cat_Salud': 'Salud', 'cat_Ropa': 'Ropa', 'cat_Otros': 'Otros',
   btn_cancel: 'Cancelar', btn_save: 'Guardar', btn_edit: 'Editar', btn_delete: 'Borrar',
@@ -497,9 +585,9 @@ es: {
   chal_streak_one: 'Racha: 1 semana cumplida', chal_streak_many: 'Racha: {n} semanas cumplidas',
   chal_streak_zero: 'Racha: 0 semanas. ¡Esta puede ser la primera!',
   chal_target_label: 'Meta semanal de ahorro ($)', chal_save: 'Guardar meta semanal',
-  rep_title: 'Informe del mes', rep_download: 'Descargar imagen',
+  rep_title: 'Informe del mes', rep_download: 'Descargar imagen', rep_share_image: 'Compartir imagen',
   rep_income: 'Ingresos', rep_expenses: 'Gastos', rep_savings: 'Ahorros',
-  rep_top_cat: 'Categoría mayor', rep_goal: 'Meta de ahorro', rep_none: 'Sin movimientos',
+  rep_top_cat: 'Categoría mayor', rep_top3: 'Top 3 categorías', rep_goal: 'Meta de ahorro', rep_none: 'Sin movimientos',
   calc_title: 'Calculadora de deudas',
   calc_intro: 'Compara dos planes para salir de deudas: pagar primero la más pequeña (bola de nieve) o la de mayor interés (avalancha). Cada mes pagas los mínimos de todas y el resto va a la deuda objetivo.',
   calc_budget_label: '¿Cuánto puedes pagar al mes en total a deudas? ($)', calc_run: 'Calcular',
@@ -514,10 +602,66 @@ es: {
   debt_terms: 'Interés {pct}% anual · Mínimo {min}/mes',
   exp_photo_label: 'Foto del recibo (opcional)', exp_photo_remove: 'Quitar foto', photo_close: 'Cerrar',
   err_photo_quota: 'No hubo espacio para guardar la foto: el gasto se guardó sin foto.',
-  banner_backup: 'Hace tiempo que no guardas una copia de tus datos. Exporta tu respaldo en Ajustes.'
+  banner_backup: 'Hace tiempo que no guardas una copia de tus datos. Exporta tu respaldo en Ajustes.',
+  /* --- Fase 4: PETO Pro, informe avanzado, organizador de san --- */
+  pro_title: 'PETO Pro',
+  pro_card_text: 'La nube sin límites, el informe avanzado, el presupuesto compartido y el modo organizador de san.',
+  pro_status_free: 'Ahora tienes el plan Gratis.',
+  pro_status_active: 'Tienes PETO Pro activo. ¡Gracias por apoyar PETO! ⭐',
+  pro_status_test: 'PETO Pro está abierto durante la prueba cerrada: tienes acceso completo mientras dure la prueba.',
+  pro_status_waitlist: 'Estás en la lista de espera de PETO Pro.',
+  pro_btn_see: 'Ver PETO Pro',
+  pro_wall_title: 'Esto es de PETO Pro ⭐',
+  pro_price_line: 'Solo $1.99 al mes',
+  pro_benefit_cloud: '☁️ Nube sin límites para tus datos',
+  pro_benefit_report: '📊 Informe avanzado: compara meses y exporta en CSV',
+  pro_benefit_shared: '🏠 Presupuesto compartido con tu hogar',
+  pro_benefit_org: '🤝 Modo organizador de san: la tanda de todo el grupo',
+  pro_coming_text: 'La compra dentro de la app llega con el lanzamiento en Google Play. Mientras tanto puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar Pro por $1.99 al mes.',
+  pro_waitlist_btn: 'Anotarme en la lista de espera',
+  pro_waitlist_done: 'Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.',
+  pro_close: 'Ahora no',
+  pro_tag: 'PRO',
+  adv_title: 'Informe avanzado',
+  adv_note: 'Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.',
+  adv_open_btn: 'Ver informe avanzado',
+  adv_export_csv: 'Exportar mes en CSV',
+  adv_this_month: 'Este mes',
+  adv_prev_month: 'Mes anterior',
+  adv_change: 'Cambio',
+  adv_all_cats: 'Todas las categorías',
+  adv_empty: 'Sin movimientos en estos dos meses.',
+  org_title: 'Modo organizador de san',
+  org_intro: 'Organiza la tanda de todo el grupo: turnos con fecha, marca quién ya pagó en cada ronda y comparte el estado con el grupo.',
+  org_pro_note: 'El modo organizador es una función de PETO Pro.',
+  org_form_title: 'Crear san del grupo',
+  org_freq_label: 'Frecuencia de las rondas',
+  org_freq_semanal: 'Semanal',
+  org_freq_quincenal: 'Quincenal (cada 2 semanas)',
+  org_freq_mensual: 'Mensual',
+  org_start_label: 'Fecha de la primera ronda',
+  org_create_btn: 'Crear san organizado',
+  org_round: 'Ronda {x} de {n}',
+  org_receiver_line: 'Recibe: {name}',
+  org_pending_none: '¡Todos pagaron! 🎉',
+  org_pending_list: 'Pendientes: {names}',
+  org_totals_title: 'Aportes por participante',
+  org_paid_rounds: '{paid} de {n} rondas pagadas',
+  org_delete: 'Borrar san organizado',
+  org_delete_confirm: '¿Borrar el san organizado «{name}»? Se pierde el registro de pagos del grupo.',
+  org_share_title: 'Estado del san',
+  shared_live_note: 'Comparte el presupuesto con tu hogar: crea un hogar o únete con un código y verán los mismos miembros. Necesitas tu cuenta en la nube (arriba en Ajustes) y PETO Pro.',
+  shared_leave_live: '¿Salir de este hogar? Dejarás de ver su presupuesto compartido.',
+  shared_err_login: 'Primero entra con tu cuenta en la nube (arriba, en Ajustes) y vuelve a intentarlo.',
+  shared_err_generic: 'No se pudo completar. Revisa tu conexión e inténtalo de nuevo.',
+  shared_err_code_live: 'Ese código no existe. Revísalo e inténtalo de nuevo.',
+  shared_err_member: 'Ya eres miembro de este hogar.',
+  shared_err_owner_leave: 'Eres el dueño/la dueña del hogar: no puedes salir sin borrarlo. Pide a otro miembro que cree el hogar nuevo.',
+  shared_created_live: 'Hogar creado ✅ Comparte el código para invitar a tu hogar.',
+  shared_joined_live: 'Te uniste al hogar ✅'
 },
 en: {
-  app_title: 'PETO — Web', back: '← All options', greeting: 'Hello', lock_btn: 'Lock',
+  app_title: 'PETO Finanzas', back: '← All options', greeting: 'Hello', lock_btn: 'Lock',
   home_menu_heading: 'What do you want to see?',
   group_daily: 'Day to day', group_plan: 'Planning', group_accounts: 'Accounts & commitments', group_yourapp: 'Your app',
   sec_gastos: 'Monthly expenses', sec_ingresos: 'Weekly income', sec_ahorros: 'Savings', sec_resumen: 'Summary',
@@ -532,6 +676,11 @@ en: {
   bio_failed: 'Fingerprint could not be verified. Type your PIN.',
   bio_unavailable: 'Fingerprint is not available on this phone. Type your PIN.',
   bio_not_enrolled: 'This phone has no fingerprint enrolled. Enroll one in the phone settings or type your PIN.',
+  bio_offer_title: 'Unlock with your fingerprint?',
+  bio_offer_text: 'You just created your PIN. If you want, you can open PETO with your fingerprint instead of typing your PIN every time. Turn it on now?',
+  bio_offer_yes: 'Yes, turn on fingerprint',
+  bio_offer_no: 'Not now',
+  bio_activated: 'Done: fingerprint unlock is now on.',
   fix_auto_suffix: '(automatic fixed payment)',
   backup_pass_label: 'Encrypted backup password', backup_pass_ph: 'At least 4 characters',
   data_export_enc: 'Export encrypted backup',
@@ -544,10 +693,38 @@ en: {
   notif_fixed_title: 'Fixed payment tomorrow', notif_fixed_today: 'Fixed payment today', notif_fixed_body: '{name} · {amount}',
   notif_weekly_title: 'Your week in PETO', notif_weekly_body: 'Log this week’s expenses and income to stay on track.',
   sec_remesas: 'Remittances', key_remesas: 'Sent this month: {amount}',
-  rem_intro: 'Money you send to your people: how much left in dollars and how much arrived in pesos.',
-  rem_usd_label: 'Amount sent ($ USD)', rem_rate_label: 'Rate (pesos per $1)', rem_recipient_label: 'For whom?',
-  rem_dop_label: 'Arrives (RD$)', rem_save: 'Save remittance', rem_empty: 'No remittances recorded yet.',
-  rem_total_month: 'This month: {usd} → {dop}', rem_delete_confirm: 'Delete the remittance to {name}?',
+  rem_intro: 'Money you send to your people: how much left in dollars and how much arrived in their currency.',
+  rem_usd_label: 'Amount sent ($ USD)', rem_rate_label: 'Rate ({cur} per $1)', rem_recipient_label: 'For whom?',
+  rem_currency_label: 'Destination currency', rem_arrives_label: 'Arrives',
+  rem_rate_suggested: 'Last rate you used for {cur}: {rate}. It is filled in; change it if today’s is different.',
+  rem_month_sent: 'This month you sent {usd}', rem_totals_title: 'Totals by currency (all history)',
+  rem_total_row: '{usd} sent → {amount} received · {n} sends',
+  rem_save: 'Save remittance', rem_empty: 'No remittances recorded yet.',
+  rem_delete_confirm: 'Delete the remittance to {name}?',
+  csv_title: 'Import bank statement (CSV)',
+  csv_help: 'Upload your bank’s CSV file and review everything in a preview before importing: nothing is saved until you confirm.',
+  csv_file_label: 'Bank CSV file', csv_preview_title: 'Import preview',
+  csv_summary: '{total} transactions · {dups} duplicates (excluded) · {sel} to import',
+  csv_dup_badge: 'Duplicate', csv_income_badge: 'Income', csv_expense_badge: 'Expense',
+  csv_all: 'Check all', csv_none: 'Uncheck all',
+  csv_apply: 'Import selected', csv_cancel: 'Cancel import',
+  csv_done: '{n} transactions imported. ✅',
+  csv_none_selected: 'You did not check any transaction to import.',
+  csv_err_parse: 'That file could not be read as CSV. Check that it is the bank statement in CSV format.',
+  csv_err_headers: 'The date and amount columns were not found in that file.',
+  csv_err_big: 'That file is too large to import.',
+  csv_err_empty: 'That file has no transactions that can be imported.',
+  shared_title: 'Shared budget',
+  shared_preview_note: '🔧 Design preview: it does not connect to other accounts yet. Use it to try how creating a household, joining with a code and seeing members will look.',
+  shared_create_label: 'Household name', shared_create_btn: 'Create household',
+  shared_join_label: 'Invite code', shared_join_btn: 'Join with code',
+  shared_members_title: 'Members', shared_code_label: 'Invite code: {code}',
+  shared_role_dueno: 'Owner', shared_role_admin: 'Admin', shared_role_miembro: 'Member', shared_role_lector: 'Read-only',
+  shared_you: 'You', shared_host: 'Host',
+  shared_leave_btn: 'Leave household', shared_leave_confirm: 'Leave this household? (preview)',
+  shared_err_name: 'Enter a name for the household.', shared_err_code: 'The code has 6 letters or numbers.',
+  shared_created: 'Household created (preview). ✅', shared_joined: 'You joined the household (preview). ✅',
+  shared_household_fallback: 'Shared household',
   privacy_hide: 'Hide amounts', privacy_show: 'Show amounts',
   ins_title: '💡 Money insights', ins_cat_up: '{cat} is up {pct}% vs last month ({from} → {to}).',
   ins_pace_down: 'You are pacing better: spending is down {pct}% vs last month.',
@@ -579,6 +756,11 @@ en: {
   cloud_err_generic: 'Something failed with the cloud. Check your internet and try again.',
   cloud_conflict: 'The cloud and this phone hold different data. Download the cloud data and replace what is on this phone? (Cancel = upload this phone’s data)',
   cloud_wipe_confirm: 'Delete ALL your cloud data? What is on this phone stays as it is.',
+  cloud_delete: 'Delete my account',
+  cloud_delete_confirm1: 'Delete your PETO account? This deletes your account, your copy of the data in the cloud and the shared households you own. The data on THIS phone stays here, untouched (you can erase it in Settings). This cannot be undone.',
+  cloud_delete_confirm2: 'Final confirmation: delete your account for good?',
+  cloud_deleted: 'Your account was deleted.',
+  cloud_delete_err_auth: 'Your session is no longer valid. Sign in again and try again.',
   cloud_unavailable: 'The cloud is not available in this version.',
   key_settings: 'Name, split, text, sections, PIN',
   footer: 'PETO Web · With your cloud account, your data syncs with your phone',
@@ -596,7 +778,11 @@ en: {
   banner_payday: 'Today is payday: log your income and your savings.',
   banner_dues_title: 'Payments due soon:', banner_due_item: '{name} (day {day})', banner_close: 'Dismiss',
   spend_title: 'How much can you spend today?',
-  spend_note: 'This is what you can spend today without going over.', spend_hint: 'Log an income to calculate it.',
+  spend_note: 'This is what you can spend today without going over.',
+  spend_guide: 'Create your first category budget and you will see here how much you can spend each day.',
+  spend_left: 'You have {amount} left for the {days} remaining days of the month.',
+  spend_left_one: 'You have {amount} left for today, the last day of the month.',
+  spend_over: "You've reached this month's budget.", spend_over_by: "You're over by {amount}.",
   'cat_Renta': 'Rent', 'cat_Comida': 'Food', 'cat_Comida fuera': 'Eating out', 'cat_Gasolina': 'Gas',
   'cat_Transporte': 'Transport', 'cat_Salud': 'Health', 'cat_Ropa': 'Clothing', 'cat_Otros': 'Other',
   btn_cancel: 'Cancel', btn_save: 'Save', btn_edit: 'Edit', btn_delete: 'Delete',
@@ -726,9 +912,9 @@ en: {
   chal_streak_one: 'Streak: 1 week completed', chal_streak_many: 'Streak: {n} weeks completed',
   chal_streak_zero: 'Streak: 0 weeks. This can be the first!',
   chal_target_label: 'Weekly savings target ($)', chal_save: 'Save weekly target',
-  rep_title: 'Monthly report', rep_download: 'Download image',
+  rep_title: 'Monthly report', rep_download: 'Download image', rep_share_image: 'Share image',
   rep_income: 'Income', rep_expenses: 'Expenses', rep_savings: 'Savings',
-  rep_top_cat: 'Top category', rep_goal: 'Savings goal', rep_none: 'No activity',
+  rep_top_cat: 'Top category', rep_top3: 'Top 3 categories', rep_goal: 'Savings goal', rep_none: 'No activity',
   calc_title: 'Debt payoff calculator',
   calc_intro: 'Compare two plans to get out of debt: pay the smallest first (snowball) or the highest interest first (avalanche). Each month you pay every minimum and the rest goes to the target debt.',
   calc_budget_label: 'How much can you pay per month toward debts in total? ($)', calc_run: 'Calculate',
@@ -743,11 +929,630 @@ en: {
   debt_terms: '{pct}% annual interest · Minimum {min}/month',
   exp_photo_label: 'Receipt photo (optional)', exp_photo_remove: 'Remove photo', photo_close: 'Close',
   err_photo_quota: 'There was no room to store the photo: the expense was saved without it.',
-  banner_backup: 'It has been a while since you saved a backup of your data. Export your backup in Settings.'
+  banner_backup: 'It has been a while since you saved a backup of your data. Export your backup in Settings.',
+  /* --- Phase 4: PETO Pro, advanced report, san organizer --- */
+  pro_title: 'PETO Pro',
+  pro_card_text: 'Unlimited cloud for your data, the advanced report, the shared budget and the san organizer mode.',
+  pro_status_free: 'You are on the Free plan right now.',
+  pro_status_active: 'PETO Pro is active. Thanks for supporting PETO! ⭐',
+  pro_status_test: 'PETO Pro is open during the closed test: you have full access while the test lasts.',
+  pro_status_waitlist: 'You are on the PETO Pro waiting list.',
+  pro_btn_see: 'See PETO Pro',
+  pro_wall_title: 'This is a PETO Pro feature ⭐',
+  pro_price_line: 'Only $1.99 a month',
+  pro_benefit_cloud: '☁️ Unlimited cloud for your data',
+  pro_benefit_report: '📊 Advanced report: compare months and export CSV',
+  pro_benefit_shared: '🏠 Shared budget with your household',
+  pro_benefit_org: '🤝 San organizer mode: the whole group’s tanda',
+  pro_coming_text: 'In-app purchase arrives with the Google Play launch. Meanwhile you can join the waiting list: we will let you know as soon as you can turn on Pro for $1.99 a month.',
+  pro_waitlist_btn: 'Join the waiting list',
+  pro_waitlist_done: 'You are on the list ✅ We will let you know when Pro is available.',
+  pro_close: 'Not now',
+  pro_tag: 'PRO',
+  adv_title: 'Advanced report',
+  adv_note: 'A PETO Pro feature: this month vs the previous one, every category and a CSV export of the month.',
+  adv_open_btn: 'View advanced report',
+  adv_export_csv: 'Export month as CSV',
+  adv_this_month: 'This month',
+  adv_prev_month: 'Previous month',
+  adv_change: 'Change',
+  adv_all_cats: 'All categories',
+  adv_empty: 'No activity in these two months.',
+  org_title: 'San organizer mode',
+  org_intro: 'Run the whole group’s tanda: dated turns, mark who has paid in each round and share the status with the group.',
+  org_pro_note: 'Organizer mode is a PETO Pro feature.',
+  org_form_title: 'Create the group san',
+  org_freq_label: 'Round frequency',
+  org_freq_semanal: 'Weekly',
+  org_freq_quincenal: 'Every 2 weeks',
+  org_freq_mensual: 'Monthly',
+  org_start_label: 'Date of the first round',
+  org_create_btn: 'Create organized san',
+  org_round: 'Round {x} of {n}',
+  org_receiver_line: 'Receives: {name}',
+  org_pending_none: 'Everyone has paid! 🎉',
+  org_pending_list: 'Still to pay: {names}',
+  org_totals_title: 'Contributions per participant',
+  org_paid_rounds: '{paid} of {n} rounds paid',
+  org_delete: 'Delete organized san',
+  org_delete_confirm: 'Delete the organized san “{name}”? The group’s payment record will be lost.',
+  org_share_title: 'San status',
+  shared_live_note: 'Share the budget with your household: create a household or join with a code and you will see the same members. You need your cloud account (above, in Settings) and PETO Pro.',
+  shared_leave_live: 'Leave this household? You will stop seeing its shared budget.',
+  shared_err_login: 'First sign in with your cloud account (above, in Settings) and try again.',
+  shared_err_generic: 'It could not be completed. Check your connection and try again.',
+  shared_err_code_live: 'That code does not exist. Check it and try again.',
+  shared_err_member: 'You are already a member of this household.',
+  shared_err_owner_leave: 'You own this household: you cannot leave without deleting it. Ask another member to create the new household.',
+  shared_created_live: 'Household created ✅ Share the code to invite your household.',
+  shared_joined_live: 'You joined the household ✅'
+},
+it: {
+  app_title: 'PETO Finanzas',
+  back: '← Tutte le opzioni',
+  greeting: 'Ciao',
+  lock_btn: 'Blocca',
+  home_menu_heading: 'Cosa vuoi vedere?',
+  group_daily: 'Giorno per giorno',
+  group_plan: 'Pianificazione',
+  group_accounts: 'Conti e impegni',
+  group_yourapp: 'La tua app',
+  sec_gastos: 'Spese del mese',
+  sec_ingresos: 'Entrate settimanali',
+  sec_ahorros: 'Risparmi',
+  sec_resumen: 'Riepilogo',
+  sec_presupuesto: 'Budget per categoria',
+  sec_pagos: 'Pagamenti fissi',
+  sec_cuentas: 'I miei conti',
+  sec_deudas: 'I miei debiti',
+  sec_san: 'Il mio san',
+  sec_ajustes: 'Impostazioni e personalizzazione',
+  menu_open_aria: 'Apri il menu',
+  menu_close_aria: 'Chiudi il menu',
+  sec_home: 'Home',
+  key_home: 'La tua schermata principale',
+  set_notif_label: 'Notifiche con l’app chiusa',
+  set_notif_help: 'Avvisi dei tuoi pagamenti fissi un giorno prima e lo stesso giorno, anche se PETO è chiusa.',
+  set_autofixed_label: 'Registra i pagamenti fissi automaticamente',
+  set_autofixed_help: 'Quando un pagamento fisso scade, la spesa si registra da sola. Puoi annullarla subito.',
+  set_bio_label: 'Sblocca con l’impronta digitale',
+  set_bio_help: 'Entra con la tua impronta digitale oltre al PIN (devi avere un PIN attivo).',
+  bio_btn: '👆 Entra con l’impronta digitale',
+  bio_reason: 'Conferma che sei tu per aprire PETO',
+  bio_need_pin: 'L’impronta ha bisogno di un PIN attivo: crea il tuo PIN in Impostazioni → Sicurezza e poi l’impronta funzionerà all’apertura dell’app.',
+  bio_failed: 'Non è stato possibile verificare l’impronta. Inserisci il PIN.',
+  bio_unavailable: 'L’impronta non è disponibile su questo telefono. Inserisci il PIN.',
+  bio_not_enrolled: 'Questo telefono non ha nessuna impronta registrata. Registrala nelle impostazioni del telefono o inserisci il PIN.',
+  bio_offer_title: 'Sbloccare con l’impronta digitale?',
+  bio_offer_text: 'Hai appena creato il tuo PIN. Se vuoi, puoi entrare in PETO con l’impronta invece di digitare il PIN ogni volta. Lo attiviamo ora?',
+  bio_offer_yes: 'Sì, attiva l’impronta',
+  bio_offer_no: 'Non ora',
+  bio_activated: 'Fatto: lo sblocco con l’impronta è attivo.',
+  fix_auto_suffix: '(pagamento fisso automatico)',
+  backup_pass_label: 'Password della copia crittografata',
+  backup_pass_ph: 'Minimo 4 caratteri',
+  data_export_enc: 'Esporta copia crittografata',
+  backup_help: 'La copia crittografata si apre solo con la tua password. Senza di essa non si può recuperare: conservala bene. Per importare una copia crittografata, scrivi qui la sua password prima di scegliere il file.',
+  backup_err_short: 'La password deve avere almeno 4 caratteri.',
+  backup_need_pass: 'Scrivi la password della copia crittografata prima di importarla.',
+  backup_err_pass: 'Non è stato possibile aprire la copia: password errata o file danneggiato.',
+  share_btn: 'Condividi il riepilogo',
+  share_copied: 'Riepilogo copiato. Incollalo dove vuoi.',
+  share_report_title: 'Il mio riepilogo PETO',
+  notif_fixed_title: 'Pagamento fisso domani',
+  notif_fixed_today: 'Pagamento fisso oggi',
+  notif_fixed_body: '{name} · {amount}',
+  notif_weekly_title: 'La tua settimana su PETO',
+  notif_weekly_body: 'Registra le spese e le entrate della settimana per non perdere il filo.',
+  sec_remesas: 'Rimesse',
+  key_remesas: 'Inviato questo mese: {amount}',
+  rem_intro: 'I soldi che mandi ai tuoi cari: quanto è uscito in dollari e quanto è arrivato nella loro valuta.',
+  rem_usd_label: 'Importo inviato ($ USD)',
+  rem_rate_label: 'Tasso ({cur} per 1 $)',
+  rem_recipient_label: 'Per chi è?',
+  rem_currency_label: 'Valuta di destinazione',
+  rem_arrives_label: 'Arriva',
+  rem_rate_suggested: 'Ultimo tasso che hai usato per {cur}: {rate}. È già impostato; cambialo se oggi è diverso.',
+  rem_month_sent: 'Questo mese hai inviato {usd}',
+  rem_totals_title: 'Totali per valuta (tutta la cronologia)',
+  rem_total_row: '{usd} inviati → {amount} ricevuti · {n} invii',
+  rem_save: 'Salva rimessa',
+  rem_empty: 'Non hai rimesse registrate.',
+  rem_delete_confirm: 'Eliminare la rimessa a {name}?',
+  csv_title: 'Importa estratto conto (CSV)',
+  csv_help: 'Carica il file CSV della tua banca e controlla tutto in un’anteprima prima di importare: niente viene salvato finché non confermi.',
+  csv_file_label: 'File CSV della banca',
+  csv_preview_title: 'Anteprima dell’importazione',
+  csv_summary: '{total} movimenti · {dups} duplicati (esclusi) · {sel} da importare',
+  csv_dup_badge: 'Duplicato',
+  csv_income_badge: 'Entrata',
+  csv_expense_badge: 'Spesa',
+  csv_all: 'Seleziona tutti',
+  csv_none: 'Deseleziona tutti',
+  csv_apply: 'Importa i selezionati',
+  csv_cancel: 'Annulla importazione',
+  csv_done: 'Sono stati importati {n} movimenti. ✅',
+  csv_none_selected: 'Non hai selezionato nessun movimento da importare.',
+  csv_err_parse: 'Non è stato possibile leggere quel file come CSV. Controlla che sia l’estratto conto in formato CSV.',
+  csv_err_headers: 'Non ho trovato le colonne di data e importo in quel file.',
+  csv_err_big: 'Quel file è troppo grande per essere importato.',
+  csv_err_empty: 'Quel file non contiene movimenti importabili.',
+  shared_title: 'Budget condiviso',
+  shared_preview_note: '🔧 Anteprima del design: non si collega ancora ad altri account. Serve per provare come sarà creare una casa, unirsi con un codice e vedere i membri.',
+  shared_create_label: 'Nome della casa',
+  shared_create_btn: 'Crea casa',
+  shared_join_label: 'Codice di invito',
+  shared_join_btn: 'Unisciti con codice',
+  shared_members_title: 'Membri',
+  shared_code_label: 'Codice per invitare: {code}',
+  shared_role_dueno: 'Proprietario/a',
+  shared_role_admin: 'Amministratore',
+  shared_role_miembro: 'Membro',
+  shared_role_lector: 'Solo lettura',
+  shared_you: 'Tu',
+  shared_host: 'Ospitante',
+  shared_leave_btn: 'Lascia la casa',
+  shared_leave_confirm: 'Lasciare questa casa? (anteprima)',
+  shared_err_name: 'Scrivi un nome per la casa.',
+  shared_err_code: 'Il codice ha 6 lettere o numeri.',
+  shared_created: 'Casa creata (anteprima). ✅',
+  shared_joined: 'Ti sei unito alla casa (anteprima). ✅',
+  shared_household_fallback: 'Casa condivisa',
+  privacy_hide: 'Nascondi importi',
+  privacy_show: 'Mostra importi',
+  ins_title: '💡 Idee per i tuoi soldi',
+  ins_cat_up: '{cat} è salita del {pct}% rispetto al mese scorso ({from} → {to}).',
+  ins_pace_down: 'Stai andando più tranquillo: il tuo ritmo di spesa è sceso del {pct}% rispetto al mese scorso.',
+  ins_pace_up: 'Attenzione: il tuo ritmo di spesa è salito del {pct}% rispetto al mese scorso.',
+  ins_biggest: 'La tua spesa più grande del mese: {note} · {amount}.',
+  ins_saved: 'Hai risparmiato {amount} questo mese. Continua così!',
+  bud_alert_title: 'Budget a rischio',
+  bud_alert_warn: '{cat}: sei al {pct}% del budget.',
+  bud_alert_over: '{cat}: hai superato il budget ({pct}%).',
+  voice_btn: '🎤 Detta',
+  voice_listening: 'In ascolto… dì l’importo e per cosa è stato.',
+  voice_unavailable: 'La voce non è disponibile su questo dispositivo.',
+  voice_heard: 'Ho sentito: «{text}». Controlla e salva.',
+  voice_no_amount: 'Ho sentito: «{text}», ma non ho trovato l’importo.',
+  ocr_found: 'Ho rilevato {amount} nello scontrino. Verificalo prima di salvare.',
+  goals_title: 'Altri obiettivi',
+  goal2_create: 'Crea obiettivo',
+  goal_add: '+ Versa',
+  goal_take: '− Preleva',
+  goal_done: '🎉 Obiettivo raggiunto!',
+  goal_move_label: 'Importo',
+  goal_delete_confirm: 'Eliminare l’obiettivo "{name}"? I tuoi risparmi non vengono toccati: si elimina solo l’obiettivo.',
+  err_limit_goals: 'Hai già il massimo di obiettivi.',
+  biz_label: 'È della mia attività',
+  biz_title: 'La mia attività questo mese',
+  biz_income: 'Entrate dell’attività',
+  biz_expenses: 'Spese dell’attività',
+  biz_profit: 'Guadagno',
+  chal_share: 'Condividi la mia sfida',
+  cloud_title: 'Account nel cloud',
+  cloud_help: 'Con un account, i tuoi dati si salvano anche nel cloud e si sincronizzano: se cambi telefono, accedi con la tua email e trovi tutto lì. Senza account, l’app funziona solo su questo telefono, come sempre.',
+  cloud_email: 'Email',
+  cloud_pass: 'Password',
+  cloud_signin: 'Accedi',
+  cloud_signup: 'Crea account',
+  cloud_signout: 'Esci',
+  cloud_sync_now: 'Sincronizza ora',
+  cloud_wipe: 'Elimina i miei dati dal cloud',
+  cloud_who: 'Accesso effettuato come {email}',
+  cloud_synced: 'Sincronizzato ✓ · {time}',
+  cloud_never: 'Non è stato ancora sincronizzato.',
+  cloud_working: 'In corso…',
+  cloud_ok_in: 'Bentornato!',
+  cloud_ok_up: 'Account creato! I tuoi dati sono già nel cloud.',
+  cloud_err_fields: 'Scrivi la tua email e una password di almeno 6 caratteri.',
+  cloud_err_login: 'Non è stato possibile accedere. Controlla email e password.',
+  cloud_err_exists: 'Questa email ha già un account. Usa «Accedi».',
+  cloud_err_confirm: 'Account creato. Controlla la tua email e conferma l’account, poi accedi.',
+  cloud_err_generic: 'Qualcosa è andato storto con il cloud. Controlla la connessione e riprova.',
+  cloud_conflict: 'Ci sono dati diversi nel cloud e su questo telefono. Vuoi scaricare quelli del cloud e sostituire quelli di questo telefono? (Annulla = carica quelli di questo telefono)',
+  cloud_wipe_confirm: 'Eliminare TUTTI i tuoi dati dal cloud? Quelli di questo telefono restano come sono.',
+  cloud_delete: 'Elimina il mio account',
+  cloud_delete_confirm1: 'Eliminare il tuo account PETO? Si eliminano il tuo account, la tua copia dei dati nel cloud e le case condivise create da te. I dati di QUESTO telefono restano qui, senza essere eliminati (puoi cancellarli in Impostazioni). Non si può annullare.',
+  cloud_delete_confirm2: 'Ultima conferma: eliminare il tuo account per sempre?',
+  cloud_deleted: 'Il tuo account è stato eliminato.',
+  cloud_delete_err_auth: 'La tua sessione non è più valida. Accedi di nuovo e riprova.',
+  cloud_unavailable: 'Il cloud non è disponibile in questa versione.',
+  key_settings: 'Nome, ripartizione, testo, sezioni, PIN',
+  footer: 'PETO Web · Con il tuo account nel cloud, i tuoi dati si sincronizzano con il tuo telefono',
+  tile_available: 'Denaro disponibile',
+  tile_available_aria: 'Denaro disponibile: vai a I miei conti',
+  tile_savings: 'Risparmi del mese',
+  tile_savings_aria: 'Risparmi del mese: vai a Risparmi',
+  tile_debts: 'Debiti in sospeso',
+  tile_debts_aria: 'Debiti in sospeso: vai a I miei debiti',
+  tile_incomes: '💵 Entrate',
+  tile_incomes_aria: 'Entrate: vai a Entrate settimanali',
+  tile_expenses: '🧾 Spese',
+  tile_expenses_aria: 'Spese: vai a Spese del mese',
+  tile_goal: 'Obiettivo \'{name}\': {pct}%',
+  key_spent_month: '{amount} spesi questo mese',
+  key_income_month: '{amount} ricevuti questo mese',
+  key_saved_total: '{amount} risparmiati in totale',
+  key_goal_suffix: ' · Obiettivo \'{name}\': {pct}%',
+  key_budget_one: '{n} categoria con limite',
+  key_budget_many: '{n} categorie con limite',
+  key_fixed: '{amount} al mese · {n} da pagare',
+  key_available: 'Disponibile: {amount}',
+  key_debts: '{amount} in sospeso',
+  key_san: 'Settimana {x} di {n} · Tocca a {name}',
+  key_san_done: 'San terminato 🎉',
+  key_san_none: 'Nessun san attivo',
+  banner_payday: 'Oggi è giorno di paga: registra la tua entrata e il tuo risparmio.',
+  banner_dues_title: 'Pagamenti in scadenza:',
+  banner_due_item: '{name} (giorno {day})',
+  banner_close: 'Chiudi avviso',
+  spend_title: 'Quanto puoi spendere oggi?',
+  spend_note: 'Questo è quanto puoi spendere oggi senza sforare.',
+  spend_guide: 'Crea il tuo primo budget per categoria e qui vedrai quanto puoi spendere ogni giorno.',
+  spend_left: 'Ti restano {amount} per i {days} giorni che mancano del mese.',
+  spend_left_one: 'Ti resta {amount} per oggi, l’ultimo giorno del mese.',
+  spend_over: 'Hai raggiunto il budget del mese.',
+  spend_over_by: 'Hai sforato di {amount}.',
+  cat_Renta: 'Affitto',
+  cat_Comida: 'Alimentari',
+  'cat_Comida fuera': 'Mangiare fuori',
+  cat_Gasolina: 'Benzina',
+  cat_Transporte: 'Trasporti',
+  cat_Salud: 'Salute',
+  cat_Ropa: 'Abbigliamento',
+  cat_Otros: 'Altro',
+  btn_cancel: 'Annulla',
+  btn_save: 'Salva',
+  btn_edit: 'Modifica',
+  btn_delete: 'Elimina',
+  err_amount: 'Scrivi un importo valido, maggiore di $0.',
+  err_amount_generic: 'Scrivi un importo valido.',
+  err_name: 'Scrivi un nome.',
+  chip_paid: 'Pagato',
+  chip_pending: 'In sospeso',
+  month_prev_aria: 'Mese precedente',
+  month_next_aria: 'Mese successivo',
+  exp_new: 'Nuova spesa',
+  exp_edit: 'Modifica spesa',
+  exp_total_label: 'Totale del mese:',
+  amount_label: 'Importo ($)',
+  category_label: 'Categoria',
+  date_label: 'Data',
+  note_label: 'Nota (facoltativa)',
+  exp_note_ph: 'Per cosa è stato?',
+  exp_save: 'Salva spesa',
+  exp_empty: 'Non ci sono ancora spese in questo mese.\nRegistra la prima con il modulo qui sopra. 👍',
+  exp_delete_confirm: 'Eliminare questa spesa di {amount}? È della categoria {cat}, del {date}. Si elimina solo questa spesa.',
+  err_category: 'Scegli una categoria valida.',
+  err_limit_expenses: 'Hai raggiunto il limite di spese salvate.',
+  inc_intro: 'Il risparmio non si calcola da solo: sei tu a scrivere quanto hai risparmiato davvero da ogni entrata. L’app ti suggerisce solo un importo in base alla tua percentuale nelle Impostazioni.',
+  inc_new: 'Nuova entrata',
+  inc_edit: 'Modifica entrata',
+  inc_note_ph: 'Da dove è arrivata?',
+  inc_savings_label: 'Risparmio ($)',
+  inc_savings_label_sug: 'Risparmio (suggerito: {amount})',
+  inc_savings_help: 'Suggerimento in base alla tua percentuale di risparmio: cambialo con quanto hai risparmiato davvero. Puoi mettere $0.',
+  inc_split_line: 'Risparmio registrato: {sav} · Suggerimento: Attività {biz} · Spese {exp} · Famiglia {fam}',
+  inc_split_preview: 'Ripartizione suggerita: Risparmio {sav} · Attività {biz} · Spese {exp} · Famiglia {fam}. Il risparmio che conta è quello che scrivi qui sotto.',
+  inc_save: 'Salva entrata',
+  inc_empty: 'Non ci sono ancora entrate registrate.\nAggiungi la tua prima entrata e scrivi quanto ne hai risparmiato. 💪',
+  inc_delete_confirm: 'Eliminare questa entrata di {amount} del {date}? Si elimina anche il suo risparmio registrato di {savings}.',
+  err_inc_savings: 'Scrivi quanto hai risparmiato da questa entrata (può essere $0).',
+  err_limit_incomes: 'Hai raggiunto il limite di entrate salvate.',
+  sav_intro_1: 'Qui vedi ogni importo che hai risparmiato, uno per uno. Puoi anche aggiungere un risparmio a parte,',
+  sav_intro_2: 'che non viene da un’entrata',
+  sav_intro_3: ', con il modulo qui sotto. Se elimini un risparmio, si elimina solo quell’importo:',
+  sav_intro_4: 'l’entrata resta uguale',
+  sav_intro_5: '.',
+  sav_total_label: 'Totale risparmiato:',
+  sav_month_label: 'Risparmiato questo mese:',
+  sav_form_title: 'Aggiungi risparmio',
+  sav_note_ph: 'Per cosa è questo risparmio?',
+  sav_save: 'Salva risparmio',
+  sav_empty: 'Non hai ancora risparmi annotati.\nAggiungine uno con il modulo qui sopra, oppure annota il risparmio di un’entrata quando la registri e apparirà qui. 🌱',
+  sav_from_title: 'Risparmio del {date}',
+  sav_from_sub: 'Da un’entrata di {amount}',
+  sav_manual_title: 'Risparmio aggiunto',
+  sav_manual_sub: 'Manuale · aggiunto il {date}',
+  sav_delete_income_confirm: 'Eliminare questo risparmio di {amount} del {date}? Si elimina solo questo importo di risparmio: l’entrata di {income} resta uguale.',
+  sav_delete_manual_confirm: 'Eliminare questo risparmio di {amount} del {date}? È un risparmio che hai aggiunto a mano in Risparmi; si elimina solo questa voce.',
+  err_limit_savings: 'Hai raggiunto il limite di risparmi salvati.',
+  goal_prompt: 'Per cosa stai risparmiando?',
+  goal_prompt_sub: 'Crea un obiettivo e guarda come il tuo risparmio si avvicina a esso.',
+  goal_form_create: 'Crea obiettivo',
+  goal_form_edit: 'Modifica obiettivo',
+  goal_name_label: 'Nome dell’obiettivo',
+  goal_name_ph: 'Es.: Fondo di emergenza',
+  goal_target_label: 'Importo obiettivo ($)',
+  goal_create_btn: 'Crea obiettivo',
+  goal_save_btn: 'Salva obiettivo',
+  goal_progress: 'Hai {have} di {target}',
+  goal_remaining: 'Ti mancano {amount}',
+  goal_edit: 'Modifica obiettivo',
+  goal_delete: 'Elimina obiettivo',
+  err_goal_name: 'Scrivi un nome per il tuo obiettivo.',
+  res_cats_title: 'Spese per categoria',
+  res_summary_title: 'Entrate vs Spese vs Risparmi',
+  chart_income: 'Entrate',
+  chart_expenses: 'Spese',
+  chart_savings: 'Risparmi',
+  res_cats_empty: 'Non ci sono spese in questo mese.',
+  res_summary_empty: 'Non ci sono ancora movimenti in questo mese.',
+  bud_intro: 'Imposta un limite mensile per categoria e guarda quanto hai speso.',
+  bud_spent_left: 'Spesi {spent} di {budget} · Restano {left}',
+  bud_spent_over: 'Spesi {spent} di {budget} · Hai sforato di {over}',
+  bud_nolimit: 'Senza limite. Speso questo mese: {spent}',
+  bud_placeholder: 'Limite mensile $',
+  bud_aria: 'Limite mensile per {cat}',
+  bud_delete_cat: 'Elimina categoria',
+  bud_delete_cat_confirm: 'Eliminare la categoria "{cat}"? Le spese che la usano passeranno a "{other}".',
+  bud_alert_amount: 'Scrivi un importo valido per il limite.',
+  cat_form_title: 'Categoria personalizzata',
+  cat_name_label: 'Nome della categoria',
+  cat_name_ph: 'Es.: Animali',
+  cat_save: 'Aggiungi categoria',
+  err_cat_name: 'Scrivi un nome per la categoria.',
+  err_cat_exists: 'Questa categoria esiste già.',
+  fix_intro: 'Pagamenti che si ripetono ogni mese: affitto, telefono, abbonamenti…',
+  fix_new: 'Nuovo pagamento fisso',
+  fix_edit: 'Modifica pagamento fisso',
+  fix_name_ph: 'Es.: Affitto',
+  fix_day_label: 'Giorno del mese',
+  fix_save: 'Salva pagamento fisso',
+  fix_empty: 'Non hai ancora pagamenti fissi.',
+  fix_sub: 'Giorno {day} di ogni mese · {month}',
+  fix_mark: 'Segna pagato',
+  fix_unmark: 'Togli il segno',
+  fix_delete_confirm: 'Eliminare il pagamento fisso "{name}"?',
+  err_day: 'Il giorno deve essere tra 1 e 31.',
+  err_limit_fixed: 'Hai raggiunto il limite di pagamenti fissi.',
+  acc_new: 'Nuovo conto',
+  acc_edit: 'Modifica conto',
+  acc_balance_label: 'Saldo ($)',
+  acc_name_ph: 'Es.: Contanti, Banca, Risparmi',
+  acc_save: 'Salva conto',
+  acc_empty: 'Non hai ancora conti.\nAggiungine uno per vedere il tuo denaro disponibile nel riepilogo.',
+  acc_delete_confirm: 'Eliminare il conto "{name}"?',
+  err_balance: 'Scrivi un saldo valido.',
+  err_limit_accounts: 'Hai raggiunto il limite di conti.',
+  debt_new: 'Nuovo debito',
+  debt_edit: 'Modifica debito',
+  debt_name_ph: 'Es.: Carta, Prestito',
+  debt_status_label: 'Stato',
+  debt_status_pending: 'In sospeso',
+  debt_status_paid: 'Pagato',
+  debt_save: 'Salva debito',
+  debt_empty: 'Non hai debiti registrati. 🎉',
+  debt_mark_paid: 'Segna pagato',
+  debt_mark_pending: 'Segna in sospeso',
+  debt_delete_confirm: 'Eliminare il debito "{name}"?',
+  err_limit_debts: 'Hai raggiunto il limite di debiti.',
+  name_label: 'Nome',
+  san_intro: 'Un san (tanda) è un circolo di risparmio: ogni settimana tutti versano un contributo e una persona riceve il totale, a turno.',
+  san_form_title: 'Crea un san',
+  san_name_label: 'Nome del san',
+  san_name_ph: 'Es.: San della famiglia',
+  san_aporte_label: 'Contributo per turno ($)',
+  san_participants_label: 'Partecipanti (in ordine di turno)',
+  san_pname_ph: 'Nome del partecipante',
+  san_add_participant: 'Aggiungi',
+  san_create_btn: 'Crea san',
+  san_err_participants: 'Aggiungi almeno 2 partecipanti.',
+  san_err_dup: 'Questo partecipante è già nella lista.',
+  san_err_pname: 'Scrivi il nome del partecipante.',
+  san_remove: 'Rimuovi',
+  san_draft_empty: 'Non hai ancora aggiunto partecipanti.',
+  san_week: 'Settimana {x} di {n}',
+  san_finished: '🎉 San terminato!',
+  san_finished_note: 'Tutte le settimane sono state completate. Puoi eliminare questo san e crearne uno nuovo.',
+  san_total_line: 'Totale raccolto: {amount}',
+  san_week_collected: 'Raccolto questa settimana: {amount} di {target}',
+  san_receiver_line: 'Tocca a: {name}',
+  san_aporte_line: 'Contributo per turno: {amount}',
+  san_paid_title: 'Chi ha già pagato questa settimana?',
+  san_paid: 'ha già pagato',
+  san_advance: 'Segna settimana completa',
+  san_delete: 'Elimina san',
+  san_delete_confirm: 'Eliminare il san "{name}"? Si elimina il suo registro di settimane e pagamenti.',
+  san_new_btn: 'Crea un nuovo san',
+  san_new_confirm: 'Il san attuale è già terminato. Eliminarlo e crearne uno nuovo?',
+  set_profile: 'Il tuo profilo',
+  set_name_label: 'Il tuo nome',
+  set_textsize_label: 'Dimensione del testo',
+  textsize_normal: 'Normale',
+  textsize_large: 'Grande',
+  set_lang_label: 'Lingua / Language',
+  set_reminders_title: 'Promemoria',
+  set_payday_label: 'Giorno di paga',
+  set_reminders_label: 'Promemoria nella Home',
+  wd_none: 'Nessun giorno di paga',
+  wd_0: 'Domenica',
+  wd_1: 'Lunedì',
+  wd_2: 'Martedì',
+  wd_3: 'Mercoledì',
+  wd_4: 'Giovedì',
+  wd_5: 'Venerdì',
+  wd_6: 'Sabato',
+  set_split_title: 'Ripartizione suggerita delle entrate (%)',
+  set_split_help: 'I quattro numeri devono sommare 100. Queste percentuali sono solo un suggerimento su come ripartire le tue entrate: il risparmio non si salva mai da solo, sei sempre tu a scrivere quanto hai risparmiato davvero da ogni entrata.',
+  split_ahorro: 'Risparmio',
+  split_negocio: 'Attività',
+  split_gastos: 'Spese',
+  split_familia: 'Famiglia',
+  set_save: 'Salva impostazioni',
+  set_err_sum: 'Le percentuali devono sommare 100. Ora sommano {total}.',
+  set_saved: 'Impostazioni salvate. ✅',
+  set_sections_title: 'Sezioni visibili',
+  set_sections_help: 'Disattiva quelle che non usi per avere una lista più corta.',
+  set_pin_title: 'Sicurezza (PIN)',
+  pin_status_on: 'Hai un PIN attivo. L’app si blocca all’apertura.',
+  pin_status_off: 'Non hai un PIN. Puoi crearne uno qui per proteggere i tuoi dati.',
+  pin_current_label: 'PIN attuale (se ne hai già uno)',
+  pin_new_label: 'PIN nuovo (vuoto = rimuovi il PIN)',
+  pin_update: 'Aggiorna PIN',
+  pin_err_current: 'Il PIN attuale non è corretto.',
+  pin_err_format: 'Il PIN nuovo deve avere da 4 a 6 numeri.',
+  pin_off: 'PIN disattivato.',
+  pin_updated: 'PIN aggiornato. ✅',
+  set_data_title: 'I tuoi dati',
+  set_data_help: 'I tuoi dati si salvano in questo browser e, se accedi con il tuo account, anche nel cloud. Esporta una copia se vuoi conservarla altrove.',
+  data_export: 'Esporta copia (JSON)',
+  data_import: 'Importa copia',
+  data_reset: 'Elimina tutti i dati',
+  data_err_big: 'Quel file è troppo grande.',
+  data_err_invalid: 'Non è stato possibile importare: il file non è una copia valida di PETO.',
+  import_confirm: 'L’importazione sostituirà TUTTI i dati attuali dell’app. Sei sicuro?',
+  import_done: 'Copia importata. ✅',
+  reset_confirm1: 'Questo elimina TUTTI i tuoi dati dell’app su questo telefono. Non si può annullare. Sei sicuro?',
+  reset_confirm2: 'Ultima conferma: eliminare tutto e ricominciare da zero?',
+  lock_prompt: 'Inserisci il tuo PIN per entrare.',
+  lock_pin_label: 'PIN',
+  lock_enter: 'Entra',
+  lock_note: 'I tuoi dati sono protetti con il tuo PIN.',
+  lock_err: 'PIN errato. Riprova.',
+  ob_title: 'Benvenuto in PETO!',
+  ob_intro_1: 'Organizza i tuoi soldi in pochi minuti: spese, entrate, budget, conti e debiti.',
+  ob_intro_2: 'Con il tuo account nel cloud.',
+  ob_intro_3: 'I tuoi dati si sincronizzano con il tuo telefono.',
+  ob_name_label: 'Come ti chiami?',
+  ob_name_ph: 'Il tuo nome',
+  ob_pin_label: 'Crea un PIN di sicurezza (facoltativo)',
+  ob_pin_ph: 'Da 4 a 6 numeri, o lascialo vuoto',
+  ob_pin2_label: 'Ripeti il PIN',
+  ob_pin2_ph: 'Ripeti il PIN',
+  ob_start: 'Inizia',
+  ob_note: 'Potrai cambiare il PIN quando vuoi nelle Impostazioni.',
+  ob_err_name: 'Scrivi il tuo nome per iniziare.',
+  ob_err_pin_format: 'Il PIN deve avere da 4 a 6 numeri.',
+  ob_err_pin_mismatch: 'I due PIN non coincidono.',
+  set_theme_label: 'Tema',
+  theme_light: 'Chiaro',
+  theme_dark: 'Scuro',
+  theme_auto: 'Automatico (in base al sistema)',
+  set_accent_label: 'Colore principale',
+  accent_verde: 'Verde',
+  accent_azul: 'Blu',
+  accent_morado: 'Viola',
+  accent_naranja: 'Arancione',
+  undo_done: 'Fatto',
+  undo_btn: 'Annulla',
+  btn_repeat: 'Ripeti',
+  fab_aria: 'Aggiungi veloce',
+  quick_title: 'Cosa vuoi aggiungere?',
+  quick_expense: '🧾 Spesa',
+  quick_income: '💵 Entrata',
+  quick_savings: '🐷 Risparmio',
+  sec_buscar: 'Cerca movimenti',
+  search_label: 'Cerca',
+  search_ph: 'Nota, categoria o importo…',
+  search_month_label: 'Mese (vuoto = tutti)',
+  search_type_label: 'Tipo',
+  type_all: 'Tutti',
+  type_gastos: 'Spese',
+  type_ingresos: 'Entrate',
+  type_ahorros: 'Risparmi',
+  search_empty: 'Nessun risultato.',
+  search_type_income: 'Entrata',
+  search_type_saving: 'Risparmio',
+  chal_title: '🔥 Sfida di risparmio settimanale',
+  chal_progress: 'Questa settimana: {have} di {target}',
+  chal_done: '🎉 Sfida di questa settimana completata!',
+  chal_streak_one: 'Serie: 1 settimana completata',
+  chal_streak_many: 'Serie: {n} settimane completate',
+  chal_streak_zero: 'Serie: 0 settimane. Questa può essere la prima!',
+  chal_target_label: 'Obiettivo settimanale di risparmio ($)',
+  chal_save: 'Salva obiettivo settimanale',
+  rep_title: 'Resoconto del mese',
+  rep_download: 'Scarica immagine',
+  rep_share_image: 'Condividi immagine',
+  rep_income: 'Entrate',
+  rep_expenses: 'Spese',
+  rep_savings: 'Risparmi',
+  rep_top_cat: 'Categoria maggiore',
+  rep_top3: 'Top 3 categorie',
+  rep_goal: 'Obiettivo di risparmio',
+  rep_none: 'Nessun movimento',
+  calc_title: 'Calcolatrice dei debiti',
+  calc_intro: 'Confronta due piani per uscire dai debiti: pagare prima il più piccolo (palla di neve) o quello con l’interesse più alto (valanga). Ogni mese paghi i minimi di tutti e il resto va al debito obiettivo.',
+  calc_budget_label: 'Quanto puoi pagare al mese in totale per i debiti? ($)',
+  calc_run: 'Calcola',
+  calc_snowball: 'Palla di neve (saldo minore prima)',
+  calc_avalanche: 'Valanga (interesse maggiore prima)',
+  calc_result: '{months} mesi per uscirne · interessi circa {interest}',
+  calc_months_one: '1 mese per uscirne · interessi circa {interest}',
+  calc_order: 'Ordine in cui si pagano:',
+  calc_free: 'Non hai debiti in sospeso! 🎉',
+  calc_warn: 'Con quel pagamento mensile, qualche debito non finisce mai: il pagamento non copre nemmeno gli interessi. Aumenta il pagamento mensile.',
+  calc_note_zero: 'I debiti senza pagamento minimo o senza interesse annotati si calcolano con minimo $0 e interesse 0%.',
+  calc_err_budget: 'Scrivi quanto puoi pagare al mese.',
+  debt_interest_label: 'Interesse annuale % (facoltativo)',
+  debt_minpay_label: 'Pagamento minimo mensile $ (facoltativo)',
+  debt_terms: 'Interesse {pct}% annuale · Minimo {min}/mese',
+  exp_photo_label: 'Foto dello scontrino (facoltativa)',
+  exp_photo_remove: 'Rimuovi foto',
+  photo_close: 'Chiudi',
+  err_photo_quota: 'Non c’era spazio per salvare la foto: la spesa è stata salvata senza foto.',
+  banner_backup: 'È da un po’ che non salvi una copia dei tuoi dati. Esporta il tuo backup nelle Impostazioni.',
+  /* --- Fase 4: PETO Pro, resoconto avanzato, organizzatore del san --- */
+  pro_title: 'PETO Pro',
+  pro_card_text: 'Il cloud senza limiti per i tuoi dati, il resoconto avanzato, il budget condiviso e la modalità organizzatore del san.',
+  pro_status_free: 'Ora hai il piano Gratuito.',
+  pro_status_active: 'Hai PETO Pro attivo. Grazie per sostenere PETO! ⭐',
+  pro_status_test: 'PETO Pro è aperto durante il test chiuso: hai accesso completo per tutta la durata del test.',
+  pro_status_waitlist: 'Sei nella lista d’attesa di PETO Pro.',
+  pro_btn_see: 'Vedi PETO Pro',
+  pro_wall_title: 'Questa è una funzione di PETO Pro ⭐',
+  pro_price_line: 'Solo $1.99 al mese',
+  pro_benefit_cloud: '☁️ Cloud senza limiti per i tuoi dati',
+  pro_benefit_report: '📊 Resoconto avanzato: confronta i mesi ed esporta in CSV',
+  pro_benefit_shared: '🏠 Budget condiviso con la tua casa',
+  pro_benefit_org: '🤝 Modalità organizzatore del san: la tanda di tutto il gruppo',
+  pro_coming_text: 'L’acquisto in-app arriva con il lancio su Google Play. Intanto puoi iscriverti alla lista d’attesa: ti avviseremo appena potrai attivare Pro a $1.99 al mese.',
+  pro_waitlist_btn: 'Iscrivimi alla lista d’attesa',
+  pro_waitlist_done: 'Sei già in lista ✅ Ti avviseremo quando Pro sarà disponibile.',
+  pro_close: 'Non ora',
+  pro_tag: 'PRO',
+  adv_title: 'Resoconto avanzato',
+  adv_note: 'Funzione di PETO Pro: questo mese contro il precedente, tutte le categorie ed esportazione del mese in CSV.',
+  adv_open_btn: 'Vedi il resoconto avanzato',
+  adv_export_csv: 'Esporta il mese in CSV',
+  adv_this_month: 'Questo mese',
+  adv_prev_month: 'Mese precedente',
+  adv_change: 'Variazione',
+  adv_all_cats: 'Tutte le categorie',
+  adv_empty: 'Nessun movimento in questi due mesi.',
+  org_title: 'Modalità organizzatore del san',
+  org_intro: 'Organizza la tanda di tutto il gruppo: turni con data, segna chi ha già pagato in ogni turno e condividi lo stato con il gruppo.',
+  org_pro_note: 'La modalità organizzatore è una funzione di PETO Pro.',
+  org_form_title: 'Crea il san del gruppo',
+  org_freq_label: 'Frequenza dei turni',
+  org_freq_semanal: 'Settimanale',
+  org_freq_quincenal: 'Ogni 2 settimane',
+  org_freq_mensual: 'Mensile',
+  org_start_label: 'Data del primo turno',
+  org_create_btn: 'Crea san organizzato',
+  org_round: 'Turno {x} di {n}',
+  org_receiver_line: 'Riceve: {name}',
+  org_pending_none: 'Hanno pagato tutti! 🎉',
+  org_pending_list: 'In attesa: {names}',
+  org_totals_title: 'Contributi per partecipante',
+  org_paid_rounds: '{paid} di {n} turni pagati',
+  org_delete: 'Elimina san organizzato',
+  org_delete_confirm: 'Eliminare il san organizzato «{name}»? Si perderà il registro dei pagamenti del gruppo.',
+  org_share_title: 'Stato del san',
+  shared_live_note: 'Condividi il budget con la tua casa: crea una casa o unisciti con un codice e vedrete gli stessi membri. Servono il tuo account nel cloud (sopra, in Impostazioni) e PETO Pro.',
+  shared_leave_live: 'Uscire da questa casa? Non vedrai più il suo budget condiviso.',
+  shared_err_login: 'Prima accedi con il tuo account nel cloud (sopra, in Impostazioni) e riprova.',
+  shared_err_generic: 'Non è stato possibile completare. Controlla la connessione e riprova.',
+  shared_err_code_live: 'Quel codice non esiste. Controllalo e riprova.',
+  shared_err_member: 'Sei già membro di questa casa.',
+  shared_err_owner_leave: 'Sei il proprietario/la proprietaria della casa: non puoi uscire senza eliminarla. Chiedi a un altro membro di creare la nuova casa.',
+  shared_created_live: 'Casa creata ✅ Condividi il codice per invitare la tua casa.',
+  shared_joined_live: 'Ti sei unito alla casa ✅'
 }
 };
-function lang() { return (db && db.settings && db.settings.lang === 'en') ? 'en' : 'es'; }
-function localeTag() { return lang() === 'en' ? 'en-US' : 'es'; }
+function lang() { return (db && db.settings && (db.settings.lang === 'en' || db.settings.lang === 'it')) ? db.settings.lang : 'es'; }
+function localeTag() { return lang() === 'en' ? 'en-US' : (lang() === 'it' ? 'it-IT' : 'es'); }
 function t(key, vars) {
   let s = (I18N[lang()] && I18N[lang()][key]) || I18N.es[key] || key;
   if (vars) for (const k of Object.keys(vars)) s = s.split('{' + k + '}').join(String(vars[k]));
@@ -903,7 +1708,7 @@ function showView(name) {
   if (name === 'cuentas') renderAccounts();
   if (name === 'deudas') renderDebts();
   if (name === 'remesas') renderRemittances();
-  if (name === 'san') renderSan();
+  if (name === 'san') { renderSan(); renderSanOrg(); }
   if (name === 'ajustes') renderSettings();
 }
 
@@ -1120,23 +1925,63 @@ function daysInMonth(key) {
   const p = key.split('-');
   return new Date(Number(p[0]), Number(p[1]), 0).getDate();
 }
-/* (ingreso del mes − gastos del mes − pagos fijos pendientes del mes −
-   ahorro del mes) ÷ días que quedan del mes (incluido hoy), mínimo $0. */
-function safeToSpendCents() {
+/* Presupuesto total del mes según la Fase 1: la suma de los presupuestos
+   por categoría (db.budgets) si hay alguno; si no hay ninguno, el total
+   de ingresos registrados en el mes; si tampoco hay, 0 (sin base). */
+function monthlyBudgetTotalCents(key) {
+  let total = 0;
+  for (const cat of Object.keys(db.budgets)) {
+    const b = db.budgets[cat] || 0;
+    if (b > 0) total += b;
+  }
+  if (total > 0) return total;
+  return sumCents(monthIncomes(key));
+}
+/* Días que quedan del mes en curso, incluido hoy. */
+function daysLeftInMonth(key) {
+  return daysInMonth(key) - Number(todayStr().slice(8, 10)) + 1;
+}
+/* Número diario de Inicio: (presupuesto total del mes − gastos del mes)
+   ÷ días restantes, nunca negativo. Si ya se gastó todo el presupuesto,
+   el diario es $0 y la tarjeta avisa. Sin presupuestos ni ingresos
+   devuelve null: la tarjeta muestra la guía y ningún número inventado. */
+function dailySpendInfo() {
   const key = currentMonthKey();
-  const income = sumCents(monthIncomes(key));
-  const expenses = sumCents(monthExpenses(key));
-  const pendingFixed = db.fixed.filter((f) => !f.paidMonths[key])
-    .reduce((total, f) => total + f.amountCents, 0);
-  const base = income - expenses - pendingFixed - monthSavings(key);
-  const remaining = daysInMonth(key) - Number(todayStr().slice(8, 10)) + 1;
-  return Math.max(0, Math.floor(base / remaining));
+  const total = monthlyBudgetTotalCents(key);
+  if (total <= 0) return null;
+  const spent = sumCents(monthExpenses(key));
+  const left = total - spent;
+  return {
+    total: total, spent: spent, left: left,
+    daysLeft: daysLeftInMonth(key), over: left <= 0,
+    daily: left > 0 ? Math.floor(left / daysLeftInMonth(key)) : 0
+  };
 }
 function renderSpendToday() {
-  const key = currentMonthKey();
-  const noData = sumCents(monthIncomes(key)) === 0 && db.accounts.length === 0;
-  document.getElementById('spend-today').textContent = noData ? '—' : fmt(safeToSpendCents());
-  document.getElementById('spend-today-note').textContent = t(noData ? 'spend_hint' : 'spend_note');
+  const valueEl = document.getElementById('spend-today');
+  const noteEl = document.getElementById('spend-today-note');
+  const leftEl = document.getElementById('spend-today-left');
+  if (!valueEl || !noteEl) return;
+  const info = dailySpendInfo();
+  if (!info) {
+    valueEl.textContent = '—';
+    noteEl.textContent = t('spend_guide');
+    if (leftEl) leftEl.textContent = '';
+    return;
+  }
+  valueEl.textContent = fmt(info.daily);
+  noteEl.textContent = info.over ? t('spend_over') : t('spend_note');
+  if (leftEl) {
+    if (info.left < 0) {
+      leftEl.textContent = t('spend_over_by', { amount: fmt(-info.left) });
+    } else if (info.over) {
+      leftEl.textContent = '';
+    } else if (info.daysLeft === 1) {
+      leftEl.textContent = t('spend_left_one', { amount: fmt(info.left) });
+    } else {
+      leftEl.textContent = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
+    }
+  }
 }
 
 function renderHome() {
@@ -2069,12 +2914,287 @@ function onSanNew() {
   save(); renderSan();
 }
 
+/* ---------------- MODO ORGANIZADOR DE SAN (Fase 4 · Pro) -------------
+   La tanda de TODO el grupo (hermana del san personal de arriba, del
+   que reutiliza estructura y textos): participantes en orden de turno
+   y una ronda por participante; a diferencia del personal, cada ronda
+   tiene fecha (inicio + índice × frecuencia: semanal, quincenal o
+   mensual) y los pagos se pueden marcar en CUALQUIER ronda, no solo
+   en la «actual». Vive en db.sanOrg (el mismo db local) y es función
+   de PETO Pro: sin Pro se ve la nota con el botón al muro de pago. */
+let sanOrgDraft = [];
+function orgRoundDate(org, i) {
+  const parts = String(org.startDate).split('-').map(Number);
+  const y = parts[0], mo = (parts[1] || 1) - 1, day = parts[2] || 1;
+  const d = new Date(y, mo, day);
+  if (org.frequency === 'semanal') d.setDate(d.getDate() + i * 7);
+  else if (org.frequency === 'quincenal') d.setDate(d.getDate() + i * 14);
+  else {
+    /* Mensual: mismo día en el mes destino, con tope al último día de
+       ese mes (31 de enero → 28/29 de febrero, nunca 3 de marzo). */
+    const target = new Date(y, mo + i, 1);
+    const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+    d.setFullYear(target.getFullYear(), target.getMonth(), Math.min(day, lastDay));
+  }
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function orgRoundPaidCount(org, i) {
+  if (!org.rounds[i]) return 0;
+  return org.participants.filter((p) => org.rounds[i].paid[p]).length;
+}
+function orgCurrentRound(org) {
+  for (let i = 0; i < org.participants.length; i++) {
+    if (orgRoundPaidCount(org, i) < org.participants.length) return i;
+  }
+  return org.participants.length; /* todas las rondas completas */
+}
+function orgTotalReunido() {
+  if (!db.sanOrg) return 0;
+  let total = 0;
+  for (const r of db.sanOrg.rounds) {
+    for (const p of Object.keys(r.paid)) if (r.paid[p]) total += db.sanOrg.aporteCents;
+  }
+  return total;
+}
+function orgParticipantPaidRounds(org, name) {
+  return org.rounds.filter((r) => r.paid[name]).length;
+}
+function resetSanOrgForm() {
+  const form = document.getElementById('org-form');
+  if (!form) return;
+  form.reset();
+  const pname = document.getElementById('org-pname');
+  if (pname) pname.value = '';
+  const start = document.getElementById('org-start');
+  if (start) start.value = todayStr();
+  sanOrgDraft = [];
+  showError('org-error', '');
+}
+function renderSanOrg() {
+  const locked = document.getElementById('org-locked');
+  const main = document.getElementById('org-main');
+  if (!locked || !main) return;
+  const pro = isPro();
+  locked.hidden = pro;
+  main.hidden = !pro;
+  if (!pro) return;
+  const has = !!db.sanOrg;
+  document.getElementById('org-create-wrap').hidden = has;
+  document.getElementById('org-active-wrap').hidden = !has;
+  if (!has) {
+    const ul = document.getElementById('org-draft-list');
+    clearNode(ul);
+    for (const name of sanOrgDraft) {
+      const li = el('li', 'item');
+      const mainLi = el('div', 'item-main');
+      mainLi.appendChild(el('div', 'item-title', name));
+      li.appendChild(mainLi);
+      const acts = el('div', 'item-actions');
+      acts.appendChild(actionButton(t('san_remove'), 'btn-ghost', () => {
+        sanOrgDraft = sanOrgDraft.filter((x) => x !== name);
+        renderSanOrg();
+      }));
+      li.appendChild(acts);
+      ul.appendChild(li);
+    }
+    document.getElementById('org-draft-empty').hidden = sanOrgDraft.length > 0;
+    return;
+  }
+  const org = db.sanOrg;
+  const n = org.participants.length;
+  document.getElementById('org-title-line').textContent = org.name;
+  document.getElementById('org-meta-line').textContent =
+    t('san_aporte_line', { amount: fmt(org.aporteCents) }) + ' · ' + t('org_freq_' + org.frequency);
+  document.getElementById('org-total-line').textContent =
+    t('san_total_line', { amount: fmt(orgTotalReunido()) });
+  const roundsBox = document.getElementById('org-rounds');
+  clearNode(roundsBox);
+  org.participants.forEach((receiver, i) => {
+    const card = el('div', 'card');
+    const paidCount = orgRoundPaidCount(org, i);
+    card.appendChild(el('h4', null, t('org_round', { x: i + 1, n: n }) + ' · ' + prettyDate(orgRoundDate(org, i))));
+    card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
+    card.appendChild(el('p', 'muted', t('san_week_collected', {
+      amount: fmt(paidCount * org.aporteCents), target: fmt(n * org.aporteCents)
+    })));
+    const pending = org.participants.filter((p) => !org.rounds[i].paid[p]);
+    card.appendChild(el('p', 'muted small', pending.length
+      ? t('org_pending_list', { names: pending.join(', ') })
+      : t('org_pending_none')));
+    for (const p of org.participants) {
+      const row = el('label', 'toggle-row');
+      row.appendChild(el('span', null, p + ' · ' + t('san_paid')));
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = org.rounds[i].paid[p] === true;
+      cb.setAttribute('aria-label', p);
+      cb.addEventListener('change', () => {
+        if (cb.checked) org.rounds[i].paid[p] = true; else delete org.rounds[i].paid[p];
+        save(); renderSanOrg();
+      });
+      row.appendChild(cb);
+      card.appendChild(row);
+    }
+    roundsBox.appendChild(card);
+  });
+  const totals = document.getElementById('org-totals');
+  clearNode(totals);
+  for (const p of org.participants) {
+    const paidRounds = orgParticipantPaidRounds(org, p);
+    const li = el('li', 'item');
+    const mainLi = el('div', 'item-main');
+    mainLi.appendChild(el('div', 'item-title', p));
+    mainLi.appendChild(el('div', 'item-sub', t('org_paid_rounds', { paid: paidRounds, n: n })));
+    li.appendChild(mainLi);
+    li.appendChild(el('div', 'item-amount', fmt(paidRounds * org.aporteCents)));
+    totals.appendChild(li);
+  }
+}
+function onSanOrgAddParticipant() {
+  const input = document.getElementById('org-pname');
+  const name = cleanText(input.value, 40);
+  if (!name) { showError('org-error', t('san_err_pname')); return; }
+  if (sanOrgDraft.some((x) => x.toLowerCase() === name.toLowerCase())) {
+    showError('org-error', t('san_err_dup')); return;
+  }
+  sanOrgDraft.push(name);
+  input.value = '';
+  showError('org-error', '');
+  renderSanOrg();
+}
+function onSanOrgCreateSubmit(ev) {
+  ev.preventDefault();
+  if (!requirePro()) return; /* función Pro: sin Pro, muro y no se crea nada */
+  const name = cleanText(document.getElementById('org-name').value, 60);
+  if (!name) { showError('org-error', t('err_name')); return; }
+  const cents = parseAmount(document.getElementById('org-amount').value, false);
+  if (cents === null) { showError('org-error', t('err_amount')); return; }
+  if (sanOrgDraft.length < 2) { showError('org-error', t('san_err_participants')); return; }
+  const freqSel = document.getElementById('org-freq').value;
+  const startRaw = document.getElementById('org-start').value;
+  db.sanOrg = {
+    name: name,
+    aporteCents: cents,
+    frequency: ORG_FREQUENCIES.includes(freqSel) ? freqSel : 'semanal',
+    startDate: /^\d{4}-\d{2}-\d{2}$/.test(startRaw || '') ? startRaw : todayStr(),
+    participants: sanOrgDraft.slice(),
+    rounds: sanOrgDraft.map(() => ({ paid: {} }))
+  };
+  resetSanOrgForm();
+  save(); renderSanOrg();
+}
+function onSanOrgDelete() {
+  if (!db.sanOrg) return;
+  if (!window.confirm(t('org_delete_confirm', { name: db.sanOrg.name }))) return;
+  db.sanOrg = null;
+  save(); renderSanOrg();
+}
+/* Líneas del estado del grupo: las usan el compartir por texto
+   (WhatsApp y demás, vía shareText) y la imagen del estado. */
+function orgShareLines() {
+  const org = db.sanOrg;
+  if (!org) return [];
+  const n = org.participants.length;
+  const lines = ['🤝 ' + org.name + ' · ' + t('org_share_title')];
+  lines.push(t('san_aporte_line', { amount: fmtMoney(org.aporteCents) }) + ' · ' + t('org_freq_' + org.frequency));
+  const cur = orgCurrentRound(org);
+  if (cur >= n) {
+    lines.push(t('san_finished'));
+  } else {
+    lines.push(t('org_round', { x: cur + 1, n: n }) + ' · ' + prettyDate(orgRoundDate(org, cur)));
+    lines.push(t('org_receiver_line', { name: org.participants[cur] }));
+    lines.push(t('san_week_collected', {
+      amount: fmtMoney(orgRoundPaidCount(org, cur) * org.aporteCents),
+      target: fmtMoney(n * org.aporteCents)
+    }));
+    const pending = org.participants.filter((p) => !org.rounds[cur].paid[p]);
+    if (pending.length) lines.push('⏳ ' + pending.join(', '));
+  }
+  lines.push(t('san_total_line', { amount: fmtMoney(orgTotalReunido()) }));
+  return lines;
+}
+function onShareSanOrg() {
+  if (!db.sanOrg) return;
+  const lines = orgShareLines();
+  if (lines.length) shareText(db.sanOrg.name, lines.join('\n'));
+}
+/* Imagen del estado del grupo, con la misma marca que el informe
+   mensual (lienzo puro, sin librerías). Devuelve null sin contexto 2d. */
+function buildSanOrgCanvas() {
+  const org = db.sanOrg;
+  if (!org) return null;
+  const lines = orgShareLines().slice(1);
+  const n = org.participants.length;
+  for (const p of org.participants) {
+    lines.push(p + ': ' + t('org_paid_rounds', { paid: orgParticipantPaidRounds(org, p), n: n }) +
+      ' · ' + fmtMoney(orgParticipantPaidRounds(org, p) * org.aporteCents));
+  }
+  const height = 150 + lines.length * 46 + 30;
+  const canvas = document.createElement('canvas');
+  canvas.width = 800; canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 800, height);
+  ctx.fillStyle = '#0b6e4f'; ctx.fillRect(0, 0, 800, 96);
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
+  ctx.fillText(t('app_title'), 40, 58);
+  ctx.fillStyle = '#1c2733'; ctx.font = 'bold 28px sans-serif';
+  ctx.fillText(org.name, 40, 148);
+  ctx.font = '24px sans-serif';
+  let y = 200;
+  for (const line of lines) {
+    ctx.fillStyle = '#1c2733'; ctx.fillText(line, 40, y);
+    y += 46;
+  }
+  return canvas;
+}
+/* Comparte el estado como IMAGEN: Web Share con archivos cuando el
+   sistema lo permite; si no, la imagen se descarga (mismo patrón que
+   el informe mensual). */
+async function shareSanOrgPng() {
+  const canvas = buildSanOrgCanvas();
+  if (!canvas) return;
+  try {
+    const blob = await new Promise((resolve) => {
+      if (canvas.toBlob) canvas.toBlob(resolve, 'image/png');
+      else resolve(null);
+    });
+    if (blob && typeof File !== 'undefined' && navigator.share && navigator.canShare) {
+      const file = new File([blob], 'san-organizador.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: t('org_share_title') });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+    }
+  } catch (e) { /* sin lienzo/blob disponible: se cae a la descarga */ }
+  try {
+    const url = canvas.toDataURL ? canvas.toDataURL('image/png') : null;
+    if (!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'san-organizador.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) { /* sin lienzo disponible: no pasa nada */ }
+}
+
+
 /* ---------------- AJUSTES ---------------- */
 function renderSettings() {
   renderCloudCard();
+  renderProCard();
+  renderSharedCard();
+  if (SHARED_LIVE) sharedRefresh();
+  const settingsBuildEl = document.getElementById('settings-build-label');
+  if (settingsBuildEl) settingsBuildEl.textContent = BUILD_LABEL;
   document.getElementById('set-name').value = db.settings.name;
   document.getElementById('set-textsize').value = db.settings.textSize;
-  document.getElementById('set-lang').value = db.settings.lang === 'en' ? 'en' : 'es';
+  document.getElementById('set-lang').value = lang();
   document.getElementById('set-theme').value = db.settings.theme || 'claro';
   document.getElementById('set-accent').value = db.settings.accent || 'verde';
   const paydaySel = document.getElementById('set-payday');
@@ -2135,7 +3255,7 @@ function onSettingsSubmit(ev) {
   db.settings.name = cleanText(document.getElementById('set-name').value, 40);
   db.settings.split = split;
   db.settings.textSize = document.getElementById('set-textsize').value === 'grande' ? 'grande' : 'normal';
-  db.settings.lang = document.getElementById('set-lang').value === 'en' ? 'en' : 'es';
+  db.settings.lang = ['es', 'en', 'it'].includes(document.getElementById('set-lang').value) ? document.getElementById('set-lang').value : 'es';
   const paydayRaw = document.getElementById('set-payday').value;
   const paydayNum = Math.trunc(Number(paydayRaw));
   db.settings.payday = (paydayRaw !== '' && Number.isFinite(paydayNum) && paydayNum >= 0 && paydayNum <= 6)
@@ -2182,6 +3302,10 @@ async function onPinSubmit(ev) {
   document.getElementById('pin-form').reset();
   renderSettings();
   window.alert(next === '' ? t('pin_off') : t('pin_updated'));
+  /* PIN recién establecido/actualizado: ofrecer la huella en el momento.
+     Si el PIN se quitó, maybeOfferBiometric no muestra nada (sin PIN no
+     hay bloqueo) y si la huella ya estaba activa, tampoco pregunta. */
+  if (next !== '') maybeOfferBiometric();
 }
 
 /* ---------------- Datos: exportar / importar / borrar ---------------- */
@@ -2233,6 +3357,326 @@ function onReset() {
   db = defaultData();
   save();
   location.reload();
+}
+
+/* ---------------- Importar CSV del banco (Fase 3) ----------------
+   El CSV del estado de cuenta se parsea EN el dispositivo y se muestra
+   una VISTA PREVIA: cada fila trae la categoría sugerida, la marca de
+   duplicado y su casilla para incluirla o no. NADA se escribe en db
+   hasta que la persona pulsa «Importar seleccionados».
+   Duplicado = misma fecha + mismo monto + descripción similar a un
+   movimiento ya registrado (gasto o ingreso según el signo); nace
+   desmarcado. La categoría sugerida sale primero del historial propio
+   (misma descripción anotada antes) y luego de palabras clave de
+   comercios y servicios conocidos. */
+let csvPending = [];
+const CSV_COL_DATE = ['date', 'fecha', 'posting date', 'transaction date', 'trans date', 'posted date',
+  'fecha transaccion', 'fecha de transaccion', 'fecha movimiento', 'fecha operacion', 'fecha de operacion',
+  'operation date', 'value date', 'fecha valor'];
+const CSV_COL_DESC = ['description', 'descripcion', 'concepto', 'detalle', 'detalles', 'details',
+  'merchant', 'comercio', 'name', 'nombre', 'memo', 'payee', 'movimiento', 'transaction description',
+  'descripcion del movimiento'];
+const CSV_COL_AMOUNT = ['amount', 'monto', 'importe', 'valor', 'value', 'cantidad', 'net amount', 'total'];
+const CSV_COL_DEBIT = ['debit', 'debito', 'cargo', 'cargos', 'withdrawal', 'retiro', 'money out', 'salida', 'salidas'];
+const CSV_COL_CREDIT = ['credit', 'credito', 'abono', 'abonos', 'deposit', 'deposito', 'money in', 'entrada', 'entradas', 'ingreso', 'ingresos'];
+const CSV_CAT_KEYWORDS = [
+  ['Gasolina', ['shell', 'exxon', 'mobil', 'gulf', 'sunoco', 'texaco', 'chevron', 'gasolin', 'fuel', 'gas station', 'british petroleum']],
+  ['Comida', ['walmart', 'target', 'costco', 'supermercado', 'supermarket', 'grocery', 'fine fare', 'cherry valley', 'key food', 'aldi', 'lidl', 'trader joe', 'mercadona', 'soriana']],
+  ['Comida fuera', ['mcdonald', 'burger king', 'wendy', 'kfc', 'pizza', 'restaurant', 'restaurante', 'doordash', 'uber eats', 'grubhub', 'deli', 'starbucks', 'dunkin', 'taco', 'sushi', 'bakery', 'panaderia', 'cafe ']],
+  ['Transporte', ['uber', 'lyft', 'mta', 'metro', 'taxi', 'toll', 'peaje', 'parking', 'parqueo', 'e zpass', 'ez pass', 'transit']],
+  ['Salud', ['cvs', 'walgreens', 'pharmacy', 'farmacia', 'clinic', 'clinica', 'hospital', 'dental', 'medical']],
+  ['Ropa', ['nike', 'adidas', 'zara', 'marshalls', 'tj maxx', 'old navy', 'gap', 'clothing', 'ropa']],
+  ['Renta', ['rent', 'renta', 'alquiler', 'landlord', 'lease']]
+];
+function csvTokenize(text, delim) {
+  const rows = [];
+  let row = [], cell = '', inQ = false;
+  const s = String(text).replace(/^﻿/, '');
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (inQ) {
+      if (ch === '"') {
+        if (s[i + 1] === '"') { cell += '"'; i++; }
+        else inQ = false;
+      } else cell += ch;
+    } else if (ch === '"' && cell === '') {
+      inQ = true;
+    } else if (ch === delim) {
+      row.push(cell); cell = '';
+    } else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && s[i + 1] === '\n') i++;
+      row.push(cell); cell = '';
+      rows.push(row); row = [];
+    } else cell += ch;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter((r) => r.some((c) => String(c).trim() !== ''));
+}
+function csvDetectDelim(text) {
+  let inQ = false, semi = 0, comma = 0, tab = 0;
+  const s = String(text).replace(/^﻿/, '');
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (ch === '"') inQ = !inQ;
+    else if (!inQ && (ch === '\n' || ch === '\r')) break;
+    else if (!inQ && ch === ';') semi++;
+    else if (!inQ && ch === ',') comma++;
+    else if (!inQ && ch === '\t') tab++;
+  }
+  if (tab > 0 && tab >= semi && tab >= comma) return '\t';
+  return semi > comma ? ';' : ',';
+}
+function csvNormHeader(h) {
+  return String(h == null ? '' : h).normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+function csvFindCol(headers, names) {
+  for (const n of names) {
+    const i = headers.indexOf(n);
+    if (i >= 0) return i;
+  }
+  for (const n of names) {
+    const i = headers.findIndex((h) => h && (h.includes(n) || n.includes(h)));
+    if (i >= 0) return i;
+  }
+  return -1;
+}
+function csvDateOk(y, mo, d) {
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(y, mo - 1, d);
+  if (Number.isNaN(dt.getTime()) || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+}
+function csvParseDateCell(raw, preferDMY) {
+  const s = String(raw == null ? '' : raw).trim();
+  if (!s) return null;
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);
+  if (m) return csvDateOk(Number(m[1]), Number(m[2]), Number(m[3]));
+  m = /^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/.exec(s);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    let y = Number(m[3]);
+    if (y < 100) y += 2000;
+    if (a > 12 && b <= 12) return csvDateOk(y, b, a); /* DD/MM inequívoco */
+    if (b > 12 && a <= 12) return csvDateOk(y, a, b); /* MM/DD inequívoco */
+    /* Ambiguo (05/10): manda el origen del archivo — encabezado en
+       español o delimitador ';' → DD/MM; si no, MM/DD de EE. UU. */
+    return preferDMY ? csvDateOk(y, b, a) : csvDateOk(y, a, b);
+  }
+  const months = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+    ene: 1, abr: 4, ago: 8, dic: 12 };
+  m = /^(\d{1,2})\s+([a-z]{3,})\.?\s+(\d{4})/i.exec(s);
+  if (m && months[m[2].toLowerCase().slice(0, 3)]) return csvDateOk(Number(m[3]), months[m[2].toLowerCase().slice(0, 3)], Number(m[1]));
+  m = /^([a-z]{3,})\.?\s+(\d{1,2}),?\s+(\d{4})/i.exec(s);
+  if (m && months[m[1].toLowerCase().slice(0, 3)]) return csvDateOk(Number(m[3]), months[m[1].toLowerCase().slice(0, 3)], Number(m[2]));
+  return null;
+}
+function csvParseAmountCell(raw) {
+  let s = String(raw == null ? '' : raw).trim();
+  if (!s) return null;
+  let neg = false;
+  if (/^\(.*\)$/.test(s)) { neg = true; s = s.slice(1, -1); }
+  if (/-$/.test(s)) { neg = true; s = s.slice(0, -1); }
+  s = s.replace(/[^0-9.,-]/g, '');
+  if (s.charAt(0) === '-') { neg = true; s = s.slice(1); }
+  s = s.replace(/-/g, '');
+  if (!/[0-9]/.test(s)) return null;
+  const lastDot = s.lastIndexOf('.'), lastComma = s.lastIndexOf(',');
+  let decimalComma = false;
+  if (lastDot >= 0 && lastComma >= 0) decimalComma = lastComma > lastDot;
+  else if (lastComma >= 0) decimalComma = /,\d{1,2}$/.test(s);
+  if (decimalComma) s = s.replace(/\./g, '').replace(',', '.');
+  else s = s.replace(/,/g, '');
+  const n = parseFloat(s);
+  if (!Number.isFinite(n)) return null;
+  const cents = Math.round(n * 100);
+  return neg ? -cents : cents;
+}
+function csvNormDesc(s) {
+  return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function csvDescSimilar(a, b) {
+  const x = csvNormDesc(a), y = csvNormDesc(b);
+  if (!x || !y) return false;
+  if (x === y) return true;
+  if (x.length >= 6 && y.includes(x)) return true;
+  if (y.length >= 6 && x.includes(y)) return true;
+  const tx = new Set(x.split(' ')), ty = new Set(y.split(' '));
+  let inter = 0;
+  for (const w of tx) if (ty.has(w)) inter++;
+  const union = tx.size + ty.size - inter;
+  return union > 0 && inter / union >= 0.75;
+}
+function csvGuessCategory(descRaw) {
+  const norm = csvNormDesc(descRaw);
+  if (norm) {
+    for (const e of db.expenses) {
+      if (e.note && csvNormDesc(e.note) === norm) return e.category;
+    }
+  }
+  const low = ' ' + String(descRaw == null ? '' : descRaw).toLowerCase() + ' ';
+  for (const pair of CSV_CAT_KEYWORDS) {
+    for (const kw of pair[1]) if (low.includes(kw)) return pair[0];
+  }
+  for (const c of db.customCategories) {
+    if (c && low.includes(' ' + c.toLowerCase() + ' ')) return c;
+  }
+  return 'Otros';
+}
+function csvFindDuplicate(row) {
+  const list = row.kind === 'gasto' ? db.expenses : db.incomes;
+  return list.some((x) => x.date === row.date && x.amountCents === row.amountCents &&
+    csvDescSimilar(row.description, x.note || ''));
+}
+function csvBuildRows(text) {
+  const delim = csvDetectDelim(text);
+  const table = csvTokenize(text, delim);
+  if (table.length < 2) return { error: 'csv_err_parse' };
+  const headers = table[0].map(csvNormHeader);
+  const ci = {
+    date: csvFindCol(headers, CSV_COL_DATE),
+    desc: csvFindCol(headers, CSV_COL_DESC),
+    amount: csvFindCol(headers, CSV_COL_AMOUNT),
+    debit: csvFindCol(headers, CSV_COL_DEBIT),
+    credit: csvFindCol(headers, CSV_COL_CREDIT)
+  };
+  if (ci.date < 0 || (ci.amount < 0 && ci.debit < 0 && ci.credit < 0)) return { error: 'csv_err_headers' };
+  const CSV_DATE_ES = ['fecha', 'fecha transaccion', 'fecha de transaccion', 'fecha movimiento',
+    'fecha operacion', 'fecha de operacion', 'fecha valor'];
+  const preferDMY = delim === ';' || CSV_DATE_ES.includes(headers[ci.date]);
+  const rows = [];
+  for (let i = 1; i < table.length; i++) {
+    const cells = table[i];
+    const date = csvParseDateCell(cells[ci.date], preferDMY);
+    if (!date) continue;
+    let cents = null;
+    if (ci.amount >= 0) {
+      cents = csvParseAmountCell(cells[ci.amount]);
+    } else {
+      const d = ci.debit >= 0 ? csvParseAmountCell(cells[ci.debit]) : null;
+      const c = ci.credit >= 0 ? csvParseAmountCell(cells[ci.credit]) : null;
+      if (d) cents = -Math.abs(d);
+      else if (c) cents = Math.abs(c);
+    }
+    if (!cents) continue;
+    const amountCents = Math.abs(cents);
+    if (amountCents > MAX_MONEY_CENTS) continue;
+    const desc = cleanText(ci.desc >= 0 ? String(cells[ci.desc] == null ? '' : cells[ci.desc]) : '', 120) || '—';
+    const kind = cents < 0 ? 'gasto' : 'ingreso';
+    const row = {
+      date: date, description: desc, kind: kind, amountCents: amountCents,
+      category: kind === 'gasto' ? csvGuessCategory(desc) : '',
+      duplicate: false, include: true
+    };
+    row.duplicate = csvFindDuplicate(row);
+    row.include = !row.duplicate;
+    rows.push(row);
+    if (rows.length >= 1000) break;
+  }
+  if (!rows.length) return { error: 'csv_err_empty' };
+  return { rows: rows };
+}
+function renderCsvSummary() {
+  const dups = csvPending.filter((r) => r.duplicate).length;
+  const sel = csvPending.filter((r) => r.include).length;
+  document.getElementById('csv-summary').textContent =
+    t('csv_summary', { total: csvPending.length, dups: dups, sel: sel });
+}
+function renderCsvPreview() {
+  const wrap = document.getElementById('csv-preview');
+  const ul = document.getElementById('csv-rows');
+  clearNode(ul);
+  showError('csv-error', '');
+  for (const row of csvPending) {
+    const li = el('li', 'item');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = row.include;
+    cb.setAttribute('aria-label', row.description);
+    cb.addEventListener('change', () => { row.include = cb.checked; renderCsvSummary(); });
+    li.appendChild(cb);
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', row.description));
+    const badges = [prettyDate(row.date), row.kind === 'ingreso' ? t('csv_income_badge') : t('csv_expense_badge')];
+    if (row.duplicate) badges.push(t('csv_dup_badge'));
+    main.appendChild(el('div', 'item-sub', badges.join(' · ')));
+    li.appendChild(main);
+    if (row.kind === 'gasto') {
+      const sel = document.createElement('select');
+      for (const c of allCategories()) {
+        const o = el('option', null, catName(c));
+        o.value = c;
+        if (c === row.category) o.selected = true;
+        sel.appendChild(o);
+      }
+      sel.addEventListener('change', () => { row.category = sel.value; });
+      li.appendChild(sel);
+    }
+    li.appendChild(el('span', 'item-amount', (row.kind === 'ingreso' ? '+' : '−') + fmt(row.amountCents)));
+    ul.appendChild(li);
+  }
+  wrap.hidden = false;
+  renderCsvSummary();
+}
+function onCsvFile(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!file) return;
+  const wrap = document.getElementById('csv-preview');
+  if (file.size > 2000000) {
+    csvPending = [];
+    clearNode(document.getElementById('csv-rows'));
+    document.getElementById('csv-summary').textContent = '';
+    wrap.hidden = false;
+    showError('csv-error', t('csv_err_big'));
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const built = csvBuildRows(String(reader.result || ''));
+    if (built.error) {
+      csvPending = [];
+      clearNode(document.getElementById('csv-rows'));
+      document.getElementById('csv-summary').textContent = '';
+      wrap.hidden = false;
+      showError('csv-error', t(built.error));
+      return;
+    }
+    csvPending = built.rows;
+    renderCsvPreview();
+  };
+  reader.onerror = () => { showError('csv-error', t('csv_err_parse')); wrap.hidden = false; };
+  reader.readAsText(file);
+}
+function onCsvApply() {
+  const chosen = csvPending.filter((r) => r.include);
+  if (!chosen.length) { showError('csv-error', t('csv_none_selected')); return; }
+  beginUndo();
+  let n = 0;
+  for (const r of chosen) {
+    if (r.kind === 'gasto') {
+      if (db.expenses.length >= MAX_ITEMS) break;
+      db.expenses.push({ id: uid(), amountCents: r.amountCents, category: r.category, date: r.date, note: r.description, photo: null, biz: false });
+    } else {
+      if (db.incomes.length >= MAX_ITEMS) break;
+      /* El ahorro de un ingreso importado nace en 0: el ahorro se anota
+         a mano, nunca se calcula solo (regla permanente de la app). */
+      db.incomes.push({ id: uid(), amountCents: r.amountCents, savingsCents: 0, date: r.date, note: r.description, biz: false });
+    }
+    n++;
+  }
+  save();
+  csvPending = [];
+  document.getElementById('csv-preview').hidden = true;
+  renderExpenses();
+  renderIncomes();
+  showUndoToast();
+  window.alert(t('csv_done', { n: n }));
+}
+function onCsvCancel() {
+  csvPending = [];
+  document.getElementById('csv-preview').hidden = true;
 }
 
 /* ---------------- Mejoras: notificaciones, huella, pagos automáticos,
@@ -2374,6 +3818,25 @@ async function bioAuthenticate(BA) {
   err.code = 'biometryNotAvailable';
   throw err;
 }
+/* Comprobación de biometría con tiempo límite (~4 s): si el puente
+   nativo se cuelga y checkBiometry() nunca responde, sin esto la app
+   se quedaba esperando en silencio para siempre. Al vencer devuelve
+   null y quien llama lo trata como «no disponible» mostrando el aviso.
+   Si el plugin rechaza, el rechazo se propaga a quien llama. */
+async function bioCheckWithTimeout(BA) {
+  let timer = null;
+  const timeout = new Promise((resolve) => {
+    timer = setTimeout(() => resolve(null), 4000);
+  });
+  try {
+    return await Promise.race([
+      Promise.resolve().then(() => BA.checkBiometry()),
+      timeout
+    ]);
+  } finally {
+    if (timer) { clearTimeout(timer); timer = null; }
+  }
+}
 async function refreshBioButton() {
   const btn = document.getElementById('btn-biometric');
   if (!btn) return;
@@ -2388,7 +3851,12 @@ async function refreshBioButton() {
     return;
   }
   try {
-    const r = await BA.checkBiometry();
+    const r = await bioCheckWithTimeout(BA);
+    if (r === null) {
+      /* Venció el tiempo límite: como si no hubiera biometría. */
+      showError('lock-error', t('bio_unavailable'));
+      return;
+    }
     /* Vale la biometría enrolada O, como respaldo, un teléfono seguro
        (con PIN/patrón), porque el diálogo admite la credencial del
        dispositivo. */
@@ -2431,6 +3899,57 @@ async function tryBiometric() {
   } finally {
     bioPromptOpen = false;
   }
+}
+
+/* --- Oferta guiada de huella al crear el PIN ---
+   Pedido de Sterlin (23-oct-2026): activar la huella no debe depender
+   de encontrar la casilla de Ajustes. Al crear el PIN (bienvenida) o
+   al establecer/actualizarlo (Ajustes), si la huella está apagada, la
+   app pregunta «¿Desbloquear con tu huella?» (Sí / Ahora no). El Sí
+   solo activa tras comprobar de verdad que hay huella disponible y
+   registrada: nunca se guarda true sin esa comprobación aprobada.
+   «Ahora no» no guarda nada y no se vuelve a preguntar en ese mismo
+   guardado: la pregunta solo nace de crear/actualizar el PIN. */
+function maybeOfferBiometric() {
+  if (!db || !db.settings.pinHash) return false;
+  if (db.settings.biometric === true) return false;
+  const offer = document.getElementById('bio-offer');
+  if (!offer) return false;
+  showError('bio-offer-error', '');
+  offer.hidden = false;
+  return true;
+}
+function hideBioOffer() {
+  const offer = document.getElementById('bio-offer');
+  if (offer) offer.hidden = true;
+}
+async function onBioOfferYes() {
+  const BA = bioPlugin();
+  if (!BA) { showError('bio-offer-error', t('bio_unavailable')); return; }
+  let r = null;
+  let err = null;
+  try { r = await bioCheckWithTimeout(BA); } catch (e) { err = e; }
+  if (r && r.isAvailable) {
+    db.settings.biometric = true;
+    save();
+    hideBioOffer();
+    const cb = document.getElementById('set-biometric');
+    if (cb) cb.checked = true;
+    window.alert(t('bio_activated'));
+    return;
+  }
+  const code = String((r && r.code) || (err && (err.code || err.message)) || '');
+  if (code === 'biometryNotEnrolled') {
+    showError('bio-offer-error', t('bio_not_enrolled'));
+  } else {
+    /* Incluye el tiempo límite agotado (r === null): no disponible. */
+    showError('bio-offer-error', t('bio_unavailable'));
+  }
+}
+function onBioOfferNo() {
+  /* No se guarda nada: la huella queda como estaba (apagada). */
+  showError('bio-offer-error', '');
+  hideBioOffer();
 }
 
 /* --- Copia de seguridad cifrada con contraseña (AES-GCM) --- */
@@ -2533,14 +4052,55 @@ function onShareSan() {
 /* ---------------- PAQUETE 2: remesas, ideas, alertas, metas,
    negocio, voz y recibos que se leen solos ---------------- */
 
-/* --- Remesas --- */
+/* --- Remesas ---
+   Desde la Fase 3 la remesa guarda la moneda destino (currency) además
+   de la tasa aplicada (rateCents = tasa × 100, en unidades destino por
+   $1). Lo que llegó se calcula siempre con la tasa GUARDADA en el
+   registro: si mañana cambia el tipo de cambio, el historial no se
+   mueve. Las remesas viejas sin currency valen como DOP. */
 function monthRemittances(key) { return db.remittances.filter((r) => monthKeyOf(r.date) === key); }
-function remDopCents(r) { return Math.round(r.usdCents * r.rateCents / 100); }
-function fmtDop(cents) { return 'RD$' + (cents / 100).toLocaleString(localeTag(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function remDestCents(r) { return Math.round(r.usdCents * r.rateCents / 100); }
+const REM_SYMBOLS = { DOP: 'RD$', MXN: 'MX$', EUR: '€', BRL: 'R$', CLP: 'CLP$', ARS: 'AR$' };
+function fmtForeign(cents, currency) {
+  const sym = REM_SYMBOLS[currency] || (currency + ' ');
+  return sym + (cents / 100).toLocaleString(localeTag(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtDop(cents) { return fmtForeign(cents, 'DOP'); }
+/* La remesa más reciente (por fecha; a igual fecha, la última anotada). */
+function lastRemittance(pred) {
+  let best = null;
+  for (const r of db.remittances) {
+    if (pred && !pred(r)) continue;
+    if (!best || r.date >= best.date) best = r;
+  }
+  return best;
+}
+/* Tasa sugerida: la de la remesa más reciente en esa misma moneda. */
+function lastRateCentsFor(currency) {
+  const r = lastRemittance((x) => (x.currency || 'DOP') === currency);
+  return r ? r.rateCents : null;
+}
+function updateRemRateUI(applySuggestion) {
+  const sel = document.getElementById('rem-currency');
+  const cur = sel && sel.value ? sel.value : 'DOP';
+  document.getElementById('rem-rate-label').textContent = t('rem_rate_label', { cur: cur });
+  const sug = lastRateCentsFor(cur);
+  const hint = document.getElementById('rem-rate-hint');
+  if (sug) {
+    hint.textContent = t('rem_rate_suggested', { cur: cur, rate: (sug / 100).toFixed(2) });
+    if (applySuggestion) document.getElementById('rem-rate').value = (sug / 100).toFixed(2);
+  } else {
+    hint.textContent = '';
+  }
+}
+function onRemCurrencyChange() { updateRemRateUI(true); }
 function resetRemittanceForm() {
   document.getElementById('remittance-form').reset();
   document.getElementById('rem-id').value = '';
   document.getElementById('rem-date').value = todayStr();
+  const last = lastRemittance(null);
+  document.getElementById('rem-currency').value = last ? (last.currency || 'DOP') : 'DOP';
+  updateRemRateUI(true);
   document.getElementById('remittance-form-title').textContent = t('rem_save');
   showError('rem-error', '');
 }
@@ -2549,26 +4109,35 @@ function renderRemittances() {
   const key = currentMonthKey();
   const mine = monthRemittances(key);
   const totUsd = mine.reduce((t2, r) => t2 + r.usdCents, 0);
-  const totDop = mine.reduce((t2, r) => t2 + remDopCents(r), 0);
-  document.getElementById('rem-total').textContent =
-    mine.length ? t('rem_total_month', { usd: fmt(totUsd), dop: fmtDop(totDop) }) : '';
+  const byCur = {};
+  for (const r of mine) {
+    const c = r.currency || 'DOP';
+    byCur[c] = (byCur[c] || 0) + remDestCents(r);
+  }
+  document.getElementById('rem-total').textContent = mine.length
+    ? t('rem_month_sent', { usd: fmt(totUsd) }) +
+      Object.keys(byCur).sort().map((c) => ' → ' + fmtForeign(byCur[c], c)).join(' · ')
+    : '';
   const ul = document.getElementById('remittance-list');
   clearNode(ul);
   const all = db.remittances.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
   document.getElementById('remittance-empty').hidden = all.length > 0;
   for (const r of all) {
+    const cur = r.currency || 'DOP';
     const li = el('li', 'item');
     const main = el('div', 'item-main');
     main.appendChild(el('div', 'item-title', r.recipient || '—'));
     main.appendChild(el('div', 'item-sub',
-      prettyDate(r.date) + ' · ' + t('rem_dop_label') + ' ' + fmtDop(remDopCents(r)) +
-      ' @ ' + (r.rateCents / 100).toFixed(2) + (r.note ? ' · ' + r.note : '')));
+      prettyDate(r.date) + ' · ' + t('rem_arrives_label') + ' ' + fmtForeign(remDestCents(r), cur) +
+      ' @ ' + (r.rateCents / 100).toFixed(2) + ' ' + cur + (r.note ? ' · ' + r.note : '')));
     li.appendChild(main);
     li.appendChild(el('span', 'item-amount', fmt(r.usdCents)));
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
       document.getElementById('rem-id').value = r.id;
       document.getElementById('rem-amount').value = (r.usdCents / 100).toFixed(2);
+      document.getElementById('rem-currency').value = cur;
+      updateRemRateUI(false);
       document.getElementById('rem-rate').value = (r.rateCents / 100).toFixed(2);
       document.getElementById('rem-recipient').value = r.recipient;
       document.getElementById('rem-date').value = r.date;
@@ -2585,23 +4154,41 @@ function renderRemittances() {
     li.appendChild(acts);
     ul.appendChild(li);
   }
+  /* Totales de todo el historial, agrupados por moneda destino. */
+  const totalsBox = document.getElementById('rem-totals');
+  clearNode(totalsBox);
+  totalsBox.hidden = all.length === 0;
+  if (all.length) {
+    totalsBox.appendChild(el('h3', null, t('rem_totals_title')));
+    const agg = {};
+    for (const r of all) {
+      const c = r.currency || 'DOP';
+      if (!agg[c]) agg[c] = { usd: 0, dest: 0, n: 0 };
+      agg[c].usd += r.usdCents; agg[c].dest += remDestCents(r); agg[c].n += 1;
+    }
+    for (const c of Object.keys(agg).sort((a, b) => agg[b].usd - agg[a].usd)) {
+      totalsBox.appendChild(el('p', 'total-line',
+        c + ' · ' + t('rem_total_row', { usd: fmt(agg[c].usd), amount: fmtForeign(agg[c].dest, c), n: agg[c].n })));
+    }
+  }
 }
 function onRemittanceSubmit(ev) {
   ev.preventDefault();
   const usd = parseAmount(document.getElementById('rem-amount').value, false);
   const rate = Number(document.getElementById('rem-rate').value);
+  const currency = cleanCurrency(document.getElementById('rem-currency').value);
   const recipient = cleanText(document.getElementById('rem-recipient').value, 60);
   const date = cleanDate(document.getElementById('rem-date').value);
   const note = cleanText(document.getElementById('rem-note').value, 120);
   if (usd === null) { showError('rem-error', t('err_amount')); return; }
-  if (!Number.isFinite(rate) || rate <= 0 || rate > 100000) { showError('rem-error', t('err_amount')); return; }
+  if (!Number.isFinite(rate) || rate <= 0 || rate > 10000) { showError('rem-error', t('err_amount')); return; }
   const id = document.getElementById('rem-id').value;
   beginUndo();
   if (id) {
     const f = db.remittances.find((x) => x.id === id);
-    if (f) { f.usdCents = usd; f.rateCents = Math.round(rate * 100); f.recipient = recipient; f.date = date; f.note = note; }
+    if (f) { f.usdCents = usd; f.rateCents = Math.round(rate * 100); f.currency = currency; f.recipient = recipient; f.date = date; f.note = note; }
   } else {
-    db.remittances.push({ id: uid(), date: date, usdCents: usd, rateCents: Math.round(rate * 100), recipient: recipient, note: note });
+    db.remittances.push({ id: uid(), date: date, usdCents: usd, rateCents: Math.round(rate * 100), currency: currency, recipient: recipient, note: note });
   }
   save();
   renderRemittances();
@@ -2804,7 +4391,7 @@ async function startVoice(kind) {
     let perm = await SR.checkPermissions();
     if (perm && perm.speechRecognition !== 'granted') perm = await SR.requestPermissions();
     if (status) status.textContent = t('voice_listening');
-    const res = await SR.start({ language: db.settings.lang === 'en' ? 'en-US' : 'es-US', maxResults: 1, partialResults: false });
+    const res = await SR.start({ language: lang() === 'en' ? 'en-US' : (lang() === 'it' ? 'it-IT' : 'es-US'), maxResults: 1, partialResults: false });
     const text = res && res.matches && res.matches[0];
     if (!text) { if (status) status.textContent = ''; return; }
     const cents = voiceAmount(text);
@@ -3010,6 +4597,7 @@ async function cloudBoot() {
       cloudState.email = cloudUser.email;
       saveCloudState();
       await cloudReconcile(false);
+      sharedRefresh();
     }
   } catch (e) { /* sin red: la app sigue local */ }
   renderCloudCard();
@@ -3040,6 +4628,7 @@ async function onCloudSignUp() {
       cloudState.email = cloudUser.email;
       saveCloudState();
       await cloudPush();
+      sharedRefresh();
       cloudStatus(t('cloud_ok_up'));
     } else {
       showError('cloud-error', t('cloud_err_confirm'));
@@ -3065,6 +4654,7 @@ async function onCloudSignIn() {
     cloudState.email = cloudUser.email;
     saveCloudState();
     await cloudReconcile(true);
+    sharedRefresh();
     cloudStatus(t('cloud_ok_in'));
   } catch (e) { cloudStatus(''); showError('cloud-error', t('cloud_err_generic')); }
   renderCloudCard();
@@ -3077,6 +4667,10 @@ async function onCloudSignOut() {
   saveCloudState();
   cloudStatus('');
   renderCloudCard();
+  sharedState = { household: null, members: [] };
+  householdBook = null;
+  sharedSave();
+  renderSharedCard();
 }
 async function onCloudSyncNow() {
   showError('cloud-error', '');
@@ -3094,6 +4688,386 @@ async function onCloudWipe() {
     await sb.from('user_data').delete().eq('user_id', cloudUser.id);
   } catch (e) { /* si falla la red, se intenta de nuevo luego */ }
   await onCloudSignOut();
+}
+/* Borrar la CUENTA (requisito de Play para apps con registro): la RPC
+   delete_my_account() del servidor borra la fila de auth.users del
+   propio usuario y la cascada limpia su user_data, los hogares donde
+   es dueño y sus membresías (compartido/borrado-cuenta.sql). Aquí:
+   doble confirmación (el patrón fuerte de onReset); si el servidor
+   responde error, se muestra traducido y NO se cierra sesión ni se
+   toca nada; si sale bien, la sesión local se cierra por el mismo
+   camino del logout (que también limpia el estado del hogar) y se
+   avisa. Los datos locales de ESTE teléfono NO se borran. */
+function cloudDeleteError(error) {
+  const msg = String((error && error.message) || '');
+  if (/no autenticado/i.test(msg)) return t('cloud_delete_err_auth');
+  return t('cloud_err_generic');
+}
+async function onCloudDeleteAccount() {
+  const sb = supa();
+  if (!sb || !cloudUser) return;
+  if (!window.confirm(t('cloud_delete_confirm1'))) return;
+  if (!window.confirm(t('cloud_delete_confirm2'))) return;
+  showError('cloud-error', '');
+  cloudStatus(t('cloud_working'));
+  try {
+    const { error } = await sb.rpc('delete_my_account');
+    if (error) {
+      cloudStatus('');
+      showError('cloud-error', cloudDeleteError(error));
+      return;
+    }
+  } catch (e) {
+    cloudStatus('');
+    showError('cloud-error', t('cloud_err_generic'));
+    return;
+  }
+  await onCloudSignOut();
+  cloudStatus(t('cloud_deleted'));
+}
+
+/* ---------------- Presupuesto compartido (Fase 3 → cableado real) -----
+   La migración compartido/migracion.sql YA está aplicada en el
+   proyecto Supabase en vivo — verificado el 24-oct-2026 con la llave
+   anónima por la API pública: las tablas households,
+   household_members y household_data existen (un GET anónimo recibe
+   401 «permission denied»: hay RLS y ningún grant para anon, tal como
+   deja la migración) y las RPC create_household, join_household,
+   leave_household, is_household_member y household_role existen con
+   las firmas del SQL (responden con sus propios errores de
+   autenticación/membresía, p. ej. «no autenticado»). Por eso
+   SHARED_LIVE = true y la tarjeta trabaja contra las llamadas REALES
+   de abajo, con el mismo cliente sb que la sync personal (user_data).
+   ⚠️ Defecto detectado en esa verificación (lado servidor, NO en
+   esta app): en el SQL aplicado, rotate_invite_code,
+   delete_household y set_member_role comprueban el rol con
+   «household_role(...) <> 'dueno'»; cuando el rol es NULL (quien
+   llama no es miembro) la comparación no bloquea y la RPC sigue
+   (devolver un código nuevo / no fallar), aunque sin filas que tocar
+   si el hogar no existe. Esas tres RPC NO las llama esta app en v1 y
+   el id de un hogar solo lo conocen sus miembros, pero la migración
+   debería corregirse en el servidor a «is distinct from 'dueno'»
+   antes del lanzamiento público. Queda anotado en DISENO.md §8.
+   Modelo (DISENO.md): la membresía es de la CUENTA, no del respaldo.
+   El estado local cgastos.shared.v1 es solo una caché de pantalla de
+   {household, members}; la verdad vive en household_members. El
+   libro del hogar (household_data) baja y sube como un db parcial
+   {expenses, incomes, budgets, fixed, customCategories} validado con
+   validateData, con su propio estado de sync cgastos.household.v1
+   {householdId, lastRemoteAt, dirty} y el mismo debounce de la sync
+   personal. Cada movimiento del libro lleva author_id/author_name
+   (ver householdAddMovement). El ahorro compartido sigue siendo
+   manual: entra en el propio ingreso, nunca se calcula solo.
+   Crear/unirse es función de PETO Pro (PLAN-IDEAS): pasa por
+   requirePro(). Si SHARED_LIVE volviera a false, la tarjeta regresa
+   a la vista previa local de la Fase 3 (sharedMock*) sin tocar la
+   nube — las funciones reales no se llaman. */
+const SHARED_KEY = 'cgastos.shared.v1';
+const SHARED_LIVE = true; /* verificado en vivo (ver la nota de arriba) */
+const HOUSEHOLD_KEY = 'cgastos.household.v1';
+let sharedState = null; /* { household: {id, name, code, role} | null, members: [{name, role, me}] } */
+let householdBook = null; /* db parcial del hogar, en memoria */
+let householdSync = { householdId: '', lastRemoteAt: '', dirty: false };
+let householdSyncLoaded = false;
+let householdTimer = null;
+function sharedLoad() {
+  if (sharedState) return sharedState;
+  sharedState = { household: null, members: [] };
+  try {
+    const r = JSON.parse(localStorage.getItem(SHARED_KEY) || 'null');
+    if (r && typeof r === 'object' && r.household && typeof r.household === 'object') {
+      sharedState.household = {
+        id: cleanText(r.household.id, 50), name: cleanText(r.household.name, 60),
+        code: cleanText(r.household.code, 6).toUpperCase(),
+        role: ['dueno', 'admin', 'miembro', 'lector'].includes(r.household.role) ? r.household.role : 'miembro'
+      };
+      sharedState.members = (Array.isArray(r.members) ? r.members : []).slice(0, 30)
+        .map((mm) => ({
+          name: cleanText(mm && mm.name, 60) || '—',
+          role: ['dueno', 'admin', 'miembro', 'lector'].includes(mm && mm.role) ? mm.role : 'miembro',
+          me: !!(mm && mm.me === true)
+        })).filter((mm) => mm.name);
+    }
+  } catch (e) { /* estado dañado: se ignora, la tarjeta arranca vacía */ }
+  return sharedState;
+}
+function sharedSave() {
+  try { localStorage.setItem(SHARED_KEY, JSON.stringify(sharedState)); } catch (e) { /* sin espacio: se ignora */ }
+}
+function sharedGenCode() {
+  const abc = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; /* sin 0/O/1/I/L: se dictan por teléfono */
+  let code = '';
+  for (let i = 0; i < 6; i++) code += abc.charAt(Math.floor(Math.random() * abc.length));
+  return code;
+}
+function sharedMeName() {
+  return (db && db.settings && db.settings.name) ? db.settings.name : t('shared_you');
+}
+function householdSyncLoad() {
+  if (householdSyncLoaded) return;
+  householdSyncLoaded = true;
+  try {
+    const r = JSON.parse(localStorage.getItem(HOUSEHOLD_KEY) || 'null');
+    if (r && typeof r === 'object') {
+      householdSync = {
+        householdId: String(r.householdId || ''),
+        lastRemoteAt: String(r.lastRemoteAt || ''),
+        dirty: r.dirty === true
+      };
+    }
+  } catch (e) { /* estado dañado: se ignora */ }
+}
+function householdSyncSave() {
+  try { localStorage.setItem(HOUSEHOLD_KEY, JSON.stringify(householdSync)); } catch (e) { /* sin espacio */ }
+}
+/* Valida un libro de hogar bajado de la nube con la MISMA validación
+   de la app (diseño §3): se monta un db completo con los ajustes
+   locales y las llaves compartidas remotas, se pasa por validateData
+   y se extraen solo las llaves del hogar. */
+function sharedBookClean(raw) {
+  const empty = { expenses: [], incomes: [], budgets: {}, fixed: [], customCategories: [] };
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return empty;
+  const tmp = defaultData();
+  tmp.settings = db.settings;
+  for (const k of Object.keys(empty)) if (raw[k] !== undefined) tmp[k] = raw[k];
+  const clean = validateData(tmp);
+  if (!clean) return empty;
+  return {
+    expenses: clean.expenses, incomes: clean.incomes, budgets: clean.budgets,
+    fixed: clean.fixed, customCategories: clean.customCategories
+  };
+}
+async function householdPull() {
+  householdSyncLoad();
+  const sb = supa();
+  if (!sb || !cloudUser || !sharedState || !sharedState.household) { householdBook = null; return; }
+  const hid = sharedState.household.id;
+  try {
+    const { data, error } = await sb.from('household_data')
+      .select('data, updated_at').eq('household_id', hid).maybeSingle();
+    if (error) return;
+    if (data) {
+      householdBook = sharedBookClean(data.data);
+      householdSync = { householdId: hid, lastRemoteAt: data.updated_at || '', dirty: false };
+    } else {
+      householdBook = sharedBookClean(null);
+      householdSync = { householdId: hid, lastRemoteAt: '', dirty: true };
+    }
+    householdSyncSave();
+  } catch (e) { /* sin red: el libro queda como estaba */ }
+}
+async function householdPush() {
+  if (!SHARED_LIVE || !householdBook) return false;
+  householdSyncLoad();
+  const sb = supa();
+  if (!sb || !cloudUser || !sharedState || !sharedState.household) return false;
+  if (sharedState.household.role === 'lector') return false; /* solo lectura: no escribe */
+  try {
+    const { data, error } = await sb.from('household_data')
+      .upsert({
+        household_id: sharedState.household.id, data: householdBook,
+        updated_at: new Date().toISOString(), updated_by: cloudUser.id
+      }, { onConflict: 'household_id' })
+      .select('updated_at').single();
+    if (error) return false;
+    householdSync.householdId = sharedState.household.id;
+    householdSync.lastRemoteAt = data.updated_at;
+    householdSync.dirty = false;
+    householdSyncSave();
+    return true;
+  } catch (e) { return false; }
+}
+function householdMarkDirty() {
+  if (!sharedState || !sharedState.household) return;
+  householdSyncLoad();
+  householdSync.householdId = sharedState.household.id;
+  householdSync.dirty = true;
+  householdSyncSave();
+  if (householdTimer) clearTimeout(householdTimer);
+  householdTimer = setTimeout(() => { householdPush(); }, 3500);
+}
+/* Agrega un movimiento al LIBRO del hogar con su autor (diseño §3:
+   author_id + author_name van dentro del propio movimiento). Es la
+   vía por la que cualquier pantalla futura anota en el hogar; marca
+   el libro sucio y la subida sale con el debounce de la sync. */
+function householdAddMovement(kind, item) {
+  if (!householdBook || (kind !== 'expenses' && kind !== 'incomes')) return null;
+  const stamped = Object.assign({}, item, {
+    author_id: cloudUser ? cloudUser.id : '',
+    author_name: sharedMeName()
+  });
+  householdBook[kind].push(stamped);
+  householdMarkDirty();
+  return stamped;
+}
+/* Refresca la membresía desde el servidor: mi fila de
+   household_members manda; de ahí salen el hogar (con su código, que
+   los miembros sí pueden leer) y la lista completa de miembros.
+   Termina bajando el libro del hogar y repintando la tarjeta. */
+async function sharedRefresh() {
+  if (!SHARED_LIVE) { sharedLoad(); renderSharedCard(); return; }
+  const sb = supa();
+  if (!sb || !cloudUser) {
+    sharedState = { household: null, members: [] };
+    householdBook = null;
+    renderSharedCard();
+    return;
+  }
+  try {
+    const mine = await sb.from('household_members')
+      .select('household_id, role, display_name').eq('user_id', cloudUser.id).limit(1);
+    if (mine.error) return;
+    const rows = mine.data || [];
+    if (!rows.length) {
+      sharedState = { household: null, members: [] };
+      householdBook = null;
+      sharedSave();
+      renderSharedCard();
+      return;
+    }
+    const hid = rows[0].household_id;
+    const hh = await sb.from('households')
+      .select('id, name, invite_code').eq('id', hid).maybeSingle();
+    const mem = await sb.from('household_members')
+      .select('user_id, role, display_name').eq('household_id', hid);
+    sharedState = {
+      household: {
+        id: hid,
+        name: (hh.data && hh.data.name) || t('shared_household_fallback'),
+        code: (hh.data && hh.data.invite_code) || '',
+        role: ['dueno', 'admin', 'miembro', 'lector'].includes(rows[0].role) ? rows[0].role : 'miembro'
+      },
+      members: (mem.data || []).map((mm) => ({
+        name: cleanText(mm.display_name, 60) || '—',
+        role: ['dueno', 'admin', 'miembro', 'lector'].includes(mm.role) ? mm.role : 'miembro',
+        me: mm.user_id === cloudUser.id
+      }))
+    };
+    sharedSave();
+    await householdPull();
+  } catch (e) { /* sin red: se queda la caché de pantalla */ }
+  renderSharedCard();
+}
+function sharedRpcError(error) {
+  const msg = (error && error.message) || '';
+  if (/codigo invalido/i.test(msg)) return t('shared_err_code_live');
+  if (/ya eres miembro/i.test(msg)) return t('shared_err_member');
+  if (/dueno no puede salir/i.test(msg)) return t('shared_err_owner_leave');
+  return t('shared_err_generic');
+}
+/* --- Crear hogar: RPC create_household(p_name, p_display_name) →
+   devuelve (household_id, invite_code). Función Pro (requirePro). --- */
+async function sharedCreate(name) {
+  if (!requirePro()) return;
+  if (!SHARED_LIVE) { sharedMockCreate(name); window.alert(t('shared_created')); renderSharedCard(); return; }
+  const sb = supa();
+  if (!sb || !cloudUser) { showError('shared-error', t('shared_err_login')); return; }
+  try {
+    const { error } = await sb.rpc('create_household', { p_name: name, p_display_name: sharedMeName() });
+    if (error) { showError('shared-error', sharedRpcError(error)); return; }
+    await sharedRefresh();
+    window.alert(t('shared_created_live'));
+  } catch (e) { showError('shared-error', t('shared_err_generic')); }
+}
+/* --- Unirse: RPC join_household(p_code, p_display_name) → devuelve
+   (household_id, household_name, role). El código se valida en el
+   servidor; la app nunca lo consulta directo. Función Pro. --- */
+async function sharedJoin(code) {
+  if (!requirePro()) return;
+  if (!SHARED_LIVE) { sharedMockJoin(code); window.alert(t('shared_joined')); renderSharedCard(); return; }
+  const sb = supa();
+  if (!sb || !cloudUser) { showError('shared-error', t('shared_err_login')); return; }
+  try {
+    const { error } = await sb.rpc('join_household', { p_code: code, p_display_name: sharedMeName() });
+    if (error) { showError('shared-error', sharedRpcError(error)); return; }
+    await sharedRefresh();
+    window.alert(t('shared_joined_live'));
+  } catch (e) { showError('shared-error', t('shared_err_generic')); }
+}
+/* --- Salir: RPC leave_household(p_household). El dueño no puede
+   salir (el servidor lo rechaza y el mensaje se traduce). --- */
+async function sharedLeave() {
+  if (!SHARED_LIVE) { sharedMockLeave(); renderSharedCard(); return; }
+  const sb = supa();
+  const st = sharedLoad();
+  if (!sb || !cloudUser || !st.household) { renderSharedCard(); return; }
+  try {
+    const { error } = await sb.rpc('leave_household', { p_household: st.household.id });
+    if (error) { showError('shared-error', sharedRpcError(error)); return; }
+    sharedState = { household: null, members: [] };
+    householdBook = null;
+    householdSync = { householdId: '', lastRemoteAt: '', dirty: false };
+    householdSyncSave();
+    sharedSave();
+  } catch (e) { showError('shared-error', t('shared_err_generic')); }
+  renderSharedCard();
+}
+/* --- [VISTA PREVIA · solo si SHARED_LIVE = false] Las funciones de
+   la Fase 3 contra datos locales de mentira. Con SHARED_LIVE = true
+   no se llaman: quedan como el modo demo sin servidor. --- */
+function sharedMockCreate(name) {
+  const me = sharedMeName();
+  sharedState.household = { id: 'local-' + uid(), name: name, code: sharedGenCode(), role: 'dueno' };
+  sharedState.members = [{ name: me, role: 'dueno', me: true }];
+  sharedSave();
+}
+function sharedMockJoin(code) {
+  const me = sharedMeName();
+  sharedState.household = { id: 'local-' + uid(), name: t('shared_household_fallback'), code: code, role: 'miembro' };
+  sharedState.members = [
+    { name: t('shared_host'), role: 'dueno', me: false },
+    { name: me, role: 'miembro', me: true }
+  ];
+  sharedSave();
+}
+function sharedMockLeave() {
+  sharedState.household = null;
+  sharedState.members = [];
+  sharedSave();
+}
+function renderSharedCard() {
+  const note = document.getElementById('shared-note');
+  if (note) note.textContent = t(SHARED_LIVE ? 'shared_live_note' : 'shared_preview_note');
+  /* Sin sesión en la nube no se pinta ninguna caché: la membresía es
+     de la cuenta y una caché de otra cuenta no debe ni asomarse. */
+  const st = (SHARED_LIVE && !cloudUser) ? { household: null, members: [] } : sharedLoad();
+  const none = document.getElementById('shared-none');
+  const inn = document.getElementById('shared-in');
+  if (!none || !inn) return;
+  none.hidden = !!st.household;
+  inn.hidden = !st.household;
+  if (!st.household) return;
+  document.getElementById('shared-household-name').textContent = st.household.name;
+  document.getElementById('shared-household-code').textContent =
+    t('shared_code_label', { code: st.household.code });
+  const ul = document.getElementById('shared-members');
+  clearNode(ul);
+  for (const mm of st.members) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', mm.name + (mm.me ? ' (' + t('shared_you') + ')' : '')));
+    main.appendChild(el('div', 'item-sub', t('shared_role_' + mm.role)));
+    li.appendChild(main);
+    ul.appendChild(li);
+  }
+}
+function onSharedCreate() {
+  const name = cleanText(document.getElementById('shared-name').value, 60);
+  if (!name) { showError('shared-error', t('shared_err_name')); return; }
+  showError('shared-error', '');
+  document.getElementById('shared-name').value = '';
+  sharedCreate(name);
+}
+function onSharedJoin() {
+  const code = cleanText(document.getElementById('shared-code').value, 6).toUpperCase();
+  if (!/^[A-Z0-9]{6}$/.test(code)) { showError('shared-error', t('shared_err_code')); return; }
+  showError('shared-error', '');
+  document.getElementById('shared-code').value = '';
+  sharedJoin(code);
+}
+function onSharedLeave() {
+  if (!window.confirm(t(SHARED_LIVE ? 'shared_leave_live' : 'shared_leave_confirm'))) return;
+  sharedLeave();
 }
 
 /* ---------------- Tema (claro / oscuro / automático + color) ----------
@@ -3281,12 +5255,19 @@ function reportData(key) {
   for (const e of exps) byCat[e.category] = (byCat[e.category] || 0) + e.amountCents;
   let topCat = null, topAmt = 0;
   for (const c of Object.keys(byCat)) if (byCat[c] > topAmt) { topAmt = byCat[c]; topCat = c; }
+  /* Top 3 categorías del mes, de mayor a menor gasto (Fase 1: van en la
+     imagen compartible del informe). */
+  const topCats = Object.keys(byCat)
+    .map((c) => ({ cat: c, amt: byCat[c] }))
+    .filter((x) => x.amt > 0)
+    .sort((a, b) => b.amt - a.amt)
+    .slice(0, 3);
   return {
     month: monthLabel(key),
     income: sumCents(monthIncomes(key)),
     expenses: sumCents(exps),
     savings: monthSavings(key),
-    topCat: topCat, topAmt: topAmt,
+    topCat: topCat, topAmt: topAmt, topCats: topCats,
     goal: db.savingsGoal ? { name: db.savingsGoal.name, pct: goalPct() } : null
   };
 }
@@ -3308,35 +5289,56 @@ function renderReport() {
   card.appendChild(reportRow(t('rep_top_cat'), d.topCat ? catName(d.topCat) + ' · ' + fmt(d.topAmt) : t('rep_none')));
   if (d.goal) card.appendChild(reportRow(t('rep_goal') + ' · ' + d.goal.name, d.goal.pct + '%'));
 }
-/* Dibuja el informe en un lienzo (Canvas puro, sin librerías) y lo
-   descarga como imagen PNG. */
+/* Dibuja el informe del mes en un lienzo (Canvas puro, sin librerías,
+   con la marca PETO): mes, ingresos, gastos, el ahorro REAL anotado por
+   la persona (nunca calculado) y el top 3 de categorías. Lo comparten
+   la descarga y el compartir en imagen. Devuelve null sin contexto 2d. */
+function buildReportCanvas() {
+  const d = reportData(chartMonth);
+  const mainLines = [
+    [t('rep_income'), fmtMoney(d.income)],
+    [t('rep_expenses'), fmtMoney(d.expenses)],
+    [t('rep_savings'), fmtMoney(d.savings)]
+  ];
+  if (d.goal) mainLines.push([t('rep_goal') + ' · ' + d.goal.name, d.goal.pct + '%']);
+  const top = d.topCats || [];
+  const height = 190 + mainLines.length * 52 + (top.length ? 80 + top.length * 46 : 0) + 24;
+  const canvas = document.createElement('canvas');
+  canvas.width = 800; canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 800, height);
+  ctx.fillStyle = '#0b6e4f'; ctx.fillRect(0, 0, 800, 96);
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
+  ctx.fillText(t('app_title'), 40, 58);
+  ctx.fillStyle = '#1c2733'; ctx.font = 'bold 30px sans-serif';
+  ctx.fillText(d.month, 40, 150);
+  ctx.font = '26px sans-serif';
+  let y = 210;
+  for (const line of mainLines) {
+    ctx.fillStyle = '#5d6b7a'; ctx.fillText(line[0], 40, y);
+    ctx.fillStyle = '#1c2733'; ctx.fillText(line[1], 420, y);
+    y += 52;
+  }
+  if (top.length) {
+    y += 28;
+    ctx.fillStyle = '#1c2733'; ctx.font = 'bold 25px sans-serif';
+    ctx.fillText(t('rep_top3'), 40, y);
+    ctx.font = '25px sans-serif';
+    y += 48;
+    top.forEach((c, i) => {
+      ctx.fillStyle = '#5d6b7a'; ctx.fillText((i + 1) + '. ' + catName(c.cat), 40, y);
+      ctx.fillStyle = '#1c2733'; ctx.fillText(fmtMoney(c.amt), 420, y);
+      y += 46;
+    });
+  }
+  return canvas;
+}
+/* Descarga el informe como imagen PNG. */
 function downloadReportPng() {
   try {
-    const d = reportData(chartMonth);
-    const canvas = document.createElement('canvas');
-    canvas.width = 800; canvas.height = 520;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 800, 520);
-    ctx.fillStyle = '#0b6e4f'; ctx.fillRect(0, 0, 800, 96);
-    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
-    ctx.fillText(t('app_title'), 40, 58);
-    ctx.fillStyle = '#1c2733'; ctx.font = 'bold 30px sans-serif';
-    ctx.fillText(d.month, 40, 150);
-    ctx.font = '26px sans-serif';
-    const lines = [
-      [t('rep_income'), fmtMoney(d.income)],
-      [t('rep_expenses'), fmtMoney(d.expenses)],
-      [t('rep_savings'), fmtMoney(d.savings)],
-      [t('rep_top_cat'), d.topCat ? catName(d.topCat) + ' · ' + fmtMoney(d.topAmt) : t('rep_none')]
-    ];
-    if (d.goal) lines.push([t('rep_goal') + ' · ' + d.goal.name, d.goal.pct + '%']);
-    let y = 210;
-    for (const line of lines) {
-      ctx.fillStyle = '#5d6b7a'; ctx.fillText(line[0], 40, y);
-      ctx.fillStyle = '#1c2733'; ctx.fillText(line[1], 420, y);
-      y += 52;
-    }
+    const canvas = buildReportCanvas();
+    if (!canvas) return;
     const finish = (url) => {
       if (!url) return;
       const a = document.createElement('a');
@@ -3350,6 +5352,218 @@ function downloadReportPng() {
     else if (canvas.toDataURL) finish(canvas.toDataURL('image/png'));
   } catch (e) { /* sin lienzo disponible: no pasa nada */ }
 }
+/* Comparte el informe como IMAGEN (Fase 1): Web Share con archivos
+   cuando el sistema lo permite (WhatsApp y demás); si compartir
+   archivos no está disponible, la imagen se descarga. Si la persona
+   cancela el compartir, no se fuerza la descarga. */
+async function shareReportPng() {
+  const canvas = buildReportCanvas();
+  if (!canvas) return;
+  try {
+    const blob = await new Promise((resolve) => {
+      if (canvas.toBlob) canvas.toBlob(resolve, 'image/png');
+      else resolve(null);
+    });
+    if (blob && typeof File !== 'undefined' && navigator.share && navigator.canShare) {
+      const file = new File([blob], 'informe-' + chartMonth + '.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: t('share_report_title') });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return; /* canceló: nada más */
+          /* otro fallo: se cae a la descarga */
+        }
+      }
+    }
+  } catch (e) { /* sin lienzo/blob disponible: se cae a la descarga */ }
+  downloadReportPng();
+}
+
+/* ---------------- PETO PRO (Fase 4) ----------------------------------
+   Qué incluye Pro (PLAN-IDEAS, Fase 4): nube sin límites, informe
+   avanzado, presupuesto compartido y modo organizador de san. Lo
+   básico sigue gratis. Precio fijado por Sterlin (23-oct-2026):
+   $1.99/mes.
+   ESTADO DE LA FACTURACIÓN EN ESTA COMPILACIÓN: todavía NO hay
+   plugin de Google Play Billing. La compra real requiere que la app
+   esté publicada en una pista de Play Console con la suscripción
+   PRO_PRODUCT_ID creada a $1.99/mes (paso de tienda, aparte). Por
+   eso la pantalla de Pro se presenta como «muy pronto» y ofrece una
+   lista de espera LOCAL (settings.proWaitlist): nadie puede pagar
+   todavía y NADA se simula como si fuera una compra real.
+   El estado Pro vive en settings.pro y SOLO lo enciende la capa de
+   facturación (PetoBilling) cuando Play confirme la suscripción.
+   EXCEPCIÓN DE PRUEBA CERRADA (decisión de Sterlin, 23-oct-2026):
+   mientras PETO_PRO_OPEN_TEST sea true, isPro() devuelve true para
+   todos y el muro no aparece, para que Sterlin y los testers puedan
+   usar el compartido, el organizador y el informe avanzado antes de
+   que exista el cobro. La tarjeta de Ajustes lo muestra tal cual
+   (pro_status_test). Al activar Play Billing: bandera en false. */
+const PRO_PRICE_TEXT = '$1.99';
+const PRO_PRODUCT_ID = 'peto_pro_mensual';
+/* PRUEBA CERRADA: Pro abierto para Sterlin y los testers; poner en
+   false al activar Play Billing. No escribe settings.pro: solo hace
+   que isPro() devuelva true mientras dure la prueba. */
+const PETO_PRO_OPEN_TEST = true;
+function isPro() {
+  return PETO_PRO_OPEN_TEST || !!(db && db.settings && db.settings.pro === true);
+}
+/* === CAPA DE FACTURACIÓN — único punto de integración con la tienda ==
+   Para activar la compra real hay que: (1) publicar la app en Play
+   Console y crear la suscripción PRO_PRODUCT_ID a $1.99/mes;
+   (2) integrar el plugin de facturación en el proyecto nativo;
+   (3) implementar purchase()/restore() aquí con ese plugin y, tras la
+   confirmación de Play, poner settings.pro = true + save() y
+   renderProCard(). Ninguna otra parte de la app habla con la tienda. */
+const PetoBilling = {
+  available: false, /* ← true solo cuando Play Billing esté integrado */
+  async purchase() { return { ok: false, reason: 'billing_no_disponible' }; },
+  async restore() { return { ok: false, reason: 'billing_no_disponible' }; }
+};
+/* Muro de pago: las funciones Pro llaman requirePro() antes de abrir;
+   sin Pro se muestra la pantalla de venta y no se ejecuta nada más. */
+function requirePro() {
+  if (isPro()) return true;
+  showProPaywall();
+  return false;
+}
+function renderProCard() {
+  const status = document.getElementById('pro-status');
+  if (!status) return;
+  /* Con Pro abierto por la prueba, el botón que abre el muro no aplica. */
+  const openBtn = document.getElementById('btn-pro-open');
+  if (openBtn) openBtn.hidden = PETO_PRO_OPEN_TEST;
+  if (!db) return;
+  status.textContent = PETO_PRO_OPEN_TEST ? t('pro_status_test')
+    : isPro() ? t('pro_status_active')
+    : (db.settings.proWaitlist ? t('pro_status_waitlist') : t('pro_status_free'));
+}
+function renderProPaywall() {
+  const price = document.getElementById('pro-price-line');
+  if (price) price.textContent = t('pro_price_line');
+  const ul = document.getElementById('pro-benefits');
+  if (ul) {
+    clearNode(ul);
+    for (const k of ['pro_benefit_cloud', 'pro_benefit_report', 'pro_benefit_shared', 'pro_benefit_org']) {
+      ul.appendChild(el('li', 'item', t(k)));
+    }
+  }
+  const onList = !!(db && db.settings && db.settings.proWaitlist);
+  const btn = document.getElementById('pro-waitlist-btn');
+  if (btn) btn.hidden = onList;
+  const done = document.getElementById('pro-waitlist-done');
+  if (done) done.hidden = !onList;
+}
+function showProPaywall() {
+  renderProPaywall();
+  const o = document.getElementById('pro-paywall');
+  if (o) o.hidden = false;
+}
+function hideProPaywall() {
+  const o = document.getElementById('pro-paywall');
+  if (o) o.hidden = true;
+}
+function onProWaitlist() {
+  db.settings.proWaitlist = true;
+  save();
+  renderProPaywall();
+  renderProCard();
+}
+/* Botón de compra — SOLO existirá cuando PetoBilling.available sea
+   true (la UI de esta compilación no lo muestra). No finge resultados:
+   si la facturación no está disponible, no toca el estado Pro. */
+async function onProBuy() {
+  if (!PetoBilling.available) return { ok: false, reason: 'billing_no_disponible' };
+  const r = await PetoBilling.purchase();
+  if (r && r.ok) { renderProCard(); hideProPaywall(); }
+  return r;
+}
+
+/* ---------------- Informe avanzado (Fase 4 · Pro) ---------------------
+   En Resumen: el mes elegido contra el anterior (ingresos, gastos y
+   ahorro real con su cambio), TODAS las categorías con su porcentaje
+   y la exportación del mes en CSV. Detrás del muro de Pro. */
+function advDeltaText(nowCents, prevCents) {
+  const d = nowCents - prevCents;
+  if (d === 0) return '= ' + fmtMoney(0);
+  let s = (d > 0 ? '+' : '−') + fmtMoney(Math.abs(d));
+  if (prevCents > 0) s += ' (' + Math.round(Math.abs(d) / prevCents * 100) + '%)';
+  return s;
+}
+function renderAdvReport() {
+  const card = document.getElementById('adv-card');
+  const csvBtn = document.getElementById('btn-adv-csv');
+  if (!card) return;
+  const key = chartMonth;
+  const cur = reportData(key);
+  const prev = reportData(shiftMonth(key, -1));
+  clearNode(card);
+  card.hidden = false;
+  card.appendChild(el('h3', null, '📊 ' + t('adv_title') + ' · ' + cur.month));
+  if (!cur.income && !cur.expenses && !prev.income && !prev.expenses) {
+    card.appendChild(el('p', 'muted', t('adv_empty')));
+    if (csvBtn) csvBtn.hidden = true;
+    return;
+  }
+  const pairs = [
+    [t('rep_income'), cur.income, prev.income],
+    [t('rep_expenses'), cur.expenses, prev.expenses],
+    [t('rep_savings'), cur.savings, prev.savings]
+  ];
+  for (const [label, nowV, prevV] of pairs) {
+    card.appendChild(reportRow(label + ' · ' + t('adv_this_month'), fmt(nowV)));
+    card.appendChild(reportRow(label + ' · ' + t('adv_prev_month'), fmt(prevV)));
+    card.appendChild(reportRow(label + ' · ' + t('adv_change'), advDeltaText(nowV, prevV)));
+  }
+  card.appendChild(el('h4', null, t('adv_all_cats')));
+  const exps = monthExpenses(key);
+  const byCat = {};
+  let total = 0;
+  for (const e of exps) { byCat[e.category] = (byCat[e.category] || 0) + e.amountCents; total += e.amountCents; }
+  const entries = Object.keys(byCat)
+    .map((c) => ({ cat: c, amt: byCat[c] }))
+    .filter((x) => x.amt > 0)
+    .sort((a, b) => b.amt - a.amt);
+  for (const entry of entries) {
+    const pct = total > 0 ? Math.round(entry.amt / total * 100) : 0;
+    card.appendChild(reportRow(catName(entry.cat) + ' · ' + pct + '%', fmt(entry.amt)));
+  }
+  if (csvBtn) csvBtn.hidden = false;
+}
+function onAdvOpen() {
+  if (!requirePro()) return; /* sin Pro: muro, y la tarjeta queda oculta */
+  renderAdvReport();
+}
+/* CSV del mes (fecha, tipo, categoría, nota, cantidad): lo generan los
+   datos ya validados de la app, ordenado por fecha. */
+function advBuildCsv(key) {
+  const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const items = [];
+  for (const e of monthExpenses(key)) {
+    items.push({ date: e.date, tipo: 'gasto', categoria: e.category, nota: e.note, cantidad: (e.amountCents / 100).toFixed(2) });
+  }
+  for (const i of monthIncomes(key)) {
+    items.push({ date: i.date, tipo: 'ingreso', categoria: '', nota: i.note, cantidad: (i.amountCents / 100).toFixed(2) });
+  }
+  items.sort((a, b) => (a.date < b.date ? -1 : (a.date > b.date ? 1 : 0)));
+  const lines = ['fecha,tipo,categoria,nota,cantidad'];
+  for (const it of items) lines.push([it.date, it.tipo, it.categoria, it.nota, it.cantidad].map(esc).join(','));
+  return lines.join('\n');
+}
+function onAdvCsv() {
+  if (!requirePro()) return;
+  const blob = new Blob([advBuildCsv(chartMonth)], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'peto-' + chartMonth + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 
 /* ---------------- Calculadora de deudas ----------------
    Simulación mensual: primero se devenga el interés del mes en cada
@@ -3491,6 +5705,8 @@ function showLock() {
   document.getElementById('app-shell').hidden = true;
   document.getElementById('view-onboarding').hidden = true;
   document.getElementById('view-lock').hidden = false;
+  const lockBuildEl = document.getElementById('lock-build-label');
+  if (lockBuildEl) lockBuildEl.textContent = BUILD_LABEL;
   document.getElementById('lock-pin').value = '';
   showError('lock-error', '');
   refreshBioButton();
@@ -3529,16 +5745,26 @@ async function onOnboardingSubmit(ev) {
     if (pin !== pin2) { showError('ob-error', t('ob_err_pin_mismatch')); return; }
   }
   db.settings.name = name;
+  const obLangEl = document.getElementById('ob-lang');
+  if (obLangEl) db.settings.lang = ['es', 'en', 'it'].includes(obLangEl.value) ? obLangEl.value : 'es';
   db.settings.onboarded = true;
   if (pin) await setPin(pin);
   save();
   enterApp();
+  /* Recién creado el PIN: ofrecer la huella en el momento (flujo guiado). */
+  if (pin) maybeOfferBiometric();
 }
 
 /* ---------------- Inicio ---------------- */
 function wireEvents() {
   document.getElementById('lock-form').addEventListener('submit', onLockSubmit);
   document.getElementById('onboarding-form').addEventListener('submit', onOnboardingSubmit);
+  const obLangSel = document.getElementById('ob-lang');
+  if (obLangSel) obLangSel.addEventListener('change', (ev) => {
+    db.settings.lang = ['es', 'en', 'it'].includes(ev.target.value) ? ev.target.value : 'es';
+    save();
+    applyStaticI18n();
+  });
   document.getElementById('expense-form').addEventListener('submit', onExpenseSubmit);
   document.getElementById('income-form').addEventListener('submit', onIncomeSubmit);
   document.getElementById('savings-form').addEventListener('submit', onSavingsSubmit);
@@ -3550,6 +5776,29 @@ function wireEvents() {
   document.getElementById('debt-form').addEventListener('submit', onDebtSubmit);
   document.getElementById('settings-form').addEventListener('submit', onSettingsSubmit);
   document.getElementById('pin-form').addEventListener('submit', onPinSubmit);
+  /* La casilla de huella vive en la tarjeta de Seguridad, FUERA del
+     #settings-form: su valor solo llegaba a db.settings.biometric al
+     pulsar «Guardar ajustes» (botón de OTRA tarjeta). Marcarla y pulsar
+     «Actualizar PIN» no guardaba nada, renderSettings la volvía a
+     mostrar desmarcada y el bloqueo salía en silencio con la huella
+     desactivada (así le pasó a Sterlin en su teléfono, 23-oct-2026).
+     Ahora se guarda al instante al tocarla, como el tema y el color;
+     onSettingsSubmit la sigue leyendo del DOM y no se rompe.
+     Activarla sin PIN no tiene sentido (sin PIN no hay bloqueo): se
+     avisa con el mismo mensaje de siempre y no se guarda. */
+  document.getElementById('set-biometric').addEventListener('change', (ev) => {
+    const cb = ev.target;
+    if (cb.checked && !db.settings.pinHash) {
+      window.alert(t('bio_need_pin'));
+      cb.checked = false;
+      return;
+    }
+    db.settings.biometric = cb.checked === true;
+    save();
+  });
+  /* Botones de la oferta guiada de huella (al crear/actualizar el PIN). */
+  document.getElementById('bio-offer-yes').addEventListener('click', onBioOfferYes);
+  document.getElementById('bio-offer-no').addEventListener('click', onBioOfferNo);
   document.getElementById('challenge-form').addEventListener('submit', onChallengeSubmit);
 
   /* Tema y color: se aplican al instante al cambiar el selector. */
@@ -3596,6 +5845,7 @@ function wireEvents() {
   /* Calculadora de deudas e informe en imagen. */
   document.getElementById('calc-run').addEventListener('click', renderCalc);
   document.getElementById('btn-report-png').addEventListener('click', downloadReportPng);
+  document.getElementById('btn-report-share-img').addEventListener('click', shareReportPng);
 
   document.querySelectorAll('[data-nav="home"]').forEach((b) =>
     b.addEventListener('click', () => showView('home')));
@@ -3612,10 +5862,34 @@ function wireEvents() {
   document.getElementById('btn-cloud-signout').addEventListener('click', onCloudSignOut);
   document.getElementById('btn-cloud-sync').addEventListener('click', onCloudSyncNow);
   document.getElementById('btn-cloud-wipe').addEventListener('click', onCloudWipe);
+  document.getElementById('btn-cloud-delete').addEventListener('click', onCloudDeleteAccount);
   document.getElementById('btn-privacy').addEventListener('click', togglePrivacy);
   document.getElementById('exp-voice').addEventListener('click', () => startVoice('expense'));
   document.getElementById('inc-voice').addEventListener('click', () => startVoice('income'));
   document.getElementById('remittance-form').addEventListener('submit', onRemittanceSubmit);
+  document.getElementById('rem-currency').addEventListener('change', onRemCurrencyChange);
+  /* Importar CSV del banco: elegir archivo, marcar/desmarcar, aplicar. */
+  document.getElementById('csv-file').addEventListener('change', onCsvFile);
+  document.getElementById('csv-all').addEventListener('click', () => { for (const r of csvPending) r.include = true; renderCsvPreview(); });
+  document.getElementById('csv-none').addEventListener('click', () => { for (const r of csvPending) r.include = false; renderCsvPreview(); });
+  document.getElementById('csv-apply').addEventListener('click', onCsvApply);
+  document.getElementById('csv-cancel').addEventListener('click', onCsvCancel);
+  /* Presupuesto compartido (vista previa con capa simulada). */
+  document.getElementById('btn-shared-create').addEventListener('click', onSharedCreate);
+  document.getElementById('btn-shared-join').addEventListener('click', onSharedJoin);
+  document.getElementById('btn-shared-leave').addEventListener('click', onSharedLeave);
+  document.getElementById('btn-pro-open').addEventListener('click', showProPaywall);
+  document.getElementById('pro-close').addEventListener('click', hideProPaywall);
+  document.getElementById('pro-waitlist-btn').addEventListener('click', onProWaitlist);
+  document.getElementById('pro-paywall').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) hideProPaywall(); });
+  document.getElementById('btn-org-pro').addEventListener('click', showProPaywall);
+  document.getElementById('btn-adv-open').addEventListener('click', onAdvOpen);
+  document.getElementById('btn-adv-csv').addEventListener('click', onAdvCsv);
+  document.getElementById('org-form').addEventListener('submit', onSanOrgCreateSubmit);
+  document.getElementById('org-add-participant').addEventListener('click', onSanOrgAddParticipant);
+  document.getElementById('org-delete').addEventListener('click', onSanOrgDelete);
+  document.getElementById('btn-share-org').addEventListener('click', onShareSanOrg);
+  document.getElementById('btn-share-org-img').addEventListener('click', shareSanOrgPng);
   document.getElementById('goal2-form').addEventListener('submit', onGoal2Submit);
   document.getElementById('btn-menu-close').addEventListener('click', closeMenu);
   document.getElementById('menu-backdrop').addEventListener('click', closeMenu);
@@ -3642,7 +5916,7 @@ function wireEvents() {
   /* Cambio de idioma en vivo: guarda, traduce lo estático y re-renderiza
      la vista actual sin perder datos. */
   document.getElementById('set-lang').addEventListener('change', (ev) => {
-    db.settings.lang = ev.target.value === 'en' ? 'en' : 'es';
+    db.settings.lang = ['es', 'en', 'it'].includes(ev.target.value) ? ev.target.value : 'es';
     save();
     applyStaticI18n();
     showView(currentView);
@@ -3672,6 +5946,7 @@ function init() {
   resetSavingsForm();
   resetGoalForm();
   resetSanForm();
+  resetSanOrgForm();
   applyStaticI18n();
   resetFixedForm();
   resetAccountForm();
@@ -3680,6 +5955,8 @@ function init() {
     document.getElementById('app-shell').hidden = true;
     document.getElementById('view-lock').hidden = true;
     document.getElementById('view-onboarding').hidden = false;
+    const obLangBoot = document.getElementById('ob-lang');
+    if (obLangBoot) obLangBoot.value = lang();
     return;
   }
   if (db.settings.pinHash) { showLock(); return; }
@@ -3690,7 +5967,44 @@ init();
 cloudBoot();
 
 /* PWA: el service worker solo cachea los archivos de la propia app. */
-if ('serviceWorker' in navigator) {
+/* --- Service worker SOLO en web; en la app nativa es un peligro ---
+   Diagnóstico (23-oct-2026): el APK con el arreglo de la huella (corrida
+   #14) llegó bien a Sterlin y él reportó «sigue sin funcionar». Dentro
+   del WebView de Capacitor este bloque registraba el SW SIN condición y
+   www/sw.js servía cache-first (caches.match antes que la red) con el
+   CACHE_NAME sin cambiar desde el paquete 1. Resultado: el SW instalado
+   por versiones anteriores podía seguir sirviendo el app.js VIEJO (con
+   el nombre de plugin equivocado) aunque el APK nuevo ya trajera el
+   arreglo — el código nuevo ni siquiera llegaba a correr.
+   Corrección: en plataforma nativa NO se registra el SW (los archivos
+   ya vienen dentro del APK; no hace falta caché web) y al arrancar se
+   limpia lo viejo: se desregistra cualquier SW existente y se borran
+   TODAS las cachés. Es best-effort (try/catch, sin await que bloquee el
+   arranque) y no toca los datos de la app: localStorage queda intacto.
+   En web (no nativo) se registra como siempre. */
+async function cleanupNativeServiceWorker() {
+  try {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.getRegistrations) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => {
+        try { return Promise.resolve(r.unregister()).catch(() => false); }
+        catch (e) { return false; }
+      }));
+    }
+  } catch (e) { /* limpieza best-effort: si falla, la app sigue igual */ }
+  try {
+    if (window.caches && caches.keys) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => {
+        try { return Promise.resolve(caches.delete(k)).catch(() => false); }
+        catch (e) { return false; }
+      }));
+    }
+  } catch (e) { /* limpieza best-effort: si falla, la app sigue igual */ }
+}
+if (bioIsNative()) {
+  cleanupNativeServiceWorker();
+} else if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => { /* sin SW la app igual funciona */ });
   });

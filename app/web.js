@@ -105,16 +105,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function showUpdateBar(worker) {
     if (document.getElementById('sw-update-bar')) return;
-    var es = ((document.documentElement.lang || 'es').indexOf('en') !== 0);
+    var lg = (document.documentElement.lang || 'es');
+    var es = lg.indexOf('en') !== 0 && lg.indexOf('it') !== 0;
+    var it = lg.indexOf('it') === 0;
     var bar = document.createElement('div');
     bar.id = 'sw-update-bar';
     bar.className = 'sw-update-bar';
     var text = document.createElement('span');
-    text.textContent = es ? 'Hay una versión nueva de PETO Web.' : 'A new version of PETO Web is available.';
+    text.textContent = it ? 'È disponibile una nuova versione di PETO Web.' : (es ? 'Hay una versión nueva de PETO Web.' : 'A new version of PETO Web is available.');
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn btn-primary btn-small';
-    btn.textContent = es ? 'Actualizar' : 'Update';
+    btn.textContent = it ? 'Aggiorna' : (es ? 'Actualizar' : 'Update');
     btn.addEventListener('click', function () {
       try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) { window.location.reload(); }
     });
