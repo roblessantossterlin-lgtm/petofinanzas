@@ -30,15 +30,35 @@
   <p class="muted">Idioma · Language · Lingua: <a href="#es">Español</a> · <a href="#en">English</a> · <a href="#it">Italiano</a></p>
 
 <h2 id="es">Resumen en una frase</h2>
-<p>PETO guarda tu información <strong>únicamente en tu dispositivo</strong>. No tenemos
-servidores, no recopilamos datos y no compartimos nada con nadie.</p>
+<p>PETO guarda tus datos <strong>en tu teléfono</strong>. Solo si tú quieres, puedes crear una cuenta
+gratuita para guardarlos también en la nube y sincronizarlos entre tu teléfono y la web.
+Sin cuenta, nada sale de tu teléfono. No usamos analíticas, no hay publicidad y no vendemos tus datos.</p>
 <h2>Qué datos guarda la app</h2>
-<p>La app guarda en el almacenamiento local de tu propio teléfono los datos que tú mismo escribes:</p>
+<p>En el almacenamiento local de tu propio teléfono, solo lo que tú mismo escribes:</p>
 <ul>
-<li>Tu nombre (solo para saludarte dentro de la app, si decides escribirlo).</li>
-<li>Tus gastos, ingresos, ahorros, presupuestos, pagos fijos, cuentas y deudas.</li>
+<li>Tu nombre (opcional, solo para saludarte dentro de la app).</li>
+<li>Tus gastos, ingresos, ahorros, presupuestos, pagos fijos, cuentas, deudas, remesas y tu san o tanda, con los nombres de participantes que anotes.</li>
+<li>Las fotos de recibos que adjuntes a un gasto: quedan guardadas como parte de ese gasto.</li>
 <li>Tus preferencias de la app (idioma, tema, reparto de ingresos, etc.).</li>
-<li>Un PIN opcional, guardado como <strong>hash</strong> (huella criptográfica), nunca como texto.</li>
+<li>Un PIN opcional, guardado únicamente como <strong>hash con sal</strong> (huella criptográfica), nunca como texto ni en su forma original.</li>
+</ul>
+<h2>Tu cuenta en la nube (opcional)</h2>
+<p>La cuenta es <strong>opcional</strong>: sin cuenta, PETO funciona solo en tu teléfono, como siempre. Si decides crear una:</p>
+<ul>
+<li>Te registras con tu <strong>correo electrónico y una contraseña</strong>, gestionados por nuestro proveedor de cuentas y nube (Supabase). Tu contraseña se guarda cifrada por el proveedor; nosotros no la conocemos.</li>
+<li>Con la sesión iniciada, los datos que guardas en la app (los de la lista anterior, incluidas las fotos de recibos y el hash de tu PIN, nunca tu PIN) se <strong>sincronizan automáticamente</strong> con tu cuenta, para que veas lo mismo en tu teléfono y en la versión web de PETO.</li>
+<li>Cada cuenta puede acceder <strong>solo a sus propios datos</strong>: las reglas del servidor impiden que un usuario vea o toque los datos de otro.</li>
+<li>La conexión con la nube viaja <strong>cifrada (HTTPS)</strong>.</li>
+<li>Puedes cerrar sesión cuando quieras: la sincronización se detiene y tus datos locales se quedan en el teléfono.</li>
+</ul>
+<h2>Presupuesto compartido</h2>
+<p>Si creas un hogar de presupuesto compartido, o te unes a uno con un código de invitación, los datos que anotas <strong>en ese hogar</strong> se comparten con los demás miembros del hogar:</p>
+<ul>
+<li>Se comparte solo el libro del hogar: sus gastos, ingresos, presupuestos, pagos fijos y categorías, junto con tu nombre visible como autor de cada movimiento que anotes.</li>
+<li><strong>Nunca</strong> se comparte tu información personal: tu PIN, tus ajustes, tus metas de ahorro personales, tu san personal, tus cuentas y tus deudas permanecen solo en tu cuenta privada.</li>
+<li>Según tu rol en el hogar (dueño, administrador, miembro o solo lectura), los miembros pueden ver el libro y —excepto el rol de solo lectura— anotar y editar movimientos.</li>
+<li>Si sales del hogar, dejas de ver su información; el libro compartido permanece con los miembros que sigan, y el dueño puede borrar el hogar completo y con él los datos compartidos.</li>
+<li>Comparte el código de invitación solo con personas de tu confianza: quien se una con el código podrá ver el libro del hogar.</li>
 </ul>
 <h2>Funciones del dispositivo</h2>
 <ul>
@@ -46,27 +66,32 @@ servidores, no recopilamos datos y no compartimos nada con nadie.</p>
 sistema de tu teléfono. PETO nunca ve ni guarda tu huella.</li>
 <li><strong>Notificaciones:</strong> los avisos de pagos se generan dentro de tu dispositivo;
 ningún dato sale del teléfono para crearlos.</li>
-<li><strong>Cámara y fotos:</strong> si adjuntas la foto de un recibo, queda guardada solo en tu teléfono.</li>
+<li><strong>Cámara, fotos y lectura de recibos:</strong> si adjuntas la foto de un recibo, queda guardada como parte de ese gasto; su texto se lee en tu propio dispositivo (reconocimiento local), sin enviar la foto a ningún servicio de lectura externo.</li>
+<li><strong>Dictado por voz:</strong> si anotas hablando, el reconocimiento de voz lo hace el servicio de voz de tu propio teléfono. PETO solo recibe el texto resultante: no grabamos ni guardamos tu voz.</li>
+<li><strong>Compartir informes:</strong> si tocas «compartir», la imagen o el archivo sale solo hacia la aplicación que tú elijas en ese momento.</li>
 </ul>
-<h2>Qué datos NO recopilamos</h2>
+<h2>Qué NO hacemos</h2>
 <ul>
-<li>No recopilamos datos personales ni financieros en ningún servidor.</li>
-<li>No usamos analíticas, rastreadores ni publicidad de terceros.</li>
-<li>No vendemos ni compartimos datos: <strong>no tenemos acceso a ellos</strong>.</li>
-<li>La app funciona sin conexión a internet y no envía información a la red.</li>
+<li>No usamos analíticas ni rastreadores de terceros.</li>
+<li>No mostramos publicidad.</li>
+<li>No vendemos ni alquilamos tus datos, y no los compartimos con terceros con fines publicitarios o de marketing.</li>
+<li>El único servicio externo que utiliza la app es la infraestructura de la cuenta en la nube (Supabase), que almacena los datos de tu cuenta actuando como nuestro proveedor. Aparte de eso, tus datos solo se comparten con las personas que tú invites a tu hogar.</li>
 </ul>
 <h2>Copias de seguridad</h2>
 <p>La app te permite exportar tus datos en un archivo (JSON), también con opción cifrada con
 contraseña, e importarlos cuando quieras. Ese archivo lo generas y lo guardas <strong>tú</strong>,
 donde tú decidas. Tú eres responsable de cuidar ese archivo, porque contiene tu información financiera.</p>
-<h2>Eliminar tus datos</h2>
-<p>Puedes borrar todo en cualquier momento desde la propia app (Ajustes → borrar datos) o
-desinstalando la aplicación. Al no existir cuentas ni servidores, no queda ninguna copia en ningún otro lugar.</p>
+<h2>Eliminar tus datos y tu cuenta</h2>
+<ul>
+<li><strong>Datos de este teléfono:</strong> puedes borrarlos cuando quieras desde la propia app (Ajustes → «Borrar todos los datos») o desinstalando la aplicación.</li>
+<li><strong>Datos de la nube:</strong> desde Ajustes → Cuenta en la nube → «Borrar mis datos de la nube» se elimina tu copia sincronizada del servidor y se cierra tu sesión. Los datos de este teléfono no se tocan.</li>
+<li><strong>Cerrar tu cuenta:</strong> la app todavía no incluye un botón para eliminar la cuenta en sí (el correo y la credencial de registro). Para cerrarla y eliminar tu registro, escríbenos a <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a> y lo eliminamos.</li>
+</ul>
 <h2>Niños</h2>
-<p>La app no está dirigida a menores de 13 años y no recopila datos de nadie, incluidos menores.</p>
+<p>La app no está dirigida a menores de 13 años.</p>
 <h2>Cambios a esta política</h2>
-<p>Si en el futuro la app agregara funciones con servidor (por ejemplo, respaldo en la nube opcional),
-esta política se actualizará <strong>antes</strong> de publicar esa versión y la app te lo avisará.</p>
+<p>Si esta política cambia, publicaremos la versión nueva en esta misma página con la fecha actualizada.
+Te recomendamos revisarla de vez en cuando.</p>
 <h2>Contacto</h2>
 <p>¿Preguntas sobre privacidad? Escríbenos a: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a></p>
 
@@ -75,40 +100,68 @@ esta política se actualizará <strong>antes</strong> de publicar esa versión y
   <p class="muted">Last updated: October 23, 2026</p>
 
 <h2>In one sentence</h2>
-<p>PETO stores your information <strong>only on your device</strong>. We have no servers,
-we collect no data, and we share nothing with anyone.</p>
+<p>PETO stores your data <strong>on your phone</strong>. Only if you choose to, you can create a free
+account to also store it in the cloud and sync it between your phone and the web.
+Without an account, nothing leaves your phone. We use no analytics, there are no ads, and we never sell your data.</p>
 <h2>What the app stores</h2>
-<p>Locally on your own phone, only what you type in yourself: your name (optional, used only
-to greet you in the app), your expenses, income, savings, budgets, fixed payments, accounts and
-debts, your app preferences, and an optional PIN stored as a cryptographic <strong>hash</strong>,
-never as plain text.</p>
+<p>In your own phone's local storage, only what you type in yourself:</p>
+<ul>
+<li>Your name (optional, only used to greet you inside the app).</li>
+<li>Your expenses, income, savings, budgets, fixed payments, accounts, debts, remittances and your san / rotating savings circle, including the participant names you enter.</li>
+<li>Receipt photos you attach to an expense: they are stored as part of that expense.</li>
+<li>Your app preferences (language, theme, income split, etc.).</li>
+<li>An optional PIN, stored only as a <strong>salted hash</strong> (a cryptographic fingerprint), never as text or in its original form.</li>
+</ul>
+<h2>Your cloud account (optional)</h2>
+<p>The account is <strong>optional</strong>: without an account, PETO works only on your phone, as always. If you decide to create one:</p>
+<ul>
+<li>You sign up with your <strong>email address and a password</strong>, managed by our account and cloud provider (Supabase). Your password is stored encrypted by the provider; we never see it.</li>
+<li>While you are signed in, the data you keep in the app (the list above, including receipt photos and your PIN hash — never your PIN itself) <strong>syncs automatically</strong> with your account, so you see the same thing on your phone and in PETO's web version.</li>
+<li>Each account can access <strong>only its own data</strong>: server rules prevent any user from seeing or touching another user's data.</li>
+<li>The connection to the cloud is <strong>encrypted in transit (HTTPS)</strong>.</li>
+<li>You can sign out at any time: syncing stops and your local data stays on the phone.</li>
+</ul>
+<h2>Shared budget</h2>
+<p>If you create a shared-budget household, or join one with an invite code, the data you record <strong>in that household</strong> is shared with the household's other members:</p>
+<ul>
+<li>Only the household's book is shared: its expenses, income, budgets, fixed payments and categories, together with your display name as the author of each entry you record.</li>
+<li>Your personal information is <strong>never</strong> shared: your PIN, your settings, your personal savings goals, your personal san, your accounts and your debts stay in your private account only.</li>
+<li>Depending on your role in the household (owner, admin, member or read-only), members can view the book and — except for the read-only role — add and edit entries.</li>
+<li>If you leave the household, you stop seeing its information; the shared book stays with the remaining members, and the owner can delete the whole household, including its shared data.</li>
+<li>Share the invite code only with people you trust: anyone who joins with the code will be able to see the household's book.</li>
+</ul>
 <h2>On-device features</h2>
 <ul>
 <li><strong>Fingerprint:</strong> if you enable fingerprint unlock, your phone's system performs
 the check. PETO never sees or stores your fingerprint.</li>
 <li><strong>Notifications:</strong> payment alerts are generated on your device; no data leaves
 the phone to create them.</li>
-<li><strong>Camera and photos:</strong> if you attach a receipt photo, it stays only on your phone.</li>
+<li><strong>Camera, photos and receipt scanning:</strong> if you attach a receipt photo, it is stored as part of that expense; its text is read on your own device (local recognition), without sending the photo to any external reading service.</li>
+<li><strong>Voice dictation:</strong> if you record an entry by speaking, your own phone's voice service does the recognition. PETO only receives the resulting text: we do not record or store your voice.</li>
+<li><strong>Sharing reports:</strong> if you tap "share", the image or file goes only to the app you choose at that moment.</li>
 </ul>
-<h2>What we do NOT collect</h2>
+<h2>What we do NOT do</h2>
 <ul>
-<li>No personal or financial data is collected on any server.</li>
-<li>No analytics, no trackers, no third-party advertising.</li>
-<li>We never sell or share data — <strong>we have no access to it</strong>.</li>
-<li>The app works fully offline and sends nothing over the network.</li>
+<li>No third-party analytics or trackers.</li>
+<li>No advertising.</li>
+<li>We never sell or rent your data, and we do not share it with third parties for advertising or marketing purposes.</li>
+<li>The only external service the app uses is the cloud account infrastructure (Supabase), which stores your account data acting as our provider. Apart from that, your data is shared only with the people you invite to your household.</li>
 </ul>
 <h2>Backups</h2>
 <p>You can export your data to a JSON file — with an optional password-encrypted version — and
 import it later. You create and keep that file wherever you choose; you are responsible for keeping
 it safe, as it contains your financial information.</p>
-<h2>Deleting your data</h2>
-<p>Delete everything anytime from inside the app (Settings → erase data) or by uninstalling it.
-With no accounts and no servers, no copy remains anywhere else.</p>
+<h2>Deleting your data and your account</h2>
+<ul>
+<li><strong>Data on this phone:</strong> delete it anytime from inside the app (Settings → "Delete all data") or by uninstalling the app.</li>
+<li><strong>Cloud data:</strong> Settings → Cloud account → "Delete my cloud data" removes your synced copy from the server and signs you out. The data on this phone is not touched.</li>
+<li><strong>Closing your account:</strong> the app does not yet include a button to delete the account itself (your email and sign-in credential). To close it and delete your registration, email us at <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a> and we will delete it.</li>
+</ul>
 <h2>Children</h2>
-<p>The app is not directed at children under 13 and collects no data from anyone.</p>
-<h2>Changes</h2>
-<p>If future versions add server features (such as optional cloud backup), this policy will be
-updated <strong>before</strong> that version ships, and the app will tell you.</p>
+<p>The app is not directed at children under 13.</p>
+<h2>Changes to this policy</h2>
+<p>If this policy changes, the new version will be posted on this page with an updated date.
+We recommend checking it from time to time.</p>
 <h2>Contact</h2>
 <p>Privacy questions: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a></p>
 
@@ -118,15 +171,35 @@ updated <strong>before</strong> that version ships, and the app will tell you.</
   <p class="muted">Ultimo aggiornamento: 23 ottobre 2026</p>
 
 <h2>Riepilogo in una frase</h2>
-<p>PETO conserva le tue informazioni <strong>unicamente sul tuo dispositivo</strong>. Non abbiamo
-server, non raccogliamo dati e non condividiamo nulla con nessuno.</p>
+<p>PETO conserva i tuoi dati <strong>sul tuo telefono</strong>. Solo se lo desideri, puoi creare un account
+gratuito per conservarli anche nel cloud e sincronizzarli tra il tuo telefono e il web.
+Senza account, nulla esce dal tuo telefono. Non usiamo statistiche di utilizzo, non c'è pubblicità e non vendiamo i tuoi dati.</p>
 <h2>Quali dati conserva l'app</h2>
-<p>L'app conserva nella memoria locale del tuo telefono i dati che scrivi tu stesso:</p>
+<p>Nella memoria locale del tuo telefono, solo ciò che scrivi tu stesso:</p>
 <ul>
-<li>Il tuo nome (solo per salutarti dentro l'app, se decidi di scriverlo).</li>
-<li>Le tue spese, entrate, risparmi, budget, pagamenti fissi, conti e debiti.</li>
+<li>Il tuo nome (facoltativo, solo per salutarti dentro l'app).</li>
+<li>Le tue spese, entrate, risparmi, budget, pagamenti fissi, conti, debiti, rimesse e il tuo san / fondo comune a turni, con i nomi dei partecipanti che annoti.</li>
+<li>Le foto degli scontrini che alleghi a una spesa: restano salvate come parte di quella spesa.</li>
 <li>Le tue preferenze dell'app (lingua, tema, ripartizione delle entrate, ecc.).</li>
-<li>Un PIN facoltativo, conservato come <strong>hash</strong> (impronta crittografica), mai in chiaro.</li>
+<li>Un PIN facoltativo, conservato unicamente come <strong>hash con sale</strong> (impronta crittografica), mai in chiaro né nella sua forma originale.</li>
+</ul>
+<h2>Il tuo account nel cloud (facoltativo)</h2>
+<p>L'account è <strong>facoltativo</strong>: senza account, PETO funziona solo sul tuo telefono, come sempre. Se decidi di crearne uno:</p>
+<ul>
+<li>Ti registri con la tua <strong>email e una password</strong>, gestiti dal nostro fornitore di account e cloud (Supabase). La tua password viene conservata cifrata dal fornitore; noi non la conosciamo.</li>
+<li>Con l'accesso effettuato, i dati che conservi nell'app (quelli dell'elenco precedente, incluse le foto degli scontrini e l'hash del tuo PIN, mai il tuo PIN) si <strong>sincronizzano automaticamente</strong> con il tuo account, così vedi le stesse cose sul telefono e nella versione web di PETO.</li>
+<li>Ogni account può accedere <strong>solo ai propri dati</strong>: le regole del server impediscono a un utente di vedere o toccare i dati di un altro.</li>
+<li>La connessione con il cloud viaggia <strong>cifrata (HTTPS)</strong>.</li>
+<li>Puoi disconnetterti quando vuoi: la sincronizzazione si ferma e i tuoi dati locali restano sul telefono.</li>
+</ul>
+<h2>Budget condiviso</h2>
+<p>Se crei un nucleo di budget condiviso, o ti unisci a uno con un codice di invito, i dati che annoti <strong>in quel nucleo</strong> vengono condivisi con gli altri membri del nucleo:</p>
+<ul>
+<li>Si condivide solo il libro del nucleo: le sue spese, entrate, budget, pagamenti fissi e categorie, insieme al tuo nome visibile come autore di ogni movimento che annoti.</li>
+<li>Le tue informazioni personali non si condividono <strong>mai</strong>: il tuo PIN, le tue impostazioni, i tuoi obiettivi di risparmio personali, il tuo san personale, i tuoi conti e i tuoi debiti restano solo nel tuo account privato.</li>
+<li>A seconda del tuo ruolo nel nucleo (proprietario, amministratore, membro o sola lettura), i membri possono vedere il libro e — tranne il ruolo di sola lettura — annotare e modificare i movimenti.</li>
+<li>Se esci dal nucleo, smetti di vedere le sue informazioni; il libro condiviso resta ai membri che rimangono, e il proprietario può eliminare l'intero nucleo, e con esso i dati condivisi.</li>
+<li>Condividi il codice di invito solo con persone di fiducia: chi si unisce con il codice potrà vedere il libro del nucleo.</li>
 </ul>
 <h2>Funzioni del dispositivo</h2>
 <ul>
@@ -134,27 +207,32 @@ server, non raccogliamo dati e non condividiamo nulla con nessuno.</p>
 sistema del tuo telefono. PETO non vede né conserva mai la tua impronta.</li>
 <li><strong>Notifiche:</strong> gli avvisi dei pagamenti si generano dentro il tuo dispositivo;
 nessun dato esce dal telefono per crearli.</li>
-<li><strong>Fotocamera e foto:</strong> se alleghi la foto di uno scontrino, resta salvata solo sul tuo telefono.</li>
+<li><strong>Fotocamera, foto e lettura degli scontrini:</strong> se alleghi la foto di uno scontrino, resta salvata come parte di quella spesa; il suo testo viene letto sul tuo stesso dispositivo (riconoscimento locale), senza inviare la foto a nessun servizio di lettura esterno.</li>
+<li><strong>Dettatura vocale:</strong> se annoti parlando, il riconoscimento vocale lo fa il servizio vocale del tuo telefono. PETO riceve solo il testo risultante: non registriamo né conserviamo la tua voce.</li>
+<li><strong>Condividere rapporti:</strong> se tocchi «condividi», l'immagine o il file va solo all'applicazione che scegli in quel momento.</li>
 </ul>
-<h2>Quali dati NON raccogliamo</h2>
+<h2>Cosa NON facciamo</h2>
 <ul>
-<li>Non raccogliamo dati personali né finanziari su nessun server.</li>
-<li>Non usiamo statistiche, tracciatori né pubblicità di terze parti.</li>
-<li>Non vendiamo né condividiamo dati: <strong>non abbiamo accesso ad essi</strong>.</li>
-<li>L'app funziona senza connessione a internet e non invia informazioni in rete.</li>
+<li>Non usiamo statistiche né tracciatori di terze parti.</li>
+<li>Non mostriamo pubblicità.</li>
+<li>Non vendiamo né affittiamo i tuoi dati, e non li condividiamo con terzi per fini pubblicitari o di marketing.</li>
+<li>L'unico servizio esterno che usa l'app è l'infrastruttura dell'account nel cloud (Supabase), che conserva i dati del tuo account in qualità di nostro fornitore. A parte questo, i tuoi dati si condividono solo con le persone che inviti nel tuo nucleo.</li>
 </ul>
 <h2>Copie di backup</h2>
 <p>L'app ti permette di esportare i tuoi dati in un file (JSON), anche con l'opzione cifrata con
 password, e di importarli quando vuoi. Quel file lo generi e lo conservi <strong>tu</strong>,
 dove decidi tu. Sei tu responsabile di custodire quel file, perché contiene le tue informazioni finanziarie.</p>
-<h2>Eliminare i tuoi dati</h2>
-<p>Puoi cancellare tutto in qualsiasi momento dalla stessa app (Impostazioni → cancella dati) o
-disinstallando l'applicazione. Non esistendo account né server, non resta nessuna copia in nessun altro luogo.</p>
+<h2>Eliminare i tuoi dati e il tuo account</h2>
+<ul>
+<li><strong>Dati di questo telefono:</strong> puoi eliminarli quando vuoi dalla stessa app (Impostazioni → «Elimina tutti i dati») o disinstallando l'applicazione.</li>
+<li><strong>Dati nel cloud:</strong> da Impostazioni → Account nel cloud → «Elimina i miei dati dal cloud» si elimina la tua copia sincronizzata dal server e si chiude la sessione. I dati di questo telefono non vengono toccati.</li>
+<li><strong>Chiudere il tuo account:</strong> l'app non include ancora un pulsante per eliminare l'account in sé (l'email e la credenziale di registrazione). Per chiuderlo ed eliminare la tua registrazione, scrivici a <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a> e lo elimineremo.</li>
+</ul>
 <h2>Bambini</h2>
-<p>L'app non è rivolta a minori di 13 anni e non raccoglie dati di nessuno, minori inclusi.</p>
+<p>L'app non è rivolta a minori di 13 anni.</p>
 <h2>Modifiche a questa informativa</h2>
-<p>Se in futuro l'app aggiungesse funzioni con server (per esempio, un backup nel cloud facoltativo),
-questa informativa verrà aggiornata <strong>prima</strong> di pubblicare quella versione e l'app te lo comunicherà.</p>
+<p>Se questa informativa cambia, la versione nuova verrà pubblicata in questa stessa pagina con la data aggiornata.
+Ti consigliamo di consultarla di tanto in tanto.</p>
 <h2>Contatti</h2>
 <p>Domande sulla privacy? Scrivici a: <a href="mailto:sterlinrobles05@gmail.com">sterlinrobles05@gmail.com</a></p>
 </div>
