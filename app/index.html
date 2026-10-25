@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 43</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 44</p>
   </div>
 </section>
 
@@ -228,6 +228,19 @@
     <div id="home-streak" class="streak-pill" hidden></div>
 
     <div id="home-podcast" class="menu-group" hidden></div>
+
+    <div id="home-san" class="menu-group" hidden></div>
+
+    <section id="home-chart" class="card chart-card">
+      <h3 class="chart-title" data-i18n="chart_title">En qué se va tu dinero</h3>
+      <div class="chart-flex">
+        <div id="home-chart-svg" class="chart-svg" role="img"></div>
+        <div class="chart-side">
+          <p id="home-chart-empty" class="muted" data-i18n="chart_empty" hidden>Cuando anotes gastos, aquí verás en qué se va tu dinero</p>
+          <ul id="home-chart-legend" class="chart-legend"></ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ======= GASTOS ======= -->
@@ -814,7 +827,9 @@
           </form>
         </div>
         <div id="org-active-wrap" hidden>
-          <h4 id="org-title-line"></h4>
+          <h4 id="org-san-head" class="san-acc-head org-round-head" role="button" tabindex="0" aria-expanded="false"><span id="org-title-line"></span><span class="org-round-chevron" aria-hidden="true">▸</span></h4>
+          <p id="org-state-line" class="muted"></p>
+          <div id="org-san-body">
           <p id="org-meta-line" class="muted"></p>
           <p id="org-total-line" class="total-line"></p>
           <p id="org-started-line" class="total-line" hidden></p>
@@ -827,9 +842,11 @@
             <button id="org-shuffle-active" type="button" class="btn btn-secondary" data-i18n="org_shuffle_btn">🎲 Sortear orden</button>
           </div>
           <p id="org-shuffle-msg" class="muted small" role="status"></p>
-          <h4 data-i18n="org_order_title">Orden de turnos</h4>
+          <h4 id="org-order-head" class="san-acc-head org-round-head" role="button" tabindex="0" aria-expanded="false"><span data-i18n="org_order_title">Orden de turnos</span><span class="org-round-chevron" aria-hidden="true">▸</span></h4>
+          <div id="org-order-body">
           <ul id="org-order" class="item-list"></ul>
           <p id="org-swap-msg" class="error" role="alert"></p>
+          </div>
           <div id="org-rounds"></div>
           <div id="org-history"></div>
           <h4 data-i18n="org_link_btn">🔗 Enlace de solo lectura</h4>
@@ -847,6 +864,7 @@
             <button id="btn-share-org" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
             <button id="btn-share-org-img" type="button" class="btn btn-secondary" data-i18n="rep_share_image">Compartir imagen</button>
             <button id="org-delete" type="button" class="btn btn-ghost" data-i18n="org_delete">Borrar san organizado</button>
+          </div>
           </div>
         </div>
       </div>
@@ -1074,6 +1092,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c44">Tu página principal estrena gráfica: se actualiza sola con cada movimiento y te muestra en qué se va tu dinero. Tu san volvió a Inicio, y dentro del organizador cada san se pliega para que veas solo lo importante.</li>
         <li data-i18n="news_c43">Tu Dinero disponible ya refleja solo tus cuentas y lo que anotas desde ahora: cada ingreso y gasto nuevo se suma o se resta al momento, según el bolsillo que elijas. Mi san ahora se pliega por bloques, tu página principal muestra solo lo importante y la lupa sobre el botón + busca cualquier movimiento.</li>
         <li data-i18n="news_c42">Tu Dinero disponible ahora se mueve con cada gasto e ingreso que anotas, salga de donde salga. En las remesas puedes escribir cuánto llegó y la tasa se calcula sola. La bienvenida es más corta y el nombre es opcional, «Tengo un negocio» se enciende solo si lo usas, y Novedades ahora se lee en lenguaje de beneficios.</li>
         <li data-i18n="news_c41">Tus cuentas ya están vivas: al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos. El enlace público del san trae buscador de nombre y rondas plegadas, tu primer día va guiado paso a paso con el modo «Lo esencial», el san personal ya puede ser quincenal o mensual, y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.</li>
@@ -1094,7 +1113,7 @@
         <li data-i18n="news_c24">Tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 43</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 44</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">

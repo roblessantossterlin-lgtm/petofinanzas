@@ -531,3 +531,23 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 .next-step-card h3{margin:.1rem 0 .5rem}
 .sav-add-card{border:2px solid var(--accent)}
 .sav-add-card h3{font-size:1.2rem}
+
+/* ---------- Compilación 44 · Bloque J: gráfica circular de Inicio ----------
+   Dona SVG propia (sin librerías): anillo con un segmento por
+   categoría, total del mes en el centro y leyenda con monto y
+   porcentaje. El riel y los textos toman los colores del tema. */
+.chart-card{margin-top:.55rem}
+.chart-title{margin:.1rem 0 .6rem}
+.chart-flex{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+.chart-svg{flex:0 0 auto;width:150px;max-width:44vw}
+.chart-donut{width:100%;height:auto;display:block}
+.chart-track{stroke:var(--line)}
+.chart-center-value{fill:var(--ink);font-weight:700}
+.chart-center-label{fill:var(--muted)}
+.chart-side{flex:1 1 180px;min-width:170px}
+.chart-legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4rem}
+.chart-legend-item{display:flex;align-items:center;gap:.5rem}
+.chart-dot{width:.8rem;height:.8rem;border-radius:50%;flex:0 0 auto}
+.chart-legend-name{flex:1 1 auto}
+.chart-legend-amt{font-weight:600}
+.chart-legend-pct{color:var(--muted);min-width:2.6em;text-align:right}
