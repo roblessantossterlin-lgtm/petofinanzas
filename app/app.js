@@ -1,25 +1,22 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 42) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 43) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 42: la FASE 3 y
-   CIERRE de la auditoría de cliente — remesas al revés (escribes
-   cuánto llegó y la tasa se calcula sola), textos de cliente
-   (Novedades en lenguaje de beneficio, sin prefijo «Compilación»;
-   respaldo sin «JSON»; importar «CSV o PDF» con enlaces), «Tengo
-   un negocio», tarjeta de privacidad, bloqueo honesto según la
-   nube (la nota con nube, lock_note_cloud, va tal cual del
-   teléfono: también es verdad en la web), aviso de Zelle junto al
-   enlace, contraseña de la nube con ojo, bienvenida en 2 pasos con
-   nombre opcional y enlace de san vencido con explicación y CTA —
-   y el «Dinero disponible» de bolsillos exclusivos: cada gasto e
-   ingreso mueve solo su bolsillo según su fuente (783 claves por
-   idioma). Sobre la base de la Compilación 41 ya sincronizada
-   (la FASE 2 de la auditoría). */
+   Sincronizado el 25-oct-2026 con la Compilación 43: el parche del
+   «Dinero disponible» — los formularios estampan la fuente (src) en
+   cada movimiento y, con cuentas, la tarjeta suma solo lo
+   clasificado desde ahora (sin cuentas, igual que antes) —; Mi san
+   en acordeones por bloque con el estado recordado («Crear un san»,
+   el san activo y «Modo organizador ⭐ PRO»); Inicio simple: sale la
+   lista «¿Qué quieres ver?» y la tarjeta de «Ideas de tu dinero» se
+   muda arriba de Resumen, con el Podcast en su fila propia; y la
+   lupa flotante sobre el botón + que busca cualquier movimiento
+   (786 claves por idioma). Sobre la base de la Compilación 42 ya
+   sincronizada (la FASE 3 y cierre de la auditoría de cliente). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -31,7 +28,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 42'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 43'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -94,7 +91,13 @@ function defaultData() {
          parte de Negocio del reparto ni el informe de negocio del
          Resumen. La migración de usuarios actuales vive en
          validateData (nadie pierde de vista lo suyo). */
-      bizMode: false
+      bizMode: false,
+      /* Compilación 43 (Bloque G): estado de los acordeones de la
+         vista Mi san. null = el usuario no lo ha tocado: manda la
+         regla por defecto (crear abierto solo sin san personal, el
+         san activo abierto, el organizador cerrado). true/false =
+         lo que el usuario dejó, y amanece igual. */
+      sanAcc: { create: null, active: null, org: null }
     },
     lastExportAt: null,
     customCategories: [],
@@ -299,6 +302,13 @@ function validateData(raw) {
   d.settings.lastExpCategory = (typeof s.lastExpCategory === 'string' && s.lastExpCategory.length <= 30) ? s.lastExpCategory : null;
   d.settings.lastExpSource = (typeof s.lastExpSource === 'string' && s.lastExpSource.length <= 40) ? s.lastExpSource : null;
   d.settings.lastIncSource = (typeof s.lastIncSource === 'string' && s.lastIncSource.length <= 40) ? s.lastIncSource : null;
+  /* Compilación 43 (Bloque G): acordeones de Mi san — solo se
+     acepta true/false; cualquier otra cosa vuelve a null (sin
+     tocar: manda la regla por defecto de cada bloque). */
+  if (s.sanAcc && typeof s.sanAcc === 'object') {
+    const accVal = (v) => (v === true ? true : (v === false ? false : null));
+    d.settings.sanAcc = { create: accVal(s.sanAcc.create), active: accVal(s.sanAcc.active), org: accVal(s.sanAcc.org) };
+  }
   d.settings.lang = (s.lang === 'auto' || LANGS.includes(s.lang)) ? s.lang : 'auto';
   d.settings.payday = (typeof s.payday === 'number' && Number.isFinite(s.payday) &&
     Math.trunc(s.payday) >= 0 && Math.trunc(s.payday) <= 6) ? Math.trunc(s.payday) : null;
@@ -341,7 +351,13 @@ function validateData(raw) {
        NO mueven ningún saldo ni el total de ahorros. La limpieza del
        accountId contra las cuentas vivas va al final de la función. */
     accountId: (typeof x.accountId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.accountId)) ? x.accountId : null,
-    fromSavings: x.fromSavings === true
+    fromSavings: x.fromSavings === true,
+    /* Compilación 43: la fuente EXPLÍCITA que el formulario guardó
+       ('avail' | 'savings' | 'account'). Los movimientos anteriores
+       a la 43 no la traen y quedan en null = SIN CLASIFICAR: el
+       saneado NO se la inventa, porque de ella depende la regla
+       nueva de availableMoney() con cuentas. */
+    src: (x.src === 'avail' || x.src === 'savings' || x.src === 'account') ? x.src : null
   }));
   d.incomes = arr(raw.incomes).filter((x) => x && typeof x === 'object').map((x) => {
     const amount = cleanCents(x.amountCents, false);
@@ -356,7 +372,10 @@ function validateData(raw) {
       date: cleanDate(x.date), note: cleanText(x.note, 120), biz: x.biz === true,
       /* Compilación 41 (cuentas vivas): a dónde entró el dinero. */
       accountId: (typeof x.accountId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.accountId)) ? x.accountId : null,
-      toSavings: x.toSavings === true
+      toSavings: x.toSavings === true,
+      /* Compilación 43: fuente explícita ('avail' | 'savings' |
+         'account'); lo anterior a la 43 queda null = sin clasificar. */
+      src: (x.src === 'avail' || x.src === 'savings' || x.src === 'account') ? x.src : null
     };
   });
   d.savings = arr(raw.savings).filter((x) => x && typeof x === 'object').map((x) => ({
@@ -984,8 +1003,8 @@ es: {
   news_c38: '🎙️ El Podcast ya carga y reproduce sus episodios.',
   news_c39: '🎙️ El Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.',
   news_c40: 'Tu saldo en cuentas se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.',
-  src_exp_label: '¿De dónde salió?', src_inc_label: '¿A dónde entró?', src_available: 'Saldo disponible', src_savings: 'Ahorros', src_from_savings: 'de Ahorros', src_to_savings: 'a Ahorros', tile_available_help: 'Tus cuentas más lo que anotas sin cuenta: se actualiza solo con cada gasto e ingreso.', pub_find_hint: '¿Ya pagaste? Escribe tu nombre, toca tu fila y luego Ya pagué.', pub_find_ph: 'Escribe tu nombre', pub_find_clear: 'Limpiar', pub_find_none: 'No aparece ese nombre. Revisa cómo lo escribió el organizador.', next_title: 'Tu siguiente paso', next_step1_btn: 'Crea tu presupuesto', next_step2_btn: 'Anota tu primer gasto', next_step3_btn: 'Crea tu cuenta de efectivo', ob_mode_title: '¿Cómo quieres ver tu app?', ob_mode_essential: 'Lo esencial', ob_mode_essential_help: 'Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.', ob_mode_all: 'Todo', ob_mode_all_help: 'Las 13 secciones completas desde el primer día.', ob_mode_btn: 'Continuar', set_mode_essential_btn: 'Modo Lo esencial', set_mode_all_btn: 'Mostrar todo', san_freq_label: 'Frecuencia', san_start_label: 'Fecha de inicio', san_period_semanal: 'Semana', san_period_quincenal: 'Quincena', san_period_mensual: 'Mes', san_period_line: '{p} {x} de {n}', san_collected_period: 'Reunido este periodo: {amount} de {target}', san_paid_title_period: '¿Quién ya pagó este periodo?', san_advance_period: 'Marcar periodo completo', san_finished_period: 'Todos los periodos se completaron. Puedes borrar este san y crear uno nuevo.', chal_ask: '¿Quieres un reto semanal?', key_san_period: '{p} {x} de {n} · Le toca a {name}', news_c41: 'Tus cuentas ya están vivas: al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos. El enlace público del san trae buscador de nombre y rondas plegadas, tu primer día va guiado paso a paso con el modo «Lo esencial», el san personal ya puede ser quincenal o mensual, y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.',
-  rem_arrived_label: '¿Cuánto llegó en pesos?', rem_arrived_help: 'Si lo sabes, escríbelo y la tasa se calcula sola.', rem_rate_calc: 'Tasa calculada: {rate}', import_hint: '¿Tienes tu estado de cuenta? Impórtalo y empieza con datos', import_cta_btn: 'Importar estado de cuenta', set_biz_label: 'Tengo un negocio', set_biz_help: 'Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.', inc_split_line_nb: 'Ahorro anotado: {sav} · Sugerencia: Gastos {exp} · Familia {fam}', inc_split_preview_nb: 'Reparto sugerido: Ahorro {sav} · Gastos {exp} · Familia {fam}. El ahorro que cuenta es el que anotes abajo.', priv_title: 'Privacidad: cómo cuidamos tus datos', priv_text: 'Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.', priv_btn: 'Leer la política completa', lock_note_cloud: 'Tus datos se sincronizan con tu cuenta.', org_link_zelle_warn: 'Quien tenga el enlace verá los nombres, el avance y el Zelle de quien recibe cada ronda.', org_link_copy: 'Copiar enlace', cloud_pass_hint: 'Mínimo 6 caracteres', pass_show: 'Mostrar contraseña', pass_hide: 'Ocultar contraseña', pub_gone_help: 'Puede que el organizador lo haya borrado o cambiado.', news_c42: 'Tu Dinero disponible ahora se mueve con cada gasto e ingreso que anotas, salga de donde salga. En las remesas puedes escribir cuánto llegó y la tasa se calcula sola. La bienvenida es más corta y el nombre es opcional, «Tengo un negocio» se enciende solo si lo usas, y Novedades ahora se lee en lenguaje de beneficios.',
+  src_exp_label: '¿De dónde salió?', src_inc_label: '¿A dónde entró?', src_available: 'Saldo disponible', src_savings: 'Ahorros', src_from_savings: 'de Ahorros', src_to_savings: 'a Ahorros', tile_available_help: 'Tus cuentas más lo que anotas desde ahora como Saldo disponible: se mueve solo con cada gasto e ingreso.', pub_find_hint: '¿Ya pagaste? Escribe tu nombre, toca tu fila y luego Ya pagué.', pub_find_ph: 'Escribe tu nombre', pub_find_clear: 'Limpiar', pub_find_none: 'No aparece ese nombre. Revisa cómo lo escribió el organizador.', next_title: 'Tu siguiente paso', next_step1_btn: 'Crea tu presupuesto', next_step2_btn: 'Anota tu primer gasto', next_step3_btn: 'Crea tu cuenta de efectivo', ob_mode_title: '¿Cómo quieres ver tu app?', ob_mode_essential: 'Lo esencial', ob_mode_essential_help: 'Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.', ob_mode_all: 'Todo', ob_mode_all_help: 'Las 13 secciones completas desde el primer día.', ob_mode_btn: 'Continuar', set_mode_essential_btn: 'Modo Lo esencial', set_mode_all_btn: 'Mostrar todo', san_freq_label: 'Frecuencia', san_start_label: 'Fecha de inicio', san_period_semanal: 'Semana', san_period_quincenal: 'Quincena', san_period_mensual: 'Mes', san_period_line: '{p} {x} de {n}', san_collected_period: 'Reunido este periodo: {amount} de {target}', san_paid_title_period: '¿Quién ya pagó este periodo?', san_advance_period: 'Marcar periodo completo', san_finished_period: 'Todos los periodos se completaron. Puedes borrar este san y crear uno nuevo.', chal_ask: '¿Quieres un reto semanal?', key_san_period: '{p} {x} de {n} · Le toca a {name}', news_c41: 'Tus cuentas ya están vivas: al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos. El enlace público del san trae buscador de nombre y rondas plegadas, tu primer día va guiado paso a paso con el modo «Lo esencial», el san personal ya puede ser quincenal o mensual, y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.',
+  rem_arrived_label: '¿Cuánto llegó en pesos?', rem_arrived_help: 'Si lo sabes, escríbelo y la tasa se calcula sola.', rem_rate_calc: 'Tasa calculada: {rate}', import_hint: '¿Tienes tu estado de cuenta? Impórtalo y empieza con datos', import_cta_btn: 'Importar estado de cuenta', set_biz_label: 'Tengo un negocio', set_biz_help: 'Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.', inc_split_line_nb: 'Ahorro anotado: {sav} · Sugerencia: Gastos {exp} · Familia {fam}', inc_split_preview_nb: 'Reparto sugerido: Ahorro {sav} · Gastos {exp} · Familia {fam}. El ahorro que cuenta es el que anotes abajo.', priv_title: 'Privacidad: cómo cuidamos tus datos', priv_text: 'Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.', priv_btn: 'Leer la política completa', lock_note_cloud: 'Tus datos se sincronizan con tu cuenta.', org_link_zelle_warn: 'Quien tenga el enlace verá los nombres, el avance y el Zelle de quien recibe cada ronda.', org_link_copy: 'Copiar enlace', cloud_pass_hint: 'Mínimo 6 caracteres', pass_show: 'Mostrar contraseña', pass_hide: 'Ocultar contraseña', pub_gone_help: 'Puede que el organizador lo haya borrado o cambiado.', news_c42: 'Tu Dinero disponible ahora se mueve con cada gasto e ingreso que anotas, salga de donde salga. En las remesas puedes escribir cuánto llegó y la tasa se calcula sola. La bienvenida es más corta y el nombre es opcional, «Tengo un negocio» se enciende solo si lo usas, y Novedades ahora se lee en lenguaje de beneficios.', news_c43: 'Tu Dinero disponible ya refleja solo tus cuentas y lo que anotas desde ahora: cada ingreso y gasto nuevo se suma o se resta al momento, según el bolsillo que elijas. Mi san ahora se pliega por bloques, tu página principal muestra solo lo importante y la lupa sobre el botón + busca cualquier movimiento.', search_fab_aria: 'Buscar movimientos', search_hint: 'Escribe para buscar en tus movimientos',
   news_c37: 'Widgets renovados: degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san. Y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy. La marca queda siempre visible al bajar por el enlace público del san, y las rondas del organizador se pliegan en acordeón, con solo la de esta semana abierta.',
   widget_today: 'hoy',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -1461,8 +1480,8 @@ en: {
   news_c38: '🎙️ The Podcast now loads and plays its episodes.',
   news_c39: '🎙️ The Podcast now plays its episodes and the small widgets work again.',
   news_c40: 'Your account balance is now labeled honestly, when you create your PIN the app warns it cannot be recovered (and there is an emergency exit if you forget it), your daily spending number is born on day one with “Create my budget”, and logging an expense now takes three taps.',
-  src_exp_label: 'Where did it come from?', src_inc_label: 'Where did it go to?', src_available: 'Available balance', src_savings: 'Savings', src_from_savings: 'from Savings', src_to_savings: 'to Savings', tile_available_help: 'Your accounts plus what you log with no account: it updates on its own with every expense and income.', pub_find_hint: 'Already paid? Type your name, tap your row, then I paid.', pub_find_ph: 'Type your name', pub_find_clear: 'Clear', pub_find_none: 'That name does not appear. Check how the organizer spelled it.', next_title: 'Your next step', next_step1_btn: 'Create your budget', next_step2_btn: 'Log your first expense', next_step3_btn: 'Create your cash account', ob_mode_title: 'How do you want to see your app?', ob_mode_essential: 'The essentials', ob_mode_essential_help: 'Only Home, Expenses, Income, Savings and My san. Everything else can be turned on later in Settings.', ob_mode_all: 'Everything', ob_mode_all_help: 'All 13 sections from day one.', ob_mode_btn: 'Continue', set_mode_essential_btn: 'Essentials mode', set_mode_all_btn: 'Show everything', san_freq_label: 'Frequency', san_start_label: 'Start date', san_period_semanal: 'Week', san_period_quincenal: 'Fortnight', san_period_mensual: 'Month', san_period_line: '{p} {x} of {n}', san_collected_period: 'Collected this period: {amount} of {target}', san_paid_title_period: 'Who has paid this period?', san_advance_period: 'Mark period complete', san_finished_period: 'All periods are complete. You can delete this san and create a new one.', chal_ask: 'Want a weekly challenge?', key_san_period: '{p} {x} of {n} · Up next: {name}', news_c41: 'Your accounts are alive now: when you log an expense or income you choose where it came from or went to (available balance, Savings, or one of your accounts) and balances move on their own. The public san link now has a name search and folding rounds, your first day is guided step by step with an “Essentials” mode, the personal san can now be every two weeks or monthly, and Savings is now one tidy screen with a single goal form.',
-  rem_arrived_label: 'How much arrived?', rem_arrived_help: 'If you know it, type it and the rate is calculated for you.', rem_rate_calc: 'Calculated rate: {rate}', import_hint: 'Have your bank statement? Import it and start with your data', import_cta_btn: 'Import bank statement', set_biz_label: 'I have a business', set_biz_help: 'With this on, the forms ask whether a movement is for your business, the suggested split includes the Business part, and the Summary shows your business report. Off, all of that is hidden; your data is untouched.', inc_split_line_nb: 'Saved: {sav} · Suggestion: Expenses {exp} · Family {fam}', inc_split_preview_nb: 'Suggested split: Savings {sav} · Expenses {exp} · Family {fam}. The savings that count are the ones you enter below.', priv_title: 'Privacy: how we look after your data', priv_text: 'Your data lives on your phone. The cloud is optional and only turns on if you create your account. We never sell your data.', priv_btn: 'Read the full policy', lock_note_cloud: 'Your data syncs with your account.', org_link_zelle_warn: 'Anyone with the link will see the names, the progress and the Zelle of whoever receives each round.', org_link_copy: 'Copy link', cloud_pass_hint: 'At least 6 characters', pass_show: 'Show password', pass_hide: 'Hide password', pub_gone_help: 'The organizer may have deleted or changed it.', news_c42: 'Your available money now moves with every expense and income you log, whichever pocket it comes from. For remittances you can type how much arrived and the rate is calculated for you. The welcome is shorter and the name is optional, “I have a business” only turns on if you use it, and What’s new now reads in plain benefit language.',
+  src_exp_label: 'Where did it come from?', src_inc_label: 'Where did it go to?', src_available: 'Available balance', src_savings: 'Savings', src_from_savings: 'from Savings', src_to_savings: 'to Savings', tile_available_help: 'Your accounts plus what you log from now on as Available balance: it moves on its own with every expense and income.', pub_find_hint: 'Already paid? Type your name, tap your row, then I paid.', pub_find_ph: 'Type your name', pub_find_clear: 'Clear', pub_find_none: 'That name does not appear. Check how the organizer spelled it.', next_title: 'Your next step', next_step1_btn: 'Create your budget', next_step2_btn: 'Log your first expense', next_step3_btn: 'Create your cash account', ob_mode_title: 'How do you want to see your app?', ob_mode_essential: 'The essentials', ob_mode_essential_help: 'Only Home, Expenses, Income, Savings and My san. Everything else can be turned on later in Settings.', ob_mode_all: 'Everything', ob_mode_all_help: 'All 13 sections from day one.', ob_mode_btn: 'Continue', set_mode_essential_btn: 'Essentials mode', set_mode_all_btn: 'Show everything', san_freq_label: 'Frequency', san_start_label: 'Start date', san_period_semanal: 'Week', san_period_quincenal: 'Fortnight', san_period_mensual: 'Month', san_period_line: '{p} {x} of {n}', san_collected_period: 'Collected this period: {amount} of {target}', san_paid_title_period: 'Who has paid this period?', san_advance_period: 'Mark period complete', san_finished_period: 'All periods are complete. You can delete this san and create a new one.', chal_ask: 'Want a weekly challenge?', key_san_period: '{p} {x} of {n} · Up next: {name}', news_c41: 'Your accounts are alive now: when you log an expense or income you choose where it came from or went to (available balance, Savings, or one of your accounts) and balances move on their own. The public san link now has a name search and folding rounds, your first day is guided step by step with an “Essentials” mode, the personal san can now be every two weeks or monthly, and Savings is now one tidy screen with a single goal form.',
+  rem_arrived_label: 'How much arrived?', rem_arrived_help: 'If you know it, type it and the rate is calculated for you.', rem_rate_calc: 'Calculated rate: {rate}', import_hint: 'Have your bank statement? Import it and start with your data', import_cta_btn: 'Import bank statement', set_biz_label: 'I have a business', set_biz_help: 'With this on, the forms ask whether a movement is for your business, the suggested split includes the Business part, and the Summary shows your business report. Off, all of that is hidden; your data is untouched.', inc_split_line_nb: 'Saved: {sav} · Suggestion: Expenses {exp} · Family {fam}', inc_split_preview_nb: 'Suggested split: Savings {sav} · Expenses {exp} · Family {fam}. The savings that count are the ones you enter below.', priv_title: 'Privacy: how we look after your data', priv_text: 'Your data lives on your phone. The cloud is optional and only turns on if you create your account. We never sell your data.', priv_btn: 'Read the full policy', lock_note_cloud: 'Your data syncs with your account.', org_link_zelle_warn: 'Anyone with the link will see the names, the progress and the Zelle of whoever receives each round.', org_link_copy: 'Copy link', cloud_pass_hint: 'At least 6 characters', pass_show: 'Show password', pass_hide: 'Hide password', pub_gone_help: 'The organizer may have deleted or changed it.', news_c42: 'Your available money now moves with every expense and income you log, whichever pocket it comes from. For remittances you can type how much arrived and the rate is calculated for you. The welcome is shorter and the name is optional, “I have a business” only turns on if you use it, and What’s new now reads in plain benefit language.', news_c43: 'Your available money now reflects only your accounts and what you log from now on: every new income and expense is added or subtracted right away, in the pocket you choose. My san now folds by blocks, your home page shows only what matters, and the magnifier above the + button finds any movement.', search_fab_aria: 'Search movements', search_hint: 'Type to search your movements',
   news_c37: 'Renewed widgets: brand gradient, a progress bar that changes color with your budget and the line for your san’s next turn. Plus a new icon-sized widget with what you can spend today. The brand stays visible as you scroll the public san link, and the organizer’s rounds now fold into an accordion, with only this week’s open.',
   widget_today: 'today',
   widget_san_next: 'Next turn: {name} · {date}',
@@ -2181,8 +2200,8 @@ it: {
   news_c38: 'Il Podcast ora carica e riproduce i suoi episodi.',
   news_c39: 'Il Podcast ora riproduce i suoi episodi e i widget piccoli funzionano di nuovo.',
   news_c40: 'Il saldo dei tuoi conti ora è etichettato con onestà, quando crei il PIN l’app avvisa che non si può recuperare (e c’è un’uscita di emergenza se lo dimentichi), il tuo numero di spesa giornaliera nasce il primo giorno con «Crea il mio budget» e registrare una spesa ora richiede tre tocchi.',
-  src_exp_label: 'Da dove è uscito?', src_inc_label: 'Dove è entrato?', src_available: 'Saldo disponibile', src_savings: 'Risparmi', src_from_savings: 'dai Risparmi', src_to_savings: 'ai Risparmi', tile_available_help: 'I tuoi conti più quello che annoti senza conto: si aggiorna da solo con ogni spesa ed entrata.', pub_find_hint: 'Hai già pagato? Scrivi il tuo nome, tocca la tua riga e poi Ho pagato.', pub_find_ph: 'Scrivi il tuo nome', pub_find_clear: 'Cancella', pub_find_none: 'Quel nome non compare. Controlla come lo ha scritto l’organizzatore.', next_title: 'Il tuo prossimo passo', next_step1_btn: 'Crea il tuo budget', next_step2_btn: 'Annota la tua prima spesa', next_step3_btn: 'Crea il tuo conto contanti', ob_mode_title: 'Come vuoi vedere la tua app?', ob_mode_essential: 'L’essenziale', ob_mode_essential_help: 'Solo Home, Spese, Entrate, Risparmi e Il mio san. Il resto si attiva quando vuoi in Impostazioni.', ob_mode_all: 'Tutto', ob_mode_all_help: 'Le 13 sezioni complete dal primo giorno.', ob_mode_btn: 'Continua', set_mode_essential_btn: 'Modo Essenziale', set_mode_all_btn: 'Mostra tutto', san_freq_label: 'Frequenza', san_start_label: 'Data di inizio', san_period_semanal: 'Settimana', san_period_quincenal: 'Quindicina', san_period_mensual: 'Mese', san_period_line: '{p} {x} di {n}', san_collected_period: 'Raccolto in questo periodo: {amount} di {target}', san_paid_title_period: 'Chi ha già pagato in questo periodo?', san_advance_period: 'Segna periodo completo', san_finished_period: 'Tutti i periodi sono completi. Puoi eliminare questo san e crearne uno nuovo.', chal_ask: 'Vuoi una sfida settimanale?', key_san_period: '{p} {x} di {n} · Tocca a {name}', news_c41: 'I tuoi conti ora sono vivi — quando annoti una spesa o un’entrata scegli da dove è uscita o dove è entrata (saldo disponibile, Risparmi o uno dei tuoi conti) e i saldi si muovono da soli — il link pubblico del san ora ha la ricerca per nome e i turni che si chiudono — il tuo primo giorno è guidato passo dopo passo, con la modalità «Essenziale» — il san personale ora può essere quindicinale o mensile — e Risparmi è ora una sola schermata ordinata, con un solo modulo per gli obiettivi.',
-  rem_arrived_label: 'Quanto è arrivato?', rem_arrived_help: 'Se lo sai, scrivilo e il tasso si calcola da solo.', rem_rate_calc: 'Tasso calcolato: {rate}', import_hint: 'Hai il tuo estratto conto? Importalo e parti dai tuoi dati', import_cta_btn: 'Importa estratto conto', set_biz_label: 'Ho un’attività', set_biz_help: 'Con questa opzione attiva, i moduli chiedono se un movimento è per la tua attività, la ripartizione suggerita include la parte Attività e il Riepilogo mostra il rapporto della tua attività. Disattivata, tutto questo si nasconde; i tuoi dati non si toccano.', inc_split_line_nb: 'Risparmio registrato: {sav} · Suggerimento: Spese {exp} · Famiglia {fam}', inc_split_preview_nb: 'Ripartizione suggerita: Risparmio {sav} · Spese {exp} · Famiglia {fam}. Il risparmio che conta è quello che scrivi qui sotto.', priv_title: 'Privacy: come ci prendiamo cura dei tuoi dati', priv_text: 'I tuoi dati vivono sul tuo telefono. Il cloud è facoltativo e si attiva solo se crei il tuo account. Non vendiamo mai i tuoi dati.', priv_btn: 'Leggi la politica completa', lock_note_cloud: 'I tuoi dati si sincronizzano con il tuo account.', org_link_zelle_warn: 'Chi ha il link vedrà i nomi, l’avanzamento e lo Zelle di chi riceve ogni turno.', org_link_copy: 'Copia link', cloud_pass_hint: 'Minimo 6 caratteri', pass_show: 'Mostra password', pass_hide: 'Nascondi password', pub_gone_help: 'Forse l’organizzatore lo ha cancellato o cambiato.', news_c42: 'I tuoi soldi disponibili si muovono ora con ogni spesa ed entrata che annoti, da qualunque tasca escano. Nelle rimesse puoi scrivere quanto è arrivato e il tasso si calcola da solo. Il benvenuto è più corto e il nome è facoltativo, «Ho un’attività» si accende solo se la usi, e le Novità ora si leggono in linguaggio di benefici.',
+  src_exp_label: 'Da dove è uscito?', src_inc_label: 'Dove è entrato?', src_available: 'Saldo disponibile', src_savings: 'Risparmi', src_from_savings: 'dai Risparmi', src_to_savings: 'ai Risparmi', tile_available_help: 'I tuoi conti più quello che annoti da ora come Saldo disponibile: si muove da solo con ogni spesa ed entrata.', pub_find_hint: 'Hai già pagato? Scrivi il tuo nome, tocca la tua riga e poi Ho pagato.', pub_find_ph: 'Scrivi il tuo nome', pub_find_clear: 'Cancella', pub_find_none: 'Quel nome non compare. Controlla come lo ha scritto l’organizzatore.', next_title: 'Il tuo prossimo passo', next_step1_btn: 'Crea il tuo budget', next_step2_btn: 'Annota la tua prima spesa', next_step3_btn: 'Crea il tuo conto contanti', ob_mode_title: 'Come vuoi vedere la tua app?', ob_mode_essential: 'L’essenziale', ob_mode_essential_help: 'Solo Home, Spese, Entrate, Risparmi e Il mio san. Il resto si attiva quando vuoi in Impostazioni.', ob_mode_all: 'Tutto', ob_mode_all_help: 'Le 13 sezioni complete dal primo giorno.', ob_mode_btn: 'Continua', set_mode_essential_btn: 'Modo Essenziale', set_mode_all_btn: 'Mostra tutto', san_freq_label: 'Frequenza', san_start_label: 'Data di inizio', san_period_semanal: 'Settimana', san_period_quincenal: 'Quindicina', san_period_mensual: 'Mese', san_period_line: '{p} {x} di {n}', san_collected_period: 'Raccolto in questo periodo: {amount} di {target}', san_paid_title_period: 'Chi ha già pagato in questo periodo?', san_advance_period: 'Segna periodo completo', san_finished_period: 'Tutti i periodi sono completi. Puoi eliminare questo san e crearne uno nuovo.', chal_ask: 'Vuoi una sfida settimanale?', key_san_period: '{p} {x} di {n} · Tocca a {name}', news_c41: 'I tuoi conti ora sono vivi — quando annoti una spesa o un’entrata scegli da dove è uscita o dove è entrata (saldo disponibile, Risparmi o uno dei tuoi conti) e i saldi si muovono da soli — il link pubblico del san ora ha la ricerca per nome e i turni che si chiudono — il tuo primo giorno è guidato passo dopo passo, con la modalità «Essenziale» — il san personale ora può essere quindicinale o mensile — e Risparmi è ora una sola schermata ordinata, con un solo modulo per gli obiettivi.',
+  rem_arrived_label: 'Quanto è arrivato?', rem_arrived_help: 'Se lo sai, scrivilo e il tasso si calcola da solo.', rem_rate_calc: 'Tasso calcolato: {rate}', import_hint: 'Hai il tuo estratto conto? Importalo e parti dai tuoi dati', import_cta_btn: 'Importa estratto conto', set_biz_label: 'Ho un’attività', set_biz_help: 'Con questa opzione attiva, i moduli chiedono se un movimento è per la tua attività, la ripartizione suggerita include la parte Attività e il Riepilogo mostra il rapporto della tua attività. Disattivata, tutto questo si nasconde; i tuoi dati non si toccano.', inc_split_line_nb: 'Risparmio registrato: {sav} · Suggerimento: Spese {exp} · Famiglia {fam}', inc_split_preview_nb: 'Ripartizione suggerita: Risparmio {sav} · Spese {exp} · Famiglia {fam}. Il risparmio che conta è quello che scrivi qui sotto.', priv_title: 'Privacy: come ci prendiamo cura dei tuoi dati', priv_text: 'I tuoi dati vivono sul tuo telefono. Il cloud è facoltativo e si attiva solo se crei il tuo account. Non vendiamo mai i tuoi dati.', priv_btn: 'Leggi la politica completa', lock_note_cloud: 'I tuoi dati si sincronizzano con il tuo account.', org_link_zelle_warn: 'Chi ha il link vedrà i nomi, l’avanzamento e lo Zelle di chi riceve ogni turno.', org_link_copy: 'Copia link', cloud_pass_hint: 'Minimo 6 caratteri', pass_show: 'Mostra password', pass_hide: 'Nascondi password', pub_gone_help: 'Forse l’organizzatore lo ha cancellato o cambiato.', news_c42: 'I tuoi soldi disponibili si muovono ora con ogni spesa ed entrata che annoti, da qualunque tasca escano. Nelle rimesse puoi scrivere quanto è arrivato e il tasso si calcola da solo. Il benvenuto è più corto e il nome è facoltativo, «Ho un’attività» si accende solo se la usi, e le Novità ora si leggono in linguaggio di benefici.', news_c43: 'Il tuo Saldo disponibile ora riflette solo i tuoi conti e quello che annoti da ora: ogni entrata e spesa nuova si somma o si sottrae subito, nel salvadanaio che scegli. Il mio san ora si piega a blocchi, la pagina principale mostra solo l\'importante e la lente sopra il pulsante + cerca qualsiasi movimento.', search_fab_aria: 'Cerca movimenti', search_hint: 'Scrivi per cercare nei tuoi movimenti',
   news_c37: 'Widget ridisegnati — gradiente del marchio, barra di avanzamento che cambia colore in base al budget e la riga del prossimo turno del tuo san — e un widget nuovo grande quanto un’icona, con quanto puoi spendere oggi — e il marchio resta visibile mentre scorri il link pubblico del san — e i turni dell’organizzatore ora si piegano a fisarmonica, con aperto solo quello di questa settimana.',
   widget_today: 'oggi',
   widget_san_next: 'Prossimo turno: {name} · {date}',
@@ -2901,8 +2920,8 @@ pt: {
   news_c38: 'O Podcast agora carrega e reproduz seus episódios.',
   news_c39: 'O Podcast agora reproduz seus episódios e os widgets pequenos voltaram a funcionar.',
   news_c40: 'O saldo das suas contas agora é rotulado com honestidade, ao criar seu PIN o app avisa que ele não pode ser recuperado (e há uma saída de emergência se você esquecê-lo), seu número de gastos diários nasce no primeiro dia com «Criar meu orçamento» e registrar uma despesa agora leva três toques.',
-  src_exp_label: 'De onde saiu?', src_inc_label: 'Para onde entrou?', src_available: 'Saldo disponível', src_savings: 'Poupança', src_from_savings: 'da Poupança', src_to_savings: 'para a Poupança', tile_available_help: 'Suas contas mais o que você anota sem conta: atualiza sozinho a cada despesa e receita.', pub_find_hint: 'Já pagou? Escreva seu nome, toque na sua linha e depois em Já paguei.', pub_find_ph: 'Escreva seu nome', pub_find_clear: 'Limpar', pub_find_none: 'Esse nome não aparece. Verifique como o organizador o escreveu.', next_title: 'Seu próximo passo', next_step1_btn: 'Crie seu orçamento', next_step2_btn: 'Anote sua primeira despesa', next_step3_btn: 'Crie sua conta de dinheiro', ob_mode_title: 'Como você quer ver seu app?', ob_mode_essential: 'O essencial', ob_mode_essential_help: 'Apenas Início, Despesas, Receitas, Poupança e Meu san. O resto você ativa quando quiser em Ajustes.', ob_mode_all: 'Tudo', ob_mode_all_help: 'As 13 seções completas desde o primeiro dia.', ob_mode_btn: 'Continuar', set_mode_essential_btn: 'Modo Essencial', set_mode_all_btn: 'Mostrar tudo', san_freq_label: 'Frequência', san_start_label: 'Data de início', san_period_semanal: 'Semana', san_period_quincenal: 'Quinzena', san_period_mensual: 'Mês', san_period_line: '{p} {x} de {n}', san_collected_period: 'Reunido neste período: {amount} de {target}', san_paid_title_period: 'Quem já pagou neste período?', san_advance_period: 'Marcar período completo', san_finished_period: 'Todos os períodos foram concluídos. Você pode apagar este san e criar um novo.', chal_ask: 'Quer um desafio semanal?', key_san_period: '{p} {x} de {n} · É a vez de {name}', news_c41: 'Suas contas agora estão vivas — ao anotar uma despesa ou receita você escolhe de onde saiu ou para onde entrou (saldo disponível, Poupança ou uma das suas contas) e os saldos se movem sozinhos — o link público do san agora tem busca por nome e rodadas dobráveis — seu primeiro dia é guiado passo a passo, com o modo «Essencial» — o san pessoal agora pode ser quinzenal ou mensal — e Poupança virou uma só tela organizada, com um único formulário de meta.',
-  rem_arrived_label: 'Quanto chegou?', rem_arrived_help: 'Se souber, escreva e a taxa é calculada sozinha.', rem_rate_calc: 'Taxa calculada: {rate}', import_hint: 'Tem seu extrato do banco? Importe e comece com seus dados', import_cta_btn: 'Importar extrato do banco', set_biz_label: 'Tenho um negócio', set_biz_help: 'Com isso ligado, os formulários perguntam se um movimento é do seu negócio, a divisão sugerida inclui a parte Negócio e o Resumo mostra o relatório do seu negócio. Desligado, tudo isso se esconde; seus dados não são tocados.', inc_split_line_nb: 'Poupado: {sav} · Sugestão: Gastos {exp} · Família {fam}', inc_split_preview_nb: 'Divisão sugerida: Poupança {sav} · Gastos {exp} · Família {fam}. A poupança que conta é a que você digita abaixo.', priv_title: 'Privacidade: como cuidamos dos seus dados', priv_text: 'Seus dados vivem no seu telefone. A nuvem é opcional e só é ativada se você criar sua conta. Nunca vendemos seus dados.', priv_btn: 'Ler a política completa', lock_note_cloud: 'Seus dados sincronizam com sua conta.', org_link_zelle_warn: 'Quem tiver o link verá os nomes, o andamento e o Zelle de quem recebe cada rodada.', org_link_copy: 'Copiar link', cloud_pass_hint: 'Mínimo de 6 caracteres', pass_show: 'Mostrar senha', pass_hide: 'Ocultar senha', pub_gone_help: 'Pode ser que o organizador o tenha apagado ou mudado.', news_c42: 'Seu Dinheiro disponível agora se move com cada despesa e receita que você anota, saia de onde sair. Nas remessas, você pode escrever quanto chegou e a taxa é calculada sozinha. A boas-vindas é mais curta e o nome é opcional, «Tenho um negócio» só liga se você usar, e as Novidades agora se leem em linguagem de benefícios.',
+  src_exp_label: 'De onde saiu?', src_inc_label: 'Para onde entrou?', src_available: 'Saldo disponível', src_savings: 'Poupança', src_from_savings: 'da Poupança', src_to_savings: 'para a Poupança', tile_available_help: 'Suas contas mais o que você anota de agora em diante como Saldo disponível: se move sozinho a cada despesa e receita.', pub_find_hint: 'Já pagou? Escreva seu nome, toque na sua linha e depois em Já paguei.', pub_find_ph: 'Escreva seu nome', pub_find_clear: 'Limpar', pub_find_none: 'Esse nome não aparece. Verifique como o organizador o escreveu.', next_title: 'Seu próximo passo', next_step1_btn: 'Crie seu orçamento', next_step2_btn: 'Anote sua primeira despesa', next_step3_btn: 'Crie sua conta de dinheiro', ob_mode_title: 'Como você quer ver seu app?', ob_mode_essential: 'O essencial', ob_mode_essential_help: 'Apenas Início, Despesas, Receitas, Poupança e Meu san. O resto você ativa quando quiser em Ajustes.', ob_mode_all: 'Tudo', ob_mode_all_help: 'As 13 seções completas desde o primeiro dia.', ob_mode_btn: 'Continuar', set_mode_essential_btn: 'Modo Essencial', set_mode_all_btn: 'Mostrar tudo', san_freq_label: 'Frequência', san_start_label: 'Data de início', san_period_semanal: 'Semana', san_period_quincenal: 'Quinzena', san_period_mensual: 'Mês', san_period_line: '{p} {x} de {n}', san_collected_period: 'Reunido neste período: {amount} de {target}', san_paid_title_period: 'Quem já pagou neste período?', san_advance_period: 'Marcar período completo', san_finished_period: 'Todos os períodos foram concluídos. Você pode apagar este san e criar um novo.', chal_ask: 'Quer um desafio semanal?', key_san_period: '{p} {x} de {n} · É a vez de {name}', news_c41: 'Suas contas agora estão vivas — ao anotar uma despesa ou receita você escolhe de onde saiu ou para onde entrou (saldo disponível, Poupança ou uma das suas contas) e os saldos se movem sozinhos — o link público do san agora tem busca por nome e rodadas dobráveis — seu primeiro dia é guiado passo a passo, com o modo «Essencial» — o san pessoal agora pode ser quinzenal ou mensal — e Poupança virou uma só tela organizada, com um único formulário de meta.',
+  rem_arrived_label: 'Quanto chegou?', rem_arrived_help: 'Se souber, escreva e a taxa é calculada sozinha.', rem_rate_calc: 'Taxa calculada: {rate}', import_hint: 'Tem seu extrato do banco? Importe e comece com seus dados', import_cta_btn: 'Importar extrato do banco', set_biz_label: 'Tenho um negócio', set_biz_help: 'Com isso ligado, os formulários perguntam se um movimento é do seu negócio, a divisão sugerida inclui a parte Negócio e o Resumo mostra o relatório do seu negócio. Desligado, tudo isso se esconde; seus dados não são tocados.', inc_split_line_nb: 'Poupado: {sav} · Sugestão: Gastos {exp} · Família {fam}', inc_split_preview_nb: 'Divisão sugerida: Poupança {sav} · Gastos {exp} · Família {fam}. A poupança que conta é a que você digita abaixo.', priv_title: 'Privacidade: como cuidamos dos seus dados', priv_text: 'Seus dados vivem no seu telefone. A nuvem é opcional e só é ativada se você criar sua conta. Nunca vendemos seus dados.', priv_btn: 'Ler a política completa', lock_note_cloud: 'Seus dados sincronizam com sua conta.', org_link_zelle_warn: 'Quem tiver o link verá os nomes, o andamento e o Zelle de quem recebe cada rodada.', org_link_copy: 'Copiar link', cloud_pass_hint: 'Mínimo de 6 caracteres', pass_show: 'Mostrar senha', pass_hide: 'Ocultar senha', pub_gone_help: 'Pode ser que o organizador o tenha apagado ou mudado.', news_c42: 'Seu Dinheiro disponível agora se move com cada despesa e receita que você anota, saia de onde sair. Nas remessas, você pode escrever quanto chegou e a taxa é calculada sozinha. A boas-vindas é mais curta e o nome é opcional, «Tenho um negócio» só liga se você usar, e as Novidades agora se leem em linguagem de benefícios.', news_c43: 'Seu Saldo disponível agora reflete só suas contas e o que você anota de agora em diante: cada receita e despesa nova soma ou subtrai na hora, no bolso que você escolher. Meu san agora dobra por blocos, sua página inicial mostra só o importante e a lupa sobre o botão + busca qualquer movimento.', search_fab_aria: 'Buscar movimentos', search_hint: 'Digite para buscar nos seus movimentos',
   news_c37: 'Widgets renovados — degradê da marca, barra de progresso que muda de cor conforme seu orçamento e a linha do próximo turno do seu san — e um widget novo do tamanho de um ícone, com o que você pode gastar hoje — e a marca sempre visível ao rolar o link público do san — e as rodadas do organizador agora dobram em acordeão, com só a desta semana aberta.',
   widget_today: 'hoje',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -3621,8 +3640,8 @@ fr: {
   news_c38: 'Le Podcast charge et lit désormais ses épisodes.',
   news_c39: 'Le Podcast lit désormais ses épisodes, et les petits widgets fonctionnent à nouveau.',
   news_c40: 'Le solde de tes comptes est maintenant étiqueté honnêtement, quand tu crées ton code PIN l’appli prévient qu’il ne peut pas être récupéré (et il y a une sortie de secours si tu l’oublies), ton montant de dépense quotidienne naît dès le premier jour avec « Créer mon budget » et enregistrer une dépense ne prend plus que trois touchers.',
-  src_exp_label: 'D’où est-ce sorti ?', src_inc_label: 'Où est-ce entré ?', src_available: 'Solde disponible', src_savings: 'Épargne', src_from_savings: 'de l’Épargne', src_to_savings: 'vers l’Épargne', tile_available_help: 'Tes comptes plus ce que tu notes sans compte : ça se met à jour tout seul à chaque dépense et revenu.', pub_find_hint: 'Déjà payé ? Écris ton nom, touche ta ligne puis J’ai payé.', pub_find_ph: 'Écris ton nom', pub_find_clear: 'Effacer', pub_find_none: 'Ce nom n’apparaît pas. Vérifie comment l’organisateur l’a écrit.', next_title: 'Ta prochaine étape', next_step1_btn: 'Crée ton budget', next_step2_btn: 'Note ta première dépense', next_step3_btn: 'Crée ton compte d’espèces', ob_mode_title: 'Comment veux-tu voir ton appli ?', ob_mode_essential: 'L’essentiel', ob_mode_essential_help: 'Seulement Accueil, Dépenses, Revenus, Épargne et Mon san. Le reste s’active quand tu veux dans Réglages.', ob_mode_all: 'Tout', ob_mode_all_help: 'Les 13 sections complètes dès le premier jour.', ob_mode_btn: 'Continuer', set_mode_essential_btn: 'Mode Essentiel', set_mode_all_btn: 'Tout afficher', san_freq_label: 'Fréquence', san_start_label: 'Date de début', san_period_semanal: 'Semaine', san_period_quincenal: 'Quinzaine', san_period_mensual: 'Mois', san_period_line: '{p} {x} sur {n}', san_collected_period: 'Réuni sur cette période : {amount} sur {target}', san_paid_title_period: 'Qui a déjà payé sur cette période ?', san_advance_period: 'Marquer la période comme complète', san_finished_period: 'Toutes les périodes sont terminées. Tu peux supprimer ce san et en créer un nouveau.', chal_ask: 'Tu veux un défi hebdomadaire ?', key_san_period: '{p} {x} sur {n} · Au tour de {name}', news_c41: 'Tes comptes sont maintenant vivants — quand tu notes une dépense ou un revenu, tu choisis d’où c’est sorti ou où c’est entré (solde disponible, Épargne ou l’un de tes comptes) et les soldes bougent tout seuls — le lien public du san a maintenant une recherche par nom et des tours pliables — ton premier jour est guidé pas à pas, avec le mode « Essentiel » — le san personnel peut maintenant être tous les quinze jours ou mensuel — et Épargne est maintenant un seul écran bien rangé, avec un seul formulaire d’objectif.',
-  rem_arrived_label: 'Combien est arrivé ?', rem_arrived_help: 'Si tu le sais, écris-le et le taux se calcule tout seul.', rem_rate_calc: 'Taux calculé : {rate}', import_hint: 'Tu as ton relevé bancaire ? Importe-le et commence avec tes données', import_cta_btn: 'Importer le relevé bancaire', set_biz_label: 'J’ai une activité', set_biz_help: 'Avec cette option, les formulaires demandent si un mouvement est pour ton activité, la répartition suggérée inclut la part Activité et le Résumé affiche le rapport de ton activité. Désactivée, tout cela se cache ; tes données ne sont pas touchées.', inc_split_line_nb: 'Épargné : {sav} · Suggestion : Dépenses {exp} · Famille {fam}', inc_split_preview_nb: 'Répartition suggérée : Épargne {sav} · Dépenses {exp} · Famille {fam}. L’épargne qui compte est celle que tu saisis ci-dessous.', priv_title: 'Confidentialité : comment nous protégeons tes données', priv_text: 'Tes données vivent sur ton téléphone. Le cloud est facultatif et ne s’active que si tu crées ton compte. Nous ne vendons jamais tes données.', priv_btn: 'Lire la politique complète', lock_note_cloud: 'Tes données se synchronisent avec ton compte.', org_link_zelle_warn: 'Quiconque a le lien verra les noms, l’avancement et le Zelle de la personne qui reçoit à chaque tour.', org_link_copy: 'Copier le lien', cloud_pass_hint: 'Au moins 6 caractères', pass_show: 'Afficher le mot de passe', pass_hide: 'Masquer le mot de passe', pub_gone_help: 'L’organisateur l’a peut-être supprimé ou modifié.', news_c42: 'Ton argent disponible bouge maintenant avec chaque dépense et revenu que tu notes, d’où qu’il vienne. Pour les envois d’argent, tu peux écrire combien est arrivé et le taux se calcule tout seul. L’accueil est plus court et le nom est facultatif, « J’ai une activité » ne s’active que si tu l’utilises, et les Nouveautés se lisent désormais en langage de bénéfices.',
+  src_exp_label: 'D’où est-ce sorti ?', src_inc_label: 'Où est-ce entré ?', src_available: 'Solde disponible', src_savings: 'Épargne', src_from_savings: 'de l’Épargne', src_to_savings: 'vers l’Épargne', tile_available_help: 'Tes comptes plus ce que tu notes dès maintenant comme Solde disponible: ça bouge tout seul à chaque dépense et revenu.', pub_find_hint: 'Déjà payé ? Écris ton nom, touche ta ligne puis J’ai payé.', pub_find_ph: 'Écris ton nom', pub_find_clear: 'Effacer', pub_find_none: 'Ce nom n’apparaît pas. Vérifie comment l’organisateur l’a écrit.', next_title: 'Ta prochaine étape', next_step1_btn: 'Crée ton budget', next_step2_btn: 'Note ta première dépense', next_step3_btn: 'Crée ton compte d’espèces', ob_mode_title: 'Comment veux-tu voir ton appli ?', ob_mode_essential: 'L’essentiel', ob_mode_essential_help: 'Seulement Accueil, Dépenses, Revenus, Épargne et Mon san. Le reste s’active quand tu veux dans Réglages.', ob_mode_all: 'Tout', ob_mode_all_help: 'Les 13 sections complètes dès le premier jour.', ob_mode_btn: 'Continuer', set_mode_essential_btn: 'Mode Essentiel', set_mode_all_btn: 'Tout afficher', san_freq_label: 'Fréquence', san_start_label: 'Date de début', san_period_semanal: 'Semaine', san_period_quincenal: 'Quinzaine', san_period_mensual: 'Mois', san_period_line: '{p} {x} sur {n}', san_collected_period: 'Réuni sur cette période : {amount} sur {target}', san_paid_title_period: 'Qui a déjà payé sur cette période ?', san_advance_period: 'Marquer la période comme complète', san_finished_period: 'Toutes les périodes sont terminées. Tu peux supprimer ce san et en créer un nouveau.', chal_ask: 'Tu veux un défi hebdomadaire ?', key_san_period: '{p} {x} sur {n} · Au tour de {name}', news_c41: 'Tes comptes sont maintenant vivants — quand tu notes une dépense ou un revenu, tu choisis d’où c’est sorti ou où c’est entré (solde disponible, Épargne ou l’un de tes comptes) et les soldes bougent tout seuls — le lien public du san a maintenant une recherche par nom et des tours pliables — ton premier jour est guidé pas à pas, avec le mode « Essentiel » — le san personnel peut maintenant être tous les quinze jours ou mensuel — et Épargne est maintenant un seul écran bien rangé, avec un seul formulaire d’objectif.',
+  rem_arrived_label: 'Combien est arrivé ?', rem_arrived_help: 'Si tu le sais, écris-le et le taux se calcule tout seul.', rem_rate_calc: 'Taux calculé : {rate}', import_hint: 'Tu as ton relevé bancaire ? Importe-le et commence avec tes données', import_cta_btn: 'Importer le relevé bancaire', set_biz_label: 'J’ai une activité', set_biz_help: 'Avec cette option, les formulaires demandent si un mouvement est pour ton activité, la répartition suggérée inclut la part Activité et le Résumé affiche le rapport de ton activité. Désactivée, tout cela se cache ; tes données ne sont pas touchées.', inc_split_line_nb: 'Épargné : {sav} · Suggestion : Dépenses {exp} · Famille {fam}', inc_split_preview_nb: 'Répartition suggérée : Épargne {sav} · Dépenses {exp} · Famille {fam}. L’épargne qui compte est celle que tu saisis ci-dessous.', priv_title: 'Confidentialité : comment nous protégeons tes données', priv_text: 'Tes données vivent sur ton téléphone. Le cloud est facultatif et ne s’active que si tu crées ton compte. Nous ne vendons jamais tes données.', priv_btn: 'Lire la politique complète', lock_note_cloud: 'Tes données se synchronisent avec ton compte.', org_link_zelle_warn: 'Quiconque a le lien verra les noms, l’avancement et le Zelle de la personne qui reçoit à chaque tour.', org_link_copy: 'Copier le lien', cloud_pass_hint: 'Au moins 6 caractères', pass_show: 'Afficher le mot de passe', pass_hide: 'Masquer le mot de passe', pub_gone_help: 'L’organisateur l’a peut-être supprimé ou modifié.', news_c42: 'Ton argent disponible bouge maintenant avec chaque dépense et revenu que tu notes, d’où qu’il vienne. Pour les envois d’argent, tu peux écrire combien est arrivé et le taux se calcule tout seul. L’accueil est plus court et le nom est facultatif, « J’ai une activité » ne s’active que si tu l’utilises, et les Nouveautés se lisent désormais en langage de bénéfices.', news_c43: 'Ton Solde disponible reflète désormais uniquement tes comptes et ce que tu notes à partir de maintenant: chaque revenu et dépense nouveau s\'ajoute ou se retire aussitôt, dans la poche que tu choisis. Mon san se plie maintenant par blocs, ta page d\'accueil ne montre que l\'essentiel et la loupe au-dessus du bouton + retrouve n\'importe quel mouvement.', search_fab_aria: 'Rechercher des mouvements', search_hint: 'Écris pour chercher dans tes mouvements',
   news_c37: 'Widgets repensés — dégradé de la marque, barre de progression qui change de couleur selon votre budget et la ligne du prochain tour de votre san — et un nouveau widget de la taille d’une icône, avec ce que vous pouvez dépenser aujourd’hui — et la marque reste visible quand on fait défiler le lien public du san — et les tours de l’organisateur se plient en accordéon, avec seul celui de cette semaine ouvert.',
   widget_today: 'aujourd’hui',
   widget_san_next: 'Prochain tour : {name} · {date}',
@@ -4341,8 +4360,8 @@ de: {
   news_c38: 'Der Podcast lädt und spielt seine Episoden jetzt ab.',
   news_c39: 'Der Podcast spielt seine Episoden jetzt ab, und die kleinen Widgets funktionieren wieder.',
   news_c40: 'Dein Kontostand wird jetzt ehrlich bezeichnet, beim Erstellen deiner PIN warnt die App, dass sie nicht wiederhergestellt werden kann (und es gibt einen Notausgang, falls du sie vergisst), deine tägliche Ausgabenzahl entsteht am ersten Tag mit „Mein Budget erstellen“ und eine Ausgabe einzutragen dauert jetzt drei Tipps.',
-  src_exp_label: 'Woher kam es?', src_inc_label: 'Wohin ist es gegangen?', src_available: 'Verfügbarer Saldo', src_savings: 'Ersparnisse', src_from_savings: 'aus Ersparnissen', src_to_savings: 'zu Ersparnissen', tile_available_help: 'Deine Konten plus das, was du ohne Konto einträgst: aktualisiert sich mit jeder Ausgabe und Einnahme von selbst.', pub_find_hint: 'Schon bezahlt? Schreib deinen Namen, tippe auf deine Zeile und dann auf Bezahlt.', pub_find_ph: 'Schreib deinen Namen', pub_find_clear: 'Leeren', pub_find_none: 'Dieser Name erscheint nicht. Prüfe, wie der Organisator ihn geschrieben hat.', next_title: 'Dein nächster Schritt', next_step1_btn: 'Erstelle dein Budget', next_step2_btn: 'Trage deine erste Ausgabe ein', next_step3_btn: 'Erstelle dein Bargeldkonto', ob_mode_title: 'Wie möchtest du deine App sehen?', ob_mode_essential: 'Das Wesentliche', ob_mode_essential_help: 'Nur Start, Ausgaben, Einnahmen, Ersparnisse und Mein San. Alles andere schaltest du in den Einstellungen ein, wann du willst.', ob_mode_all: 'Alles', ob_mode_all_help: 'Alle 13 Bereiche komplett ab dem ersten Tag.', ob_mode_btn: 'Weiter', set_mode_essential_btn: 'Modus Wesentlich', set_mode_all_btn: 'Alles anzeigen', san_freq_label: 'Häufigkeit', san_start_label: 'Startdatum', san_period_semanal: 'Woche', san_period_quincenal: 'Zwei Wochen', san_period_mensual: 'Monat', san_period_line: '{p} {x} von {n}', san_collected_period: 'In diesem Zeitraum gesammelt: {amount} von {target}', san_paid_title_period: 'Wer hat in diesem Zeitraum schon bezahlt?', san_advance_period: 'Zeitraum als komplett markieren', san_finished_period: 'Alle Zeiträume sind komplett. Du kannst diesen San löschen und einen neuen erstellen.', chal_ask: 'Möchtest du eine wöchentliche Challenge?', key_san_period: '{p} {x} von {n} · An der Reihe: {name}', news_c41: 'Deine Konten leben jetzt — wenn du eine Ausgabe oder Einnahme einträgst, wählst du, woher sie kam oder wohin sie ging (verfügbarer Saldo, Ersparnisse oder eines deiner Konten), und die Salden bewegen sich von selbst — der öffentliche San-Link hat jetzt eine Namenssuche und einklappbare Runden — dein erster Tag wird Schritt für Schritt geführt, mit dem Modus „Wesentlich“ — der persönliche San kann jetzt alle zwei Wochen oder monatlich sein — und Ersparnisse ist jetzt ein einziger aufgeräumter Bildschirm mit nur einem Ziel-Formular.',
-  rem_arrived_label: 'Wie viel ist angekommen?', rem_arrived_help: 'Wenn du es weißt, trag es ein und der Kurs wird automatisch berechnet.', rem_rate_calc: 'Berechneter Kurs: {rate}', import_hint: 'Hast du deinen Kontoauszug? Importiere ihn und starte mit deinen Daten', import_cta_btn: 'Kontoauszug importieren', set_biz_label: 'Ich habe ein Geschäft', set_biz_help: 'Damit eingeschaltet fragen die Formulare, ob eine Bewegung für dein Geschäft ist, die vorgeschlagene Aufteilung enthält den Geschäftsanteil und die Übersicht zeigt deinen Geschäftsbericht. Ausgeschaltet wird all das versteckt; deine Daten bleiben unberührt.', inc_split_line_nb: 'Gespart: {sav} · Vorschlag: Ausgaben {exp} · Familie {fam}', inc_split_preview_nb: 'Vorgeschlagene Aufteilung: Ersparnis {sav} · Ausgaben {exp} · Familie {fam}. Die Ersparnis, die zählt, ist die, die du unten eingibst.', priv_title: 'Datenschutz: wie wir deine Daten schützen', priv_text: 'Deine Daten leben auf deinem Telefon. Die Cloud ist optional und wird nur aktiv, wenn du dein Konto erstellst. Wir verkaufen deine Daten niemals.', priv_btn: 'Die vollständige Richtlinie lesen', lock_note_cloud: 'Deine Daten werden mit deinem Konto synchronisiert.', org_link_zelle_warn: 'Wer den Link hat, sieht die Namen, den Fortschritt und die Zelle-Nummer der Person, die in jeder Runde erhält.', org_link_copy: 'Link kopieren', cloud_pass_hint: 'Mindestens 6 Zeichen', pass_show: 'Passwort anzeigen', pass_hide: 'Passwort verbergen', pub_gone_help: 'Vielleicht hat der Organisator ihn gelöscht oder geändert.', news_c42: 'Dein verfügbares Geld bewegt sich jetzt mit jeder Ausgabe und Einnahme, die du einträgst, egal aus welcher Tasche. Bei Überweisungen kannst du eintragen, wie viel angekommen ist, und der Kurs wird automatisch berechnet. Die Begrüßung ist kürzer und der Name optional, „Ich habe ein Geschäft“ schaltet sich nur ein, wenn du es nutzt, und die Neuigkeiten lesen sich jetzt in Nutzen-Sprache.',
+  src_exp_label: 'Woher kam es?', src_inc_label: 'Wohin ist es gegangen?', src_available: 'Verfügbarer Saldo', src_savings: 'Ersparnisse', src_from_savings: 'aus Ersparnissen', src_to_savings: 'zu Ersparnissen', tile_available_help: 'Deine Konten plus das, was du ab jetzt als Verfügbarer Saldo einträgst: bewegt sich mit jeder Ausgabe und Einnahme von selbst.', pub_find_hint: 'Schon bezahlt? Schreib deinen Namen, tippe auf deine Zeile und dann auf Bezahlt.', pub_find_ph: 'Schreib deinen Namen', pub_find_clear: 'Leeren', pub_find_none: 'Dieser Name erscheint nicht. Prüfe, wie der Organisator ihn geschrieben hat.', next_title: 'Dein nächster Schritt', next_step1_btn: 'Erstelle dein Budget', next_step2_btn: 'Trage deine erste Ausgabe ein', next_step3_btn: 'Erstelle dein Bargeldkonto', ob_mode_title: 'Wie möchtest du deine App sehen?', ob_mode_essential: 'Das Wesentliche', ob_mode_essential_help: 'Nur Start, Ausgaben, Einnahmen, Ersparnisse und Mein San. Alles andere schaltest du in den Einstellungen ein, wann du willst.', ob_mode_all: 'Alles', ob_mode_all_help: 'Alle 13 Bereiche komplett ab dem ersten Tag.', ob_mode_btn: 'Weiter', set_mode_essential_btn: 'Modus Wesentlich', set_mode_all_btn: 'Alles anzeigen', san_freq_label: 'Häufigkeit', san_start_label: 'Startdatum', san_period_semanal: 'Woche', san_period_quincenal: 'Zwei Wochen', san_period_mensual: 'Monat', san_period_line: '{p} {x} von {n}', san_collected_period: 'In diesem Zeitraum gesammelt: {amount} von {target}', san_paid_title_period: 'Wer hat in diesem Zeitraum schon bezahlt?', san_advance_period: 'Zeitraum als komplett markieren', san_finished_period: 'Alle Zeiträume sind komplett. Du kannst diesen San löschen und einen neuen erstellen.', chal_ask: 'Möchtest du eine wöchentliche Challenge?', key_san_period: '{p} {x} von {n} · An der Reihe: {name}', news_c41: 'Deine Konten leben jetzt — wenn du eine Ausgabe oder Einnahme einträgst, wählst du, woher sie kam oder wohin sie ging (verfügbarer Saldo, Ersparnisse oder eines deiner Konten), und die Salden bewegen sich von selbst — der öffentliche San-Link hat jetzt eine Namenssuche und einklappbare Runden — dein erster Tag wird Schritt für Schritt geführt, mit dem Modus „Wesentlich“ — der persönliche San kann jetzt alle zwei Wochen oder monatlich sein — und Ersparnisse ist jetzt ein einziger aufgeräumter Bildschirm mit nur einem Ziel-Formular.',
+  rem_arrived_label: 'Wie viel ist angekommen?', rem_arrived_help: 'Wenn du es weißt, trag es ein und der Kurs wird automatisch berechnet.', rem_rate_calc: 'Berechneter Kurs: {rate}', import_hint: 'Hast du deinen Kontoauszug? Importiere ihn und starte mit deinen Daten', import_cta_btn: 'Kontoauszug importieren', set_biz_label: 'Ich habe ein Geschäft', set_biz_help: 'Damit eingeschaltet fragen die Formulare, ob eine Bewegung für dein Geschäft ist, die vorgeschlagene Aufteilung enthält den Geschäftsanteil und die Übersicht zeigt deinen Geschäftsbericht. Ausgeschaltet wird all das versteckt; deine Daten bleiben unberührt.', inc_split_line_nb: 'Gespart: {sav} · Vorschlag: Ausgaben {exp} · Familie {fam}', inc_split_preview_nb: 'Vorgeschlagene Aufteilung: Ersparnis {sav} · Ausgaben {exp} · Familie {fam}. Die Ersparnis, die zählt, ist die, die du unten eingibst.', priv_title: 'Datenschutz: wie wir deine Daten schützen', priv_text: 'Deine Daten leben auf deinem Telefon. Die Cloud ist optional und wird nur aktiv, wenn du dein Konto erstellst. Wir verkaufen deine Daten niemals.', priv_btn: 'Die vollständige Richtlinie lesen', lock_note_cloud: 'Deine Daten werden mit deinem Konto synchronisiert.', org_link_zelle_warn: 'Wer den Link hat, sieht die Namen, den Fortschritt und die Zelle-Nummer der Person, die in jeder Runde erhält.', org_link_copy: 'Link kopieren', cloud_pass_hint: 'Mindestens 6 Zeichen', pass_show: 'Passwort anzeigen', pass_hide: 'Passwort verbergen', pub_gone_help: 'Vielleicht hat der Organisator ihn gelöscht oder geändert.', news_c42: 'Dein verfügbares Geld bewegt sich jetzt mit jeder Ausgabe und Einnahme, die du einträgst, egal aus welcher Tasche. Bei Überweisungen kannst du eintragen, wie viel angekommen ist, und der Kurs wird automatisch berechnet. Die Begrüßung ist kürzer und der Name optional, „Ich habe ein Geschäft“ schaltet sich nur ein, wenn du es nutzt, und die Neuigkeiten lesen sich jetzt in Nutzen-Sprache.', news_c43: 'Dein Verfügbarer Saldo zeigt jetzt nur deine Konten und das, was du ab jetzt einträgst: Jede neue Einnahme und Ausgabe wird sofort addiert oder abgezogen, in der Tasche, die du wählst. Mein San klappt jetzt in Blöcken, deine Startseite zeigt nur das Wichtige und die Lupe über der +-Taste findet jede Bewegung.', search_fab_aria: 'Bewegungen suchen', search_hint: 'Tippe, um in deinen Bewegungen zu suchen',
   news_c37: 'Widgets im neuen Look — Marken-Farbverlauf, ein Fortschrittsbalken, der je nach Budget die Farbe wechselt, und die Zeile zum nächsten Zug deines San — plus ein neues Widget in App-Symbol-Größe mit deinem heutigen Budget — und die Marke bleibt beim Scrollen im öffentlichen San-Link sichtbar — und die Runden des Organisators klappen jetzt als Akkordeon, mit nur der dieser Woche offen.',
   widget_today: 'heute',
   widget_san_next: 'Nächster Zug: {name} · {date}',
@@ -5061,8 +5080,8 @@ zh: {
   news_c38: '播客现在可以加载并播放节目了。',
   news_c39: '播客现在可以播放节目了，小部件也重新正常工作。',
   news_c40: '你的账户余额现在会诚实标注；创建 PIN 时应用会提醒它无法找回（如果你忘了，还有紧急出口）；你的每日可花金额在第一天就能通过“创建我的预算”诞生；现在记录一笔支出只需点三下。',
-  src_exp_label: '钱从哪里出的？', src_inc_label: '钱进到哪里了？', src_available: '可用余额', src_savings: '储蓄', src_from_savings: '来自储蓄', src_to_savings: '存入储蓄', tile_available_help: '你的账户加上你不记在账户上的记录：每笔支出和收入都会自动更新。', pub_find_hint: '已经付了吗？输入你的名字，点你的那一行，然后点“我已付款”。', pub_find_ph: '输入你的名字', pub_find_clear: '清除', pub_find_none: '没有找到这个名字。请核对组织者写的拼写。', next_title: '你的下一步', next_step1_btn: '创建你的预算', next_step2_btn: '记下你的第一笔支出', next_step3_btn: '创建你的现金账户', ob_mode_title: '你想如何查看你的应用？', ob_mode_essential: '精简模式', ob_mode_essential_help: '只显示首页、支出、收入、储蓄和我的 San。其他功能可随时在设置中开启。', ob_mode_all: '全部', ob_mode_all_help: '从第一天起就有完整的 13 个板块。', ob_mode_btn: '继续', set_mode_essential_btn: '精简模式', set_mode_all_btn: '显示全部', san_freq_label: '频率', san_start_label: '开始日期', san_period_semanal: '周', san_period_quincenal: '双周', san_period_mensual: '月', san_period_line: '{p} {x} / {n}', san_collected_period: '本期已收：{amount} / {target}', san_paid_title_period: '本期谁已经付了？', san_advance_period: '标记本期完成', san_finished_period: '所有期数都已完成。你可以删除这个 San 并创建一个新的。', chal_ask: '想要每周挑战吗？', key_san_period: '{p} {x} / {n} · 轮到 {name}', news_c41: '你的账户现在是活的了——记录支出或收入时，你可以选择钱从哪里出或进到哪里（可用余额、储蓄或你的某个账户），余额会自动变动——San 公开链接现在有姓名搜索和可折叠的轮次——你的第一天有分步引导，还有“精简”模式——个人 San 现在可以每两周或每月一次——储蓄现在是一个整洁的页面，只有一个目标表单。',
-  rem_arrived_label: '实际收到了多少？', rem_arrived_help: '如果你知道，填上它，汇率会自动算出来。', rem_rate_calc: '算出的汇率：{rate}', import_hint: '有银行对账单吗？导入它，直接从你的数据开始', import_cta_btn: '导入银行对账单', set_biz_label: '我有自己的生意', set_biz_help: '开启后，表单会询问某笔记录是否与你的生意有关，建议分配会包含生意部分，汇总会显示你的生意报表。关闭后，这些都会隐藏；你的数据不会被动。', inc_split_line_nb: '已存：{sav} · 建议：支出 {exp} · 家庭 {fam}', inc_split_preview_nb: '建议分配：储蓄 {sav} · 支出 {exp} · 家庭 {fam}。计入的是你在下面输入的储蓄。', priv_title: '隐私：我们如何保护你的数据', priv_text: '你的数据保存在你的手机上。云端是可选的，只有你创建账户时才会开启。我们永远不会出售你的数据。', priv_btn: '阅读完整政策', lock_note_cloud: '你的数据会与你的账户同步。', org_link_zelle_warn: '拥有链接的任何人都能看到姓名、进度以及每轮收款人的 Zelle。', org_link_copy: '复制链接', cloud_pass_hint: '至少 6 个字符', pass_show: '显示密码', pass_hide: '隐藏密码', pub_gone_help: '组织者可能已经删除或更改了它。', news_c42: '你的可用资金现在会随你记录的每一笔支出和收入变动，无论钱从哪个口袋出。在汇款中，你可以填写实际收到的金额，汇率会自动计算。欢迎流程更短，姓名可选，"我有自己的生意"只有你使用时才开启，新动态现在用讲好处的方式呈现。',
+  src_exp_label: '钱从哪里出的？', src_inc_label: '钱进到哪里了？', src_available: '可用余额', src_savings: '储蓄', src_from_savings: '来自储蓄', src_to_savings: '存入储蓄', tile_available_help: '你的账户，加上你从现在起记为可用余额的记录：每笔支出和收入都会自动变动。', pub_find_hint: '已经付了吗？输入你的名字，点你的那一行，然后点“我已付款”。', pub_find_ph: '输入你的名字', pub_find_clear: '清除', pub_find_none: '没有找到这个名字。请核对组织者写的拼写。', next_title: '你的下一步', next_step1_btn: '创建你的预算', next_step2_btn: '记下你的第一笔支出', next_step3_btn: '创建你的现金账户', ob_mode_title: '你想如何查看你的应用？', ob_mode_essential: '精简模式', ob_mode_essential_help: '只显示首页、支出、收入、储蓄和我的 San。其他功能可随时在设置中开启。', ob_mode_all: '全部', ob_mode_all_help: '从第一天起就有完整的 13 个板块。', ob_mode_btn: '继续', set_mode_essential_btn: '精简模式', set_mode_all_btn: '显示全部', san_freq_label: '频率', san_start_label: '开始日期', san_period_semanal: '周', san_period_quincenal: '双周', san_period_mensual: '月', san_period_line: '{p} {x} / {n}', san_collected_period: '本期已收：{amount} / {target}', san_paid_title_period: '本期谁已经付了？', san_advance_period: '标记本期完成', san_finished_period: '所有期数都已完成。你可以删除这个 San 并创建一个新的。', chal_ask: '想要每周挑战吗？', key_san_period: '{p} {x} / {n} · 轮到 {name}', news_c41: '你的账户现在是活的了——记录支出或收入时，你可以选择钱从哪里出或进到哪里（可用余额、储蓄或你的某个账户），余额会自动变动——San 公开链接现在有姓名搜索和可折叠的轮次——你的第一天有分步引导，还有“精简”模式——个人 San 现在可以每两周或每月一次——储蓄现在是一个整洁的页面，只有一个目标表单。',
+  rem_arrived_label: '实际收到了多少？', rem_arrived_help: '如果你知道，填上它，汇率会自动算出来。', rem_rate_calc: '算出的汇率：{rate}', import_hint: '有银行对账单吗？导入它，直接从你的数据开始', import_cta_btn: '导入银行对账单', set_biz_label: '我有自己的生意', set_biz_help: '开启后，表单会询问某笔记录是否与你的生意有关，建议分配会包含生意部分，汇总会显示你的生意报表。关闭后，这些都会隐藏；你的数据不会被动。', inc_split_line_nb: '已存：{sav} · 建议：支出 {exp} · 家庭 {fam}', inc_split_preview_nb: '建议分配：储蓄 {sav} · 支出 {exp} · 家庭 {fam}。计入的是你在下面输入的储蓄。', priv_title: '隐私：我们如何保护你的数据', priv_text: '你的数据保存在你的手机上。云端是可选的，只有你创建账户时才会开启。我们永远不会出售你的数据。', priv_btn: '阅读完整政策', lock_note_cloud: '你的数据会与你的账户同步。', org_link_zelle_warn: '拥有链接的任何人都能看到姓名、进度以及每轮收款人的 Zelle。', org_link_copy: '复制链接', cloud_pass_hint: '至少 6 个字符', pass_show: '显示密码', pass_hide: '隐藏密码', pub_gone_help: '组织者可能已经删除或更改了它。', news_c42: '你的可用资金现在会随你记录的每一笔支出和收入变动，无论钱从哪个口袋出。在汇款中，你可以填写实际收到的金额，汇率会自动计算。欢迎流程更短，姓名可选，"我有自己的生意"只有你使用时才开启，新动态现在用讲好处的方式呈现。', news_c43: '你的可用余额现在只反映你的账户和你从现在起记录的内容：每笔新的收入和支出都会按你选择的口袋立即增减。我的 san 现在按区块折叠，首页只显示重要的内容，+ 按钮上方的放大镜可以查找任何一笔记录。', search_fab_aria: '搜索记录', search_hint: '输入以搜索你的记录',
   news_c37: '小部件全新设计——品牌渐变、会随预算变色的进度条，以及 San 下一轮的提示行——还有一个全新的、只有一个图标大小的小部件，显示你今天能花多少；在 san 公开链接中下滑时，品牌始终可见；组织者的轮次现在折叠成手风琴，仅展开本周一轮。',
   widget_today: '今日',
   widget_san_next: '下一轮：{name} · {date}',
@@ -5781,8 +5800,8 @@ ja: {
   news_c38: 'ポッドキャストのエピソードが読み込めて再生できるようになりました。',
   news_c39: 'ポッドキャストのエピソードが再生できるようになり、小さいウィジェットも再び使えるようになりました。',
   news_c40: '口座残高が正直に表示されるようになりました。PINを作成するとき、復旧できないことが警告され（忘れた場合の緊急出口もあります）、毎日の支出額は初日から「予算を作成」で生まれ、支出の記録は3タップで済むようになりました。',
-  src_exp_label: 'どこから出た？', src_inc_label: 'どこに入った？', src_available: '利用可能残高', src_savings: '貯金', src_from_savings: '貯金から', src_to_savings: '貯金へ', tile_available_help: 'あなたの口座と、口座なしで記録した分：支出と収入のたびに自動で更新されます。', pub_find_hint: 'もう払った？名前を入力して、自分の行をタップし、「払った」を押してください。', pub_find_ph: '名前を入力', pub_find_clear: 'クリア', pub_find_none: 'その名前は見つかりません。主催者の表記を確認してください。', next_title: '次のステップ', next_step1_btn: '予算を作る', next_step2_btn: '最初の支出を記録', next_step3_btn: '現金口座を作る', ob_mode_title: 'アプリをどう表示しますか？', ob_mode_essential: 'シンプル', ob_mode_essential_help: 'ホーム、支出、収入、貯金、マイSanだけ。その他は設定でいつでもオンにできます。', ob_mode_all: 'すべて', ob_mode_all_help: '初日から全13セクションが使えます。', ob_mode_btn: '続ける', set_mode_essential_btn: 'シンプルモード', set_mode_all_btn: 'すべて表示', san_freq_label: '頻度', san_start_label: '開始日', san_period_semanal: '週', san_period_quincenal: '隔週', san_period_mensual: '月', san_period_line: '{p} {x} / {n}', san_collected_period: 'この期間の集金：{amount} / {target}', san_paid_title_period: 'この期間に払ったのは誰？', san_advance_period: 'この期間を完了にする', san_finished_period: 'すべての期間が完了しました。このSanを削除して新しく作れます。', chal_ask: '毎週のチャレンジをしますか？', key_san_period: '{p} {x} / {n} · 次は {name}', news_c41: '口座が生きてきました——支出や収入を記録するとき、どこから出たか・どこに入ったか（利用可能残高、貯金、またはあなたの口座）を選ぶと、残高が自動で動きます——Sanの公開リンクに名前検索と折りたたみラウンドが追加——初日はステップごとのガイド付きで、「シンプル」モードも選べます——個人のSanは隔週や月ごとにも対応——貯金は1つの目標フォームだけの、すっきりした1画面になりました。',
-  rem_arrived_label: 'いくら届きましたか？', rem_arrived_help: '分かれば入力してください。レートは自動で計算されます。', rem_rate_calc: '計算されたレート：{rate}', import_hint: '銀行明細がありますか？インポートして、自分のデータから始めましょう', import_cta_btn: '銀行明細をインポート', set_biz_label: '事業をしています', set_biz_help: 'オンにすると、フォームでその記録が事業用かどうかを尋ね、提案される配分に事業分が含まれ、概要に事業レポートが表示されます。オフにすると全て隠れます。データには触れません。', inc_split_line_nb: '貯蓄済み：{sav} · 提案：支出{exp} · 家族{fam}', inc_split_preview_nb: '提案される配分：貯蓄{sav} · 支出{exp} · 家族{fam}。数えられる貯蓄は下で入力したものです。', priv_title: 'プライバシー：あなたのデータの守り方', priv_text: 'あなたのデータはあなたのスマートフォンの中にあります。クラウドは任意で、アカウントを作成したときだけ有効になります。あなたのデータを売ることは決してありません。', priv_btn: 'ポリシー全文を読む', lock_note_cloud: 'あなたのデータはアカウントと同期されます。', org_link_zelle_warn: 'リンクを持っている人は、名前、進捗、そして各ラウンドの受取人のZelleを見ることができます。', org_link_copy: 'リンクをコピー', cloud_pass_hint: '6文字以上', pass_show: 'パスワードを表示', pass_hide: 'パスワードを隠す', pub_gone_help: '主催者が削除または変更した可能性があります。', news_c42: '利用可能額は、記録する支出と収入のたびに、どのポケットからでも動くようになりました。送金では、届いた金額を入力すればレートが自動で計算されます。ウェルカムは短くなり、名前は任意に。「事業をしています」は使うときだけオンになり、新着情報はメリット中心の言葉で読めるようになりました。',
+  src_exp_label: 'どこから出た？', src_inc_label: 'どこに入った？', src_available: '利用可能残高', src_savings: '貯金', src_from_savings: '貯金から', src_to_savings: '貯金へ', tile_available_help: 'あなたの口座と、これから利用可能残高として記録する分：支出と収入のたびに自動で動きます。', pub_find_hint: 'もう払った？名前を入力して、自分の行をタップし、「払った」を押してください。', pub_find_ph: '名前を入力', pub_find_clear: 'クリア', pub_find_none: 'その名前は見つかりません。主催者の表記を確認してください。', next_title: '次のステップ', next_step1_btn: '予算を作る', next_step2_btn: '最初の支出を記録', next_step3_btn: '現金口座を作る', ob_mode_title: 'アプリをどう表示しますか？', ob_mode_essential: 'シンプル', ob_mode_essential_help: 'ホーム、支出、収入、貯金、マイSanだけ。その他は設定でいつでもオンにできます。', ob_mode_all: 'すべて', ob_mode_all_help: '初日から全13セクションが使えます。', ob_mode_btn: '続ける', set_mode_essential_btn: 'シンプルモード', set_mode_all_btn: 'すべて表示', san_freq_label: '頻度', san_start_label: '開始日', san_period_semanal: '週', san_period_quincenal: '隔週', san_period_mensual: '月', san_period_line: '{p} {x} / {n}', san_collected_period: 'この期間の集金：{amount} / {target}', san_paid_title_period: 'この期間に払ったのは誰？', san_advance_period: 'この期間を完了にする', san_finished_period: 'すべての期間が完了しました。このSanを削除して新しく作れます。', chal_ask: '毎週のチャレンジをしますか？', key_san_period: '{p} {x} / {n} · 次は {name}', news_c41: '口座が生きてきました——支出や収入を記録するとき、どこから出たか・どこに入ったか（利用可能残高、貯金、またはあなたの口座）を選ぶと、残高が自動で動きます——Sanの公開リンクに名前検索と折りたたみラウンドが追加——初日はステップごとのガイド付きで、「シンプル」モードも選べます——個人のSanは隔週や月ごとにも対応——貯金は1つの目標フォームだけの、すっきりした1画面になりました。',
+  rem_arrived_label: 'いくら届きましたか？', rem_arrived_help: '分かれば入力してください。レートは自動で計算されます。', rem_rate_calc: '計算されたレート：{rate}', import_hint: '銀行明細がありますか？インポートして、自分のデータから始めましょう', import_cta_btn: '銀行明細をインポート', set_biz_label: '事業をしています', set_biz_help: 'オンにすると、フォームでその記録が事業用かどうかを尋ね、提案される配分に事業分が含まれ、概要に事業レポートが表示されます。オフにすると全て隠れます。データには触れません。', inc_split_line_nb: '貯蓄済み：{sav} · 提案：支出{exp} · 家族{fam}', inc_split_preview_nb: '提案される配分：貯蓄{sav} · 支出{exp} · 家族{fam}。数えられる貯蓄は下で入力したものです。', priv_title: 'プライバシー：あなたのデータの守り方', priv_text: 'あなたのデータはあなたのスマートフォンの中にあります。クラウドは任意で、アカウントを作成したときだけ有効になります。あなたのデータを売ることは決してありません。', priv_btn: 'ポリシー全文を読む', lock_note_cloud: 'あなたのデータはアカウントと同期されます。', org_link_zelle_warn: 'リンクを持っている人は、名前、進捗、そして各ラウンドの受取人のZelleを見ることができます。', org_link_copy: 'リンクをコピー', cloud_pass_hint: '6文字以上', pass_show: 'パスワードを表示', pass_hide: 'パスワードを隠す', pub_gone_help: '主催者が削除または変更した可能性があります。', news_c42: '利用可能額は、記録する支出と収入のたびに、どのポケットからでも動くようになりました。送金では、届いた金額を入力すればレートが自動で計算されます。ウェルカムは短くなり、名前は任意に。「事業をしています」は使うときだけオンになり、新着情報はメリット中心の言葉で読めるようになりました。', news_c43: 'あなたの利用可能残高は、口座とこれから記録する分だけを反映するようになりました：新しい収入と支出は、選んだポケットに応じてその場で増減します。マイ san はブロックごとに折りたためるようになり、ホーム画面は大切なものだけを表示し、+ ボタン上の虫めがねであらゆる記録を検索できます。', search_fab_aria: '記録を検索', search_hint: '入力すると記録を検索できます',
   news_c37: 'ウィジェットを一新——ブランドのグラデーション、予算に合わせて色が変わる進捗バー、Sanの次のターンの行——そして、今日使える金額を表示するアイコンサイズの新しいウィジェット。公開リンクをスクロールしてもブランドが常に表示されます。主催者のラウンドはアコーディオン式になり、今週分だけが開きます。',
   widget_today: '今日',
   widget_san_next: '次のターン：{name} · {date}',
@@ -6501,8 +6520,8 @@ ko: {
   news_c38: '팟캐스트 에피소드를 불러와 재생할 수 있습니다.',
   news_c39: '팟캐스트 에피소드를 재생할 수 있고, 작은 위젯도 다시 작동합니다.',
   news_c40: '계좌 잔고가 이제 정직하게 표시되고, PIN을 만들 때 복구할 수 없다는 안내가 나오며(잊었을 때를 위한 비상 출구도 있습니다), 매일 쓸 수 있는 금액이 첫날부터 "내 예산 만들기"로 생기고, 지출 기록은 이제 세 번의 탭으로 끝납니다.',
-  src_exp_label: '어디서 나갔나요?', src_inc_label: '어디로 들어왔나요?', src_available: '사용 가능 잔액', src_savings: '저축', src_from_savings: '저축에서', src_to_savings: '저축으로', tile_available_help: '내 계좌와 계좌 없이 기록한 금액: 지출과 수입 때마다 자동으로 업데이트됩니다.', pub_find_hint: '이미 냈나요? 이름을 입력하고 내 줄을 누른 뒤 "냈어요"를 누르세요.', pub_find_ph: '이름을 입력하세요', pub_find_clear: '지우기', pub_find_none: '그 이름이 보이지 않습니다. 주최자가 적은 표기를 확인하세요.', next_title: '다음 단계', next_step1_btn: '예산 만들기', next_step2_btn: '첫 지출 기록하기', next_step3_btn: '현금 계좌 만들기', ob_mode_title: '앱을 어떻게 보고 싶나요?', ob_mode_essential: '필수만', ob_mode_essential_help: '홈, 지출, 수입, 저축, 내 San만. 나머지는 설정에서 언제든 켤 수 있습니다.', ob_mode_all: '전부', ob_mode_all_help: '첫날부터 13개 섹션 전부.', ob_mode_btn: '계속', set_mode_essential_btn: '필수 모드', set_mode_all_btn: '전부 표시', san_freq_label: '주기', san_start_label: '시작 날짜', san_period_semanal: '주', san_period_quincenal: '2주', san_period_mensual: '달', san_period_line: '{p} {x} / {n}', san_collected_period: '이번 기간 모인 금액: {amount} / {target}', san_paid_title_period: '이번 기간에 누가 이미 냈나요?', san_advance_period: '기간 완료로 표시', san_finished_period: '모든 기간이 완료되었습니다. 이 San을 삭제하고 새로 만들 수 있습니다.', chal_ask: '주간 챌린지를 해볼까요?', key_san_period: '{p} {x} / {n} · 차례: {name}', news_c41: '이제 계좌가 살아 움직입니다 — 지출이나 수입을 기록할 때 어디서 나갔는지, 어디로 들어왔는지(사용 가능 잔액, 저축, 또는 내 계좌 중 하나)를 고르면 잔액이 저절로 움직입니다 — San 공개 링크에 이름 검색과 접히는 라운드가 생겼습니다 — 첫날은 단계별 안내와 "필수만" 모드가 있습니다 — 개인 San은 격주나 월간도 가능합니다 — 저축은 목표 양식이 하나뿐인 깔끔한 한 화면이 되었습니다.',
-  rem_arrived_label: '얼마가 도착했나요?', rem_arrived_help: '알고 있다면 입력하세요. 환율이 자동으로 계산됩니다.', rem_rate_calc: '계산된 환율: {rate}', import_hint: '은행 명세서가 있나요? 가져와서 내 데이터로 시작하세요', import_cta_btn: '은행 명세서 가져오기', set_biz_label: '사업이 있어요', set_biz_help: '켜면 양식에서 그 내역이 사업용인지 묻고, 제안 분배에 사업 몫이 포함되며, 요약에 사업 보고서가 표시됩니다. 끄면 모두 숨겨지고, 데이터는 건드리지 않습니다.', inc_split_line_nb: '저축됨: {sav} · 제안: 지출 {exp} · 가족 {fam}', inc_split_preview_nb: '제안된 분배: 저축 {sav} · 지출 {exp} · 가족 {fam}. 실제로 세는 저축은 아래에 입력한 것입니다.', priv_title: '개인정보: 내 데이터를 지키는 방법', priv_text: '내 데이터는 내 휴대전화에 있습니다. 클라우드는 선택 사항이며 계정을 만들 때만 켜집니다. 우리는 당신의 데이터를 절대 팔지 않습니다.', priv_btn: '전체 정책 읽기', lock_note_cloud: '내 데이터가 내 계정과 동기화됩니다.', org_link_zelle_warn: '링크를 가진 사람은 이름, 진행 상황, 그리고 각 라운드 수령인의 Zelle를 볼 수 있습니다.', org_link_copy: '링크 복사', cloud_pass_hint: '최소 6자', pass_show: '비밀번호 표시', pass_hide: '비밀번호 숨기기', pub_gone_help: '주최자가 삭제하거나 변경했을 수 있습니다.', news_c42: '사용 가능 금액이 이제 기록하는 모든 지출과 수입에 따라, 어느 주머니에서 나오든 움직입니다. 송금에서는 도착한 금액을 입력하면 환율이 자동으로 계산됩니다. 환영 화면은 더 짧아지고 이름은 선택 사항이 되었으며, "사업이 있어요"는 사용할 때만 켜지고, 새 소식은 이제 혜택 중심의 언어로 표시됩니다.',
+  src_exp_label: '어디서 나갔나요?', src_inc_label: '어디로 들어왔나요?', src_available: '사용 가능 잔액', src_savings: '저축', src_from_savings: '저축에서', src_to_savings: '저축으로', tile_available_help: '내 계좌와 지금부터 사용 가능 잔액으로 기록하는 금액: 지출과 수입 때마다 저절로 움직입니다.', pub_find_hint: '이미 냈나요? 이름을 입력하고 내 줄을 누른 뒤 "냈어요"를 누르세요.', pub_find_ph: '이름을 입력하세요', pub_find_clear: '지우기', pub_find_none: '그 이름이 보이지 않습니다. 주최자가 적은 표기를 확인하세요.', next_title: '다음 단계', next_step1_btn: '예산 만들기', next_step2_btn: '첫 지출 기록하기', next_step3_btn: '현금 계좌 만들기', ob_mode_title: '앱을 어떻게 보고 싶나요?', ob_mode_essential: '필수만', ob_mode_essential_help: '홈, 지출, 수입, 저축, 내 San만. 나머지는 설정에서 언제든 켤 수 있습니다.', ob_mode_all: '전부', ob_mode_all_help: '첫날부터 13개 섹션 전부.', ob_mode_btn: '계속', set_mode_essential_btn: '필수 모드', set_mode_all_btn: '전부 표시', san_freq_label: '주기', san_start_label: '시작 날짜', san_period_semanal: '주', san_period_quincenal: '2주', san_period_mensual: '달', san_period_line: '{p} {x} / {n}', san_collected_period: '이번 기간 모인 금액: {amount} / {target}', san_paid_title_period: '이번 기간에 누가 이미 냈나요?', san_advance_period: '기간 완료로 표시', san_finished_period: '모든 기간이 완료되었습니다. 이 San을 삭제하고 새로 만들 수 있습니다.', chal_ask: '주간 챌린지를 해볼까요?', key_san_period: '{p} {x} / {n} · 차례: {name}', news_c41: '이제 계좌가 살아 움직입니다 — 지출이나 수입을 기록할 때 어디서 나갔는지, 어디로 들어왔는지(사용 가능 잔액, 저축, 또는 내 계좌 중 하나)를 고르면 잔액이 저절로 움직입니다 — San 공개 링크에 이름 검색과 접히는 라운드가 생겼습니다 — 첫날은 단계별 안내와 "필수만" 모드가 있습니다 — 개인 San은 격주나 월간도 가능합니다 — 저축은 목표 양식이 하나뿐인 깔끔한 한 화면이 되었습니다.',
+  rem_arrived_label: '얼마가 도착했나요?', rem_arrived_help: '알고 있다면 입력하세요. 환율이 자동으로 계산됩니다.', rem_rate_calc: '계산된 환율: {rate}', import_hint: '은행 명세서가 있나요? 가져와서 내 데이터로 시작하세요', import_cta_btn: '은행 명세서 가져오기', set_biz_label: '사업이 있어요', set_biz_help: '켜면 양식에서 그 내역이 사업용인지 묻고, 제안 분배에 사업 몫이 포함되며, 요약에 사업 보고서가 표시됩니다. 끄면 모두 숨겨지고, 데이터는 건드리지 않습니다.', inc_split_line_nb: '저축됨: {sav} · 제안: 지출 {exp} · 가족 {fam}', inc_split_preview_nb: '제안된 분배: 저축 {sav} · 지출 {exp} · 가족 {fam}. 실제로 세는 저축은 아래에 입력한 것입니다.', priv_title: '개인정보: 내 데이터를 지키는 방법', priv_text: '내 데이터는 내 휴대전화에 있습니다. 클라우드는 선택 사항이며 계정을 만들 때만 켜집니다. 우리는 당신의 데이터를 절대 팔지 않습니다.', priv_btn: '전체 정책 읽기', lock_note_cloud: '내 데이터가 내 계정과 동기화됩니다.', org_link_zelle_warn: '링크를 가진 사람은 이름, 진행 상황, 그리고 각 라운드 수령인의 Zelle를 볼 수 있습니다.', org_link_copy: '링크 복사', cloud_pass_hint: '최소 6자', pass_show: '비밀번호 표시', pass_hide: '비밀번호 숨기기', pub_gone_help: '주최자가 삭제하거나 변경했을 수 있습니다.', news_c42: '사용 가능 금액이 이제 기록하는 모든 지출과 수입에 따라, 어느 주머니에서 나오든 움직입니다. 송금에서는 도착한 금액을 입력하면 환율이 자동으로 계산됩니다. 환영 화면은 더 짧아지고 이름은 선택 사항이 되었으며, "사업이 있어요"는 사용할 때만 켜지고, 새 소식은 이제 혜택 중심의 언어로 표시됩니다.', news_c43: '이제 사용 가능 잔액은 내 계좌와 지금부터 기록하는 내용만 반영합니다: 새로운 수입과 지출은 선택한 주머니에 따라 바로 더해지거나 빠집니다. 내 san은 이제 블록별로 접히고, 홈 화면은 중요한 것만 보여주며, + 버튼 위의 돋보기로 어떤 기록이든 찾을 수 있습니다.', search_fab_aria: '기록 검색', search_hint: '입력하면 기록을 검색합니다',
   news_c37: '새로워진 위젯 — 브랜드 그라데이션, 예산에 따라 색이 바뀌는 진행 바, San 다음 차례 줄 — 그리고 오늘 쓸 수 있는 금액을 보여주는 아이콘 크기의 새 위젯. 공개 san 링크를 스크롤해도 브랜드가 계속 보입니다. 주최자 라운드는 아코디언으로 접히고, 이번 주 것만 열립니다.',
   widget_today: '오늘',
   widget_san_next: '다음 차례: {name} · {date}',
@@ -7221,8 +7240,8 @@ ru: {
   news_c38: 'Подкаст теперь загружает и воспроизводит выпуски.',
   news_c39: 'Подкаст теперь воспроизводит выпуски, а маленькие виджеты снова работают.',
   news_c40: 'Баланс твоих счетов теперь подписан честно, при создании PIN приложение предупреждает, что его нельзя восстановить (и есть аварийный выход, если забудешь), твоя дневная сумма расходов рождается в первый же день с кнопкой «Создать мой бюджет», а записать расход теперь можно в три касания.',
-  src_exp_label: 'Откуда ушло?', src_inc_label: 'Куда пришло?', src_available: 'Доступный остаток', src_savings: 'Сбережения', src_from_savings: 'из сбережений', src_to_savings: 'в сбережения', tile_available_help: 'Ваши счета плюс то, что вы записываете без счёта: обновляется само с каждым расходом и доходом.', pub_find_hint: 'Уже заплатили? Напишите своё имя, коснитесь своей строки, а затем «Я заплатил».', pub_find_ph: 'Напишите своё имя', pub_find_clear: 'Очистить', pub_find_none: 'Такого имени нет. Проверьте, как его написал организатор.', next_title: 'Ваш следующий шаг', next_step1_btn: 'Создайте свой бюджет', next_step2_btn: 'Запишите первый расход', next_step3_btn: 'Создайте счёт наличных', ob_mode_title: 'Как вы хотите видеть приложение?', ob_mode_essential: 'Только главное', ob_mode_essential_help: 'Только Главная, Расходы, Доходы, Сбережения и Мой сан. Остальное включается в Настройках, когда захотите.', ob_mode_all: 'Всё', ob_mode_all_help: 'Все 13 разделов полностью с первого дня.', ob_mode_btn: 'Продолжить', set_mode_essential_btn: 'Режим «Главное»', set_mode_all_btn: 'Показать всё', san_freq_label: 'Частота', san_start_label: 'Дата начала', san_period_semanal: 'Неделя', san_period_quincenal: 'Две недели', san_period_mensual: 'Месяц', san_period_line: '{p} {x} из {n}', san_collected_period: 'Собрано за этот период: {amount} из {target}', san_paid_title_period: 'Кто уже заплатил за этот период?', san_advance_period: 'Отметить период завершённым', san_finished_period: 'Все периоды завершены. Можно удалить этот сан и создать новый.', chal_ask: 'Хотите еженедельный челлендж?', key_san_period: '{p} {x} из {n} · Очередь: {name}', news_c41: 'Ваши счета теперь живые — записывая расход или доход, вы выбираете, откуда ушло или куда пришло (доступный остаток, сбережения или один из ваших счетов), и остатки движутся сами — в публичной ссылке сана теперь есть поиск по имени и сворачиваемые раунды — первый день ведётся шаг за шагом, с режимом «Главное» — личный сан теперь может быть раз в две недели или ежемесячным — а Сбережения стали одним аккуратным экраном с единственной формой цели.',
-  rem_arrived_label: 'Сколько в итоге дошло?', rem_arrived_help: 'Если знаете, введите — и курс рассчитается сам.', rem_rate_calc: 'Рассчитанный курс: {rate}', import_hint: 'Есть банковская выписка? Импортируйте её и начните со своих данных', import_cta_btn: 'Импорт банковской выписки', set_biz_label: 'У меня есть бизнес', set_biz_help: 'Когда включено, формы спрашивают, относится ли движение к вашему бизнесу, предлагаемое распределение включает часть «Бизнес», а Сводка показывает отчёт вашего бизнеса. Когда выключено, всё это скрывается; ваши данные не затрагиваются.', inc_split_line_nb: 'Сбережено: {sav} · Предложение: Расходы {exp} · Семья {fam}', inc_split_preview_nb: 'Предлагаемое распределение: Сбережения {sav} · Расходы {exp} · Семья {fam}. Сбережения, которые засчитываются, — те, что вы вводите ниже.', priv_title: 'Конфиденциальность: как мы бережём ваши данные', priv_text: 'Ваши данные живут на вашем телефоне. Облако необязательно и включается, только если вы создадите аккаунт. Мы никогда не продаём ваши данные.', priv_btn: 'Читать политику полностью', lock_note_cloud: 'Ваши данные синхронизируются с вашим аккаунтом.', org_link_zelle_warn: 'Любой, у кого есть ссылка, увидит имена, прогресс и Zelle того, кто получает в каждом раунде.', org_link_copy: 'Копировать ссылку', cloud_pass_hint: 'Минимум 6 символов', pass_show: 'Показать пароль', pass_hide: 'Скрыть пароль', pub_gone_help: 'Возможно, организатор удалил или изменил её.', news_c42: 'Ваши доступные деньги теперь движутся с каждым расходом и доходом, который вы записываете, из какого бы кармана он ни был. В переводах можно ввести, сколько дошло, и курс рассчитается сам. Приветствие стало короче, имя необязательно, «У меня есть бизнес» включается, только если вы им пользуетесь, а новости теперь написаны языком выгод.',
+  src_exp_label: 'Откуда ушло?', src_inc_label: 'Куда пришло?', src_available: 'Доступный остаток', src_savings: 'Сбережения', src_from_savings: 'из сбережений', src_to_savings: 'в сбережения', tile_available_help: 'Ваши счета плюс то, что вы с этого момента записываете как Доступный остаток: двигается само с каждым расходом и доходом.', pub_find_hint: 'Уже заплатили? Напишите своё имя, коснитесь своей строки, а затем «Я заплатил».', pub_find_ph: 'Напишите своё имя', pub_find_clear: 'Очистить', pub_find_none: 'Такого имени нет. Проверьте, как его написал организатор.', next_title: 'Ваш следующий шаг', next_step1_btn: 'Создайте свой бюджет', next_step2_btn: 'Запишите первый расход', next_step3_btn: 'Создайте счёт наличных', ob_mode_title: 'Как вы хотите видеть приложение?', ob_mode_essential: 'Только главное', ob_mode_essential_help: 'Только Главная, Расходы, Доходы, Сбережения и Мой сан. Остальное включается в Настройках, когда захотите.', ob_mode_all: 'Всё', ob_mode_all_help: 'Все 13 разделов полностью с первого дня.', ob_mode_btn: 'Продолжить', set_mode_essential_btn: 'Режим «Главное»', set_mode_all_btn: 'Показать всё', san_freq_label: 'Частота', san_start_label: 'Дата начала', san_period_semanal: 'Неделя', san_period_quincenal: 'Две недели', san_period_mensual: 'Месяц', san_period_line: '{p} {x} из {n}', san_collected_period: 'Собрано за этот период: {amount} из {target}', san_paid_title_period: 'Кто уже заплатил за этот период?', san_advance_period: 'Отметить период завершённым', san_finished_period: 'Все периоды завершены. Можно удалить этот сан и создать новый.', chal_ask: 'Хотите еженедельный челлендж?', key_san_period: '{p} {x} из {n} · Очередь: {name}', news_c41: 'Ваши счета теперь живые — записывая расход или доход, вы выбираете, откуда ушло или куда пришло (доступный остаток, сбережения или один из ваших счетов), и остатки движутся сами — в публичной ссылке сана теперь есть поиск по имени и сворачиваемые раунды — первый день ведётся шаг за шагом, с режимом «Главное» — личный сан теперь может быть раз в две недели или ежемесячным — а Сбережения стали одним аккуратным экраном с единственной формой цели.',
+  rem_arrived_label: 'Сколько в итоге дошло?', rem_arrived_help: 'Если знаете, введите — и курс рассчитается сам.', rem_rate_calc: 'Рассчитанный курс: {rate}', import_hint: 'Есть банковская выписка? Импортируйте её и начните со своих данных', import_cta_btn: 'Импорт банковской выписки', set_biz_label: 'У меня есть бизнес', set_biz_help: 'Когда включено, формы спрашивают, относится ли движение к вашему бизнесу, предлагаемое распределение включает часть «Бизнес», а Сводка показывает отчёт вашего бизнеса. Когда выключено, всё это скрывается; ваши данные не затрагиваются.', inc_split_line_nb: 'Сбережено: {sav} · Предложение: Расходы {exp} · Семья {fam}', inc_split_preview_nb: 'Предлагаемое распределение: Сбережения {sav} · Расходы {exp} · Семья {fam}. Сбережения, которые засчитываются, — те, что вы вводите ниже.', priv_title: 'Конфиденциальность: как мы бережём ваши данные', priv_text: 'Ваши данные живут на вашем телефоне. Облако необязательно и включается, только если вы создадите аккаунт. Мы никогда не продаём ваши данные.', priv_btn: 'Читать политику полностью', lock_note_cloud: 'Ваши данные синхронизируются с вашим аккаунтом.', org_link_zelle_warn: 'Любой, у кого есть ссылка, увидит имена, прогресс и Zelle того, кто получает в каждом раунде.', org_link_copy: 'Копировать ссылку', cloud_pass_hint: 'Минимум 6 символов', pass_show: 'Показать пароль', pass_hide: 'Скрыть пароль', pub_gone_help: 'Возможно, организатор удалил или изменил её.', news_c42: 'Ваши доступные деньги теперь движутся с каждым расходом и доходом, который вы записываете, из какого бы кармана он ни был. В переводах можно ввести, сколько дошло, и курс рассчитается сам. Приветствие стало короче, имя необязательно, «У меня есть бизнес» включается, только если вы им пользуетесь, а новости теперь написаны языком выгод.', news_c43: 'Ваш Доступный остаток теперь отражает только ваши счета и то, что вы записываете с этого момента: каждый новый доход и расход сразу прибавляется или вычитается, в выбранном вами кошельке. Мой сан теперь складывается по блокам, главная страница показывает только важное, а лупа над кнопкой + находит любую операцию.', search_fab_aria: 'Поиск операций', search_hint: 'Введите текст для поиска по операциям',
   news_c37: 'Обновлённые виджеты — градиент бренда, полоса прогресса, меняющая цвет в зависимости от бюджета, и строка следующего хода вашего san — плюс новый виджет размером со значок с суммой на сегодня. А в публичной ссылке san бренд остаётся на виду при прокрутке. Раунды организатора теперь складываются аккордеоном: открыт только раунд этой недели.',
   widget_today: 'сегодня',
   widget_san_next: 'Следующий ход: {name} · {date}',
@@ -7941,8 +7960,8 @@ hi: {
   news_c38: 'पॉडकास्ट अब अपने एपिसोड लोड करके चलाता है।',
   news_c39: 'पॉडकास्ट अब अपने एपिसोड चलाता है, और छोटे विजेट फिर से काम करते हैं।',
   news_c40: 'तुम्हारे खातों का बैलेंस अब ईमानदारी से लेबल होता है, PIN बनाते समय ऐप चेतावनी देता है कि उसे वापस नहीं पाया जा सकता (और अगर तुम भूल जाओ तो एक आपातकालीन रास्ता भी है), तुम्हारा रोज़ का खर्च नंबर पहले दिन से «मेरा बजट बनाओ» के साथ जन्म लेता है, और खर्च दर्ज करना अब सिर्फ़ तीन टैप में हो जाता है।',
-  src_exp_label: 'पैसा कहाँ से गया?', src_inc_label: 'पैसा कहाँ आया?', src_available: 'उपलब्ध शेष', src_savings: 'बचत', src_from_savings: 'बचत से', src_to_savings: 'बचत में', tile_available_help: 'आपके खाते और जो आप बिना खाते के लिखते हैं: हर खर्च और आय के साथ अपने आप अपडेट होता है।', pub_find_hint: 'पैसे दे दिए? अपना नाम लिखें, अपनी पंक्ति को छुएँ और फिर "मैंने दिया" दबाएँ।', pub_find_ph: 'अपना नाम लिखें', pub_find_clear: 'साफ़ करें', pub_find_none: 'यह नाम नहीं दिख रहा। आयोजक ने इसे कैसे लिखा है, यह जाँचें।', next_title: 'आपका अगला कदम', next_step1_btn: 'अपना बजट बनाएँ', next_step2_btn: 'अपना पहला खर्च लिखें', next_step3_btn: 'अपना नकद खाता बनाएँ', ob_mode_title: 'आप ऐप को कैसे देखना चाहते हैं?', ob_mode_essential: 'सिर्फ़ ज़रूरी', ob_mode_essential_help: 'सिर्फ़ होम, खर्च, आय, बचत और मेरा सान। बाकी सब सेटिंग्स में जब चाहें चालू कर सकते हैं।', ob_mode_all: 'सब कुछ', ob_mode_all_help: 'पहले दिन से पूरे 13 सेक्शन।', ob_mode_btn: 'आगे बढ़ें', set_mode_essential_btn: 'ज़रूरी मोड', set_mode_all_btn: 'सब दिखाएँ', san_freq_label: 'आवृत्ति', san_start_label: 'शुरू होने की तारीख', san_period_semanal: 'सप्ताह', san_period_quincenal: 'पखवाड़ा', san_period_mensual: 'महीना', san_period_line: '{p} {x} / {n}', san_collected_period: 'इस अवधि में जमा: {amount} / {target}', san_paid_title_period: 'इस अवधि में किसने दे दिया?', san_advance_period: 'अवधि पूरी चिह्नित करें', san_finished_period: 'सभी अवधियाँ पूरी हो गईं। आप इस सान को हटाकर नया बना सकते हैं।', chal_ask: 'साप्ताहिक चुनौती चाहिए?', key_san_period: '{p} {x} / {n} · बारी: {name}', news_c41: 'आपके खाते अब ज़िंदा हैं — खर्च या आय लिखते समय आप चुनते हैं कि पैसा कहाँ से गया या कहाँ आया (उपलब्ध शेष, बचत या आपका कोई खाता) और शेष अपने आप बदलते हैं — सान की सार्वजनिक लिंक में अब नाम खोज और मुड़ने वाले राउंड हैं — आपका पहला दिन कदम-दर-कदम मार्गदर्शन के साथ है, "ज़रूरी" मोड के साथ — निजी सान अब पखवाड़े या मासिक भी हो सकता है — और बचत अब एक ही लक्ष्य फ़ॉर्म वाली एक साफ़ स्क्रीन है।',
-  rem_arrived_label: 'कितना पहुँचा?', rem_arrived_help: 'अगर आपको पता है, तो लिखें और दर अपने आप निकल आएगी।', rem_rate_calc: 'निकली हुई दर: {rate}', import_hint: 'आपके पास बैंक स्टेटमेंट है? उसे आयात करें और अपने डेटा के साथ शुरू करें', import_cta_btn: 'बैंक स्टेटमेंट आयात करें', set_biz_label: 'मेरा एक व्यवसाय है', set_biz_help: 'इसके चालू रहने पर फ़ॉर्म पूछते हैं कि कोई लेन-देन आपके व्यवसाय का है या नहीं, सुझाए गए बँटवारे में व्यवसाय का हिस्सा शामिल होता है और सारांश में आपके व्यवसाय की रिपोर्ट दिखती है। बंद करने पर यह सब छिप जाता है; आपका डेटा नहीं छुआ जाता।', inc_split_line_nb: 'बचाया: {sav} · सुझाव: खर्च {exp} · परिवार {fam}', inc_split_preview_nb: 'सुझाया बँटवारा: बचत {sav} · खर्च {exp} · परिवार {fam}। जो बचत गिनी जाती है वह वही है जो आप नीचे लिखते हैं।', priv_title: 'गोपनीयता: हम आपके डेटा की देखभाल कैसे करते हैं', priv_text: 'आपका डेटा आपके फ़ोन में रहता है। क्लाउड वैकल्पिक है और केवल तब चालू होता है जब आप अपना खाता बनाते हैं। हम आपका डेटा कभी नहीं बेचते।', priv_btn: 'पूरी नीति पढ़ें', lock_note_cloud: 'आपका डेटा आपके खाते के साथ सिंक होता है।', org_link_zelle_warn: 'जिसके पास भी लिंक होगा, वह नाम, प्रगति और हर राउंड में पाने वाले का Zelle देखेगा।', org_link_copy: 'लिंक कॉपी करें', cloud_pass_hint: 'कम से कम 6 अक्षर', pass_show: 'पासवर्ड दिखाएँ', pass_hide: 'पासवर्ड छिपाएँ', pub_gone_help: 'हो सकता है कि आयोजक ने इसे हटा दिया हो या बदल दिया हो।', news_c42: 'आपके उपलब्ध पैसे अब आपके द्वारा लिखे गए हर खर्च और आय के साथ बदलते हैं, चाहे वे किसी भी जेब से हों। प्रेषण में आप लिख सकते हैं कि कितना पहुँचा और दर अपने आप निकल आएगी। स्वागत छोटा हो गया है और नाम वैकल्पिक है, "मेरा एक व्यवसाय है" केवल तभी चालू होता है जब आप उसे इस्तेमाल करें, और नया-क्या-है अब फ़ायदों की भाषा में लिखा जाता है।',
+  src_exp_label: 'पैसा कहाँ से गया?', src_inc_label: 'पैसा कहाँ आया?', src_available: 'उपलब्ध शेष', src_savings: 'बचत', src_from_savings: 'बचत से', src_to_savings: 'बचत में', tile_available_help: 'आपके खाते और जो आप अभी से उपलब्ध शेष के रूप में लिखते हैं: हर खर्च और आय के साथ अपने आप बदलता है।', pub_find_hint: 'पैसे दे दिए? अपना नाम लिखें, अपनी पंक्ति को छुएँ और फिर "मैंने दिया" दबाएँ।', pub_find_ph: 'अपना नाम लिखें', pub_find_clear: 'साफ़ करें', pub_find_none: 'यह नाम नहीं दिख रहा। आयोजक ने इसे कैसे लिखा है, यह जाँचें।', next_title: 'आपका अगला कदम', next_step1_btn: 'अपना बजट बनाएँ', next_step2_btn: 'अपना पहला खर्च लिखें', next_step3_btn: 'अपना नकद खाता बनाएँ', ob_mode_title: 'आप ऐप को कैसे देखना चाहते हैं?', ob_mode_essential: 'सिर्फ़ ज़रूरी', ob_mode_essential_help: 'सिर्फ़ होम, खर्च, आय, बचत और मेरा सान। बाकी सब सेटिंग्स में जब चाहें चालू कर सकते हैं।', ob_mode_all: 'सब कुछ', ob_mode_all_help: 'पहले दिन से पूरे 13 सेक्शन।', ob_mode_btn: 'आगे बढ़ें', set_mode_essential_btn: 'ज़रूरी मोड', set_mode_all_btn: 'सब दिखाएँ', san_freq_label: 'आवृत्ति', san_start_label: 'शुरू होने की तारीख', san_period_semanal: 'सप्ताह', san_period_quincenal: 'पखवाड़ा', san_period_mensual: 'महीना', san_period_line: '{p} {x} / {n}', san_collected_period: 'इस अवधि में जमा: {amount} / {target}', san_paid_title_period: 'इस अवधि में किसने दे दिया?', san_advance_period: 'अवधि पूरी चिह्नित करें', san_finished_period: 'सभी अवधियाँ पूरी हो गईं। आप इस सान को हटाकर नया बना सकते हैं।', chal_ask: 'साप्ताहिक चुनौती चाहिए?', key_san_period: '{p} {x} / {n} · बारी: {name}', news_c41: 'आपके खाते अब ज़िंदा हैं — खर्च या आय लिखते समय आप चुनते हैं कि पैसा कहाँ से गया या कहाँ आया (उपलब्ध शेष, बचत या आपका कोई खाता) और शेष अपने आप बदलते हैं — सान की सार्वजनिक लिंक में अब नाम खोज और मुड़ने वाले राउंड हैं — आपका पहला दिन कदम-दर-कदम मार्गदर्शन के साथ है, "ज़रूरी" मोड के साथ — निजी सान अब पखवाड़े या मासिक भी हो सकता है — और बचत अब एक ही लक्ष्य फ़ॉर्म वाली एक साफ़ स्क्रीन है।',
+  rem_arrived_label: 'कितना पहुँचा?', rem_arrived_help: 'अगर आपको पता है, तो लिखें और दर अपने आप निकल आएगी।', rem_rate_calc: 'निकली हुई दर: {rate}', import_hint: 'आपके पास बैंक स्टेटमेंट है? उसे आयात करें और अपने डेटा के साथ शुरू करें', import_cta_btn: 'बैंक स्टेटमेंट आयात करें', set_biz_label: 'मेरा एक व्यवसाय है', set_biz_help: 'इसके चालू रहने पर फ़ॉर्म पूछते हैं कि कोई लेन-देन आपके व्यवसाय का है या नहीं, सुझाए गए बँटवारे में व्यवसाय का हिस्सा शामिल होता है और सारांश में आपके व्यवसाय की रिपोर्ट दिखती है। बंद करने पर यह सब छिप जाता है; आपका डेटा नहीं छुआ जाता।', inc_split_line_nb: 'बचाया: {sav} · सुझाव: खर्च {exp} · परिवार {fam}', inc_split_preview_nb: 'सुझाया बँटवारा: बचत {sav} · खर्च {exp} · परिवार {fam}। जो बचत गिनी जाती है वह वही है जो आप नीचे लिखते हैं।', priv_title: 'गोपनीयता: हम आपके डेटा की देखभाल कैसे करते हैं', priv_text: 'आपका डेटा आपके फ़ोन में रहता है। क्लाउड वैकल्पिक है और केवल तब चालू होता है जब आप अपना खाता बनाते हैं। हम आपका डेटा कभी नहीं बेचते।', priv_btn: 'पूरी नीति पढ़ें', lock_note_cloud: 'आपका डेटा आपके खाते के साथ सिंक होता है।', org_link_zelle_warn: 'जिसके पास भी लिंक होगा, वह नाम, प्रगति और हर राउंड में पाने वाले का Zelle देखेगा।', org_link_copy: 'लिंक कॉपी करें', cloud_pass_hint: 'कम से कम 6 अक्षर', pass_show: 'पासवर्ड दिखाएँ', pass_hide: 'पासवर्ड छिपाएँ', pub_gone_help: 'हो सकता है कि आयोजक ने इसे हटा दिया हो या बदल दिया हो।', news_c42: 'आपके उपलब्ध पैसे अब आपके द्वारा लिखे गए हर खर्च और आय के साथ बदलते हैं, चाहे वे किसी भी जेब से हों। प्रेषण में आप लिख सकते हैं कि कितना पहुँचा और दर अपने आप निकल आएगी। स्वागत छोटा हो गया है और नाम वैकल्पिक है, "मेरा एक व्यवसाय है" केवल तभी चालू होता है जब आप उसे इस्तेमाल करें, और नया-क्या-है अब फ़ायदों की भाषा में लिखा जाता है।', news_c43: 'आपका उपलब्ध शेष अब केवल आपके खातों और अब से दर्ज की गई राशि को दर्शाता है: हर नई आय और खर्च, चुनी हुई जेब के अनुसार, तुरंत जुड़ता या घटता है। मेरा san अब ब्लॉकों में मुड़ता है, होम पेज केवल ज़रूरी चीज़ें दिखाता है और + बटन के ऊपर का आवर्धक किसी भी लेन-देन को खोज देता है।', search_fab_aria: 'लेन-देन खोजें', search_hint: 'अपने लेन-देन में खोजने के लिए लिखें',
   news_c37: 'नए रूप में विजेट — ब्रांड ग्रेडिएंट, आपके बजट के अनुसार रंग बदलने वाली प्रगति पट्टी और आपके San की अगली बारी की पंक्ति — साथ ही एक नया आइकन-आकार का विजेट, जिसमें आज आप कितना खर्च कर सकते हैं। और san के सार्वजनिक लिंक में स्क्रॉल करते समय ब्रांड हमेशा दिखता है। आयोजक के राउंड अब अकॉर्डियन में मुड़ते हैं: केवल इस सप्ताह वाला खुला रहता है।',
   widget_today: 'आज',
   widget_san_next: 'अगली बारी: {name} · {date}',
@@ -8661,8 +8680,8 @@ ar: {
   news_c38: 'البودكاست الآن يُحمّل حلقاته ويشغّلها.',
   news_c39: 'البودكاست الآن يُشغّل حلقاته، والأدوات الصغيرة عادت تعمل من جديد.',
   news_c40: 'رصيد حساباتك الآن مُسمّى بصدق، وعند إنشاء الرقم السري يُنبّهك التطبيق إلى أنه لا يمكن استعادته (وهناك مخرج طوارئ إذا نسيته)، ورقم إنفاقك اليومي يولد من اليوم الأول مع «إنشاء ميزانيتي»، وتسجيل مصروف أصبح الآن بثلاث لمسات فقط.',
-  src_exp_label: 'من أين خرج؟', src_inc_label: 'إلى أين دخل؟', src_available: 'الرصيد المتاح', src_savings: 'المدخرات', src_from_savings: 'من المدخرات', src_to_savings: 'إلى المدخرات', tile_available_help: 'حساباتك وما تسجله بدون حساب: يتحدث تلقائيًا مع كل مصروف ودخل.', pub_find_hint: 'دفعت بالفعل؟ اكتب اسمك، المس صفك، ثم اضغط «دفعت».', pub_find_ph: 'اكتب اسمك', pub_find_clear: 'مسح', pub_find_none: 'هذا الاسم غير ظاهر. تحقق من كيفية كتابة المنظم له.', next_title: 'خطوتك التالية', next_step1_btn: 'أنشئ ميزانيتك', next_step2_btn: 'سجل أول مصروف', next_step3_btn: 'أنشئ حساب النقد', ob_mode_title: 'كيف تريد أن ترى تطبيقك؟', ob_mode_essential: 'الأساسيات', ob_mode_essential_help: 'فقط الرئيسية والمصروفات والدخل والمدخرات وسان الخاص بي. والباقي تشغله متى شئت من الإعدادات.', ob_mode_all: 'الكل', ob_mode_all_help: 'الأقسام الـ13 كاملة من أول يوم.', ob_mode_btn: 'متابعة', set_mode_essential_btn: 'وضع الأساسيات', set_mode_all_btn: 'إظهار الكل', san_freq_label: 'التكرار', san_start_label: 'تاريخ البدء', san_period_semanal: 'أسبوع', san_period_quincenal: 'أسبوعان', san_period_mensual: 'شهر', san_period_line: '{p} {x} من {n}', san_collected_period: 'جُمع في هذه الفترة: {amount} من {target}', san_paid_title_period: 'من دفع في هذه الفترة؟', san_advance_period: 'تعليم الفترة كمكتملة', san_finished_period: 'اكتملت كل الفترات. يمكنك حذف هذا السان وإنشاء جديد.', chal_ask: 'تريد تحديًا أسبوعيًا؟', key_san_period: '{p} {x} من {n} · الدور على {name}', news_c41: 'حساباتك صارت حية الآن — عند تسجيل مصروف أو دخل تختار من أين خرج أو إلى أين دخل (الرصيد المتاح أو المدخرات أو أحد حساباتك) وتتحرك الأرصدة وحدها — رابط السان العام صار فيه بحث بالاسم وجولات قابلة للطي — يومك الأول موجه خطوة بخطوة مع وضع «الأساسيات» — السان الشخصي صار يمكن أن يكون كل أسبوعين أو شهريًا — والمدخرات صارت شاشة واحدة مرتبة بنموذج هدف واحد فقط.',
-  rem_arrived_label: 'كم وصل؟', rem_arrived_help: 'إذا كنت تعرفه، اكتبه وسيُحسب السعر تلقائيًا.', rem_rate_calc: 'السعر المحسوب: {rate}', import_hint: 'عندك كشف حسابك؟ استورده وابدأ ببياناتك', import_cta_btn: 'استيراد كشف الحساب', set_biz_label: 'عندي نشاط تجاري', set_biz_help: 'عند تشغيل هذا، تسألك النماذج ما إذا كانت الحركة لنشاطك التجاري، ويشمل التوزيع المقترح جزء النشاط التجاري، ويعرض الملخص تقرير نشاطك. عند إيقافه يختفي كل ذلك؛ بياناتك لا تُمس.', inc_split_line_nb: 'المُدّخر: {sav} · الاقتراح: المصروفات {exp} · العائلة {fam}', inc_split_preview_nb: 'التقسيم المقترح: المدّخرات {sav} · المصروفات {exp} · العائلة {fam}. المدّخرات التي تُحسَب هي التي تكتبها أدناه.', priv_title: 'الخصوصية: كيف نعتني ببياناتك', priv_text: 'بياناتك تعيش في هاتفك. السحابة اختيارية ولا تعمل إلا إذا أنشأت حسابك. نحن لا نبيع بياناتك أبدًا.', priv_btn: 'قراءة السياسة الكاملة', lock_note_cloud: 'تتزامن بياناتك مع حسابك.', org_link_zelle_warn: 'من لديه الرابط سيرى الأسماء والتقدم وZelle الخاص بمن يستلم في كل جولة.', org_link_copy: 'نسخ الرابط', cloud_pass_hint: '6 أحرف على الأقل', pass_show: 'إظهار كلمة المرور', pass_hide: 'إخفاء كلمة المرور', pub_gone_help: 'ربما حذفه المنظم أو غيّره.', news_c42: 'أموالك المتاحة تتحرك الآن مع كل مصروف ودخل تسجله، من أي جيب خرج. في الحوالات يمكنك كتابة كم وصل وسيُحسب السعر تلقائيًا. صارت الترحيبة أقصر والاسم اختياريًا، و«عندي نشاط تجاري» لا يعمل إلا إذا استخدمته، و«ما الجديد» يُقرأ الآن بلغة الفوائد.',
+  src_exp_label: 'من أين خرج؟', src_inc_label: 'إلى أين دخل؟', src_available: 'الرصيد المتاح', src_savings: 'المدخرات', src_from_savings: 'من المدخرات', src_to_savings: 'إلى المدخرات', tile_available_help: 'حساباتك وما تسجله من الآن كرصيد متاح: يتحرك وحده مع كل مصروف ودخل.', pub_find_hint: 'دفعت بالفعل؟ اكتب اسمك، المس صفك، ثم اضغط «دفعت».', pub_find_ph: 'اكتب اسمك', pub_find_clear: 'مسح', pub_find_none: 'هذا الاسم غير ظاهر. تحقق من كيفية كتابة المنظم له.', next_title: 'خطوتك التالية', next_step1_btn: 'أنشئ ميزانيتك', next_step2_btn: 'سجل أول مصروف', next_step3_btn: 'أنشئ حساب النقد', ob_mode_title: 'كيف تريد أن ترى تطبيقك؟', ob_mode_essential: 'الأساسيات', ob_mode_essential_help: 'فقط الرئيسية والمصروفات والدخل والمدخرات وسان الخاص بي. والباقي تشغله متى شئت من الإعدادات.', ob_mode_all: 'الكل', ob_mode_all_help: 'الأقسام الـ13 كاملة من أول يوم.', ob_mode_btn: 'متابعة', set_mode_essential_btn: 'وضع الأساسيات', set_mode_all_btn: 'إظهار الكل', san_freq_label: 'التكرار', san_start_label: 'تاريخ البدء', san_period_semanal: 'أسبوع', san_period_quincenal: 'أسبوعان', san_period_mensual: 'شهر', san_period_line: '{p} {x} من {n}', san_collected_period: 'جُمع في هذه الفترة: {amount} من {target}', san_paid_title_period: 'من دفع في هذه الفترة؟', san_advance_period: 'تعليم الفترة كمكتملة', san_finished_period: 'اكتملت كل الفترات. يمكنك حذف هذا السان وإنشاء جديد.', chal_ask: 'تريد تحديًا أسبوعيًا؟', key_san_period: '{p} {x} من {n} · الدور على {name}', news_c41: 'حساباتك صارت حية الآن — عند تسجيل مصروف أو دخل تختار من أين خرج أو إلى أين دخل (الرصيد المتاح أو المدخرات أو أحد حساباتك) وتتحرك الأرصدة وحدها — رابط السان العام صار فيه بحث بالاسم وجولات قابلة للطي — يومك الأول موجه خطوة بخطوة مع وضع «الأساسيات» — السان الشخصي صار يمكن أن يكون كل أسبوعين أو شهريًا — والمدخرات صارت شاشة واحدة مرتبة بنموذج هدف واحد فقط.',
+  rem_arrived_label: 'كم وصل؟', rem_arrived_help: 'إذا كنت تعرفه، اكتبه وسيُحسب السعر تلقائيًا.', rem_rate_calc: 'السعر المحسوب: {rate}', import_hint: 'عندك كشف حسابك؟ استورده وابدأ ببياناتك', import_cta_btn: 'استيراد كشف الحساب', set_biz_label: 'عندي نشاط تجاري', set_biz_help: 'عند تشغيل هذا، تسألك النماذج ما إذا كانت الحركة لنشاطك التجاري، ويشمل التوزيع المقترح جزء النشاط التجاري، ويعرض الملخص تقرير نشاطك. عند إيقافه يختفي كل ذلك؛ بياناتك لا تُمس.', inc_split_line_nb: 'المُدّخر: {sav} · الاقتراح: المصروفات {exp} · العائلة {fam}', inc_split_preview_nb: 'التقسيم المقترح: المدّخرات {sav} · المصروفات {exp} · العائلة {fam}. المدّخرات التي تُحسَب هي التي تكتبها أدناه.', priv_title: 'الخصوصية: كيف نعتني ببياناتك', priv_text: 'بياناتك تعيش في هاتفك. السحابة اختيارية ولا تعمل إلا إذا أنشأت حسابك. نحن لا نبيع بياناتك أبدًا.', priv_btn: 'قراءة السياسة الكاملة', lock_note_cloud: 'تتزامن بياناتك مع حسابك.', org_link_zelle_warn: 'من لديه الرابط سيرى الأسماء والتقدم وZelle الخاص بمن يستلم في كل جولة.', org_link_copy: 'نسخ الرابط', cloud_pass_hint: '6 أحرف على الأقل', pass_show: 'إظهار كلمة المرور', pass_hide: 'إخفاء كلمة المرور', pub_gone_help: 'ربما حذفه المنظم أو غيّره.', news_c42: 'أموالك المتاحة تتحرك الآن مع كل مصروف ودخل تسجله، من أي جيب خرج. في الحوالات يمكنك كتابة كم وصل وسيُحسب السعر تلقائيًا. صارت الترحيبة أقصر والاسم اختياريًا، و«عندي نشاط تجاري» لا يعمل إلا إذا استخدمته، و«ما الجديد» يُقرأ الآن بلغة الفوائد.', news_c43: 'رصيدك المتاح الآن يعكس فقط حساباتك وما تسجله من الآن: كل دخل ومصروف جديد يُضاف أو يُخصم فورًا، في الجيب الذي تختاره. السان الخاص بي الآن ينطوي على شكل كتل، والصفحة الرئيسية تعرض فقط المهم، والعدسة المكبرة فوق زر + تبحث عن أي حركة.', search_fab_aria: 'بحث الحركات', search_hint: 'اكتب للبحث في حركاتك',
   news_c37: 'ويدجت بمظهر جديد — تدرّج العلامة، شريط تقدّم يتغيّر لونه حسب ميزانيتك وسطر الدور التالي في San الخاص بك — وويدجت جديد بحجم أيقونة يعرض ما يمكنك إنفاقه اليوم. وتبقى العلامة ظاهرة أثناء التمرير في رابط san العام. وجولات المنظّم الآن تُطوى كالأكورديون: جولة هذا الأسبوع فقط مفتوحة.',
   widget_today: 'اليوم',
   widget_san_next: 'الدور التالي: {name} · {date}',
@@ -8861,6 +8880,7 @@ function showView(name) {
 function drawerItem(id, icon, nameKey, keyText) {
   const item = el('button', 'menu-item' + (currentView === id ? ' active' : ''));
   item.type = 'button';
+  item.setAttribute('data-section', id);
   item.appendChild(el('span', 'menu-icon', icon));
   const text = el('span', 'menu-text');
   text.appendChild(el('span', 'menu-name', t(nameKey)));
@@ -9044,25 +9064,47 @@ function effectiveSavingsOfIncome(item) {
    cuenta y sin Ahorros) mueve ESTE número. El mostrado en Inicio =
    Σ saldos mostrados de cuentas + flujo del mes de los movimientos
    con fuente «disponible» (ingresos +, gastos −). Sin cuentas, el
-   primer término es 0. Los movimientos anteriores a la 41 no traen
-   fuente: el saneamiento los deja con accountId null y sin marca de
-   Ahorros, así que cuentan como «disponible» — lo que la 41 ya
-   asumía para su cálculo sin cuentas. Consecuencia deliberada: un
-   gasto «de Ahorros» ya NO baja también el disponible (en la 41 sin
-   cuentas sí lo bajaba, porque el disponible era ingresos − gastos
-   totales) y un ingreso «a Ahorros» tampoco lo sube: cada bolsillo
-   es exclusivo, con cuentas y sin cuentas. La tarjeta «¿Cuánto
-   puedes gastar hoy?» (dailySpendInfo) NO usa este número: su
-   matemática queda intacta. */
+   primer término es 0. Consecuencia deliberada: un gasto «de
+   Ahorros» ya NO baja también el disponible y un ingreso «a
+   Ahorros» tampoco lo sube: cada bolsillo es exclusivo, con
+   cuentas y sin cuentas. La tarjeta «¿Cuánto puedes gastar hoy?»
+   (dailySpendInfo) NO usa este número: su matemática queda intacta.
+
+   Compilación 43 (reporte del dueño probando la 42: «no se
+   organiza cuando agrego ingresos»): la 42 contaba en el flujo
+   «disponible» TAMBIÉN lo anterior a la 42, que nunca trajo fuente
+   elegida — para quien tiene cuentas y movimientos viejos, la
+   tarjeta dejó de ser «sus cuentas» y pasó a mostrar las cuentas
+   MÁS todo el flujo viejo sin clasificar. Regla nueva: desde la
+   43 los formularios guardan la fuente EXPLÍCITA en el movimiento
+   (src: 'avail' | 'savings' | 'account'). CON cuentas, el flujo
+   del mes suma SOLO movimientos con src registrado: los 'avail'
+   (+ ingresos / − gastos); 'savings' y 'account' viven en su
+   bolsillo, y lo SIN src (todo lo anterior a la 43) ya NO entra:
+   la tarjeta vuelve a ser «Σ saldos de cuentas + lo que el usuario
+   clasifica desde ahora». Al EDITAR un movimiento viejo, el
+   formulario lo guarda ya con su src, y la tarjeta responde.
+   SIN cuentas la fórmula NO cambia (flujo del mes de todo lo que
+   no es de Ahorros, con o sin src): quien no tiene cuentas no
+   pierde su número al actualizar. */
 function availableMoney(key) {
   const liveIds = new Set((db.accounts || []).map((a) => a.id));
+  const hasAccounts = liveIds.size > 0;
   let total = (db.accounts || []).reduce((t, a) => t + accountShownBalance(a), 0);
   for (const i of monthIncomes(key)) {
+    if (hasAccounts) {
+      if (i.src === 'avail') total += i.amountCents;
+      continue;
+    }
     if (i.toSavings) continue;
     if (i.accountId && liveIds.has(i.accountId)) continue;
     total += i.amountCents;
   }
   for (const e of monthExpenses(key)) {
+    if (hasAccounts) {
+      if (e.src === 'avail') total -= e.amountCents;
+      continue;
+    }
     if (e.fromSavings) continue;
     if (e.accountId && liveIds.has(e.accountId)) continue;
     total -= e.amountCents;
@@ -9553,61 +9595,32 @@ function renderHome() {
   renderBanners();
   renderSpendToday();
   renderStreak();
-  renderInsights();
   document.getElementById('greeting').textContent =
     db.settings.name ? t('greeting') + ', ' + db.settings.name : t('greeting');
   document.getElementById('btn-lock-now').hidden = !db.settings.pinHash;
 
-  const menu = document.getElementById('menu-list');
-  clearNode(menu);
-  /* Compilación 32 (pedido de Sterlin): el san va PRIMERO en la lista
-     de secciones de Inicio, destacado sobre los grupos — quedaba al
-     final, dentro de «Cuentas y compromisos», y había que bajar mucho
-     para encontrarlo. El orden de la lista no se guarda en los datos
-     (sale de SECTION_DEFS al dibujar), así que las instalaciones
-     existentes reciben el cambio sin migración de datos y sin
-     duplicar la entrada: el san se dibuja una sola vez, aquí, y se
-     salta en su grupo. La visibilidad guardada sí manda: con la
-     sección apagada en Ajustes no aparece ni primero ni en el grupo. */
-  const sanDef = SECTION_DEFS.find((d) => d.id === 'san');
-  if (sanDef && db.settings.sections.san !== false) {
-    const firstGroup = el('div', 'menu-group');
-    firstGroup.appendChild(homeMenuItem(sanDef));
-    menu.appendChild(firstGroup);
-  }
-  const groups = [];
-  for (const def of SECTION_DEFS) {
-    if (def.id === 'san') continue;
-    if (db.settings.sections[def.id] === false) continue;
-    if (!groups.includes(def.group)) groups.push(def.group);
-  }
-  for (const group of groups) {
-    const wrap = el('div');
-    wrap.appendChild(el('p', 'menu-group-title', t('group_' + group)));
-    const list = el('div', 'menu-group');
-    for (const def of SECTION_DEFS) {
-      if (def.id === 'san') continue;
-      if (def.group !== group || db.settings.sections[def.id] === false) continue;
-      list.appendChild(homeMenuItem(def));
+  /* Compilación 43 (Bloque H · pedido de Sterlin): Inicio queda SOLO
+     con lo esencial — tarjetas de resumen, Ingresos/Gastos del mes,
+     «¿Cuánto puedes gastar hoy?», la racha y las tarjetas
+     contextuales (siguiente paso e importar). La lista «¿Qué quieres
+     ver?» SALE de Inicio: cada acceso vive ya en el menú ☰
+     (renderDrawer recorre los mismos SECTION_DEFS + Inicio/Ajustes).
+     Única excepción, pedida aparte por el dueño: el acceso al Podcast
+     SE QUEDA en Inicio, como fila única bajo su propio contenedor,
+     y respeta su interruptor de «Secciones visibles». Las «Ideas de
+     tu dinero» se mudan a la parte superior de Resumen
+     (renderInsights se llama desde renderResumen). */
+  const podWrap = document.getElementById('home-podcast');
+  if (podWrap) {
+    clearNode(podWrap);
+    const podDef = SECTION_DEFS.find((d) => d.id === 'podcast');
+    if (podDef && db.settings.sections.podcast !== false) {
+      podWrap.appendChild(homeMenuItem(podDef));
+      podWrap.hidden = false;
+    } else {
+      podWrap.hidden = true;
     }
-    wrap.appendChild(list);
-    menu.appendChild(wrap);
   }
-  const adjWrap = el('div');
-  adjWrap.appendChild(el('p', 'menu-group-title', t('group_yourapp')));
-  const adjList = el('div', 'menu-group');
-  const adj = el('button', 'menu-item');
-  adj.type = 'button';
-  adj.appendChild(el('span', 'menu-icon', '⚙️'));
-  const adjText = el('span', 'menu-text');
-  adjText.appendChild(el('span', 'menu-name', t('sec_ajustes')));
-  adjText.appendChild(el('span', 'menu-key', t('key_settings')));
-  adj.appendChild(adjText);
-  adj.appendChild(el('span', 'menu-arrow', '›'));
-  adj.addEventListener('click', () => showView('ajustes'));
-  adjList.appendChild(adj);
-  adjWrap.appendChild(adjList);
-  menu.appendChild(adjWrap);
 }
 
 /* ---------------- GASTOS ---------------- */
@@ -9642,16 +9655,29 @@ function fillSourceSelect(selId, kind) {
 function readSource(selId) {
   const sel = document.getElementById(selId);
   const v = sel ? sel.value : '';
-  if (v === 'ahorros') return { accountId: null, savings: true, mem: 'ahorros' };
-  if (v && db.accounts.some((a) => a.id === v)) return { accountId: v, savings: false, mem: v };
-  return { accountId: null, savings: false, mem: '' };
+  /* Compilación 43: además de los campos derivados de la 41, la
+     fuente queda como valor explícito (src) que el formulario
+     estampa en el movimiento al guardar. */
+  if (v === 'ahorros') return { accountId: null, savings: true, mem: 'ahorros', src: 'savings' };
+  if (v && db.accounts.some((a) => a.id === v)) return { accountId: v, savings: false, mem: v, src: 'account' };
+  return { accountId: null, savings: false, mem: '', src: 'avail' };
+}
+/* La fuente efectiva de un movimiento ya guardado: la explícita
+   (src, desde la 43) manda; en lo viejo se deriva de los campos de
+   la 41 (marca de Ahorros o cuenta enlazada); si no hay nada, es
+   «disponible». La usa el selector al editar y el botón repetir. */
+function movementSrc(item, isIncome) {
+  if (item.src === 'avail' || item.src === 'savings' || item.src === 'account') return item.src;
+  if (isIncome ? item.toSavings : item.fromSavings) return 'savings';
+  if (item.accountId) return 'account';
+  return 'avail';
 }
 function setSourceSelect(selId, item, isIncome) {
   fillSourceSelect(selId, isIncome ? 'inc' : 'exp');
   const sel = document.getElementById(selId);
   if (!sel) return;
-  const savFlag = isIncome ? item.toSavings : item.fromSavings;
-  sel.value = savFlag ? 'ahorros' : (item.accountId || '');
+  const src = movementSrc(item, isIncome);
+  sel.value = src === 'savings' ? 'ahorros' : (src === 'account' ? (item.accountId || '') : '');
 }
 /* La fuente del movimiento en letra pequeña (lista de movimientos):
    «de Ahorros» / «a Ahorros» o el nombre de la cuenta. */
@@ -9692,6 +9718,26 @@ function resetExpenseForm() {
   document.getElementById('exp-more').checked = false;
   document.getElementById('exp-more-box').hidden = true;
 }
+/* Abre un gasto en su formulario de edición. Lo usan el botón Editar
+   de la lista de Gastos y, desde la Compilación 43 (Bloque I), los
+   resultados de Buscar: tocar un resultado abre ESE movimiento. */
+function openExpenseEdit(item) {
+  document.getElementById('exp-id').value = item.id;
+  document.getElementById('exp-amount').value = (item.amountCents / 100).toFixed(2);
+  fillCategorySelect();
+  document.getElementById('exp-category').value = item.category;
+  setSourceSelect('exp-source', item, false);
+  document.getElementById('exp-date').value = item.date;
+  document.getElementById('exp-note').value = item.note;
+  document.getElementById('exp-biz').checked = item.biz === true;
+  setExpensePhoto(item.photo || null);
+  const expHasDetails = !!(item.note || item.biz === true || item.photo);
+  document.getElementById('exp-more').checked = expHasDetails;
+  document.getElementById('exp-more-box').hidden = !expHasDetails;
+  document.getElementById('expense-form-title').textContent = t('exp_edit');
+  document.getElementById('exp-cancel-edit').hidden = false;
+  window.scrollTo(0, 0);
+}
 function renderExpenses() {
   document.getElementById('expense-form-title').textContent =
     document.getElementById('exp-id').value ? t('exp_edit') : t('exp_new');
@@ -9726,26 +9772,10 @@ function renderExpenses() {
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
       beginUndo();
-      db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null, accountId: item.accountId || null, fromSavings: item.fromSavings === true });
+      db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null, accountId: item.accountId || null, fromSavings: item.fromSavings === true, src: movementSrc(item, false) });
       save(); renderExpenses(); showUndoToast();
     }));
-    acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
-      document.getElementById('exp-id').value = item.id;
-      document.getElementById('exp-amount').value = (item.amountCents / 100).toFixed(2);
-      fillCategorySelect();
-      document.getElementById('exp-category').value = item.category;
-      setSourceSelect('exp-source', item, false);
-      document.getElementById('exp-date').value = item.date;
-      document.getElementById('exp-note').value = item.note;
-      document.getElementById('exp-biz').checked = item.biz === true;
-      setExpensePhoto(item.photo || null);
-      const expHasDetails = !!(item.note || item.biz === true || item.photo);
-      document.getElementById('exp-more').checked = expHasDetails;
-      document.getElementById('exp-more-box').hidden = !expHasDetails;
-      document.getElementById('expense-form-title').textContent = t('exp_edit');
-      document.getElementById('exp-cancel-edit').hidden = false;
-      window.scrollTo(0, 0);
-    }));
+    acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => openExpenseEdit(item)));
     acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
       if (!window.confirm(t('exp_delete_confirm', { amount: fmt(item.amountCents), cat: catName(item.category), date: prettyDate(item.date) }))) return;
       beginUndo();
@@ -9776,9 +9806,9 @@ function onExpenseSubmit(ev) {
   let savedItem = null;
   if (id) {
     const found = db.expenses.find((x) => x.id === id);
-    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; savedItem = found; }
+    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; savedItem = found; }
   } else {
-    savedItem = { id: uid(), amountCents: cents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings };
+    savedItem = { id: uid(), amountCents: cents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings, src: expSrc.src };
     db.expenses.push(savedItem);
   }
   expMonth = monthKeyOf(date);
@@ -9829,6 +9859,26 @@ function resetIncomeForm() {
   document.getElementById('inc-more').checked = false;
   document.getElementById('inc-more-box').hidden = true;
 }
+/* Abre un ingreso en su formulario de edición. Lo usan el botón
+   Editar de la lista de Ingresos y, desde la Compilación 43
+   (Bloque I), los resultados de Buscar. */
+function openIncomeEdit(item) {
+  document.getElementById('inc-id').value = item.id;
+  document.getElementById('inc-amount').value = (item.amountCents / 100).toFixed(2);
+  setSourceSelect('inc-source', item, true);
+  document.getElementById('inc-date').value = item.date;
+  document.getElementById('inc-note').value = item.note;
+  document.getElementById('inc-biz').checked = item.biz === true;
+  const incHasDetails = !!(item.note || item.biz === true);
+  document.getElementById('inc-more').checked = incHasDetails;
+  document.getElementById('inc-more-box').hidden = !incHasDetails;
+  incSavingsTouched = true;
+  document.getElementById('inc-savings').value = ((item.savingsCents || 0) / 100).toFixed(2);
+  document.getElementById('income-form-title').textContent = t('inc_edit');
+  document.getElementById('inc-cancel-edit').hidden = false;
+  updateSplitPreview();
+  window.scrollTo(0, 0);
+}
 function renderIncomes() {
   document.getElementById('income-form-title').textContent =
     document.getElementById('inc-id').value ? t('inc_edit') : t('inc_new');
@@ -9849,26 +9899,10 @@ function renderIncomes() {
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
       beginUndo();
-      db.incomes.push({ id: uid(), amountCents: item.amountCents, savingsCents: item.savingsCents || 0, date: todayStr(), note: item.note, accountId: item.accountId || null, toSavings: item.toSavings === true });
+      db.incomes.push({ id: uid(), amountCents: item.amountCents, savingsCents: item.savingsCents || 0, date: todayStr(), note: item.note, accountId: item.accountId || null, toSavings: item.toSavings === true, src: movementSrc(item, true) });
       save(); renderIncomes(); showUndoToast();
     }));
-    acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
-      document.getElementById('inc-id').value = item.id;
-      document.getElementById('inc-amount').value = (item.amountCents / 100).toFixed(2);
-      setSourceSelect('inc-source', item, true);
-      document.getElementById('inc-date').value = item.date;
-      document.getElementById('inc-note').value = item.note;
-      document.getElementById('inc-biz').checked = item.biz === true;
-      const incHasDetails = !!(item.note || item.biz === true);
-      document.getElementById('inc-more').checked = incHasDetails;
-      document.getElementById('inc-more-box').hidden = !incHasDetails;
-      incSavingsTouched = true;
-      document.getElementById('inc-savings').value = ((item.savingsCents || 0) / 100).toFixed(2);
-      document.getElementById('income-form-title').textContent = t('inc_edit');
-      document.getElementById('inc-cancel-edit').hidden = false;
-      updateSplitPreview();
-      window.scrollTo(0, 0);
-    }));
+    acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => openIncomeEdit(item)));
     acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
       if (!window.confirm(t('inc_delete_confirm', { amount: fmt(item.amountCents), date: prettyDate(item.date), savings: fmt(item.savingsCents || 0) }))) return;
       beginUndo();
@@ -9933,9 +9967,9 @@ function onIncomeSubmit(ev) {
   beginUndo();
   if (id) {
     const found = db.incomes.find((x) => x.id === id);
-    if (found) { found.amountCents = cents; found.savingsCents = savingsCents; found.date = date; found.note = note; found.biz = document.getElementById('inc-biz').checked === true; found.accountId = incSrc.accountId; found.toSavings = incSrc.savings; }
+    if (found) { found.amountCents = cents; found.savingsCents = savingsCents; found.date = date; found.note = note; found.biz = document.getElementById('inc-biz').checked === true; found.accountId = incSrc.accountId; found.toSavings = incSrc.savings; found.src = incSrc.src; }
   } else {
-    db.incomes.push({ id: uid(), amountCents: cents, savingsCents, date, note, biz: document.getElementById('inc-biz').checked === true, accountId: incSrc.accountId, toSavings: incSrc.savings });
+    db.incomes.push({ id: uid(), amountCents: cents, savingsCents, date, note, biz: document.getElementById('inc-biz').checked === true, accountId: incSrc.accountId, toSavings: incSrc.savings, src: incSrc.src });
   }
   save(); resetIncomeForm(); renderIncomes(); showUndoToast();
 }
@@ -10209,6 +10243,7 @@ function chartBarRow(label, amountText, pct) {
   return row;
 }
 function renderResumen() {
+  renderInsights();
   document.getElementById('res-month-label').textContent = monthLabel(chartMonth);
   document.getElementById('res-next').disabled = chartMonth >= currentMonthKey();
   const key = chartMonth;
@@ -10721,10 +10756,51 @@ function sanProgressText(s) {
     p: t('san_period_' + sanFreq(s)), x: s.currentWeek + 1, n: s.participants.length
   });
 }
+/* Compilación 43 (Bloque G · pedido del dueño con captura de Mi
+   san): cada bloque con título de la vista es un acordeón — tocar
+   la cabecera lo expande o lo retrae. El estado vive en
+   settings.sanAcc (persistido como las demás preferencias de
+   interfaz): null = el usuario no lo ha tocado y manda la regla
+   por defecto (crear abierto SOLO si no tiene san personal, el
+   san activo abierto, el organizador cerrado); true/false = lo
+   que el usuario dejó, y amanece igual. Por dentro nada cambia:
+   formularios, rondas y flujos funcionan idéntico. */
+function sanAccOpen(key) {
+  const acc = (db && db.settings && db.settings.sanAcc) || {};
+  if (acc[key] === true) return true;
+  if (acc[key] === false) return false;
+  if (key === 'create') return !db.san;
+  if (key === 'active') return true;
+  return false;
+}
+function applySanAcc() {
+  const blocks = [
+    ['create', 'san-acc-create-head', 'san-acc-create-body'],
+    ['active', 'san-acc-active-head', 'san-acc-active-body'],
+    ['org', 'san-acc-org-head', 'san-acc-org-body']
+  ];
+  for (const [key, headId, bodyId] of blocks) {
+    const head = document.getElementById(headId);
+    const body = document.getElementById(bodyId);
+    if (!head || !body) continue;
+    const open = sanAccOpen(key);
+    body.hidden = !open;
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const ch = head.querySelector('.org-round-chevron');
+    if (ch) ch.textContent = open ? '▾' : '▸';
+  }
+}
+function toggleSanAcc(key) {
+  if (!db.settings.sanAcc) db.settings.sanAcc = { create: null, active: null, org: null };
+  db.settings.sanAcc[key] = !sanAccOpen(key);
+  save();
+  applySanAcc();
+}
 function renderSan() {
   const has = !!db.san;
   document.getElementById('san-create-wrap').hidden = has;
   document.getElementById('san-active-wrap').hidden = !has;
+  applySanAcc();
   if (!has) {
     const ul = document.getElementById('san-draft-list');
     clearNode(ul);
@@ -11232,6 +11308,7 @@ function renderSanOrg() {
   const pro = isPro();
   locked.hidden = pro;
   main.hidden = !pro;
+  applySanAcc();
   if (!pro) return;
   const has = !!db.sanOrg;
   document.getElementById('org-create-wrap').hidden = has;
@@ -13617,7 +13694,9 @@ function onRemittanceSubmit(ev) {
 
 /* --- Ideas automáticas (Inicio) --- */
 function renderInsights() {
-  const box = document.getElementById('home-insights');
+  /* Compilación 43 (Bloque H): las «Ideas de tu dinero» viven ahora
+     arriba en Resumen, no en Inicio. */
+  const box = document.getElementById('resumen-insights');
   if (!box) return;
   clearNode(box);
   const lines = [];
@@ -14682,7 +14761,7 @@ function searchMovements(query, monthKey, type) {
     for (const e of db.expenses) {
       if (monthKey && monthKeyOf(e.date) !== monthKey) continue;
       if (matches(e.note + ' ' + e.category + ' ' + catName(e.category), e.amountCents)) {
-        out.push({ type: 'gastos', date: e.date, title: catName(e.category), sub: e.note, amountCents: e.amountCents });
+        out.push({ type: 'gastos', id: e.id, date: e.date, title: catName(e.category), sub: e.note, amountCents: e.amountCents, tag: movementSourceTag(e, false) });
       }
     }
   }
@@ -14690,7 +14769,7 @@ function searchMovements(query, monthKey, type) {
     for (const i of db.incomes) {
       if (monthKey && monthKeyOf(i.date) !== monthKey) continue;
       if (matches(i.note + ' ' + t('search_type_income'), i.amountCents)) {
-        out.push({ type: 'ingresos', date: i.date, title: t('search_type_income'), sub: i.note, amountCents: i.amountCents });
+        out.push({ type: 'ingresos', id: i.id, date: i.date, title: t('search_type_income'), sub: i.note, amountCents: i.amountCents, tag: movementSourceTag(i, true) });
       }
     }
   }
@@ -14719,15 +14798,39 @@ function renderSearch() {
   const results = searchMovements(q, month, type);
   const ul = document.getElementById('search-results');
   clearNode(ul);
-  document.getElementById('search-empty').hidden = results.length > 0;
+  /* Compilación 43 (Bloque I): sin texto escrito, la línea guía; con
+     texto y sin coincidencias, el estado vacío de siempre. */
+  const hint = document.getElementById('search-hint');
+  if (hint) hint.hidden = q.trim() !== '';
+  document.getElementById('search-empty').hidden = !(results.length === 0 && q.trim() !== '');
   for (const r of results) {
     const li = el('li', 'item');
     const main = el('div', 'item-main');
     main.appendChild(el('div', 'item-title', r.title));
     main.appendChild(el('div', 'item-sub', prettyDate(r.date) + (r.sub ? ' · ' + r.sub : '')));
+    /* La etiquetita de fuente, igual que en las listas de movimientos. */
+    if (r.tag) main.appendChild(el('div', 'item-sub', r.tag));
     li.appendChild(main);
-    li.appendChild(el('span', 'item-amount', fmt(r.amountCents)));
-    li.addEventListener('click', () => showView(r.type));
+    li.appendChild(el('span', 'item-amount', (r.type === 'gastos' ? '-' : '+') + fmt(r.amountCents)));
+    li.addEventListener('click', () => {
+      /* Compilación 43 (Bloque I): tocar un resultado abre ESE
+         movimiento en su formulario de edición, con la misma función
+         que usan las listas. */
+      if (r.type === 'gastos') {
+        const item = db.expenses.find((x) => x.id === r.id);
+        if (!item) return;
+        expMonth = monthKeyOf(item.date);
+        openExpenseEdit(item);
+        showView('gastos');
+      } else if (r.type === 'ingresos') {
+        const item = db.incomes.find((x) => x.id === r.id);
+        if (!item) return;
+        openIncomeEdit(item);
+        showView('ingresos');
+      } else {
+        showView(r.type);
+      }
+    });
     ul.appendChild(li);
   }
 }
@@ -16073,6 +16176,20 @@ function wireEvents() {
       }
     });
   }
+  /* Compilación 43 (Bloque G): las cabeceras de los tres bloques
+     de Mi san alternan su acordeón (clic o Enter/espacio), con el
+     mismo patrón de la tarjeta de secciones. */
+  for (const [headId, key] of [['san-acc-create-head', 'create'], ['san-acc-active-head', 'active'], ['san-acc-org-head', 'org']]) {
+    const headEl = document.getElementById(headId);
+    if (!headEl) continue;
+    headEl.addEventListener('click', () => toggleSanAcc(key));
+    headEl.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar') {
+        ev.preventDefault();
+        toggleSanAcc(key);
+      }
+    });
+  }
   /* La casilla de huella vive en la tarjeta de Seguridad, FUERA del
      #settings-form: su valor solo llegaba a db.settings.biometric al
      pulsar «Guardar ajustes» (botón de OTRA tarjeta). Marcarla y pulsar
@@ -16112,6 +16229,13 @@ function wireEvents() {
   const chooser = document.getElementById('quick-chooser');
   const closeChooser = () => { chooser.hidden = true; };
   document.getElementById('fab-add').addEventListener('click', () => { chooser.hidden = false; });
+  /* Compilación 43 (Bloque I): la lupa flotante sobre el + abre
+     Buscar con el campo listo para escribir. */
+  document.getElementById('fab-search').addEventListener('click', () => {
+    showView('buscar');
+    const st = document.getElementById('search-text');
+    if (st) st.focus();
+  });
   document.getElementById('quick-cancel').addEventListener('click', closeChooser);
   document.getElementById('quick-expense').addEventListener('click', () => { closeChooser(); showView('gastos'); });
   document.getElementById('quick-income').addEventListener('click', () => { closeChooser(); showView('ingresos'); });

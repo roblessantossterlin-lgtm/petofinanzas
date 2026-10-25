@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 42</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 43</p>
   </div>
 </section>
 
@@ -227,10 +227,7 @@
 
     <div id="home-streak" class="streak-pill" hidden></div>
 
-    <section id="home-insights" class="card" hidden></section>
-
-    <h2 class="menu-heading" data-i18n="home_menu_heading">¿Qué quieres ver?</h2>
-    <nav id="menu-list" class="menu-list" aria-label="Lista de opciones"></nav>
+    <div id="home-podcast" class="menu-group" hidden></div>
   </main>
 
   <!-- ======= GASTOS ======= -->
@@ -426,6 +423,7 @@
   <main id="view-resumen" class="view" hidden>
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_resumen">Resumen</h2>
+    <section id="resumen-insights" class="card" hidden></section>
     <div class="month-nav">
       <button id="res-prev" class="btn btn-ghost" type="button" data-i18n-aria="month_prev_aria" aria-label="Mes anterior">‹</button>
       <span id="res-month-label" class="month-label"></span>
@@ -473,6 +471,7 @@
         <option value="ahorros" data-i18n="type_ahorros">Ahorros</option>
       </select>
     </div>
+    <p id="search-hint" class="muted" data-i18n="search_hint">Escribe para buscar en tus movimientos</p>
     <ul id="search-results" class="item-list"></ul>
     <p id="search-empty" class="empty-state" hidden data-i18n="search_empty">Sin resultados.</p>
   </main>
@@ -679,9 +678,14 @@
     <h2 data-i18n="sec_san">Mi san</h2>
 
     <div id="san-create-wrap">
-      <p class="muted" data-i18n="san_intro">Un san (tanda) es un círculo de ahorro: cada semana todos aportan y una persona recibe el total, por turnos.</p>
-      <form id="san-form" class="card form-card" autocomplete="off">
-        <h3 data-i18n="san_form_title">Crear un san</h3>
+      <section class="card">
+        <div id="san-acc-create-head" class="san-acc-head org-round-head" role="button" tabindex="0" aria-expanded="true">
+          <h3 data-i18n="san_form_title">Crear un san</h3>
+          <span class="org-round-chevron" aria-hidden="true">▾</span>
+        </div>
+        <div id="san-acc-create-body">
+          <p class="muted" data-i18n="san_intro">Un san (tanda) es un círculo de ahorro: cada semana todos aportan y una persona recibe el total, por turnos.</p>
+          <form id="san-form" class="form-card" autocomplete="off">
         <label for="san-name" data-i18n="san_name_label">Nombre del san</label>
         <input id="san-name" type="text" maxlength="60" data-i18n-ph="san_name_ph" placeholder="Ej.: San de la familia">
         <label for="san-amount" data-i18n="san_aporte_label">Aporte por turno ($)</label>
@@ -705,12 +709,18 @@
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" data-i18n="san_create_btn">Crear san</button>
         </div>
-      </form>
+          </form>
+        </div>
+      </section>
     </div>
 
     <div id="san-active-wrap" hidden>
       <section class="card">
-        <h3 id="san-title"></h3>
+        <div id="san-acc-active-head" class="san-acc-head org-round-head" role="button" tabindex="0" aria-expanded="true">
+          <h3 id="san-title"></h3>
+          <span class="org-round-chevron" aria-hidden="true">▾</span>
+        </div>
+        <div id="san-acc-active-body">
         <p id="san-progress" class="total-line"></p>
         <p id="san-aporte-line" class="muted"></p>
         <p id="san-total-line"></p>
@@ -729,11 +739,13 @@
           <button id="btn-share-san" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
           <button id="san-delete" type="button" class="btn btn-ghost" data-i18n="san_delete">Borrar san</button>
         </div>
+        </div>
       </section>
     </div>
 
     <section class="card" id="org-section">
-      <h3><span data-i18n="org_title">Modo organizador de san</span> ⭐ <span data-i18n="pro_tag">PRO</span></h3>
+      <h3 id="san-acc-org-head" class="san-acc-head org-round-head" role="button" tabindex="0" aria-expanded="false"><span><span data-i18n="org_title">Modo organizador de san</span> ⭐ <span data-i18n="pro_tag">PRO</span></span><span class="org-round-chevron" aria-hidden="true">▸</span></h3>
+      <div id="san-acc-org-body">
       <p class="muted small" data-i18n="org_intro">Organiza la tanda de todo el grupo: turnos con fecha, marca quién ya pagó en cada ronda y comparte el estado con el grupo.</p>
       <div id="org-locked">
         <p class="muted" data-i18n="org_pro_note">El modo organizador es una función de PETO Pro.</p>
@@ -837,6 +849,7 @@
             <button id="org-delete" type="button" class="btn btn-ghost" data-i18n="org_delete">Borrar san organizado</button>
           </div>
         </div>
+      </div>
       </div>
     </section>
   </main>
@@ -1061,6 +1074,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c43">Tu Dinero disponible ya refleja solo tus cuentas y lo que anotas desde ahora: cada ingreso y gasto nuevo se suma o se resta al momento, según el bolsillo que elijas. Mi san ahora se pliega por bloques, tu página principal muestra solo lo importante y la lupa sobre el botón + busca cualquier movimiento.</li>
         <li data-i18n="news_c42">Tu Dinero disponible ahora se mueve con cada gasto e ingreso que anotas, salga de donde salga. En las remesas puedes escribir cuánto llegó y la tasa se calcula sola. La bienvenida es más corta y el nombre es opcional, «Tengo un negocio» se enciende solo si lo usas, y Novedades ahora se lee en lenguaje de beneficios.</li>
         <li data-i18n="news_c41">Tus cuentas ya están vivas: al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos. El enlace público del san trae buscador de nombre y rondas plegadas, tu primer día va guiado paso a paso con el modo «Lo esencial», el san personal ya puede ser quincenal o mensual, y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.</li>
         <li data-i18n="news_c40">Tu saldo en cuentas se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.</li>
@@ -1080,13 +1094,14 @@
         <li data-i18n="news_c24">Tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 42</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 43</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
     PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono
   </footer>
 
+  <button id="fab-search" class="fab fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍</button>
   <button id="fab-add" class="fab" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">+</button>
 
   <div id="quick-chooser" class="chooser" hidden>
