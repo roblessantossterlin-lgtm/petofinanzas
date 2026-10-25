@@ -1,19 +1,19 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 37) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 38) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 37: Widgets v3
-   (los widgets son nativos de Android; su código y las claves
-   widget_* viajan aquí como paridad, sin ejecutarse en el
-   navegador), la mini barra de marca del visor público del san,
-   fija arriba al bajar por el enlace, y el acordeón de rondas
-   del organizador, con solo la de esta semana abierta
-   (709 claves por idioma, con la línea news_c37). Sobre la base
-   de la Compilación 36 ya sincronizada (Podcast y vitrina). */
+   Sincronizado el 25-oct-2026 con la Compilación 38: el Podcast
+   lee los episodios pidiendo PRIMERO el espejo con CORS abierto
+   de nuestra función de Supabase «podcast-feed» (el feed directo
+   de muse.ai redirige a un CDN firmado sin CORS y el navegador
+   lo bloquea); si el espejo falla, cae al feed directo y luego
+   al caché (710 claves por idioma, con la línea news_c38). Sobre
+   la base de la Compilación 37 ya sincronizada (Widgets v3,
+   mini barra de marca del visor público y acordeón de rondas). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -25,7 +25,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 37'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 38'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -863,6 +863,7 @@ es: {
   pub_bar_try: 'Probar la app',
   pub_footer: 'Hecho con PETO Finanzas · petofinanzas.com',
   news_c36: 'Compilación 36: nueva sección Podcast — escucha «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet — la bienvenida ahora avanza sola, lámina a lámina — y la vista del enlace renovada: el san se presenta con su avance y acceso directo para probar la app.',
+  news_c38: 'Compilación 38: el Podcast ya carga y reproduce sus episodios.',
   news_c37: 'Compilación 37: widgets renovados — degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san — y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy — y la marca siempre visible al bajar por el enlace público del san — y las rondas del organizador ahora se pliegan en acordeón, con solo la de esta semana abierta.',
   widget_today: 'hoy',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -1328,6 +1329,7 @@ en: {
   pub_bar_try: 'Try the app',
   pub_footer: 'Made with PETO Finanzas · petofinanzas.com',
   news_c36: 'Build 36: new Podcast section — listen to “Finanzas Personales” without leaving the app, with a built-in player and the list saved for when there is no internet — the welcome now moves on its own, slide by slide — and the link view, renewed: the san is showcased with its progress and a direct way to try the app.',
+  news_c38: 'Build 38: the Podcast now loads and plays its episodes.',
   news_c37: 'Build 37: redesigned widgets — brand gradient, a progress bar that changes color with your budget and your san’s next-turn line — plus a brand-new app-icon-sized widget with what you can spend today — and the brand stays in view as you scroll the public san link — and the organizer’s rounds now fold into an accordion, with only this week’s open.',
   widget_today: 'today',
   widget_san_next: 'Next turn: {name} · {date}',
@@ -2036,6 +2038,7 @@ it: {
   pub_bar_try: 'Prova l’app',
   pub_footer: 'Fatto con PETO Finanzas · petofinanzas.com',
   news_c36: 'Versione 36: nuova sezione Podcast — ascolta «Finanzas Personales» senza uscire dall’app, con lettore integrato e l’elenco salvato per quando non c’è internet — la schermata di benvenuto ora avanza da sola, diapositiva dopo diapositiva — e la vista del link rinnovata: il san si presenta con il suo avanzamento e l’accesso diretto per provare l’app.',
+  news_c38: 'Versione 38: il Podcast ora carica e riproduce i suoi episodi.',
   news_c37: 'Versione 37: widget ridisegnati — gradiente del marchio, barra di avanzamento che cambia colore in base al budget e la riga del prossimo turno del tuo san — e un widget nuovo grande quanto un’icona, con quanto puoi spendere oggi — e il marchio resta visibile mentre scorri il link pubblico del san — e i turni dell’organizzatore ora si piegano a fisarmonica, con aperto solo quello di questa settimana.',
   widget_today: 'oggi',
   widget_san_next: 'Prossimo turno: {name} · {date}',
@@ -2744,6 +2747,7 @@ pt: {
   pub_bar_try: 'Testar o app',
   pub_footer: 'Feito com PETO Finanzas · petofinanzas.com',
   news_c36: 'Compilação 36: nova seção Podcast — ouça «Finanzas Personales» sem sair do app, com reprodutor integrado e a lista salva para quando não há internet — a boas-vindas agora avança sozinha, tela a tela — e a vista do link renovada: o san se apresenta com seu progresso e acesso direto para testar o app.',
+  news_c38: 'Compilação 38: o Podcast agora carrega e reproduz seus episódios.',
   news_c37: 'Compilação 37: widgets renovados — degradê da marca, barra de progresso que muda de cor conforme seu orçamento e a linha do próximo turno do seu san — e um widget novo do tamanho de um ícone, com o que você pode gastar hoje — e a marca sempre visível ao rolar o link público do san — e as rodadas do organizador agora dobram em acordeão, com só a desta semana aberta.',
   widget_today: 'hoje',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -3452,6 +3456,7 @@ fr: {
   pub_bar_try: 'Essayer l’appli',
   pub_footer: 'Fait avec PETO Finanzas · petofinanzas.com',
   news_c36: 'Version 36 : nouvelle section Podcast — écoutez « Finanzas Personales » sans quitter l’appli, avec lecteur intégré et la liste enregistrée pour quand il n’y a pas internet — l’écran d’accueil avance maintenant tout seul, diapositive après diapositive — et la vue du lien renouvelée : le san se présente avec sa progression et un accès direct pour essayer l’appli.',
+  news_c38: 'Version 38 : le Podcast charge et lit désormais ses épisodes.',
   news_c37: 'Version 37 : widgets repensés — dégradé de la marque, barre de progression qui change de couleur selon votre budget et la ligne du prochain tour de votre san — et un nouveau widget de la taille d’une icône, avec ce que vous pouvez dépenser aujourd’hui — et la marque reste visible quand on fait défiler le lien public du san — et les tours de l’organisateur se plient en accordéon, avec seul celui de cette semaine ouvert.',
   widget_today: 'aujourd’hui',
   widget_san_next: 'Prochain tour : {name} · {date}',
@@ -4160,6 +4165,7 @@ de: {
   pub_bar_try: 'App testen',
   pub_footer: 'Gemacht mit PETO Finanzas · petofinanzas.com',
   news_c36: 'Version 36: neuer Bereich Podcast — höre „Finanzas Personales“, ohne die App zu verlassen, mit integriertem Player und gespeicherter Liste für Zeiten ohne Internet — der Willkommensbildschirm wechselt jetzt von selbst, Folie für Folie — und die erneuerte Link-Ansicht: Der San zeigt seinen Fortschritt und einen direkten Zugang, um die App zu testen.',
+  news_c38: 'Version 38: Der Podcast lädt und spielt seine Episoden jetzt ab.',
   news_c37: 'Version 37: Widgets im neuen Look — Marken-Farbverlauf, ein Fortschrittsbalken, der je nach Budget die Farbe wechselt, und die Zeile zum nächsten Zug deines San — plus ein neues Widget in App-Symbol-Größe mit deinem heutigen Budget — und die Marke bleibt beim Scrollen im öffentlichen San-Link sichtbar — und die Runden des Organisators klappen jetzt als Akkordeon, mit nur der dieser Woche offen.',
   widget_today: 'heute',
   widget_san_next: 'Nächster Zug: {name} · {date}',
@@ -4868,6 +4874,7 @@ zh: {
   pub_bar_try: '试用应用',
   pub_footer: '由 PETO Finanzas 制作 · petofinanzas.com',
   news_c36: '第 36 版：新增播客版块——无需离开应用即可收听《Finanzas Personales》，内置播放器，列表会保存以便离线查看；欢迎页现在会自动逐页切换；链接视图也焕然一新：san 展示进度，并可直接试用应用。',
+  news_c38: '第 38 版：播客现在可以加载并播放节目了。',
   news_c37: '第 37 版：小部件全新设计——品牌渐变、会随预算变色的进度条，以及 san 下一轮的提示行——还有一个全新的、只有一个图标大小的小部件，显示你今天能花多少；在 san 公开链接中下滑时，品牌始终可见；组织者的轮次现在折叠成手风琴，仅展开本周一轮。',
   widget_today: '今日',
   widget_san_next: '下一轮：{name} · {date}',
@@ -5576,6 +5583,7 @@ ja: {
   pub_bar_try: 'アプリを試す',
   pub_footer: 'PETO Finanzas で作成 · petofinanzas.com',
   news_c36: 'バージョン36：新しいポッドキャストセクション——アプリを離れずに「Finanzas Personales」を聴けます。プレーヤー内蔵、リストはオフライン用に保存。ようこそ画面は自動で切り替わるようになりました。リンク表示も一新：sanの進み具合と、アプリを試す直接アクセス付き。',
+  news_c38: 'バージョン38：ポッドキャストのエピソードが読み込めて再生できるようになりました。',
   news_c37: 'バージョン37：ウィジェットを一新——ブランドのグラデーション、予算に合わせて色が変わる進捗バー、sanの次のターンの行——そして、今日使える金額を表示するアイコンサイズの新しいウィジェット。公開リンクをスクロールしてもブランドが常に表示されます。主催者のラウンドはアコーディオン式になり、今週分だけが開きます。',
   widget_today: '今日',
   widget_san_next: '次のターン：{name} · {date}',
@@ -6284,6 +6292,7 @@ ko: {
   pub_bar_try: '앱 사용해 보기',
   pub_footer: 'PETO Finanzas로 제작 · petofinanzas.com',
   news_c36: '버전 36: 새로운 팟캐스트 섹션 — 앱을 떠나지 않고 "Finanzas Personales"를 들을 수 있고, 내장 플레이어와 오프라인용 저장 목록을 제공합니다. 시작 화면이 이제 슬라이드마다 자동으로 넘어갑니다. 링크 화면도 새로워졌습니다: san의 진행 상황과 앱을 바로 써볼 수 있는 접근을 보여줍니다.',
+  news_c38: '버전 38: 팟캐스트 에피소드를 불러와 재생할 수 있습니다.',
   news_c37: '버전 37: 새로워진 위젯 — 브랜드 그라데이션, 예산에 따라 색이 바뀌는 진행 바, san 다음 차례 줄 — 그리고 오늘 쓸 수 있는 금액을 보여주는 아이콘 크기의 새 위젯. 공개 san 링크를 스크롤해도 브랜드가 계속 보입니다. 주최자 라운드는 아코디언으로 접히고, 이번 주 것만 열립니다.',
   widget_today: '오늘',
   widget_san_next: '다음 차례: {name} · {date}',
@@ -6992,6 +7001,7 @@ ru: {
   pub_bar_try: 'Попробовать приложение',
   pub_footer: 'Сделано в PETO Finanzas · petofinanzas.com',
   news_c36: 'Версия 36: новый раздел «Подкаст» — слушайте «Finanzas Personales», не выходя из приложения, со встроенным плеером и сохранённым списком на случай отсутствия интернета — экран приветствия теперь листается сам, слайд за слайдом — и обновлённый вид ссылки: san показывает свой прогресс и прямой доступ, чтобы попробовать приложение.',
+  news_c38: 'Версия 38: Подкаст теперь загружает и воспроизводит выпуски.',
   news_c37: 'Версия 37: обновлённые виджеты — градиент бренда, полоса прогресса, меняющая цвет в зависимости от бюджета, и строка следующего хода вашего san — плюс новый виджет размером со значок с суммой на сегодня. А в публичной ссылке san бренд остаётся на виду при прокрутке. Раунды организатора теперь складываются аккордеоном: открыт только раунд этой недели.',
   widget_today: 'сегодня',
   widget_san_next: 'Следующий ход: {name} · {date}',
@@ -7700,6 +7710,7 @@ hi: {
   pub_bar_try: 'ऐप आज़माएँ',
   pub_footer: 'PETO Finanzas से बनाया गया · petofinanzas.com',
   news_c36: 'संस्करण 36: नया पॉडकास्ट सेक्शन — ऐप छोड़े बिना "Finanzas Personales" सुनें, इन-बिल्ट प्लेयर और बिना इंटरनेट के लिए सहेजी गई सूची के साथ — स्वागत स्क्रीन अब खुद-ब-खुद स्लाइड-दर-स्लाइड आगे बढ़ती है — और लिंक का नया रूप: san अपनी प्रगति और ऐप आज़माने का सीधा एक्सेस दिखाता है।',
+  news_c38: 'संस्करण 38: पॉडकास्ट अब अपने एपिसोड लोड करके चलाता है।',
   news_c37: 'संस्करण 37: नए रूप में विजेट — ब्रांड ग्रेडिएंट, आपके बजट के अनुसार रंग बदलने वाली प्रगति पट्टी और आपके san की अगली बारी की पंक्ति — साथ ही एक नया आइकन-आकार का विजेट, जिसमें आज आप कितना खर्च कर सकते हैं। और san के सार्वजनिक लिंक में स्क्रॉल करते समय ब्रांड हमेशा दिखता है। आयोजक के राउंड अब अकॉर्डियन में मुड़ते हैं: केवल इस सप्ताह वाला खुला रहता है।',
   widget_today: 'आज',
   widget_san_next: 'अगली बारी: {name} · {date}',
@@ -8408,6 +8419,7 @@ ar: {
   pub_bar_try: 'جرّب التطبيق',
   pub_footer: 'صُنع بواسطة PETO Finanzas · petofinanzas.com',
   news_c36: 'الإصدار 36: قسم بودكاست جديد — استمع إلى «Finanzas Personales» دون مغادرة التطبيق، مع مشغّل مدمج وقائمة محفوظة لأوقات عدم وجود إنترنت — شاشة الترحيب الآن تتقدّم من تلقاء نفسها، شريحة بعد شريحة — ومظهر الرابط متجدد: يعرض san تقدّمه ووصولًا مباشرًا لتجربة التطبيق.',
+  news_c38: 'الإصدار 38: البودكاست الآن يُحمّل حلقاته ويشغّلها.',
   news_c37: 'الإصدار 37: ويدجت بمظهر جديد — تدرّج العلامة، شريط تقدّم يتغيّر لونه حسب ميزانيتك وسطر الدور التالي في san الخاص بك — وويدجت جديد بحجم أيقونة يعرض ما يمكنك إنفاقه اليوم. وتبقى العلامة ظاهرة أثناء التمرير في رابط san العام. وجولات المنظّم الآن تُطوى كالأكورديون: جولة هذا الأسبوع فقط مفتوحة.',
   widget_today: 'اليوم',
   widget_san_next: 'الدور التالي: {name} · {date}',
@@ -14812,8 +14824,22 @@ function initPullToRefresh() {
      vista vuelve a Inicio y pausa), y el pull-to-refresh (C35)
      redibuja la vista, lo que aquí significa volver a pedir el feed.
    - La CSP gana connect-src/media-src SOLO para https://muse.ai
-     (el feed y sus audios); nada más se abre. */
+     (el feed y sus audios); nada más se abre.
+   - Arreglo (Compilación 38): el feed de muse.ai responde con
+     una redirección a un CDN firmado SIN cabeceras CORS, así que
+     el fetch del WebView quedaba bloqueado y la lista nunca
+     cargaba (fallo real en el teléfono de Sterlin). El cargador
+     pide PRIMERO el espejo con CORS abierto de nuestra función
+     de Supabase «podcast-feed» (PODCAST_FEED_PROXY_URL), que
+     devuelve el mismo XML; si esa fuente falla, cae a la URL
+     directa de muse.ai y luego al caché local, como antes. Los
+     enclosure NO se reescriben: el reproductor sigue con las
+     URL de muse.ai del propio feed (media-src ya las cubre) y
+     el dominio de Supabase ya estaba en connect-src por la
+     nube, así que la CSP no cambia. */
 const PODCAST_FEED_URL = 'https://muse.ai/podcasts/feed/1246339358572522/912278e9-dcd4-40f6-8fd0-ddc078d02c04';
+const PODCAST_FEED_PROXY_URL = 'https://sboldltkywwjnslairlg.supabase.co/functions/v1/podcast-feed';
+const PODCAST_FEED_SOURCES = [PODCAST_FEED_PROXY_URL, PODCAST_FEED_URL];
 const PODCAST_CACHE_KEY = 'cgastos.podcast.v1';
 let podcastEpisodes = null;
 let podcastLoadPromise = null;
@@ -14911,10 +14937,13 @@ async function podcastLoad() {
   if (!podcastEpisodes) { status.hidden = false; status.textContent = t('pod_loading'); }
   podcastLoadPromise = (async () => {
     let eps = null;
-    try {
-      const res = await fetch(PODCAST_FEED_URL, { cache: 'no-store' });
-      if (res && res.ok) eps = podcastParseFeed(await res.text());
-    } catch (e) { eps = null; }
+    for (const sourceUrl of PODCAST_FEED_SOURCES) {
+      try {
+        const res = await fetch(sourceUrl, { cache: 'no-store' });
+        if (res && res.ok) eps = podcastParseFeed(await res.text());
+      } catch (e) { /* fuente caída o bloqueada: se prueba la siguiente */ }
+      if (eps) break;
+    }
     if (eps) {
       if (eps.length) {
         podcastEpisodes = eps;
