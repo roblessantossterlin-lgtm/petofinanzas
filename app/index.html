@@ -37,8 +37,8 @@
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
-    <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 41</p>
+    <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 42</p>
   </div>
 </section>
 
@@ -50,6 +50,24 @@
     <p><span data-i18n="ob_intro_1">Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.</span>
        <strong data-i18n="ob_intro_2">Con tu cuenta en la nube.</strong>
        <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
+    <div id="ob-lang-top-wrap" hidden>
+      <label for="ob-lang-top" data-i18n="set_lang_label">Idioma / Language</label>
+      <select id="ob-lang-top">
+        <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="ru">Русский</option>
+        <option value="hi">हिन्दी</option>
+        <option value="ar">العربية</option>
+      </select>
+    </div>
     <div id="ob-tour">
       <div class="ob-step" data-ob-step="1">
         <p class="ob-step-icon" aria-hidden="true">🧾</p>
@@ -72,9 +90,9 @@
         <button id="ob-tour-next" type="button" class="btn btn-secondary" data-i18n="ob_tour_next">Siguiente</button>
       </div>
     </div>
-    <form id="onboarding-form" autocomplete="off">
-      <label for="ob-name" data-i18n="ob_name_label">¿Cómo te llamas?</label>
-      <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre" required>
+    <form id="onboarding-form" autocomplete="off" hidden>
+      <label for="ob-name" data-i18n="ob_name_label">Tu nombre (opcional)</label>
+      <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre">
       <label for="ob-lang" data-i18n="set_lang_label">Idioma / Language</label>
       <select id="ob-lang">
         <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
@@ -98,23 +116,22 @@
       <input id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
              data-i18n-ph="ob_pin2_ph" placeholder="Repite el PIN">
       <p class="muted small" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
+      <div id="ob-mode">
+        <h2 data-i18n="ob_mode_title">¿Cómo quieres ver tu app?</h2>
+        <label class="toggle-row">
+          <span><strong data-i18n="ob_mode_essential">Lo esencial</strong><br>
+          <span class="muted small" data-i18n="ob_mode_essential_help">Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.</span></span>
+          <input type="radio" name="ob-mode" value="esencial" checked>
+        </label>
+        <label class="toggle-row">
+          <span><strong data-i18n="ob_mode_all">Todo</strong><br>
+          <span class="muted small" data-i18n="ob_mode_all_help">Las 13 secciones completas desde el primer día.</span></span>
+          <input type="radio" name="ob-mode" value="todo">
+        </label>
+      </div>
       <p id="ob-error" class="error" role="alert" hidden></p>
       <button type="submit" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </form>
-    <div id="ob-mode" hidden>
-      <h2 data-i18n="ob_mode_title">¿Cómo quieres ver tu app?</h2>
-      <label class="toggle-row">
-        <span><strong data-i18n="ob_mode_essential">Lo esencial</strong><br>
-        <span class="muted small" data-i18n="ob_mode_essential_help">Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.</span></span>
-        <input type="radio" name="ob-mode" value="esencial" checked>
-      </label>
-      <label class="toggle-row">
-        <span><strong data-i18n="ob_mode_all">Todo</strong><br>
-        <span class="muted small" data-i18n="ob_mode_all_help">Las 13 secciones completas desde el primer día.</span></span>
-        <input type="radio" name="ob-mode" value="todo">
-      </label>
-      <button id="ob-mode-btn" type="button" class="btn btn-primary btn-big" data-i18n="ob_mode_btn">Continuar</button>
-    </div>
     <p id="ob-note" class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
   </div>
 </section>
@@ -157,6 +174,13 @@
       <h3 id="next-step-title">Tu siguiente paso</h3>
       <div class="form-actions">
         <button id="next-step-btn" class="btn btn-primary" type="button">Crea tu presupuesto</button>
+      </div>
+    </section>
+
+    <section id="home-import-hint" class="card" hidden>
+      <p data-i18n="import_hint">¿Tienes tu estado de cuenta? Impórtalo y empieza con datos</p>
+      <div class="form-actions">
+        <button id="home-import-btn" class="btn btn-secondary" type="button" data-i18n="import_cta_btn">Importar estado de cuenta</button>
       </div>
     </section>
 
@@ -242,7 +266,7 @@
       <div id="exp-more-box" hidden>
         <label for="exp-note" data-i18n="note_label">Nota (opcional)</label>
         <input id="exp-note" type="text" maxlength="120" data-i18n-ph="exp_note_ph" placeholder="¿En qué fue?">
-        <label class="toggle-row">
+        <label class="toggle-row" id="exp-biz-row">
           <span data-i18n="biz_label">Es de mi negocio</span>
           <input type="checkbox" id="exp-biz">
         </label>
@@ -262,6 +286,7 @@
 
     <ul id="expense-list" class="item-list"></ul>
     <p id="expense-empty" class="empty-state" hidden data-i18n="exp_empty">Todavía no hay gastos en este mes. Registra el primero con el formulario de arriba. 👍</p>
+    <p class="empty-state" id="exp-import-row" hidden><button id="exp-import-link" class="btn btn-ghost" type="button" data-i18n="import_hint">¿Tienes tu estado de cuenta? Impórtalo y empieza con datos</button></p>
 
     <section class="card form-card" id="csv-card">
       <h3 data-i18n="csv_title">Importar estado de cuenta (CSV)</h3>
@@ -314,7 +339,7 @@
       <div id="inc-more-box" hidden>
         <label for="inc-note" data-i18n="note_label">Nota (opcional)</label>
         <input id="inc-note" type="text" maxlength="120" data-i18n-ph="inc_note_ph" placeholder="¿De dónde vino?">
-        <label class="toggle-row">
+        <label class="toggle-row" id="inc-biz-row">
           <span data-i18n="biz_label">Es de mi negocio</span>
           <input type="checkbox" id="inc-biz">
         </label>
@@ -601,8 +626,12 @@
         <option value="ARS">ARS · Peso argentino</option>
       </select>
       <label for="rem-rate" id="rem-rate-label">Tasa (DOP por $1)</label>
-      <input id="rem-rate" type="number" inputmode="decimal" min="0.01" max="999999" step="0.01" required placeholder="58.50">
+      <input id="rem-rate" type="number" inputmode="decimal" min="0.01" max="999999" step="0.01" placeholder="58.50">
       <p id="rem-rate-hint" class="muted small"></p>
+      <p id="rem-rate-calc" class="muted small" hidden></p>
+      <label for="rem-arrived" data-i18n="rem_arrived_label">¿Cuánto llegó en pesos?</label>
+      <input id="rem-arrived" type="number" inputmode="decimal" min="0" step="0.01" placeholder="5850.00">
+      <p class="muted small" data-i18n="rem_arrived_help">Si lo sabes, escríbelo y la tasa se calcula sola.</p>
       <label for="rem-recipient" data-i18n="rem_recipient_label">¿Para quién?</label>
       <input id="rem-recipient" type="text" maxlength="60" placeholder="Ej.: Mami">
       <label for="rem-date" data-i18n="date_label">Fecha</label>
@@ -794,8 +823,9 @@
           <h4 data-i18n="org_link_btn">🔗 Enlace de solo lectura</h4>
           <div class="form-actions">
             <button id="org-link-publish" type="button" class="btn btn-secondary">Crear enlace</button>
-            <button id="org-link-copy" type="button" class="btn btn-secondary" hidden>Copiar enlace</button>
+            <button id="org-link-copy" type="button" class="btn btn-secondary" hidden data-i18n="org_link_copy">Copiar enlace</button>
           </div>
+          <p class="muted small" data-i18n="org_link_zelle_warn">Quien tenga el enlace verá los nombres, el avance y el Zelle de quien recibe cada ronda.</p>
           <p id="org-link-msg" class="muted small" aria-live="polite"></p>
           <input id="org-receipt-file" type="file" accept="image/*" hidden>
           <h4 data-i18n="org_totals_title">Aportes por participante</h4>
@@ -890,6 +920,7 @@
         <input id="cloud-email" type="email" autocomplete="email" maxlength="120">
         <label for="cloud-pass" data-i18n="cloud_pass">Contraseña</label>
         <input id="cloud-pass" type="password" autocomplete="current-password" maxlength="72">
+        <p class="muted small"><span data-i18n="cloud_pass_hint">Mínimo 6 caracteres</span> <button id="cloud-pass-eye" type="button" class="btn btn-ghost btn-small" aria-label="Mostrar contraseña">👁</button></p>
         <div class="form-actions">
           <button id="btn-cloud-signin" type="button" class="btn btn-primary" data-i18n="cloud_signin">Entrar</button>
           <button id="btn-cloud-signup" type="button" class="btn btn-secondary" data-i18n="cloud_signup">Crear cuenta</button>
@@ -910,11 +941,17 @@
       <p id="cloud-status" class="muted small" aria-live="polite"></p>
       <p id="cloud-error" class="error" role="alert" hidden></p>
 
+      <label class="toggle-row">
+        <span><span data-i18n="set_biz_label">Tengo un negocio</span><br>
+        <span class="muted small" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</span></span>
+        <input type="checkbox" id="set-biz">
+      </label>
+
       <h3 data-i18n="set_split_title">Reparto sugerido de ingresos (%)</h3>
       <p class="muted small" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
       <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
       <input id="split-ahorro" type="number" min="0" max="100" step="1" required>
-      <label for="split-negocio" data-i18n="split_negocio">Negocio</label>
+      <label for="split-negocio" id="split-negocio-label" data-i18n="split_negocio">Negocio</label>
       <input id="split-negocio" type="number" min="0" max="100" step="1" required>
       <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
       <input id="split-gastos" type="number" min="0" max="100" step="1" required>
@@ -999,7 +1036,7 @@
       <h3 data-i18n="set_data_title">Tus datos</h3>
       <p class="muted small" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
       <div class="form-actions">
-        <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Exportar copia (JSON)</button>
+        <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Guardar copia de seguridad</button>
         <label class="btn btn-ghost file-label"><span data-i18n="data_import">Importar copia</span>
           <input id="file-import" type="file" accept="application/json,.json" hidden>
         </label>
@@ -1008,34 +1045,42 @@
       <label for="backup-pass" data-i18n="backup_pass_label">Contraseña de la copia cifrada</label>
       <input id="backup-pass" type="password" autocomplete="off" data-i18n-ph="backup_pass_ph" placeholder="Mínimo 4 caracteres">
       <div class="form-actions">
-        <button id="btn-export-enc" type="button" class="btn btn-secondary" data-i18n="data_export_enc">Exportar copia cifrada</button>
+        <button id="btn-export-enc" type="button" class="btn btn-secondary" data-i18n="data_export_enc">Guardar copia con contraseña</button>
       </div>
       <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
       <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
     </section>
+    <section class="card form-card" id="settings-privacy">
+      <h3 data-i18n="priv_title">Privacidad: cómo cuidamos tus datos</h3>
+      <p class="muted small" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
+      <div class="form-actions">
+        <button id="btn-privacy-policy" type="button" class="btn btn-secondary" data-i18n="priv_btn">Leer la política completa</button>
+      </div>
+    </section>
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
-        <li data-i18n="news_c41">Compilación 41: tus cuentas ya están vivas — al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos — el enlace público del san trae buscador de nombre y rondas plegadas — tu primer día va guiado paso a paso, con el modo «Lo esencial» — el san personal ya puede ser quincenal o mensual — y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.</li>
-        <li data-i18n="news_c40">Compilación 40: tu saldo en cuentas ahora se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.</li>
-        <li data-i18n="news_c39">Compilación 39: el Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.</li>
-        <li data-i18n="news_c38">Compilación 38: el Podcast ya carga y reproduce sus episodios.</li>
-        <li data-i18n="news_c37">Compilación 37: widgets renovados — degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san — y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy — y la marca siempre visible al bajar por el enlace público del san — y las rondas del organizador ahora se pliegan en acordeón, con solo la de esta semana abierta.</li>
-        <li data-i18n="news_c36">Compilación 36: nueva sección Podcast — escucha «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet — la bienvenida ahora avanza sola, lámina a lámina — y la vista del enlace renovada: el san se presenta con su avance y acceso directo para probar la app.</li>
-        <li data-i18n="news_c35">Compilación 35: desde el enlace público del san ya puedes reportar tu pago con «Ya pagué» y adjuntar tu comprobante (el organizador lo confirma), el visor se ve con el tema oscuro, la app se refresca deslizando hacia abajo y el lector de PDF ya no confunde los Zelle que envías con ingresos.</li>
-        <li data-i18n="news_c34">Compilación 34: nuevo logo de PETO Finanzas — la «P» blanca con barras y flecha en verde suave sobre fondo esmeralda, ya en el icono, la pantalla de bloqueo y toda la app.</li>
-        <li data-i18n="news_c33">Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.</li>
-        <li data-i18n="news_c32">Compilación 32: la marca ahora se lee «PETO Finanzas» en toda la app (menú, bloqueo y widgets), el san quedó primero en la lista de Inicio, el enlace público del san abre directo en el estado del grupo y los botones del organizador siempre responden con un mensaje claro.</li>
-        <li data-i18n="news_c31">Compilación 31: el botón o gesto de atrás ahora se mueve dentro de la app: cierra lo que esté abierto y vuelve a la pantalla principal antes de salir.</li>
-        <li data-i18n="news_c28">Compilación 28: letra más grande aplicada desde el arranque, esta sección de novedades, repaso del italiano y apertura más rápida.</li>
-        <li data-i18n="news_c27">Compilación 27: la app en 12 idiomas, siguiendo sola el idioma de tu teléfono.</li>
-        <li data-i18n="news_c26">Compilación 26: widgets en tres tamaños, con opciones por widget y botón para anotar un gasto sin abrir la app.</li>
-        <li data-i18n="news_c25">Compilación 25: widget en la pantalla de inicio y una app mucho más liviana (de 52 MB a 7 MB).</li>
-        <li data-i18n="news_c24">Compilación 24: tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
+        <li data-i18n="news_c42">Tu Dinero disponible ahora se mueve con cada gasto e ingreso que anotas, salga de donde salga. En las remesas puedes escribir cuánto llegó y la tasa se calcula sola. La bienvenida es más corta y el nombre es opcional, «Tengo un negocio» se enciende solo si lo usas, y Novedades ahora se lee en lenguaje de beneficios.</li>
+        <li data-i18n="news_c41">Tus cuentas ya están vivas: al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos. El enlace público del san trae buscador de nombre y rondas plegadas, tu primer día va guiado paso a paso con el modo «Lo esencial», el san personal ya puede ser quincenal o mensual, y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.</li>
+        <li data-i18n="news_c40">Tu saldo en cuentas se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.</li>
+        <li data-i18n="news_c39">🎙️ El Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.</li>
+        <li data-i18n="news_c38">🎙️ El Podcast ya carga y reproduce sus episodios.</li>
+        <li data-i18n="news_c37">Widgets renovados: degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san. Y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy. La marca queda siempre visible al bajar por el enlace público del san, y las rondas del organizador se pliegan en acordeón, con solo la de esta semana abierta.</li>
+        <li data-i18n="news_c36">🎙️ Ya puedes escuchar el podcast «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet. La bienvenida avanza sola, lámina a lámina, y la vista del enlace del san se presenta con su avance y acceso directo para probar la app.</li>
+        <li data-i18n="news_c35">Desde el enlace público del san ya puedes reportar tu pago con «Ya pagué» y adjuntar tu comprobante (el organizador lo confirma), el visor se ve con el tema oscuro, la app se refresca deslizando hacia abajo y el lector de PDF ya no confunde los Zelle que envías con ingresos.</li>
+        <li data-i18n="news_c34">Nuevo logo de PETO Finanzas: la «P» blanca con barras y flecha en verde suave sobre fondo esmeralda, ya en el icono, la pantalla de bloqueo y toda la app.</li>
+        <li data-i18n="news_c33">Crear un san ya no puede borrar el que está en curso: si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público). La versión web quedó sincronizada con el teléfono.</li>
+        <li data-i18n="news_c32">La marca se lee «PETO Finanzas» en toda la app (menú, bloqueo y widgets), el san quedó primero en la lista de Inicio, el enlace público del san abre directo en el estado del grupo y los botones del organizador siempre responden con un mensaje claro.</li>
+        <li data-i18n="news_c31">El botón o gesto de atrás ahora se mueve dentro de la app: cierra lo que esté abierto y vuelve a la pantalla principal antes de salir.</li>
+        <li data-i18n="news_c28">Letra más grande aplicada desde el arranque, esta sección de novedades, repaso del italiano y apertura más rápida.</li>
+        <li data-i18n="news_c27">La app en 12 idiomas, siguiendo sola el idioma de tu teléfono.</li>
+        <li data-i18n="news_c26">Widgets en tres tamaños, con opciones por widget y botón para anotar un gasto sin abrir la app.</li>
+        <li data-i18n="news_c25">Widget en la pantalla de inicio y una app mucho más liviana (de 52 MB a 7 MB).</li>
+        <li data-i18n="news_c24">Tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 41</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 42</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
