@@ -36,8 +36,9 @@
       <button type="submit" class="btn btn-primary btn-big" data-i18n="lock_enter">Entrar</button>
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
+    <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 39</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 40</p>
   </div>
 </section>
 
@@ -96,6 +97,7 @@
       <label for="ob-pin2" data-i18n="ob_pin2_label">Repite el PIN</label>
       <input id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
              data-i18n-ph="ob_pin2_ph" placeholder="Repite el PIN">
+      <p class="muted small" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
       <p id="ob-error" class="error" role="alert" hidden></p>
       <button type="submit" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </form>
@@ -139,8 +141,9 @@
 
     <section class="summary-strip" aria-label="Resumen del mes">
       <button id="tile-available" class="summary-item" type="button" data-i18n-aria="tile_available_aria" aria-label="Dinero disponible: ir a Mis cuentas">
-        <span class="summary-label" data-i18n="tile_available">Dinero disponible</span>
+        <span class="summary-label" id="tile-available-label" data-i18n="tile_available">Dinero disponible</span>
         <span id="sum-available" class="summary-value">$0.00</span>
+        <span id="sum-available-sub" class="summary-sub" hidden></span>
         <span class="summary-go" aria-hidden="true">›</span>
       </button>
       <button id="tile-savings" class="summary-item" type="button" data-i18n-aria="tile_savings_aria" aria-label="Ahorros del mes: ir a Ahorros">
@@ -174,6 +177,7 @@
       <span id="spend-today" class="spend-value">—</span>
       <div id="spend-today-left" class="muted small"></div>
       <span id="spend-today-note" class="muted small"></span>
+      <button id="spend-create-btn" class="btn btn-primary" type="button" hidden data-i18n="spend_create_btn">Crear mi presupuesto</button>
     </section>
 
     <div id="home-streak" class="streak-pill" hidden></div>
@@ -208,17 +212,23 @@
       <select id="exp-category" required></select>
       <label for="exp-date" data-i18n="date_label">Fecha</label>
       <input id="exp-date" type="date" required>
-      <label for="exp-note" data-i18n="note_label">Nota (opcional)</label>
-      <input id="exp-note" type="text" maxlength="120" data-i18n-ph="exp_note_ph" placeholder="¿En qué fue?">
       <label class="toggle-row">
-        <span data-i18n="biz_label">Es de mi negocio</span>
-        <input type="checkbox" id="exp-biz">
+        <span data-i18n="more_details">Más detalles</span>
+        <input type="checkbox" id="exp-more">
       </label>
-      <label for="exp-photo" data-i18n="exp_photo_label">Foto del recibo (opcional)</label>
-      <input id="exp-photo" type="file" accept="image/*">
-      <img id="exp-photo-preview" class="receipt-preview" alt="" hidden>
-      <div class="form-actions">
-        <button id="exp-photo-remove" type="button" class="btn btn-ghost btn-small" hidden data-i18n="exp_photo_remove">Quitar foto</button>
+      <div id="exp-more-box" hidden>
+        <label for="exp-note" data-i18n="note_label">Nota (opcional)</label>
+        <input id="exp-note" type="text" maxlength="120" data-i18n-ph="exp_note_ph" placeholder="¿En qué fue?">
+        <label class="toggle-row">
+          <span data-i18n="biz_label">Es de mi negocio</span>
+          <input type="checkbox" id="exp-biz">
+        </label>
+        <label for="exp-photo" data-i18n="exp_photo_label">Foto del recibo (opcional)</label>
+        <input id="exp-photo" type="file" accept="image/*">
+        <img id="exp-photo-preview" class="receipt-preview" alt="" hidden>
+        <div class="form-actions">
+          <button id="exp-photo-remove" type="button" class="btn btn-ghost btn-small" hidden data-i18n="exp_photo_remove">Quitar foto</button>
+        </div>
       </div>
       <p id="exp-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
@@ -272,12 +282,18 @@
       <p class="muted small" data-i18n="inc_savings_help">Sugerencia según tu porcentaje de ahorro — cámbialo por lo que realmente ahorraste. Puedes poner $0.</p>
       <label for="inc-date" data-i18n="date_label">Fecha</label>
       <input id="inc-date" type="date" required>
-      <label for="inc-note" data-i18n="note_label">Nota (opcional)</label>
-      <input id="inc-note" type="text" maxlength="120" data-i18n-ph="inc_note_ph" placeholder="¿De dónde vino?">
       <label class="toggle-row">
-        <span data-i18n="biz_label">Es de mi negocio</span>
-        <input type="checkbox" id="inc-biz">
+        <span data-i18n="more_details">Más detalles</span>
+        <input type="checkbox" id="inc-more">
       </label>
+      <div id="inc-more-box" hidden>
+        <label for="inc-note" data-i18n="note_label">Nota (opcional)</label>
+        <input id="inc-note" type="text" maxlength="120" data-i18n-ph="inc_note_ph" placeholder="¿De dónde vino?">
+        <label class="toggle-row">
+          <span data-i18n="biz_label">Es de mi negocio</span>
+          <input type="checkbox" id="inc-biz">
+        </label>
+      </div>
       <p id="inc-split-preview" class="split-preview" aria-live="polite"></p>
       <p id="inc-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
@@ -420,6 +436,18 @@
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_presupuesto">Presupuesto por categoría</h2>
     <p class="muted" data-i18n="bud_intro">Pon un límite mensual por categoría y mira cuánto llevas gastado.</p>
+    <section id="budget-starter" class="card form-card">
+      <label for="budget-income" data-i18n="bud_income_label">¿Cuánto entra al mes?</label>
+      <input id="budget-income" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <div class="form-actions">
+        <button id="budget-split-btn" type="button" class="btn btn-secondary" data-i18n="bud_split_btn">Repartir según mi ingreso</button>
+      </div>
+      <p class="muted small" id="budget-split-help"></p>
+      <p class="total-line"><span data-i18n="bud_total_label">Total del presupuesto:</span> <strong id="budget-total">$0.00</strong></p>
+      <div class="form-actions">
+        <button id="budget-save-all" type="button" class="btn btn-primary" data-i18n="bud_save_all">Guardar todo</button>
+      </div>
+    </section>
     <ul id="budget-list" class="item-list"></ul>
 
     <form id="category-form" class="card form-card" autocomplete="off">
@@ -923,6 +951,7 @@
         <input id="pin-current" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
         <label for="pin-new" data-i18n="pin_new_label">PIN nuevo (vacío = quitar el PIN)</label>
         <input id="pin-new" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
+        <p class="muted small" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
         <p id="pin-error" class="error" role="alert" hidden></p>
         <button type="submit" class="btn btn-secondary" data-i18n="pin_update">Actualizar PIN</button>
       </form>
@@ -955,6 +984,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c40">Compilación 40: tu saldo en cuentas ahora se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.</li>
         <li data-i18n="news_c39">Compilación 39: el Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.</li>
         <li data-i18n="news_c38">Compilación 38: el Podcast ya carga y reproduce sus episodios.</li>
         <li data-i18n="news_c37">Compilación 37: widgets renovados — degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san — y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy — y la marca siempre visible al bajar por el enlace público del san — y las rondas del organizador ahora se pliegan en acordeón, con solo la de esta semana abierta.</li>
@@ -971,7 +1001,7 @@
         <li data-i18n="news_c24">Compilación 24: tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 39</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 40</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">

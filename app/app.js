@@ -1,20 +1,22 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 39) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 40) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 39: el Podcast
-   ya REPRODUCE sus episodios — la CSP abre media-src también a
-   *.supabase.co y el espejo «podcast-feed» sirve las URL de audio
-   reescritas a nuestra función «podcast-media» (los enlaces
-   directos de muse.ai redirigen a un CDN con candado de origen);
-   el arreglo de los widgets pequeños es nativo de Android y en
-   la web solo llega la línea news_c39 (711 claves por idioma).
-   Sobre la base de la Compilación 38 ya sincronizada (el Podcast
-   lee los episodios primero por el espejo «podcast-feed»). */
+   Sincronizado el 25-oct-2026 con la Compilación 40: los 4 arreglos
+   rápidos de la auditoría de cliente — con cuentas el rótulo pasa a
+   «Saldo en tus cuentas», al crear el PIN la app avisa que no se
+   puede recuperar y la pantalla de bloqueo trae la salida de
+   emergencia «¿Olvidaste tu PIN?», la tarjeta de gasto diario nace
+   el primer día con «Crear mi presupuesto» y el arranque guiado de
+   Presupuesto (ingreso, reparto, total y «Guardar todo»), y anotar
+   un gasto toma tres toques, con la categoría que recuerda la
+   última usada y «Más detalles» plegado — (727 claves por idioma).
+   Sobre la base de la Compilación 39 ya sincronizada (el Podcast
+   ya reproduce sus episodios). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -26,7 +28,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 39'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 40'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -76,7 +78,8 @@ function defaultData() {
       split: { ahorro: 25, negocio: 10, gastos: 55, familia: 10 },
       sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true, podcast: true },
       pinSalt: null,
-      pinHash: null
+      pinHash: null,
+      lastExpCategory: null
     },
     lastExportAt: null,
     customCategories: [],
@@ -271,6 +274,7 @@ function validateData(raw) {
   d.settings.pinSalt = (typeof s.pinSalt === 'string' && /^[0-9a-f]{32}$/.test(s.pinSalt)) ? s.pinSalt : null;
   d.settings.pinHash = (typeof s.pinHash === 'string' && /^[0-9a-f]{64}$/.test(s.pinHash)) ? s.pinHash : null;
   if (!d.settings.pinSalt || !d.settings.pinHash) { d.settings.pinSalt = null; d.settings.pinHash = null; }
+  d.settings.lastExpCategory = (typeof s.lastExpCategory === 'string' && s.lastExpCategory.length <= 30) ? s.lastExpCategory : null;
   d.settings.lang = (s.lang === 'auto' || LANGS.includes(s.lang)) ? s.lang : 'auto';
   d.settings.payday = (typeof s.payday === 'number' && Number.isFinite(s.payday) &&
     Math.trunc(s.payday) >= 0 && Math.trunc(s.payday) <= 6) ? Math.trunc(s.payday) : null;
@@ -527,6 +531,7 @@ es: {
   key_settings: 'Nombre, reparto, texto, secciones, PIN',
   footer: 'PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono',
   tile_available: 'Dinero disponible', tile_available_aria: 'Dinero disponible: ir a Mis cuentas',
+  tile_accounts: 'Saldo en tus cuentas', tile_accounts_aria: 'Saldo en tus cuentas: ir a Mis cuentas', tile_accounts_help: 'Suma de tus cuentas. La actualizas tú al crear o editar una cuenta.',
   tile_savings: 'Ahorros del mes', tile_savings_aria: 'Ahorros del mes: ir a Ahorros',
   tile_debts: 'Deudas pendientes', tile_debts_aria: 'Deudas pendientes: ir a Mis deudas',
   tile_incomes: '💵 Ingresos', tile_incomes_aria: 'Ingresos: ir a Ingresos semanales',
@@ -541,7 +546,8 @@ es: {
   banner_dues_title: 'Pagos por vencer:', banner_due_item: '{name} (día {day})', banner_close: 'Cerrar aviso',
   spend_title: '¿Cuánto puedes gastar hoy?',
   spend_note: 'Esto es lo que puedes gastar hoy sin pasarte.',
-  spend_guide: 'Crea tu primer presupuesto por categoría y aquí verás cuánto puedes gastar cada día.',
+  spend_guide: 'Crea tu primer presupuesto y aquí verás cuánto puedes gastar cada día. También aparece cuando registras tu primer ingreso.',
+  spend_create_btn: 'Crear mi presupuesto',
   spend_left: 'Te quedan {amount} para los {days} días que faltan del mes.',
   spend_left_one: 'Te queda {amount} para hoy, el último día del mes.',
   spend_over: 'Ya alcanzaste el presupuesto del mes.', spend_over_by: 'Te pasaste por {amount}.',
@@ -553,6 +559,7 @@ es: {
   month_prev_aria: 'Mes anterior', month_next_aria: 'Mes siguiente',
   exp_new: 'Nuevo gasto', exp_edit: 'Editar gasto', exp_total_label: 'Total del mes:',
   amount_label: 'Cantidad ($)', category_label: 'Categoría', date_label: 'Fecha', note_label: 'Nota (opcional)',
+  cat_choose: 'Elige categoría', more_details: 'Más detalles',
   exp_note_ph: '¿En qué fue?', exp_save: 'Guardar gasto',
   exp_empty: 'Todavía no hay gastos en este mes.\nRegistra el primero con el formulario de arriba. 👍',
   exp_delete_confirm: '¿Borrar este gasto de {amount}? Es de la categoría {cat}, del {date}. Solo se borra este gasto.',
@@ -592,6 +599,8 @@ es: {
   chart_income: 'Ingresos', chart_expenses: 'Gastos', chart_savings: 'Ahorros',
   res_cats_empty: 'No hay gastos en este mes.', res_summary_empty: 'Todavía no hay movimientos en este mes.',
   bud_intro: 'Pon un límite mensual por categoría y mira cuánto llevas gastado.',
+  bud_income_label: '¿Cuánto entra al mes?', bud_split_btn: 'Repartir según mi ingreso', bud_split_help: 'Repartimos la parte de Gastos de tu reparto sugerido ({pct}% de tu ingreso) entre tus categorías. Ajusta lo que quieras y guarda todo de una vez.',
+  bud_total_label: 'Total del presupuesto:', bud_save_all: 'Guardar todo',
   bud_spent_left: 'Gastado {spent} de {budget} · Quedan {left}', bud_spent_over: 'Gastado {spent} de {budget} · Te pasaste por {over}',
   bud_nolimit: 'Sin límite. Gastado este mes: {spent}', bud_placeholder: 'Límite mensual $', bud_aria: 'Límite mensual para {cat}',
   bud_delete_cat: 'Borrar categoría',
@@ -653,6 +662,7 @@ es: {
   reset_confirm2: 'Última confirmación: ¿borrar todo y empezar de cero?',
   lock_prompt: 'Escribe tu PIN para entrar.', lock_pin_label: 'PIN', lock_enter: 'Entrar',
   lock_note: 'Tus datos están protegidos con tu PIN.', lock_err: 'PIN incorrecto. Inténtalo de nuevo.',
+  lock_forgot: '¿Olvidaste tu PIN?', lock_reset_explain: 'Si olvidaste tu PIN, no hay forma de recuperarlo. Puedes empezar de cero: se borran los datos guardados en ESTE teléfono y la app vuelve a la bienvenida. ¿Empezar de cero?', lock_reset_explain_cloud: 'Si olvidaste tu PIN, no hay forma de recuperarlo. Puedes empezar de cero: se borran los datos de ESTE teléfono y se cierra tu sesión en la nube, SIN tocar la copia guardada en tu cuenta. Al entrar de nuevo con tu cuenta, tus datos bajan otra vez. ¿Empezar de cero?',
   ob_title: '¡Bienvenido a PETO Finanzas!',
   ob_intro_1: 'Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.',
   ob_intro_2: 'Con tu cuenta en la nube.', ob_intro_3: 'Tus datos se sincronizan con tu teléfono.',
@@ -660,6 +670,7 @@ es: {
   ob_pin_label: 'Crea un PIN de seguridad (opcional)', ob_pin_ph: '4 a 6 números, o déjalo vacío',
   ob_pin2_label: 'Repite el PIN', ob_pin2_ph: 'Repite el PIN', ob_start: 'Empezar',
   ob_note: 'Podrás cambiar el PIN cuando quieras en Ajustes.',
+  pin_warn: 'Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.',
   ob_tour1_title: 'Anota un gasto en segundos',
   ob_tour1_text: 'Toca el botón +, escribe la cantidad y la categoría. Nada más: tu gasto queda registrado al instante.',
   ob_tour2_title: '¿Cuánto puedes gastar hoy?',
@@ -866,6 +877,7 @@ es: {
   news_c36: 'Compilación 36: nueva sección Podcast — escucha «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet — la bienvenida ahora avanza sola, lámina a lámina — y la vista del enlace renovada: el san se presenta con su avance y acceso directo para probar la app.',
   news_c38: 'Compilación 38: el Podcast ya carga y reproduce sus episodios.',
   news_c39: 'Compilación 39: el Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.',
+  news_c40: 'Compilación 40: tu saldo en cuentas ahora se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.',
   news_c37: 'Compilación 37: widgets renovados — degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san — y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy — y la marca siempre visible al bajar por el enlace público del san — y las rondas del organizador ahora se pliegan en acordeón, con solo la de esta semana abierta.',
   widget_today: 'hoy',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -994,6 +1006,7 @@ en: {
   key_settings: 'Name, split, text, sections, PIN',
   footer: 'PETO Web · With your cloud account, your data syncs with your phone',
   tile_available: 'Available money', tile_available_aria: 'Available money: go to My accounts',
+  tile_accounts: 'Balance in your accounts', tile_accounts_aria: 'Balance in your accounts: go to My accounts', tile_accounts_help: 'The sum of your accounts. You update it yourself when you create or edit an account.',
   tile_savings: 'Savings this month', tile_savings_aria: 'Savings this month: go to Savings',
   tile_debts: 'Pending debts', tile_debts_aria: 'Pending debts: go to My debts',
   tile_incomes: '💵 Income', tile_incomes_aria: 'Income: go to Weekly income',
@@ -1008,7 +1021,8 @@ en: {
   banner_dues_title: 'Payments due soon:', banner_due_item: '{name} (day {day})', banner_close: 'Dismiss',
   spend_title: 'How much can you spend today?',
   spend_note: 'This is what you can spend today without going over.',
-  spend_guide: 'Create your first category budget and you will see here how much you can spend each day.',
+  spend_guide: 'Create your first budget and you will see here how much you can spend each day. It also appears when you record your first income.',
+  spend_create_btn: 'Create my budget',
   spend_left: 'You have {amount} left for the {days} remaining days of the month.',
   spend_left_one: 'You have {amount} left for today, the last day of the month.',
   spend_over: "You've reached this month's budget.", spend_over_by: "You're over by {amount}.",
@@ -1020,6 +1034,7 @@ en: {
   month_prev_aria: 'Previous month', month_next_aria: 'Next month',
   exp_new: 'New expense', exp_edit: 'Edit expense', exp_total_label: 'Month total:',
   amount_label: 'Amount ($)', category_label: 'Category', date_label: 'Date', note_label: 'Note (optional)',
+  cat_choose: 'Choose a category', more_details: 'More details',
   exp_note_ph: 'What was it for?', exp_save: 'Save expense',
   exp_empty: 'No expenses this month yet.\nAdd the first one with the form above. 👍',
   exp_delete_confirm: 'Delete this expense of {amount}? Category {cat}, on {date}. Only this expense is deleted.',
@@ -1059,6 +1074,8 @@ en: {
   chart_income: 'Income', chart_expenses: 'Expenses', chart_savings: 'Savings',
   res_cats_empty: 'No expenses this month.', res_summary_empty: 'No activity this month yet.',
   bud_intro: 'Set a monthly limit per category and see how much you have spent.',
+  bud_income_label: 'How much comes in each month?', bud_split_btn: 'Split it by my income', bud_split_help: 'We spread the Expenses part of your suggested split ({pct}% of your income) across your categories. Adjust whatever you want and save everything at once.',
+  bud_total_label: 'Total budget:', bud_save_all: 'Save all',
   bud_spent_left: 'Spent {spent} of {budget} · {left} left', bud_spent_over: 'Spent {spent} of {budget} · Over by {over}',
   bud_nolimit: 'No limit. Spent this month: {spent}', bud_placeholder: 'Monthly limit $', bud_aria: 'Monthly limit for {cat}',
   bud_delete_cat: 'Delete category',
@@ -1120,6 +1137,7 @@ en: {
   reset_confirm2: 'Final confirmation: delete everything and start over?',
   lock_prompt: 'Enter your PIN to continue.', lock_pin_label: 'PIN', lock_enter: 'Unlock',
   lock_note: 'Your data is protected with your PIN.', lock_err: 'Incorrect PIN. Try again.',
+  lock_forgot: 'Forgot your PIN?', lock_reset_explain: 'If you forgot your PIN, there is no way to recover it. You can start over: the data saved on THIS phone is deleted and the app goes back to the welcome screen. Start over?', lock_reset_explain_cloud: 'If you forgot your PIN, there is no way to recover it. You can start over: the data on THIS phone is deleted and you are signed out of the cloud, WITHOUT touching the copy saved in your account. When you sign in with your account again, your data comes back down. Start over?',
   ob_title: 'Welcome to PETO Finanzas!',
   ob_intro_1: 'Organize your money in minutes: expenses, income, budget, accounts and debts.',
   ob_intro_2: 'With your cloud account.', ob_intro_3: 'Your data syncs with your phone.',
@@ -1127,6 +1145,7 @@ en: {
   ob_pin_label: 'Create a security PIN (optional)', ob_pin_ph: '4 to 6 digits, or leave it empty',
   ob_pin2_label: 'Repeat the PIN', ob_pin2_ph: 'Repeat the PIN', ob_start: 'Get started',
   ob_note: 'You can change the PIN anytime in Settings.',
+  pin_warn: 'If you forget it, there is no way to recover it: write it down somewhere safe.',
   ob_tour1_title: 'Log an expense in seconds',
   ob_tour1_text: 'Tap the + button, enter the amount and the category. That is all: your expense is saved right away.',
   ob_tour2_title: 'How much can you spend today?',
@@ -1333,6 +1352,7 @@ en: {
   news_c36: 'Build 36: new Podcast section — listen to “Finanzas Personales” without leaving the app, with a built-in player and the list saved for when there is no internet — the welcome now moves on its own, slide by slide — and the link view, renewed: the san is showcased with its progress and a direct way to try the app.',
   news_c38: 'Build 38: the Podcast now loads and plays its episodes.',
   news_c39: 'Build 39: the Podcast now plays its episodes, and the small widgets work again.',
+  news_c40: 'Build 40: your account balance is now labeled honestly, when you create your PIN the app warns it cannot be recovered (and there is an emergency exit if you forget it), your daily spending number is born on day one with "Create my budget", and logging an expense now takes three taps.',
   news_c37: 'Build 37: redesigned widgets — brand gradient, a progress bar that changes color with your budget and your san’s next-turn line — plus a brand-new app-icon-sized widget with what you can spend today — and the brand stays in view as you scroll the public san link — and the organizer’s rounds now fold into an accordion, with only this week’s open.',
   widget_today: 'today',
   widget_san_next: 'Next turn: {name} · {date}',
@@ -1530,6 +1550,7 @@ it: {
   key_settings: 'Nome, ripartizione, testo, sezioni, PIN',
   footer: 'PETO Web · Con il tuo account nel cloud, i tuoi dati si sincronizzano con il tuo telefono',
   tile_available: 'Denaro disponibile',
+  tile_accounts: 'Saldo nei tuoi conti', tile_accounts_aria: 'Saldo nei tuoi conti: vai a I miei conti', tile_accounts_help: 'La somma dei tuoi conti. La aggiorni tu quando crei o modifichi un conto.',
   tile_available_aria: 'Denaro disponibile: vai a I miei conti',
   tile_savings: 'Risparmi del mese',
   tile_savings_aria: 'Risparmi del mese: vai a Risparmi',
@@ -1558,7 +1579,8 @@ it: {
   banner_close: 'Chiudi avviso',
   spend_title: 'Quanto puoi spendere oggi?',
   spend_note: 'Questo è quanto puoi spendere oggi senza sforare.',
-  spend_guide: 'Crea il tuo primo budget per categoria e qui vedrai quanto puoi spendere ogni giorno.',
+  spend_guide: 'Crea il tuo primo budget e qui vedrai quanto puoi spendere ogni giorno. Appare anche quando registri la tua prima entrata.',
+  spend_create_btn: 'Crea il mio budget',
   spend_left: 'Ti restano {amount} per i {days} giorni rimanenti del mese.',
   spend_left_one: 'Ti resta {amount} per oggi, l’ultimo giorno del mese.',
   spend_over: 'Hai raggiunto il budget del mese.',
@@ -1587,6 +1609,7 @@ it: {
   exp_total_label: 'Totale del mese:',
   amount_label: 'Importo ($)',
   category_label: 'Categoria',
+  cat_choose: 'Scegli la categoria', more_details: 'Altri dettagli',
   date_label: 'Data',
   note_label: 'Nota (facoltativa)',
   exp_note_ph: 'Per cosa è stato?',
@@ -1651,6 +1674,8 @@ it: {
   res_cats_empty: 'Non ci sono spese in questo mese.',
   res_summary_empty: 'Non ci sono ancora movimenti in questo mese.',
   bud_intro: 'Imposta un limite mensile per categoria e guarda quanto hai speso.',
+  bud_income_label: 'Quanto entra al mese?', bud_split_btn: 'Ripartisci secondo le mie entrate', bud_split_help: 'Ripartiamo la parte Spese della tua ripartizione suggerita ({pct}% delle tue entrate) tra le tue categorie. Modifica quello che vuoi e salva tutto in una volta.',
+  bud_total_label: 'Budget totale:', bud_save_all: 'Salva tutto',
   bud_spent_left: 'Spesi {spent} di {budget} · Restano {left}',
   bud_spent_over: 'Spesi {spent} di {budget} · Hai sforato di {over}',
   bud_nolimit: 'Senza limite. Speso questo mese: {spent}',
@@ -1782,6 +1807,7 @@ it: {
   lock_pin_label: 'PIN',
   lock_enter: 'Entra',
   lock_note: 'I tuoi dati sono protetti con il tuo PIN.',
+  lock_forgot: 'Hai dimenticato il PIN?', lock_reset_explain: 'Se hai dimenticato il PIN, non c’è modo di recuperarlo. Puoi ricominciare da zero: i dati salvati su QUESTO telefono vengono eliminati e l’app torna alla schermata di benvenuto. Ricominciare da zero?', lock_reset_explain_cloud: 'Se hai dimenticato il PIN, non c’è modo di recuperarlo. Puoi ricominciare da zero: i dati su QUESTO telefono vengono eliminati e la sessione cloud viene chiusa, SENZA toccare la copia salvata nel tuo account. Quando rientri con il tuo account, i tuoi dati scendono di nuovo. Ricominciare da zero?',
   lock_err: 'PIN errato. Riprova.',
   ob_title: 'Benvenuto in PETO Finanzas!',
   ob_intro_1: 'Organizza i tuoi soldi in pochi minuti: spese, entrate, budget, conti e debiti.',
@@ -1795,6 +1821,7 @@ it: {
   ob_pin2_ph: 'Ripeti il PIN',
   ob_start: 'Inizia',
   ob_note: 'Potrai cambiare il PIN quando vuoi nelle Impostazioni.',
+  pin_warn: 'Se lo dimentichi, non c’è modo di recuperarlo: annotalo in un posto sicuro.',
   ob_tour1_title: 'Annota una spesa in pochi secondi',
   ob_tour1_text: 'Tocca il pulsante +, scrivi l’importo e la categoria. Nient’altro: la spesa viene registrata subito.',
   ob_tour2_title: 'Quanto puoi spendere oggi?',
@@ -2043,6 +2070,7 @@ it: {
   news_c36: 'Versione 36: nuova sezione Podcast — ascolta «Finanzas Personales» senza uscire dall’app, con lettore integrato e l’elenco salvato per quando non c’è internet — la schermata di benvenuto ora avanza da sola, diapositiva dopo diapositiva — e la vista del link rinnovata: il san si presenta con il suo avanzamento e l’accesso diretto per provare l’app.',
   news_c38: 'Versione 38: il Podcast ora carica e riproduce i suoi episodi.',
   news_c39: 'Versione 39: il Podcast ora riproduce i suoi episodi e i widget piccoli funzionano di nuovo.',
+  news_c40: 'Versione 40: il saldo dei tuoi conti ora è etichettato con onestà, quando crei il PIN l’app avvisa che non si può recuperare (e c’è un’uscita di emergenza se lo dimentichi), il tuo numero di spesa giornaliera nasce il primo giorno con «Crea il mio budget» e registrare una spesa ora richiede tre tocchi.',
   news_c37: 'Versione 37: widget ridisegnati — gradiente del marchio, barra di avanzamento che cambia colore in base al budget e la riga del prossimo turno del tuo san — e un widget nuovo grande quanto un’icona, con quanto puoi spendere oggi — e il marchio resta visibile mentre scorri il link pubblico del san — e i turni dell’organizzatore ora si piegano a fisarmonica, con aperto solo quello di questa settimana.',
   widget_today: 'oggi',
   widget_san_next: 'Prossimo turno: {name} · {date}',
@@ -2240,6 +2268,7 @@ pt: {
   key_settings: 'Nome, divisão, texto, seções, PIN',
   footer: 'PETO Finanzas · Funciona sem internet · A nuvem é opcional: seus dados, sua decisão',
   tile_available: 'Dinheiro disponível',
+  tile_accounts: 'Saldo nas suas contas', tile_accounts_aria: 'Saldo nas suas contas: ir para Minhas contas', tile_accounts_help: 'A soma das suas contas. Você a atualiza ao criar ou editar uma conta.',
   tile_available_aria: 'Dinheiro disponível: ir para Minhas contas',
   tile_savings: 'Poupança deste mês',
   tile_savings_aria: 'Poupança deste mês: ir para Poupança',
@@ -2268,7 +2297,8 @@ pt: {
   banner_close: 'Fechar',
   spend_title: 'Quanto você pode gastar hoje?',
   spend_note: 'Isto é o que você pode gastar hoje sem passar do limite.',
-  spend_guide: 'Crie o orçamento da sua primeira categoria e você verá aqui quanto pode gastar por dia.',
+  spend_guide: 'Crie seu primeiro orçamento e aqui você verá quanto pode gastar a cada dia. Também aparece quando você registra sua primeira renda.',
+  spend_create_btn: 'Criar meu orçamento',
   spend_left: 'Restam {amount} para os {days} dias restantes do mês.',
   spend_left_one: 'Resta {amount} para hoje, o último dia do mês.',
   spend_over: 'Você atingiu o orçamento deste mês.',
@@ -2297,6 +2327,7 @@ pt: {
   exp_total_label: 'Total do mês:',
   amount_label: 'Valor ($)',
   category_label: 'Categoria',
+  cat_choose: 'Escolhe a categoria', more_details: 'Mais detalhes',
   date_label: 'Data',
   note_label: 'Nota (opcional)',
   exp_note_ph: 'Para quê foi?',
@@ -2361,6 +2392,8 @@ pt: {
   res_cats_empty: 'Nenhum gasto este mês.',
   res_summary_empty: 'Nenhuma atividade este mês ainda.',
   bud_intro: 'Defina um limite mensal por categoria e veja quanto você gastou.',
+  bud_income_label: 'Quanto entra por mês?', bud_split_btn: 'Dividir conforme minha renda', bud_split_help: 'Distribuímos a parte de Gastos da sua divisão sugerida ({pct}% da sua renda) entre as suas categorias. Ajuste o que quiser e salve tudo de uma vez.',
+  bud_total_label: 'Orçamento total:', bud_save_all: 'Salvar tudo',
   bud_spent_left: 'Gasto {spent} de {budget} · restam {left}',
   bud_spent_over: 'Gasto {spent} de {budget} · passou em {over}',
   bud_nolimit: 'Sem limite. Gasto este mês: {spent}',
@@ -2492,6 +2525,7 @@ pt: {
   lock_pin_label: 'PIN',
   lock_enter: 'Desbloquear',
   lock_note: 'Seus dados ficam somente neste telefone.',
+  lock_forgot: 'Esqueceu seu PIN?', lock_reset_explain: 'Se você esqueceu seu PIN, não há como recuperá-lo. Você pode começar do zero: os dados salvos NESTE telefone são apagados e o app volta à tela de boas-vindas. Começar do zero?', lock_reset_explain_cloud: 'Se você esqueceu seu PIN, não há como recuperá-lo. Você pode começar do zero: os dados DESTE telefone são apagados e sua sessão na nuvem é encerrada, SEM tocar na cópia salva na sua conta. Ao entrar de novo com sua conta, seus dados baixam outra vez. Começar do zero?',
   lock_err: 'PIN incorreto. Tente de novo.',
   ob_title: 'Bem-vindo ao PETO Finanzas!',
   ob_intro_1: 'Organize seu dinheiro em minutos: gastos, renda, orçamento, contas e dívidas.',
@@ -2505,6 +2539,7 @@ pt: {
   ob_pin2_ph: 'Repita o PIN',
   ob_start: 'Começar',
   ob_note: 'Você pode trocar o PIN quando quiser em Ajustes.',
+  pin_warn: 'Se você esquecê-lo, não há como recuperá-lo: anote-o em um lugar seguro.',
   ob_tour1_title: 'Registre um gasto em segundos',
   ob_tour1_text: 'Toque no botão +, digite o valor e a categoria. Só isso: seu gasto fica salvo na hora.',
   ob_tour2_title: 'Quanto você pode gastar hoje?',
@@ -2753,6 +2788,7 @@ pt: {
   news_c36: 'Compilação 36: nova seção Podcast — ouça «Finanzas Personales» sem sair do app, com reprodutor integrado e a lista salva para quando não há internet — a boas-vindas agora avança sozinha, tela a tela — e a vista do link renovada: o san se apresenta com seu progresso e acesso direto para testar o app.',
   news_c38: 'Compilação 38: o Podcast agora carrega e reproduz seus episódios.',
   news_c39: 'Compilação 39: o Podcast agora reproduz seus episódios e os widgets pequenos voltaram a funcionar.',
+  news_c40: 'Compilação 40: o saldo das suas contas agora é rotulado com honestidade, ao criar seu PIN o app avisa que ele não pode ser recuperado (e há uma saída de emergência se você esquecê-lo), seu número de gastos diários nasce no primeiro dia com «Criar meu orçamento» e registrar uma despesa agora leva três toques.',
   news_c37: 'Compilação 37: widgets renovados — degradê da marca, barra de progresso que muda de cor conforme seu orçamento e a linha do próximo turno do seu san — e um widget novo do tamanho de um ícone, com o que você pode gastar hoje — e a marca sempre visível ao rolar o link público do san — e as rodadas do organizador agora dobram em acordeão, com só a desta semana aberta.',
   widget_today: 'hoje',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -2950,6 +2986,7 @@ fr: {
   key_settings: 'Nom, répartition, texte, sections, PIN',
   footer: 'PETO Finanzas · Fonctionne hors ligne · Le cloud est facultatif : tes données, ton choix',
   tile_available: 'Argent disponible',
+  tile_accounts: 'Solde de tes comptes', tile_accounts_aria: 'Solde de tes comptes : aller à Mes comptes', tile_accounts_help: 'La somme de tes comptes. C’est toi qui la mets à jour quand tu crées ou modifies un compte.',
   tile_available_aria: 'Argent disponible : aller à Mes comptes',
   tile_savings: 'Épargne de ce mois-ci',
   tile_savings_aria: 'Épargne de ce mois-ci : aller à Épargne',
@@ -2978,7 +3015,8 @@ fr: {
   banner_close: 'Ignorer',
   spend_title: 'Combien peux-tu dépenser aujourd’hui ?',
   spend_note: 'C’est ce que tu peux dépenser aujourd’hui sans dépasser.',
-  spend_guide: 'Crée le budget de ta première catégorie et tu verras ici combien tu peux dépenser chaque jour.',
+  spend_guide: 'Crée ton premier budget et tu verras ici combien tu peux dépenser chaque jour. Il apparaît aussi quand tu enregistres ton premier revenu.',
+  spend_create_btn: 'Créer mon budget',
   spend_left: 'Il te reste {amount} pour les {days} jours restants du mois.',
   spend_left_one: 'Il te reste {amount} pour aujourd’hui, le dernier jour du mois.',
   spend_over: 'Tu as atteint le budget de ce mois-ci.',
@@ -3007,6 +3045,7 @@ fr: {
   exp_total_label: 'Total du mois :',
   amount_label: 'Montant ($)',
   category_label: 'Catégorie',
+  cat_choose: 'Choisis une catégorie', more_details: 'Plus de détails',
   date_label: 'Date',
   note_label: 'Note (facultatif)',
   exp_note_ph: 'C’était pour quoi ?',
@@ -3071,6 +3110,8 @@ fr: {
   res_cats_empty: 'Aucune dépense ce mois-ci.',
   res_summary_empty: 'Aucune activité ce mois-ci pour le moment.',
   bud_intro: 'Fixe une limite mensuelle par catégorie et vois combien tu as dépensé.',
+  bud_income_label: 'Combien rentre chaque mois ?', bud_split_btn: 'Répartir selon mes revenus', bud_split_help: 'Nous répartissons la part Dépenses de ta répartition suggérée ({pct}% de tes revenus) entre tes catégories. Ajuste ce que tu veux et enregistre tout d’un coup.',
+  bud_total_label: 'Budget total :', bud_save_all: 'Tout enregistrer',
   bud_spent_left: 'Dépensé {spent} sur {budget} · il reste {left}',
   bud_spent_over: 'Dépensé {spent} sur {budget} · dépassement de {over}',
   bud_nolimit: 'Pas de limite. Dépensé ce mois-ci : {spent}',
@@ -3202,6 +3243,7 @@ fr: {
   lock_pin_label: 'Code PIN',
   lock_enter: 'Déverrouiller',
   lock_note: 'Tes données restent uniquement sur ce téléphone.',
+  lock_forgot: 'Tu as oublié ton code PIN ?', lock_reset_explain: 'Si tu as oublié ton code PIN, il n’y a aucun moyen de le récupérer. Tu peux repartir de zéro : les données enregistrées sur CE téléphone sont supprimées et l’appli revient à l’écran de bienvenue. Repartir de zéro ?', lock_reset_explain_cloud: 'Si tu as oublié ton code PIN, il n’y a aucun moyen de le récupérer. Tu peux repartir de zéro : les données de CE téléphone sont supprimées et ta session cloud est fermée, SANS toucher à la copie enregistrée dans ton compte. Quand tu te reconnecteras avec ton compte, tes données redescendront. Repartir de zéro ?',
   lock_err: 'Code PIN incorrect. Réessaie.',
   ob_title: 'Bienvenue dans PETO Finanzas !',
   ob_intro_1: 'Organise ton argent en quelques minutes : dépenses, revenus, budget, comptes et dettes.',
@@ -3215,6 +3257,7 @@ fr: {
   ob_pin2_ph: 'Répète le code PIN',
   ob_start: 'Commencer',
   ob_note: 'Tu peux changer le code PIN à tout moment dans les Réglages.',
+  pin_warn: 'Si tu l’oublies, il n’y a aucun moyen de le récupérer : note-le dans un endroit sûr.',
   ob_tour1_title: 'Enregistre une dépense en quelques secondes',
   ob_tour1_text: 'Touche le bouton +, saisis le montant et la catégorie. C’est tout : ta dépense est enregistrée tout de suite.',
   ob_tour2_title: 'Combien peux-tu dépenser aujourd’hui ?',
@@ -3463,6 +3506,7 @@ fr: {
   news_c36: 'Version 36 : nouvelle section Podcast — écoutez « Finanzas Personales » sans quitter l’appli, avec lecteur intégré et la liste enregistrée pour quand il n’y a pas internet — l’écran d’accueil avance maintenant tout seul, diapositive après diapositive — et la vue du lien renouvelée : le san se présente avec sa progression et un accès direct pour essayer l’appli.',
   news_c38: 'Version 38 : le Podcast charge et lit désormais ses épisodes.',
   news_c39: 'Version 39 : le Podcast lit désormais ses épisodes, et les petits widgets fonctionnent à nouveau.',
+  news_c40: 'Version 40 : le solde de tes comptes est maintenant étiqueté honnêtement, quand tu crées ton code PIN l’appli prévient qu’il ne peut pas être récupéré (et il y a une sortie de secours si tu l’oublies), ton montant de dépense quotidienne naît dès le premier jour avec « Créer mon budget » et enregistrer une dépense ne prend plus que trois touchers.',
   news_c37: 'Version 37 : widgets repensés — dégradé de la marque, barre de progression qui change de couleur selon votre budget et la ligne du prochain tour de votre san — et un nouveau widget de la taille d’une icône, avec ce que vous pouvez dépenser aujourd’hui — et la marque reste visible quand on fait défiler le lien public du san — et les tours de l’organisateur se plient en accordéon, avec seul celui de cette semaine ouvert.',
   widget_today: 'aujourd’hui',
   widget_san_next: 'Prochain tour : {name} · {date}',
@@ -3660,6 +3704,7 @@ de: {
   key_settings: 'Name, Aufteilung, Text, Abschnitte, PIN',
   footer: 'PETO Finanzas · Funktioniert offline · Die Cloud ist optional: deine Daten, deine Entscheidung',
   tile_available: 'Verfügbares Geld',
+  tile_accounts: 'Guthaben auf deinen Konten', tile_accounts_aria: 'Guthaben auf deinen Konten: zu Meine Konten', tile_accounts_help: 'Die Summe deiner Konten. Du aktualisierst sie selbst, wenn du ein Konto anlegst oder bearbeitest.',
   tile_available_aria: 'Verfügbares Geld: zu Meine Konten',
   tile_savings: 'Ersparnisse in diesem Monat',
   tile_savings_aria: 'Ersparnisse in diesem Monat: zu Ersparnisse',
@@ -3688,7 +3733,8 @@ de: {
   banner_close: 'Schließen',
   spend_title: 'Wie viel kannst du heute ausgeben?',
   spend_note: 'So viel kannst du heute ausgeben, ohne drüber zu kommen.',
-  spend_guide: 'Erstelle dein erstes Kategorie-Budget, und du siehst hier, wie viel du jeden Tag ausgeben kannst.',
+  spend_guide: 'Erstelle dein erstes Budget und du siehst hier, wie viel du jeden Tag ausgeben kannst. Es erscheint auch, wenn du dein erstes Einkommen einträgst.',
+  spend_create_btn: 'Mein Budget erstellen',
   spend_left: 'Dir bleiben {amount} für die verbleibenden {days} Tage des Monats.',
   spend_left_one: 'Dir bleibt {amount} für heute, den letzten Tag des Monats.',
   spend_over: 'Du hast das Budget dieses Monats erreicht.',
@@ -3717,6 +3763,7 @@ de: {
   exp_total_label: 'Monatssumme:',
   amount_label: 'Betrag ($)',
   category_label: 'Kategorie',
+  cat_choose: 'Kategorie wählen', more_details: 'Mehr Details',
   date_label: 'Datum',
   note_label: 'Notiz (optional)',
   exp_note_ph: 'Wofür war es?',
@@ -3781,6 +3828,8 @@ de: {
   res_cats_empty: 'Keine Ausgaben in diesem Monat.',
   res_summary_empty: 'Noch keine Aktivität in diesem Monat.',
   bud_intro: 'Lege ein Monatslimit pro Kategorie fest und sieh, wie viel du ausgegeben hast.',
+  bud_income_label: 'Wie viel kommt im Monat herein?', bud_split_btn: 'Nach meinem Einkommen aufteilen', bud_split_help: 'Wir verteilen den Ausgaben-Anteil deiner vorgeschlagenen Aufteilung ({pct}% deines Einkommens) auf deine Kategorien. Passe an, was du möchtest, und speichere alles auf einmal.',
+  bud_total_label: 'Gesamtbudget:', bud_save_all: 'Alles speichern',
   bud_spent_left: '{spent} von {budget} ausgegeben · {left} übrig',
   bud_spent_over: '{spent} von {budget} ausgegeben · {over} darüber',
   bud_nolimit: 'Kein Limit. In diesem Monat ausgegeben: {spent}',
@@ -3912,6 +3961,7 @@ de: {
   lock_pin_label: 'PIN',
   lock_enter: 'Entsperren',
   lock_note: 'Deine Daten bleiben nur auf diesem Telefon.',
+  lock_forgot: 'PIN vergessen?', lock_reset_explain: 'Wenn du deine PIN vergessen hast, gibt es keine Möglichkeit, sie wiederherzustellen. Du kannst von vorne beginnen: Die auf DIESEM Telefon gespeicherten Daten werden gelöscht und die App kehrt zum Willkommensbildschirm zurück. Von vorne beginnen?', lock_reset_explain_cloud: 'Wenn du deine PIN vergessen hast, gibt es keine Möglichkeit, sie wiederherzustellen. Du kannst von vorne beginnen: Die Daten auf DIESEM Telefon werden gelöscht und deine Cloud-Sitzung wird beendet, OHNE die in deinem Konto gespeicherte Kopie anzurühren. Wenn du dich wieder mit deinem Konto anmeldest, kommen deine Daten erneut herunter. Von vorne beginnen?',
   lock_err: 'Falsche PIN. Versuche es erneut.',
   ob_title: 'Willkommen bei PETO Finanzas!',
   ob_intro_1: 'Organisiere dein Geld in Minuten: Ausgaben, Einnahmen, Budget, Konten und Schulden.',
@@ -3925,6 +3975,7 @@ de: {
   ob_pin2_ph: 'PIN wiederholen',
   ob_start: 'Loslegen',
   ob_note: 'Du kannst die PIN jederzeit in den Einstellungen ändern.',
+  pin_warn: 'Wenn du sie vergisst, gibt es keine Möglichkeit, sie wiederherzustellen: Notiere sie an einem sicheren Ort.',
   ob_tour1_title: 'Eine Ausgabe in Sekunden eintragen',
   ob_tour1_text: 'Tippe auf den +-Knopf, gib den Betrag und die Kategorie ein. Das ist alles: Deine Ausgabe ist sofort gespeichert.',
   ob_tour2_title: 'Wie viel kannst du heute ausgeben?',
@@ -4173,6 +4224,7 @@ de: {
   news_c36: 'Version 36: neuer Bereich Podcast — höre „Finanzas Personales“, ohne die App zu verlassen, mit integriertem Player und gespeicherter Liste für Zeiten ohne Internet — der Willkommensbildschirm wechselt jetzt von selbst, Folie für Folie — und die erneuerte Link-Ansicht: Der San zeigt seinen Fortschritt und einen direkten Zugang, um die App zu testen.',
   news_c38: 'Version 38: Der Podcast lädt und spielt seine Episoden jetzt ab.',
   news_c39: 'Version 39: Der Podcast spielt seine Episoden jetzt ab, und die kleinen Widgets funktionieren wieder.',
+  news_c40: 'Version 40: Dein Kontostand wird jetzt ehrlich bezeichnet, beim Erstellen deiner PIN warnt die App, dass sie nicht wiederhergestellt werden kann (und es gibt einen Notausgang, falls du sie vergisst), deine tägliche Ausgabenzahl entsteht am ersten Tag mit „Mein Budget erstellen“ und eine Ausgabe einzutragen dauert jetzt drei Tipps.',
   news_c37: 'Version 37: Widgets im neuen Look — Marken-Farbverlauf, ein Fortschrittsbalken, der je nach Budget die Farbe wechselt, und die Zeile zum nächsten Zug deines San — plus ein neues Widget in App-Symbol-Größe mit deinem heutigen Budget — und die Marke bleibt beim Scrollen im öffentlichen San-Link sichtbar — und die Runden des Organisators klappen jetzt als Akkordeon, mit nur der dieser Woche offen.',
   widget_today: 'heute',
   widget_san_next: 'Nächster Zug: {name} · {date}',
@@ -4370,6 +4422,7 @@ zh: {
   key_settings: '姓名、分配、文字、版块、PIN',
   footer: 'PETO Finanzas · 离线可用 · 云端可选：你的数据，你做主',
   tile_available: '可用资金',
+  tile_accounts: '你的账户余额', tile_accounts_aria: '你的账户余额：前往我的账户', tile_accounts_help: '你所有账户的总和。创建或编辑账户时由你自己更新。',
   tile_available_aria: '可用资金：前往我的账户',
   tile_savings: '本月储蓄',
   tile_savings_aria: '本月储蓄：前往储蓄',
@@ -4398,7 +4451,8 @@ zh: {
   banner_close: '关闭',
   spend_title: '今天可以花多少？',
   spend_note: '这是你今天不超支可以花的金额。',
-  spend_guide: '创建你的第一个类别预算，这里就会显示你每天可以花多少。',
+  spend_guide: '创建你的第一个预算，这里就会显示你每天可以花多少钱。当你记录第一笔收入时它也会出现。',
+  spend_create_btn: '创建我的预算',
   spend_left: '本月剩余 {days} 天，你还剩 {amount}。',
   spend_left_one: '今天是本月最后一天，你还剩 {amount}。',
   spend_over: '你已用完本月预算。',
@@ -4427,6 +4481,7 @@ zh: {
   exp_total_label: '本月总计：',
   amount_label: '金额 ($)',
   category_label: '类别',
+  cat_choose: '选择类别', more_details: '更多详情',
   date_label: '日期',
   note_label: '备注（可选）',
   exp_note_ph: '这笔钱花在什么上？',
@@ -4491,6 +4546,8 @@ zh: {
   res_cats_empty: '本月没有支出。',
   res_summary_empty: '本月尚无活动。',
   bud_intro: '为每个类别设置每月上限，查看你已花了多少。',
+  bud_income_label: '每月收入多少？', bud_split_btn: '按我的收入分配', bud_split_help: '我们把你建议分配中的支出部分（收入的 {pct}%）分配到各个类别。你可以随意调整，然后一次性保存全部。',
+  bud_total_label: '预算总计：', bud_save_all: '全部保存',
   bud_spent_left: '已花 {spent} / {budget} · 还剩 {left}',
   bud_spent_over: '已花 {spent} / {budget} · 超出 {over}',
   bud_nolimit: '无上限。本月已花：{spent}',
@@ -4622,6 +4679,7 @@ zh: {
   lock_pin_label: 'PIN',
   lock_enter: '解锁',
   lock_note: '你的数据只保存在这部手机上。',
+  lock_forgot: '忘记 PIN 了？', lock_reset_explain: '如果你忘了 PIN，将无法找回。你可以重新开始：删除保存在这部手机上的数据，应用将返回欢迎界面。重新开始？', lock_reset_explain_cloud: '如果你忘了 PIN，将无法找回。你可以重新开始：删除这部手机上的数据并退出云端登录，但不会动你账户中保存的副本。当你再次用账户登录时，数据会重新下载回来。重新开始？',
   lock_err: 'PIN 不正确。请再试一次。',
   ob_title: '欢迎来到 PETO Finanzas！',
   ob_intro_1: '几分钟内打理好你的钱：支出、收入、预算、账户和债务。',
@@ -4635,6 +4693,7 @@ zh: {
   ob_pin2_ph: '重复 PIN',
   ob_start: '开始',
   ob_note: '你可以随时在「设置」中更改 PIN。',
+  pin_warn: '如果忘了，将无法找回：请把它记在安全的地方。',
   ob_tour1_title: '几秒钟记下一笔支出',
   ob_tour1_text: '点 + 按钮，输入金额和类别。就是这么简单：你的支出立即保存。',
   ob_tour2_title: '今天可以花多少？',
@@ -4883,6 +4942,7 @@ zh: {
   news_c36: '第 36 版：新增播客版块——无需离开应用即可收听《Finanzas Personales》，内置播放器，列表会保存以便离线查看；欢迎页现在会自动逐页切换；链接视图也焕然一新：san 展示进度，并可直接试用应用。',
   news_c38: '第 38 版：播客现在可以加载并播放节目了。',
   news_c39: '第 39 版：播客现在可以播放节目了，小部件也重新正常工作。',
+  news_c40: '第 40 版：你的账户余额现在会诚实标注；创建 PIN 时应用会提醒它无法找回（如果你忘了，还有紧急出口）；你的每日可花金额在第一天就能通过“创建我的预算”诞生；现在记录一笔支出只需点三下。',
   news_c37: '第 37 版：小部件全新设计——品牌渐变、会随预算变色的进度条，以及 san 下一轮的提示行——还有一个全新的、只有一个图标大小的小部件，显示你今天能花多少；在 san 公开链接中下滑时，品牌始终可见；组织者的轮次现在折叠成手风琴，仅展开本周一轮。',
   widget_today: '今日',
   widget_san_next: '下一轮：{name} · {date}',
@@ -5080,6 +5140,7 @@ ja: {
   key_settings: '名前、配分、文字、セクション、PIN',
   footer: 'PETO Finanzas · オフラインで動作 · クラウドは任意：あなたのデータ、あなたの選択',
   tile_available: '利用可能なお金',
+  tile_accounts: '口座の残高', tile_accounts_aria: '口座の残高：マイアカウントへ', tile_accounts_help: '口座の合計です。口座を作成・編集するときに自分で更新します。',
   tile_available_aria: '利用可能なお金：私の口座へ',
   tile_savings: '今月の貯蓄',
   tile_savings_aria: '今月の貯蓄：貯蓄へ',
@@ -5108,7 +5169,8 @@ ja: {
   banner_close: '閉じる',
   spend_title: '今日はいくら使えますか？',
   spend_note: 'これは、予算を超えずに今日使える金額です。',
-  spend_guide: '最初のカテゴリ予算を作成すると、ここに1日いくら使えるか表示されます。',
+  spend_guide: '最初の予算を作成すると、ここに毎日使える金額が表示されます。最初の収入を記録したときにも表示されます。',
+  spend_create_btn: '予算を作成',
   spend_left: '今月の残り{days}日で{amount}残っています。',
   spend_left_one: '今月最後の日の今日、{amount}残っています。',
   spend_over: '今月の予算に達しました。',
@@ -5137,6 +5199,7 @@ ja: {
   exp_total_label: '今月の合計：',
   amount_label: '金額（$）',
   category_label: 'カテゴリ',
+  cat_choose: 'カテゴリを選択', more_details: '詳細を追加',
   date_label: '日付',
   note_label: 'メモ（任意）',
   exp_note_ph: '何に使いましたか？',
@@ -5201,6 +5264,8 @@ ja: {
   res_cats_empty: '今月は支出がありません。',
   res_summary_empty: '今月はまだ活動がありません。',
   bud_intro: 'カテゴリごとに月の上限を設定し、いくら使ったか確認できます。',
+  bud_income_label: '毎月の収入はいくらですか？', bud_split_btn: '収入に応じて配分', bud_split_help: '提案された配分の支出分（収入の {pct}%）をカテゴリに振り分けます。好きなように調整して、まとめて保存できます。',
+  bud_total_label: '予算合計：', bud_save_all: 'すべて保存',
   bud_spent_left: '{budget}中{spent}支出 · 残り{left}',
   bud_spent_over: '{budget}中{spent}支出 · {over}超過',
   bud_nolimit: '上限なし。今月の支出：{spent}',
@@ -5332,6 +5397,7 @@ ja: {
   lock_pin_label: 'PIN',
   lock_enter: 'ロック解除',
   lock_note: 'データはこのスマートフォンだけに残ります。',
+  lock_forgot: 'PINを忘れましたか？', lock_reset_explain: 'PINを忘れた場合、復旧する方法はありません。最初からやり直すことができます：このスマートフォンに保存されたデータは削除され、アプリはようこそ画面に戻ります。最初からやり直しますか？', lock_reset_explain_cloud: 'PINを忘れた場合、復旧する方法はありません。最初からやり直すことができます：このスマートフォンのデータは削除され、クラウドからサインアウトしますが、アカウントに保存されたコピーには一切触れません。アカウントで再度サインインすると、データが再びダウンロードされます。最初からやり直しますか？',
   lock_err: 'PINが違います。もう一度お試しください。',
   ob_title: 'PETO Finanzasへようこそ！',
   ob_intro_1: '支出、収入、予算、口座、借金を、数分で整理できます。',
@@ -5345,6 +5411,7 @@ ja: {
   ob_pin2_ph: 'PINをもう一度',
   ob_start: '始める',
   ob_note: 'PINは設定でいつでも変更できます。',
+  pin_warn: '忘れると復旧できません。安全な場所にメモしておいてください。',
   ob_tour1_title: '数秒で支出を記録',
   ob_tour1_text: '+ボタンをタップし、金額とカテゴリを入力します。それだけです。支出はすぐ保存されます。',
   ob_tour2_title: '今日はいくら使えますか？',
@@ -5593,6 +5660,7 @@ ja: {
   news_c36: 'バージョン36：新しいポッドキャストセクション——アプリを離れずに「Finanzas Personales」を聴けます。プレーヤー内蔵、リストはオフライン用に保存。ようこそ画面は自動で切り替わるようになりました。リンク表示も一新：sanの進み具合と、アプリを試す直接アクセス付き。',
   news_c38: 'バージョン38：ポッドキャストのエピソードが読み込めて再生できるようになりました。',
   news_c39: 'バージョン39：ポッドキャストのエピソードが再生できるようになり、小さいウィジェットも再び使えるようになりました。',
+  news_c40: 'バージョン40：口座残高が正直に表示されるようになりました。PINを作成するとき、復旧できないことが警告され（忘れた場合の緊急出口もあります）、毎日の支出額は初日から「予算を作成」で生まれ、支出の記録は3タップで済むようになりました。',
   news_c37: 'バージョン37：ウィジェットを一新——ブランドのグラデーション、予算に合わせて色が変わる進捗バー、sanの次のターンの行——そして、今日使える金額を表示するアイコンサイズの新しいウィジェット。公開リンクをスクロールしてもブランドが常に表示されます。主催者のラウンドはアコーディオン式になり、今週分だけが開きます。',
   widget_today: '今日',
   widget_san_next: '次のターン：{name} · {date}',
@@ -5790,6 +5858,7 @@ ko: {
   key_settings: '이름, 분배, 글자, 섹션, PIN',
   footer: 'PETO Finanzas · 오프라인으로 작동 · 클라우드는 선택 사항: 내 데이터, 내 결정',
   tile_available: '사용 가능한 돈',
+  tile_accounts: '내 계좌 잔고', tile_accounts_aria: '내 계좌 잔고: 내 계좌로 이동', tile_accounts_help: '내 계좌들의 합계예요. 계좌를 만들거나 수정할 때 직접 업데이트합니다.',
   tile_available_aria: '사용 가능한 돈: 내 계좌로 이동',
   tile_savings: '이번 달 저축',
   tile_savings_aria: '이번 달 저축: 저축으로 이동',
@@ -5818,7 +5887,8 @@ ko: {
   banner_close: '닫기',
   spend_title: '오늘 얼마를 쓸 수 있나요?',
   spend_note: '오늘 예산을 넘지 않고 쓸 수 있는 금액입니다.',
-  spend_guide: '첫 카테고리 예산을 만들면 여기서 매일 얼마를 쓸 수 있는지 보입니다.',
+  spend_guide: '첫 예산을 만들면 매일 얼마를 쓸 수 있는지 여기에 표시됩니다. 첫 수입을 기록할 때도 나타납니다.',
+  spend_create_btn: '내 예산 만들기',
   spend_left: '이번 달 남은 {days}일 동안 {amount}가 남았습니다.',
   spend_left_one: '이번 달 마지막 날인 오늘, {amount}가 남았습니다.',
   spend_over: '이번 달 예산에 도달했습니다.',
@@ -5847,6 +5917,7 @@ ko: {
   exp_total_label: '이번 달 합계:',
   amount_label: '금액($)',
   category_label: '카테고리',
+  cat_choose: '카테고리 선택', more_details: '세부 정보',
   date_label: '날짜',
   note_label: '메모(선택)',
   exp_note_ph: '무엇에 썼나요?',
@@ -5911,6 +5982,8 @@ ko: {
   res_cats_empty: '이번 달 지출이 없습니다.',
   res_summary_empty: '이번 달에는 아직 활동이 없습니다.',
   bud_intro: '카테고리마다 월 한도를 정하고 얼마를 썼는지 확인하세요.',
+  bud_income_label: '한 달에 얼마가 들어오나요?', bud_split_btn: '내 수입에 맞게 나누기', bud_split_help: '제안된 배분의 지출 부분(수입의 {pct}%)을 카테고리에 나눠 드립니다. 원하는 대로 조정하고 한 번에 모두 저장하세요.',
+  bud_total_label: '총 예산:', bud_save_all: '모두 저장',
   bud_spent_left: '{budget} 중 {spent} 지출 · {left} 남음',
   bud_spent_over: '{budget} 중 {spent} 지출 · {over} 초과',
   bud_nolimit: '한도 없음. 이번 달 지출: {spent}',
@@ -6042,6 +6115,7 @@ ko: {
   lock_pin_label: 'PIN',
   lock_enter: '잠금 해제',
   lock_note: '데이터는 이 휴대전화에만 남습니다.',
+  lock_forgot: 'PIN을 잊으셨나요?', lock_reset_explain: 'PIN을 잊었다면 복구할 방법이 없습니다. 처음부터 다시 시작할 수 있습니다: 이 휴대전화에 저장된 데이터가 삭제되고 앱이 시작 화면으로 돌아갑니다. 처음부터 다시 시작할까요?', lock_reset_explain_cloud: 'PIN을 잊었다면 복구할 방법이 없습니다. 처음부터 다시 시작할 수 있습니다: 이 휴대전화의 데이터가 삭제되고 클라우드에서 로그아웃되지만, 계정에 저장된 복사본은 건드리지 않습니다. 계정으로 다시 로그인하면 데이터가 다시 내려옵니다. 처음부터 다시 시작할까요?',
   lock_err: 'PIN이 틀립니다. 다시 시도하세요.',
   ob_title: 'PETO Finanzas에 오신 것을 환영합니다!',
   ob_intro_1: '몇 분 만에 돈을 정리하세요: 지출, 수입, 예산, 계좌와 빚.',
@@ -6055,6 +6129,7 @@ ko: {
   ob_pin2_ph: 'PIN 반복',
   ob_start: '시작하기',
   ob_note: 'PIN은 설정에서 언제든 바꿀 수 있습니다.',
+  pin_warn: '잊어버리면 복구할 방법이 없습니다. 안전한 곳에 적어 두세요.',
   ob_tour1_title: '몇 초 만에 지출 기록',
   ob_tour1_text: '+ 버튼을 누르고 금액과 카테고리를 입력하세요. 그게 다입니다. 지출이 바로 저장됩니다.',
   ob_tour2_title: '오늘 얼마를 쓸 수 있나요?',
@@ -6303,6 +6378,7 @@ ko: {
   news_c36: '버전 36: 새로운 팟캐스트 섹션 — 앱을 떠나지 않고 "Finanzas Personales"를 들을 수 있고, 내장 플레이어와 오프라인용 저장 목록을 제공합니다. 시작 화면이 이제 슬라이드마다 자동으로 넘어갑니다. 링크 화면도 새로워졌습니다: san의 진행 상황과 앱을 바로 써볼 수 있는 접근을 보여줍니다.',
   news_c38: '버전 38: 팟캐스트 에피소드를 불러와 재생할 수 있습니다.',
   news_c39: '버전 39: 팟캐스트 에피소드를 재생할 수 있고, 작은 위젯도 다시 작동합니다.',
+  news_c40: '버전 40: 계좌 잔고가 이제 정직하게 표시되고, PIN을 만들 때 복구할 수 없다는 안내가 나오며(잊었을 때를 위한 비상 출구도 있습니다), 매일 쓸 수 있는 금액이 첫날부터 "내 예산 만들기"로 생기고, 지출 기록은 이제 세 번의 탭으로 끝납니다.',
   news_c37: '버전 37: 새로워진 위젯 — 브랜드 그라데이션, 예산에 따라 색이 바뀌는 진행 바, san 다음 차례 줄 — 그리고 오늘 쓸 수 있는 금액을 보여주는 아이콘 크기의 새 위젯. 공개 san 링크를 스크롤해도 브랜드가 계속 보입니다. 주최자 라운드는 아코디언으로 접히고, 이번 주 것만 열립니다.',
   widget_today: '오늘',
   widget_san_next: '다음 차례: {name} · {date}',
@@ -6500,6 +6576,7 @@ ru: {
   key_settings: 'Имя, распределение, текст, разделы, PIN',
   footer: 'PETO Finanzas · Работает офлайн · Облако необязательно: ваши данные — ваш выбор',
   tile_available: 'Доступные деньги',
+  tile_accounts: 'Баланс на твоих счетах', tile_accounts_aria: 'Баланс на твоих счетах: перейти в Мои счета', tile_accounts_help: 'Сумма по всем твоим счетам. Ты сам обновляешь её, когда создаёшь или меняешь счёт.',
   tile_available_aria: 'Доступные деньги: перейти в Мои счета',
   tile_savings: 'Сбережения в этом месяце',
   tile_savings_aria: 'Сбережения в этом месяце: перейти в Сбережения',
@@ -6528,7 +6605,8 @@ ru: {
   banner_close: 'Закрыть',
   spend_title: 'Сколько можно потратить сегодня?',
   spend_note: 'Столько вы можете потратить сегодня, не выходя за рамки.',
-  spend_guide: 'Создайте бюджет первой категории, и здесь вы увидите, сколько можно тратить каждый день.',
+  spend_guide: 'Создай свой первый бюджет, и здесь будет видно, сколько ты можешь тратить каждый день. Он также появляется, когда ты записываешь свой первый доход.',
+  spend_create_btn: 'Создать мой бюджет',
   spend_left: 'У вас осталось {amount} на оставшиеся {days} дн. месяца.',
   spend_left_one: 'У вас осталось {amount} на сегодня, последний день месяца.',
   spend_over: 'Вы достигли бюджета этого месяца.',
@@ -6557,6 +6635,7 @@ ru: {
   exp_total_label: 'Итого за месяц:',
   amount_label: 'Сумма ($)',
   category_label: 'Категория',
+  cat_choose: 'Выбери категорию', more_details: 'Ещё детали',
   date_label: 'Дата',
   note_label: 'Заметка (необязательно)',
   exp_note_ph: 'На что это было?',
@@ -6621,6 +6700,8 @@ ru: {
   res_cats_empty: 'В этом месяце нет расходов.',
   res_summary_empty: 'В этом месяце активности пока нет.',
   bud_intro: 'Установите месячный лимит по каждой категории и смотрите, сколько вы потратили.',
+  bud_income_label: 'Сколько поступает в месяц?', bud_split_btn: 'Распределить по моему доходу', bud_split_help: 'Мы распределяем часть «Расходы» из твоего предложенного распределения ({pct}% твоего дохода) по твоим категориям. Настрой, как хочешь, и сохрани всё одним разом.',
+  bud_total_label: 'Итого бюджет:', bud_save_all: 'Сохранить всё',
   bud_spent_left: 'Потрачено {spent} из {budget} · осталось {left}',
   bud_spent_over: 'Потрачено {spent} из {budget} · превышение {over}',
   bud_nolimit: 'Без лимита. Потрачено в этом месяце: {spent}',
@@ -6752,6 +6833,7 @@ ru: {
   lock_pin_label: 'PIN',
   lock_enter: 'Разблокировать',
   lock_note: 'Ваши данные остаются только на этом телефоне.',
+  lock_forgot: 'Забыл PIN-код?', lock_reset_explain: 'Если ты забыл PIN-код, восстановить его нельзя. Можно начать с нуля: данные, сохранённые на ЭТОМ телефоне, будут удалены, и приложение вернётся на экран приветствия. Начать с нуля?', lock_reset_explain_cloud: 'Если ты забыл PIN-код, восстановить его нельзя. Можно начать с нуля: данные на ЭТОМ телефоне будут удалены, а сеанс в облаке завершён — БЕЗ изменения копии, сохранённой в твоём аккаунте. Когда ты снова войдёшь со своим аккаунтом, данные загрузятся обратно. Начать с нуля?',
   lock_err: 'Неверный PIN. Попробуйте снова.',
   ob_title: 'Добро пожаловать в PETO Finanzas!',
   ob_intro_1: 'Наведите порядок в деньгах за несколько минут: расходы, доходы, бюджет, счета и долги.',
@@ -6765,6 +6847,7 @@ ru: {
   ob_pin2_ph: 'Повторите PIN',
   ob_start: 'Начать',
   ob_note: 'Вы можете изменить PIN в любое время в настройках.',
+  pin_warn: 'Если забудешь, восстановить его будет нельзя: запиши его в надёжном месте.',
   ob_tour1_title: 'Запишите расход за секунды',
   ob_tour1_text: 'Нажмите кнопку +, введите сумму и категорию. Это всё: ваш расход сразу сохраняется.',
   ob_tour2_title: 'Сколько можно потратить сегодня?',
@@ -7013,6 +7096,7 @@ ru: {
   news_c36: 'Версия 36: новый раздел «Подкаст» — слушайте «Finanzas Personales», не выходя из приложения, со встроенным плеером и сохранённым списком на случай отсутствия интернета — экран приветствия теперь листается сам, слайд за слайдом — и обновлённый вид ссылки: san показывает свой прогресс и прямой доступ, чтобы попробовать приложение.',
   news_c38: 'Версия 38: Подкаст теперь загружает и воспроизводит выпуски.',
   news_c39: 'Версия 39: Подкаст теперь воспроизводит выпуски, а маленькие виджеты снова работают.',
+  news_c40: 'Версия 40: баланс твоих счетов теперь подписан честно, при создании PIN приложение предупреждает, что его нельзя восстановить (и есть аварийный выход, если забудешь), твоя дневная сумма расходов рождается в первый же день с кнопкой «Создать мой бюджет», а записать расход теперь можно в три касания.',
   news_c37: 'Версия 37: обновлённые виджеты — градиент бренда, полоса прогресса, меняющая цвет в зависимости от бюджета, и строка следующего хода вашего san — плюс новый виджет размером со значок с суммой на сегодня. А в публичной ссылке san бренд остаётся на виду при прокрутке. Раунды организатора теперь складываются аккордеоном: открыт только раунд этой недели.',
   widget_today: 'сегодня',
   widget_san_next: 'Следующий ход: {name} · {date}',
@@ -7210,6 +7294,7 @@ hi: {
   key_settings: 'नाम, बँटवारा, अक्षर, अनुभाग, PIN',
   footer: 'PETO Finanzas · ऑफ़लाइन काम करता है · क्लाउड वैकल्पिक है: आपका डेटा, आपका फ़ैसला',
   tile_available: 'उपलब्ध पैसे',
+  tile_accounts: 'तुम्हारे खातों का बैलेंस', tile_accounts_aria: 'तुम्हारे खातों का बैलेंस: मेरे खाते पर जाएँ', tile_accounts_help: 'तुम्हारे खातों का कुल जोड़। खाता बनाते या बदलते समय तुम खुद इसे अपडेट करते हो।',
   tile_available_aria: 'उपलब्ध पैसे: मेरे खातों पर जाएँ',
   tile_savings: 'इस माह की बचत',
   tile_savings_aria: 'इस माह की बचत: बचत पर जाएँ',
@@ -7238,7 +7323,8 @@ hi: {
   banner_close: 'बंद करें',
   spend_title: 'आज आप कितना खर्च कर सकते हैं?',
   spend_note: 'आज आप बिना सीमा पार किए इतना खर्च कर सकते हैं।',
-  spend_guide: 'अपनी पहली श्रेणी का बजट बनाएँ और आप यहाँ देखेंगे कि रोज़ कितना खर्च कर सकते हैं।',
+  spend_guide: 'अपना पहला बजट बनाओ और यहाँ तुम्हें दिखेगा कि तुम हर दिन कितना खर्च कर सकते हो। यह तब भी दिखाई देता है जब तुम अपनी पहली आय दर्ज करते हो।',
+  spend_create_btn: 'मेरा बजट बनाओ',
   spend_left: 'माह के बचे {days} दिनों के लिए आपके पास {amount} बचे हैं।',
   spend_left_one: 'आज, माह के आखिरी दिन के लिए आपके पास {amount} बचे हैं।',
   spend_over: 'आप इस माह के बजट तक पहुँच गए हैं।',
@@ -7267,6 +7353,7 @@ hi: {
   exp_total_label: 'माह का कुल:',
   amount_label: 'राशि ($)',
   category_label: 'श्रेणी',
+  cat_choose: 'श्रेणी चुनो', more_details: 'और विवरण',
   date_label: 'तारीख',
   note_label: 'टिप्पणी (वैकल्पिक)',
   exp_note_ph: 'यह किस लिए था?',
@@ -7331,6 +7418,8 @@ hi: {
   res_cats_empty: 'इस माह कोई खर्च नहीं।',
   res_summary_empty: 'इस माह अभी कोई गतिविधि नहीं।',
   bud_intro: 'प्रत्येक श्रेणी के लिए मासिक सीमा तय करें और देखें कि आपने कितना खर्च किया।',
+  bud_income_label: 'हर महीने कितना आता है?', bud_split_btn: 'मेरी आय के हिसाब से बाँटो', bud_split_help: 'हम तुम्हारे सुझाए गए बँटवारे के खर्च वाले हिस्से (तुम्हारी आय का {pct}%) को तुम्हारी श्रेणियों में बाँट देते हैं। जो चाहो बदलो और सब कुछ एक साथ सहेजो।',
+  bud_total_label: 'कुल बजट:', bud_save_all: 'सब कुछ सहेजो',
   bud_spent_left: '{budget} में से {spent} खर्च · {left} बचे',
   bud_spent_over: '{budget} में से {spent} खर्च · {over} ज़्यादा',
   bud_nolimit: 'कोई सीमा नहीं। इस माह खर्च: {spent}',
@@ -7462,6 +7551,7 @@ hi: {
   lock_pin_label: 'PIN',
   lock_enter: 'अनलॉक करें',
   lock_note: 'आपका डेटा केवल इस फ़ोन पर रहता है।',
+  lock_forgot: 'PIN भूल गए?', lock_reset_explain: 'अगर तुम अपना PIN भूल गए हो, तो इसे वापस पाने का कोई तरीका नहीं है। तुम फिर से शुरू कर सकते हो: इस फ़ोन में सहेजा गया डेटा मिट जाएगा और ऐप स्वागत स्क्रीन पर लौट आएगा। फिर से शुरू करें?', lock_reset_explain_cloud: 'अगर तुम अपना PIN भूल गए हो, तो इसे वापस पाने का कोई तरीका नहीं है। तुम फिर से शुरू कर सकते हो: इस फ़ोन का डेटा मिट जाएगा और तुम क्लाउड से साइन आउट हो जाओगे, तुम्हारे खाते में सहेजी गई कॉपी को छुए बिना। जब तुम अपने खाते से फिर साइन इन करोगे, तो तुम्हारा डेटा फिर से डाउनलोड हो जाएगा। फिर से शुरू करें?',
   lock_err: 'गलत PIN। फिर से कोशिश करें।',
   ob_title: 'PETO Finanzas में आपका स्वागत है!',
   ob_intro_1: 'मिनटों में अपने पैसे व्यवस्थित करें: खर्च, आय, बजट, खाते और कर्ज़।',
@@ -7475,6 +7565,7 @@ hi: {
   ob_pin2_ph: 'PIN दोहराएँ',
   ob_start: 'शुरू करें',
   ob_note: 'आप सेटिंग में कभी भी PIN बदल सकते हैं।',
+  pin_warn: 'अगर तुम इसे भूल गए, तो इसे वापस पाने का कोई तरीका नहीं है: इसे किसी सुरक्षित जगह लिख लो।',
   ob_tour1_title: 'सेकंडों में खर्च दर्ज करें',
   ob_tour1_text: '+ बटन दबाएँ, राशि और श्रेणी लिखें। बस इतना ही: आपका खर्च तुरंत सहेजा जाता है।',
   ob_tour2_title: 'आज आप कितना खर्च कर सकते हैं?',
@@ -7723,6 +7814,7 @@ hi: {
   news_c36: 'संस्करण 36: नया पॉडकास्ट सेक्शन — ऐप छोड़े बिना "Finanzas Personales" सुनें, इन-बिल्ट प्लेयर और बिना इंटरनेट के लिए सहेजी गई सूची के साथ — स्वागत स्क्रीन अब खुद-ब-खुद स्लाइड-दर-स्लाइड आगे बढ़ती है — और लिंक का नया रूप: san अपनी प्रगति और ऐप आज़माने का सीधा एक्सेस दिखाता है।',
   news_c38: 'संस्करण 38: पॉडकास्ट अब अपने एपिसोड लोड करके चलाता है।',
   news_c39: 'संस्करण 39: पॉडकास्ट अब अपने एपिसोड चलाता है, और छोटे विजेट फिर से काम करते हैं।',
+  news_c40: 'संस्करण 40: तुम्हारे खातों का बैलेंस अब ईमानदारी से लेबल होता है, PIN बनाते समय ऐप चेतावनी देता है कि उसे वापस नहीं पाया जा सकता (और अगर तुम भूल जाओ तो एक आपातकालीन रास्ता भी है), तुम्हारा रोज़ का खर्च नंबर पहले दिन से «मेरा बजट बनाओ» के साथ जन्म लेता है, और खर्च दर्ज करना अब सिर्फ़ तीन टैप में हो जाता है।',
   news_c37: 'संस्करण 37: नए रूप में विजेट — ब्रांड ग्रेडिएंट, आपके बजट के अनुसार रंग बदलने वाली प्रगति पट्टी और आपके san की अगली बारी की पंक्ति — साथ ही एक नया आइकन-आकार का विजेट, जिसमें आज आप कितना खर्च कर सकते हैं। और san के सार्वजनिक लिंक में स्क्रॉल करते समय ब्रांड हमेशा दिखता है। आयोजक के राउंड अब अकॉर्डियन में मुड़ते हैं: केवल इस सप्ताह वाला खुला रहता है।',
   widget_today: 'आज',
   widget_san_next: 'अगली बारी: {name} · {date}',
@@ -7920,6 +8012,7 @@ ar: {
   key_settings: 'الاسم، التقسيم، النص، الأقسام، PIN',
   footer: 'PETO Finanzas · يعمل دون إنترنت · السحابة اختيارية: بياناتك، قرارك',
   tile_available: 'الأموال المتاحة',
+  tile_accounts: 'رصيد حساباتك', tile_accounts_aria: 'رصيد حساباتك: الذهاب إلى حساباتي', tile_accounts_help: 'مجموع حساباتك. أنت تُحدّثه بنفسك عند إنشاء حساب أو تعديله.',
   tile_available_aria: 'الأموال المتاحة: الذهاب إلى حساباتي',
   tile_savings: 'مدّخرات هذا الشهر',
   tile_savings_aria: 'مدّخرات هذا الشهر: الذهاب إلى المدّخرات',
@@ -7948,7 +8041,8 @@ ar: {
   banner_close: 'تجاهل',
   spend_title: 'كم يمكنك أن تنفق اليوم؟',
   spend_note: 'هذا ما يمكنك إنفاقه اليوم دون تجاوز الحد.',
-  spend_guide: 'أنشئ ميزانية فئتك الأولى وسترى هنا كم يمكنك أن تنفق كل يوم.',
+  spend_guide: 'أنشئ ميزانيتك الأولى وسترى هنا كم يمكنك أن تنفق كل يوم. وتظهر أيضًا عندما تسجل أول دخل لك.',
+  spend_create_btn: 'إنشاء ميزانيتي',
   spend_left: 'تبقّى لك {amount} للأيام الـ {days} المتبقية من الشهر.',
   spend_left_one: 'تبقّى لك {amount} لليوم، آخر يوم في الشهر.',
   spend_over: 'لقد بلغت ميزانية هذا الشهر.',
@@ -7977,6 +8071,7 @@ ar: {
   exp_total_label: 'مجموع الشهر:',
   amount_label: 'المبلغ ($)',
   category_label: 'الفئة',
+  cat_choose: 'اختر الفئة', more_details: 'تفاصيل إضافية',
   date_label: 'التاريخ',
   note_label: 'ملاحظة (اختياري)',
   exp_note_ph: 'ما كان من أجله؟',
@@ -8041,6 +8136,8 @@ ar: {
   res_cats_empty: 'لا توجد مصروفات هذا الشهر.',
   res_summary_empty: 'لا نشاط هذا الشهر بعد.',
   bud_intro: 'حدّد حدًّا شهريًا لكل فئة واطّلع على كم أنفقت.',
+  bud_income_label: 'كم يدخل كل شهر؟', bud_split_btn: 'التوزيع حسب دخلي', bud_split_help: 'نوزع جزء المصروفات من تقسيمك المقترح ({pct}% من دخلك) على فئاتك. عدّل ما تريد واحفظ كل شيء دفعة واحدة.',
+  bud_total_label: 'إجمالي الميزانية:', bud_save_all: 'حفظ الكل',
   bud_spent_left: 'أنفقت {spent} من {budget} · تبقّى {left}',
   bud_spent_over: 'أنفقت {spent} من {budget} · تجاوزت بـ {over}',
   bud_nolimit: 'لا يوجد حدّ. أنفقت هذا الشهر: {spent}',
@@ -8172,6 +8269,7 @@ ar: {
   lock_pin_label: 'PIN',
   lock_enter: 'فتح القفل',
   lock_note: 'بياناتك تبقى على هذا الهاتف فقط.',
+  lock_forgot: 'نسيت الرقم السري؟', lock_reset_explain: 'إذا نسيت الرقم السري، فلا توجد طريقة لاستعادته. يمكنك البدء من جديد: تُحذف البيانات المحفوظة على هذا الهاتف ويعود التطبيق إلى شاشة الترحيب. البدء من جديد؟', lock_reset_explain_cloud: 'إذا نسيت الرقم السري، فلا توجد طريقة لاستعادته. يمكنك البدء من جديد: تُحذف بيانات هذا الهاتف ويتم تسجيل خروجك من السحابة، دون المساس بالنسخة المحفوظة في حسابك. وعند تسجيل الدخول بحسابك من جديد، ستعود بياناتك بالنزول مرة أخرى. البدء من جديد؟',
   lock_err: 'رمز PIN غير صحيح. حاول مجددًا.',
   ob_title: 'مرحبًا بك في PETO Finanzas!',
   ob_intro_1: 'نظّم أموالك في دقائق: مصروفات، دخل، ميزانية، حسابات وديون.',
@@ -8185,6 +8283,7 @@ ar: {
   ob_pin2_ph: 'كرّر رمز PIN',
   ob_start: 'ابدأ',
   ob_note: 'يمكنك تغيير رمز PIN في أي وقت من الإعدادات.',
+  pin_warn: 'إذا نسيته، فلا توجد طريقة لاستعادته: اكتبه في مكان آمن.',
   ob_tour1_title: 'سجّل مصروفًا في ثوانٍ',
   ob_tour1_text: 'المس زر +، واكتب المبلغ والفئة. هذا كل شيء: يُحفظ مصروفك فورًا.',
   ob_tour2_title: 'كم يمكنك أن تنفق اليوم؟',
@@ -8433,6 +8532,7 @@ ar: {
   news_c36: 'الإصدار 36: قسم بودكاست جديد — استمع إلى «Finanzas Personales» دون مغادرة التطبيق، مع مشغّل مدمج وقائمة محفوظة لأوقات عدم وجود إنترنت — شاشة الترحيب الآن تتقدّم من تلقاء نفسها، شريحة بعد شريحة — ومظهر الرابط متجدد: يعرض san تقدّمه ووصولًا مباشرًا لتجربة التطبيق.',
   news_c38: 'الإصدار 38: البودكاست الآن يُحمّل حلقاته ويشغّلها.',
   news_c39: 'الإصدار 39: البودكاست الآن يُشغّل حلقاته، والأدوات الصغيرة عادت تعمل من جديد.',
+  news_c40: 'الإصدار 40: رصيد حساباتك الآن مُسمّى بصدق، وعند إنشاء الرقم السري يُنبّهك التطبيق إلى أنه لا يمكن استعادته (وهناك مخرج طوارئ إذا نسيته)، ورقم إنفاقك اليومي يولد من اليوم الأول مع «إنشاء ميزانيتي»، وتسجيل مصروف أصبح الآن بثلاث لمسات فقط.',
   news_c37: 'الإصدار 37: ويدجت بمظهر جديد — تدرّج العلامة، شريط تقدّم يتغيّر لونه حسب ميزانيتك وسطر الدور التالي في san الخاص بك — وويدجت جديد بحجم أيقونة يعرض ما يمكنك إنفاقه اليوم. وتبقى العلامة ظاهرة أثناء التمرير في رابط san العام. وجولات المنظّم الآن تُطوى كالأكورديون: جولة هذا الأسبوع فقط مفتوحة.',
   widget_today: 'اليوم',
   widget_san_next: 'الدور التالي: {name} · {date}',
@@ -8951,13 +9051,16 @@ function renderSpendToday() {
   const leftEl = document.getElementById('spend-today-left');
   if (!valueEl || !noteEl) return;
   const info = dailySpendInfo();
+  const createBtn = document.getElementById('spend-create-btn');
   if (!info) {
     valueEl.textContent = '—';
     noteEl.textContent = t('spend_guide');
     if (leftEl) leftEl.textContent = '';
+    if (createBtn) createBtn.hidden = false;
     syncWidgetSummary(null);
     return;
   }
+  if (createBtn) createBtn.hidden = true;
   valueEl.textContent = fmt(info.daily);
   noteEl.textContent = info.over ? t('spend_over') : t('spend_note');
   if (leftEl) {
@@ -9151,6 +9254,23 @@ function homeMenuItem(def) {
 function renderHome() {
   const key = currentMonthKey();
   document.getElementById('sum-available').textContent = fmt(availableMoney(key));
+  /* Compilación 40 (auditoría, hallazgo 1): con cuentas creadas el cálculo es
+     la suma de saldos que la persona mantiene a mano; el rótulo lo dice. Sin
+     cuentas se queda el rótulo de siempre (ingresos − gastos del mes). */
+  const availLabel = document.getElementById('tile-available-label');
+  const availSub = document.getElementById('sum-available-sub');
+  const availTile = document.getElementById('tile-available');
+  if ((db.accounts || []).length > 0) {
+    availLabel.textContent = t('tile_accounts');
+    availTile.setAttribute('aria-label', t('tile_accounts_aria'));
+    availSub.textContent = t('tile_accounts_help');
+    availSub.hidden = false;
+  } else {
+    availLabel.textContent = t('tile_available');
+    availTile.setAttribute('aria-label', t('tile_available_aria'));
+    availSub.textContent = '';
+    availSub.hidden = true;
+  }
   document.getElementById('sum-savings').textContent = fmt(monthSavings(key));
   document.getElementById('sum-debts').textContent = fmt(pendingDebtsTotal());
   document.getElementById('sum-incomes').textContent = fmt(sumCents(monthIncomes(key)));
@@ -9235,12 +9355,19 @@ function fillCategorySelect() {
   const sel = document.getElementById('exp-category');
   const prev = sel.value;
   clearNode(sel);
+  /* Compilación 40: el selector abre SIN selección («Elige categoría») o con
+     la última categoría usada; jamás cae en «Renta» por defecto. */
+  const choose = el('option', null, t('cat_choose'));
+  choose.value = '';
+  sel.appendChild(choose);
   for (const cat of allCategories(db)) {
     const opt = el('option', null, catName(cat));
     opt.value = cat;
     sel.appendChild(opt);
   }
   if (allCategories(db).includes(prev)) sel.value = prev;
+  else if (db.settings.lastExpCategory && allCategories(db).includes(db.settings.lastExpCategory)) sel.value = db.settings.lastExpCategory;
+  else sel.value = '';
 }
 function resetExpenseForm() {
   document.getElementById('expense-form').reset();
@@ -9251,6 +9378,8 @@ function resetExpenseForm() {
   showError('exp-error', '');
   setExpensePhoto(null);
   fillCategorySelect();
+  document.getElementById('exp-more').checked = false;
+  document.getElementById('exp-more-box').hidden = true;
 }
 function renderExpenses() {
   document.getElementById('expense-form-title').textContent =
@@ -9292,6 +9421,9 @@ function renderExpenses() {
       document.getElementById('exp-note').value = item.note;
       document.getElementById('exp-biz').checked = item.biz === true;
       setExpensePhoto(item.photo || null);
+      const expHasDetails = !!(item.note || item.biz === true || item.photo);
+      document.getElementById('exp-more').checked = expHasDetails;
+      document.getElementById('exp-more-box').hidden = !expHasDetails;
       document.getElementById('expense-form-title').textContent = t('exp_edit');
       document.getElementById('exp-cancel-edit').hidden = false;
       window.scrollTo(0, 0);
@@ -9316,6 +9448,7 @@ function onExpenseSubmit(ev) {
   const note = cleanText(document.getElementById('exp-note').value, 120);
   const id = document.getElementById('exp-id').value;
   if (!id && db.expenses.length >= MAX_ITEMS) { showError('exp-error', t('err_limit_expenses')); return; }
+  db.settings.lastExpCategory = category;
   beginUndo();
   let savedItem = null;
   if (id) {
@@ -9361,6 +9494,8 @@ function resetIncomeForm() {
   incSavingsTouched = false;
   document.getElementById('inc-savings-label').textContent = t('inc_savings_label');
   showError('inc-error', '');
+  document.getElementById('inc-more').checked = false;
+  document.getElementById('inc-more-box').hidden = true;
 }
 function renderIncomes() {
   document.getElementById('income-form-title').textContent =
@@ -9389,6 +9524,9 @@ function renderIncomes() {
       document.getElementById('inc-date').value = item.date;
       document.getElementById('inc-note').value = item.note;
       document.getElementById('inc-biz').checked = item.biz === true;
+      const incHasDetails = !!(item.note || item.biz === true);
+      document.getElementById('inc-more').checked = incHasDetails;
+      document.getElementById('inc-more-box').hidden = !incHasDetails;
       incSavingsTouched = true;
       document.getElementById('inc-savings').value = ((item.savingsCents || 0) / 100).toFixed(2);
       document.getElementById('income-form-title').textContent = t('inc_edit');
@@ -9775,12 +9913,79 @@ function renderTrend() {
 }
 
 /* ---------------- PRESUPUESTO ---------------- */
+/* Compilación 40 (auditoría, hallazgos 3 y 6): arranque de Presupuesto en un
+   solo lugar — ingreso del mes, reparto según el reparto sugerido de Ajustes,
+   total siempre visible y un solo «Guardar todo». Las filas vivas se guardan
+   en budgetRowInputs para que el total y el guardado lean lo que se ve. */
+let budgetRowInputs = [];
+
+function updateBudgetTotal() {
+  const el = document.getElementById('budget-total');
+  if (!el) return;
+  let total = 0;
+  for (const row of budgetRowInputs) {
+    const cents = parseAmount(row.input.value, false);
+    if (cents !== null) total += cents;
+  }
+  el.textContent = fmt(total);
+}
+
+function onBudgetSplit() {
+  const income = parseAmount(document.getElementById('budget-income').value, false);
+  if (income === null) { window.alert(t('err_amount')); return; }
+  if (!budgetRowInputs.length) return;
+  const pct = (db.settings.split && db.settings.split.gastos) || 0;
+  const pool = Math.round(income * pct / 100);
+  const key = currentMonthKey();
+  const spentByCat = {};
+  for (const e of monthExpenses(key)) spentByCat[e.category] = (spentByCat[e.category] || 0) + e.amountCents;
+  const STARTER = { Renta: 30, Comida: 25, 'Comida fuera': 8, Gasolina: 12, Transporte: 8, Salud: 5, Ropa: 4, Otros: 8 };
+  let anySignal = false;
+  const weights = budgetRowInputs.map((row) => {
+    let w = 0;
+    if ((db.budgets[row.cat] || 0) > 0) { w = db.budgets[row.cat]; anySignal = true; }
+    else if ((spentByCat[row.cat] || 0) > 0) { w = spentByCat[row.cat]; anySignal = true; }
+    return { row, w, cents: 0 };
+  });
+  if (!anySignal) for (const it of weights) it.w = STARTER[it.row.cat] || 0;
+  const totalW = weights.reduce((s, it) => s + it.w, 0);
+  if (totalW <= 0) { window.alert(t('err_amount')); return; }
+  let assigned = 0;
+  let biggest = weights[0];
+  for (const it of weights) {
+    if (it.w > biggest.w) biggest = it;
+    it.cents = Math.floor(pool * it.w / totalW);
+    assigned += it.cents;
+  }
+  biggest.cents += (pool - assigned);
+  for (const it of weights) it.row.input.value = it.cents > 0 ? (it.cents / 100).toFixed(2) : '';
+  updateBudgetTotal();
+}
+
+function onBudgetSaveAll() {
+  const parsed = [];
+  for (const row of budgetRowInputs) {
+    const raw = row.input.value.trim();
+    if (raw === '') { parsed.push({ cat: row.cat, cents: 0 }); continue; }
+    const cents = parseAmount(raw, false);
+    if (cents === null) { window.alert(t('bud_alert_amount')); return; }
+    parsed.push({ cat: row.cat, cents });
+  }
+  for (const p of parsed) {
+    if (p.cents > 0) db.budgets[p.cat] = p.cents;
+    else delete db.budgets[p.cat];
+  }
+  save();
+  renderBudgets();
+}
+
 function renderBudgets() {
   const key = currentMonthKey();
   const spentByCat = {};
   for (const e of monthExpenses(key)) spentByCat[e.category] = (spentByCat[e.category] || 0) + e.amountCents;
   const ul = document.getElementById('budget-list');
   clearNode(ul);
+  budgetRowInputs = [];
   for (const cat of allCategories(db)) {
     const budget = db.budgets[cat] || 0;
     const spent = spentByCat[cat] || 0;
@@ -9806,6 +10011,8 @@ function renderBudgets() {
     input.placeholder = t('bud_placeholder');
     input.value = budget > 0 ? (budget / 100).toFixed(2) : '';
     input.setAttribute('aria-label', t('bud_aria', { cat: catName(cat) }));
+    budgetRowInputs.push({ cat, input });
+    input.addEventListener('input', updateBudgetTotal);
     const saveBtn = actionButton(t('btn_save'), 'btn-secondary', () => {
       const raw = input.value.trim();
       if (raw === '') { delete db.budgets[cat]; save(); renderBudgets(); return; }
@@ -9829,6 +10036,9 @@ function renderBudgets() {
     li.appendChild(main);
     ul.appendChild(li);
   }
+  const splitHelp = document.getElementById('budget-split-help');
+  if (splitHelp) splitHelp.textContent = t('bud_split_help', { pct: db.settings.split.gastos });
+  updateBudgetTotal();
 }
 function onCategorySubmit(ev) {
   ev.preventDefault();
@@ -11569,13 +11779,59 @@ async function onImportFile(ev) {
     showError('data-error', t('data_err_invalid'));
   }
 }
-function onReset() {
-  if (!window.confirm(t('reset_confirm1'))) return;
-  if (!window.confirm(t('reset_confirm2'))) return;
+/* Compilación 40 (auditoría, hallazgo 2): salida SOLO local de la nube.
+   Cancela cualquier subida programada, cierra la sesión y limpia el estado
+   de sincronización SIN subir nada: la copia del servidor queda intacta y se
+   recupera al volver a entrar con la cuenta. Espejo de onCloudSignOut, pero
+   reutilizable por el reinicio total (bloqueo y Ajustes). */
+async function cloudSignOutLocalOnly() {
+  clearTimeout(cloudTimer);
+  clearTimeout(householdTimer);
+  const client = supa();
+  cloudUser = null;
+  if (client) { try { await client.auth.signOut(); } catch (err) { /* la sesión local se limpia igual abajo */ } }
+  cloudState = { email: '', lastSyncAt: 0, lastRemoteAt: '', dirty: false };
+  try { localStorage.removeItem(CLOUD_KEY); } catch (e) { /* sin almacenamiento */ }
+  sharedState = { household: null, members: [] };
+  householdBook = null;
+  sharedSave();
+}
+
+/* Borrado local completo («empezar de cero»): sale de la nube SIN sincronizar
+   (el estado vacío JAMÁS se sube), borra los datos de este teléfono y deja la
+   app en la bienvenida (fromLock) o recarga (Ajustes). */
+async function wipeLocalDataStartOver(fromLock) {
+  await cloudSignOutLocalOnly();
   try { localStorage.removeItem(DB_KEY); } catch (e) { /* sin acceso: se reinicia en memoria */ }
   db = defaultData();
+  try { db.settings.summaryTz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* sin zona detectable */ }
   save();
-  location.reload();
+  if (!fromLock) { location.reload(); return; }
+  document.getElementById('app-shell').hidden = true;
+  document.getElementById('view-lock').hidden = true;
+  document.getElementById('view-onboarding').hidden = false;
+  document.getElementById('ob-lang').value = db.settings.lang;
+  applyTheme();
+  applyTextSize();
+  applyStaticI18n();
+  renderObTour();
+  obTourAutoStart();
+}
+
+/* «¿Olvidaste tu PIN?» en la pantalla de bloqueo: el PIN no se puede
+   recuperar; la única salida es empezar de cero en ESTE teléfono, con la
+   doble confirmación de siempre y la copia de la nube a salvo. */
+async function onLockForgot() {
+  const hasCloud = !!(cloudUser || (cloudState && cloudState.email));
+  if (!window.confirm(t(hasCloud ? 'lock_reset_explain_cloud' : 'lock_reset_explain'))) return;
+  if (!window.confirm(t('reset_confirm2'))) return;
+  await wipeLocalDataStartOver(true);
+}
+
+async function onReset() {
+  if (!window.confirm(t('reset_confirm1'))) return;
+  if (!window.confirm(t('reset_confirm2'))) return;
+  await wipeLocalDataStartOver(false);
 }
 
 /* ---------------- Importar CSV del banco (Fase 3) ----------------
@@ -15110,6 +15366,7 @@ function wireEvents() {
   initPullToRefresh();
   podcastWirePlayer();
   document.getElementById('lock-form').addEventListener('submit', onLockSubmit);
+  document.getElementById('btn-lock-forgot').addEventListener('click', onLockForgot);
   document.getElementById('onboarding-form').addEventListener('submit', onOnboardingSubmit);
   const obTourNextBtn = document.getElementById('ob-tour-next');
   if (obTourNextBtn) obTourNextBtn.addEventListener('click', obTourNext);
@@ -15129,6 +15386,10 @@ function wireEvents() {
     applyStaticI18n();
   });
   document.getElementById('expense-form').addEventListener('submit', onExpenseSubmit);
+  document.getElementById('exp-more').addEventListener('change', (ev) => { document.getElementById('exp-more-box').hidden = !ev.target.checked; });
+  document.getElementById('inc-more').addEventListener('change', (ev) => { document.getElementById('inc-more-box').hidden = !ev.target.checked; });
+  document.getElementById('budget-split-btn').addEventListener('click', onBudgetSplit);
+  document.getElementById('budget-save-all').addEventListener('click', onBudgetSaveAll);
   document.getElementById('income-form').addEventListener('submit', onIncomeSubmit);
   document.getElementById('savings-form').addEventListener('submit', onSavingsSubmit);
   document.getElementById('goal-form').addEventListener('submit', onGoalSubmit);
@@ -15226,6 +15487,7 @@ function wireEvents() {
     b.addEventListener('click', () => showView('home')));
   /* Accesos rápidos de Inicio: tocar un resumen abre su sección. */
   document.getElementById('tile-available').addEventListener('click', () => showView('cuentas'));
+  document.getElementById('spend-create-btn').addEventListener('click', () => showView('presupuesto'));
   document.getElementById('tile-savings').addEventListener('click', () => showView('ahorros'));
   document.getElementById('tile-debts').addEventListener('click', () => showView('deudas'));
   document.getElementById('tile-incomes').addEventListener('click', () => showView('ingresos'));
