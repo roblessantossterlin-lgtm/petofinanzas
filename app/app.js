@@ -1,24 +1,20 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 33) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 34) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 33: llegan todo el
-   Paquete San de la 30 (compensación y simulación, sorteo, iniciar y
-   bloquear el orden, mover turnos con historial, pagos Pendiente →
-   Reportado → Confirmado con foto, Zelle, reglas de atraso y el
-   VISOR PÚBLICO #san= — la web no lo tenía y el enlace caía en la
-   bienvenida), lo de la 29 (resumen diario por notificación,
-   importar PDF, «Secciones visibles» plegable, enriquecimiento del
-   CSV y avisos), lo de la 28 (sección «Novedades» y arranque
-   diferido), la marca «PETO Finanzas» completa de la 32 con el san
-   primero en Inicio y el enlace público con precedencia total, y
-   las guardas de la 33: crear un san ya no puede borrar el que está
-   en curso. Sobre la base de la Compilación 27 (12 idiomas con
-   idioma automático y Widgets v2, que en web son un no-op). */
+   Sincronizado el 25-oct-2026 con la Compilación 34: el logo nuevo
+   de PETO Finanzas — la «P» blanca con barras y flecha en verde
+   suave sobre fondo esmeralda — ya en el icono, la pantalla de
+   bloqueo y toda la app; sin cambios de lógica (671 claves por
+   idioma, con la línea news_c34 nueva en los 12 idiomas). Sobre la
+   base de la Compilación 33 ya sincronizada (todo el Paquete San
+   con el visor público #san=, importar PDF, resumen diario,
+   «Secciones visibles», la marca «PETO Finanzas» completa y las
+   guardas anti-sobreescritura del san). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -30,7 +26,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 33'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 34'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -832,6 +828,7 @@ es: {
   news_c31: 'Compilación 31: el botón o gesto de atrás ahora se mueve dentro de la app: cierra lo que esté abierto y vuelve a la pantalla principal antes de salir.',
   news_c32: 'Compilación 32: la marca ahora se lee «PETO Finanzas» en toda la app (menú, bloqueo y widgets), el san quedó primero en la lista de Inicio, el enlace público del san abre directo en el estado del grupo y los botones del organizador siempre responden con un mensaje claro.',
   news_c33: 'Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.',
+  news_c34: 'Compilación 34: nuevo logo de PETO Finanzas — la «P» blanca con barras y flecha en verde suave sobre fondo esmeralda, ya en el icono, la pantalla de bloqueo y toda la app.',
   back_exit_hint: 'Pulsa atrás otra vez para salir.'
 },
 en: {
@@ -1258,6 +1255,7 @@ en: {
   news_c31: 'Build 31: the back button or gesture now moves inside the app: it closes whatever is open and returns to the main screen before exiting.',
   news_c32: 'Build 32: the brand now reads “PETO Finanzas” across the app (menu, lock screen and widgets), the san moved to the top of the Home list, the public san link opens straight into the group status, and the organizer buttons always answer with a clear message.',
   news_c33: 'Build 33: creating a san can no longer erase the one in progress — if one is already active, the app says so and protects it (payments, receipts, history and public link) — and the web version is now in sync with the phone.',
+  news_c34: 'Build 34: new PETO Finanzas logo — the white “P” with bars and arrow in soft green on an emerald background, now on the icon, the lock screen and across the app.',
   back_exit_hint: 'Press back again to exit.'
 },
 it: {
@@ -1927,6 +1925,7 @@ it: {
   news_c31: 'Compilación 31: il tasto o gesto indietro ora si muove dentro l’app: chiude ciò che è aperto e torna alla schermata principale prima di uscire.',
   news_c32: 'Versione 32: il marchio ora è «PETO Finanzas» in tutta l’app (menu, blocco e widget), il san è passato in cima all’elenco della schermata iniziale, il link pubblico del san si apre direttamente sullo stato del gruppo e i pulsanti dell’organizzatore rispondono sempre con un messaggio chiaro.',
   news_c33: 'Versione 33: creare un san non può più cancellare quello in corso — se ce n’è già uno attivo, l’app lo dice e lo protegge (pagamenti, ricevute, cronologia e link pubblico) — e la versione web è ora sincronizzata con il telefono.',
+  news_c34: 'Versione 34: nuovo logo di PETO Finanzas — la «P» bianca con barre e freccia in verde chiaro su fondo smeraldo, ora nell’icona, nella schermata di blocco e in tutta l’app.',
   back_exit_hint: 'Premi di nuovo indietro per uscire.'
 },
 pt: {
@@ -2596,6 +2595,7 @@ pt: {
   news_c31: 'Compilación 31: o botão ou gesto de voltar agora se move dentro do app: fecha o que estiver aberto e volta à tela principal antes de sair.',
   news_c32: 'Compilação 32: a marca agora é «PETO Finanzas» em todo o app (menu, bloqueio e widgets), o san ficou em primeiro na lista do Início, o link público do san abre direto no estado do grupo e os botões do organizador sempre respondem com uma mensagem clara.',
   news_c33: 'Compilação 33: criar um san já não pode apagar o que está em andamento — se já houver um ativo, o app avisa e o protege (pagamentos, comprovantes, histórico e link público) — e a versão web ficou sincronizada com o telefone.',
+  news_c34: 'Compilação 34: novo logo do PETO Finanzas — o “P” branco com barras e seta em verde suave sobre fundo esmeralda, já no ícone, na tela de bloqueio e em todo o app.',
   back_exit_hint: 'Toque em voltar outra vez para sair.'
 },
 fr: {
@@ -3265,6 +3265,7 @@ fr: {
   news_c31: 'Compilación 31 : le bouton ou le geste retour se déplace maintenant dans l’app : il ferme ce qui est ouvert et revient à l’écran principal avant de quitter.',
   news_c32: 'Version 32 : la marque affiche désormais « PETO Finanzas » dans toute l’appli (menu, verrouillage et widgets), le san passe en tête de la liste d’accueil, le lien public du san s’ouvre directement sur l’état du groupe et les boutons de l’organisateur répondent toujours par un message clair.',
   news_c33: 'Version 33 : créer un san ne peut plus effacer celui en cours — s’il y en a déjà un actif, l’appli le dit et le protège (paiements, justificatifs, historique et lien public) — et la version web est maintenant synchronisée avec le téléphone.',
+  news_c34: 'Version 34 : nouveau logo de PETO Finanzas — le «P» blanc avec barres et flèche en vert doux sur fond émeraude, désormais sur l’icône, l’écran de verrouillage et dans toute l’appli.',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.'
 },
 de: {
@@ -3934,6 +3935,7 @@ de: {
   news_c31: 'Compilación 31: Die Zurück-Taste oder -Geste bewegt sich jetzt in der App: sie schließt Geöffnetes und kehrt vor dem Beenden zum Hauptbildschirm zurück.',
   news_c32: 'Version 32: Die Marke heißt jetzt überall in der App „PETO Finanzas“ (Menü, Sperrbildschirm und Widgets), der San steht jetzt oben in der Startliste, der öffentliche San-Link öffnet direkt den Gruppenstatus und die Organisator-Schaltflächen antworten immer mit einer klaren Meldung.',
   news_c33: 'Version 33: Einen San zu erstellen kann den laufenden nicht mehr löschen — ist schon einer aktiv, sagt die App Bescheid und schützt ihn (Zahlungen, Belege, Verlauf und öffentlicher Link) — und die Webversion ist jetzt mit dem Telefon synchron.',
+  news_c34: 'Version 34: neues Logo von PETO Finanzas — das weiße „P“ mit Balken und Pfeil in sanftem Grün auf Smaragdgrün, jetzt auf dem Symbol, dem Sperrbildschirm und in der ganzen App.',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.'
 },
 zh: {
@@ -4603,6 +4605,7 @@ zh: {
   news_c31: 'Compilación 31：返回键或返回手势现在会在应用内移动：先关闭打开的内容，回到主屏幕，然后才退出。',
   news_c32: '第 32 版：品牌名称现已在整个应用中统一为“PETO Finanzas”（菜单、锁定屏幕和小部件），san 已移到主页列表顶部，san 公开链接可直接打开群组状态，组织者按钮始终会给出明确提示。',
   news_c33: '第 33 版：新建 san 不再会误删正在进行的 san——如果已有一个活跃的 san，应用会明确提示并保护它（付款、凭证、历史和公开链接）——网页版现已与手机同步。',
+  news_c34: '第 34 版：PETO Finanzas 全新标志——翠绿底色上白色的“P”配浅绿色柱条与箭头，现已出现在图标、锁屏和整个应用中。',
   back_exit_hint: '再按一次返回即可退出。'
 },
 ja: {
@@ -5272,6 +5275,7 @@ ja: {
   news_c31: 'Compilación 31：戻るボタンやジェスチャーがアプリ内で動くようになりました：開いているものを閉じ、メイン画面に戻ってから終了します。',
   news_c32: 'バージョン32：ブランド名がアプリ全体（メニュー、ロック画面、ウィジェット）で「PETO Finanzas」に統一され、sanがホームのリストの一番上に移動し、sanの公開リンクはグループの状態を直接開き、主催者ボタンは常に明確なメッセージで応答します。',
   news_c33: 'バージョン33：sanを新規作成しても、進行中のsanが消えることはなくなりました。すでにアクティブなsanがある場合、アプリが知らせて保護します（支払い、領収書、履歴、公開リンク）。ウェブ版もスマートフォンと同期されました。',
+  news_c34: 'バージョン34：PETO Finanzasの新しいロゴ——エメラルドの背景に白い「P」と淡い緑のバーと矢印が、アイコン、ロック画面、アプリ全体に登場しました。',
   back_exit_hint: 'もう一度戻るを押すと終了します。'
 },
 ko: {
@@ -5941,6 +5945,7 @@ ko: {
   news_c31: 'Compilación 31: 뒤로 가기 버튼이나 제스처가 이제 앱 안에서 이동합니다: 열려 있는 것을 닫고 메인 화면으로 돌아간 뒤 종료합니다.',
   news_c32: '버전 32: 이제 앱 전체(메뉴, 잠금 화면, 위젯)에서 브랜드가 "PETO Finanzas"로 표시되고, san이 홈 목록 맨 위로 이동했으며, san 공개 링크가 그룹 상태를 바로 열고, 조직자 버튼이 항상 명확한 메시지로 응답합니다.',
   news_c33: '버전 33: san을 새로 만들어도 진행 중인 san이 지워지지 않습니다. 이미 활성 san이 있으면 앱이 알려주고 보호합니다(결제, 영수증, 기록, 공개 링크). 웹 버전도 이제 휴대전화와 동기화됩니다.',
+  news_c34: '버전 34: PETO Finanzas의 새 로고 — 에메랄드 배경에 흰색 "P"와 연한 녹색 막대와 화살표가 이제 아이콘, 잠금 화면, 앱 전체에 적용됩니다.',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.'
 },
 ru: {
@@ -6610,6 +6615,7 @@ ru: {
   news_c31: 'Compilación 31: кнопка или жест «назад» теперь перемещаются внутри приложения: закрывают открытое и возвращают на главный экран перед выходом.',
   news_c32: 'Версия 32: бренд теперь отображается как «PETO Finanzas» по всему приложению (меню, экран блокировки и виджеты), san переехал наверх списка главного экрана, публичная ссылка san открывает сразу статус группы, а кнопки организатора всегда отвечают понятным сообщением.',
   news_c33: 'Версия 33: создание san больше не может стереть текущий — если один уже активен, приложение сообщает об этом и защищает его (платежи, чеки, историю и публичную ссылку) — а веб-версия теперь синхронизирована с телефоном.',
+  news_c34: 'Версия 34: новый логотип PETO Finanzas — белая «P» с полосками и стрелкой нежно-зелёного цвета на изумрудном фоне, теперь на значке, экране блокировки и во всём приложении.',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.'
 },
 hi: {
@@ -7279,6 +7285,7 @@ hi: {
   news_c31: 'Compilación 31: बैक बटन या जेस्चर अब ऐप के अंदर चलता है: जो खुला है उसे बंद करता है और बाहर निकलने से पहले मुख्य स्क्रीन पर लौटता है।',
   news_c32: 'संस्करण 32: अब पूरे ऐप (मेनू, लॉक स्क्रीन और विजेट) में ब्रांड "PETO Finanzas" दिखता है, san होम सूची में सबसे ऊपर आ गया है, san का सार्वजनिक लिंक सीधे समूह की स्थिति खोलता है और आयोजक बटन हमेशा स्पष्ट संदेश के साथ जवाब देते हैं।',
   news_c33: 'संस्करण 33: नया san बनाना अब चल रहे san को नहीं मिटा सकता — अगर पहले से एक सक्रिय है, तो ऐप बताता है और उसे सुरक्षित रखता है (भुगतान, रसीदें, इतिहास और सार्वजनिक लिंक) — और वेब संस्करण अब फ़ोन के साथ सिंक हो गया है।',
+  news_c34: 'संस्करण 34: PETO Finanzas का नया लोगो — पन्ना हरे रंग की पृष्ठभूमि पर हल्के हरे रंग की पट्टियों और तीर वाला सफ़ेद "P", अब आइकन, लॉक स्क्रीन और पूरे ऐप में।',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।'
 },
 ar: {
@@ -7948,6 +7955,7 @@ ar: {
   news_c31: 'Compilación 31: زر الرجوع أو إيماءته يتحرك الآن داخل التطبيق: يغلق ما هو مفتوح ويعود إلى الشاشة الرئيسية قبل الخروج.',
   news_c32: 'الإصدار 32: تظهر العلامة الآن باسم «PETO Finanzas» في التطبيق بأكمله (القائمة وشاشة القفل والأدوات)، وأصبح السان في أعلى قائمة الشاشة الرئيسية، ويفتح الرابط العام للسان حالة المجموعة مباشرة، وترد أزرار المنظّم دائمًا برسالة واضحة.',
   news_c33: 'الإصدار 33: إنشاء سان لم يعد بإمكانه مسح السان الجاري — إذا كان هناك سان نشط، يخبرك التطبيق ويحميه (المدفوعات والإيصالات والسجل والرابط العام) — وأصبحت نسخة الويب متزامنة الآن مع الهاتف.',
+  news_c34: 'الإصدار 34: شعار PETO Finanzas الجديد — حرف «P» الأبيض مع أشرطة وسهم باللون الأخضر الفاتح على خلفية زمردية، الآن في الأيقونة وشاشة القفل وفي التطبيق بأكمله.',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.'
 }
 };
