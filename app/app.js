@@ -1,21 +1,26 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 27) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 33) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 24-oct-2026 con la Compilación 27: Widgets v2
-   (la app empuja al widget nativo el resumen del día, con los
-   últimos gastos de hoy y lo que queda del mes; en web es un
-   no-op, sin plugin) y 12 idiomas con idioma automático según el
-   dispositivo (es/en/it + pt/fr/de/zh/ja/ko/ru/hi/ar, 582 claves
-   por idioma), sobre la base de la Compilación 24 (tema
-   claro/oscuro automático según el dispositivo, bloque 1 del
-   Paquete 3 y Play Billing presente pero inactivo en web). */
+   Sincronizado el 25-oct-2026 con la Compilación 33: llegan todo el
+   Paquete San de la 30 (compensación y simulación, sorteo, iniciar y
+   bloquear el orden, mover turnos con historial, pagos Pendiente →
+   Reportado → Confirmado con foto, Zelle, reglas de atraso y el
+   VISOR PÚBLICO #san= — la web no lo tenía y el enlace caía en la
+   bienvenida), lo de la 29 (resumen diario por notificación,
+   importar PDF, «Secciones visibles» plegable, enriquecimiento del
+   CSV y avisos), lo de la 28 (sección «Novedades» y arranque
+   diferido), la marca «PETO Finanzas» completa de la 32 con el san
+   primero en Inicio y el enlace público con precedencia total, y
+   las guardas de la 33: crear un san ya no puede borrar el que está
+   en curso. Sobre la base de la Compilación 27 (12 idiomas con
+   idioma automático y Widgets v2, que en web son un no-op). */
 /* ============================================================
-   PETO v0.1
+   PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
    - Los datos viven solo en localStorage de este dispositivo.
    - Todo texto del usuario se pinta con textContent (sin innerHTML),
@@ -25,7 +30,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 27'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 33'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -62,6 +67,10 @@ function defaultData() {
       accent: 'verde',
       autoFixed: true,
       notifications: false,
+      summaryDaily: true,
+      summaryTime: '08:00',
+      summaryEmail: false,
+      summaryTz: '',
       biometric: false,
       pro: false,
       proWaitlist: false,
@@ -93,6 +102,7 @@ function defaultData() {
 function save() {
   try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) { /* almacenamiento lleno o bloqueado: la app sigue en memoria */ return false; }
   noteLocalChange();
+  try { scheduleDailySummary(); } catch (e) { /* sin plugin: no-op seguro */ }
   return true;
 }
 
@@ -204,13 +214,45 @@ function cleanSanOrg(raw) {
   const srcRounds = Array.isArray(raw.rounds) ? raw.rounds : [];
   const rounds = participants.map((unused, i) => {
     const paid = {};
+    const info = {};
     const src = srcRounds[i];
     if (src && typeof src === 'object' && src.paid && typeof src.paid === 'object') {
       for (const p of participants) if (src.paid[p] === true) paid[p] = true;
     }
-    return { paid: paid };
+    if (src && typeof src === 'object' && src.info && typeof src.info === 'object' && !Array.isArray(src.info)) {
+      for (const p of participants) {
+        const inf = src.info[p];
+        if (inf && typeof inf === 'object' && (inf.st === 'reported' || inf.st === 'confirmed')) {
+          const entry = { st: inf.st };
+          if (typeof inf.photo === 'string' && inf.photo.indexOf('data:image/') === 0 && inf.photo.length <= 700000) entry.photo = inf.photo;
+          if (entry.st === 'confirmed') { info[p] = entry; paid[p] = true; }
+          else if (!paid[p]) { info[p] = entry; }
+        }
+      }
+    }
+    for (const p of participants) if (paid[p] && !info[p]) info[p] = { st: 'confirmed' };
+    return { paid: paid, info: info };
   });
-  return { name: name, aporteCents: aporte, frequency: frequency, startDate: startDate, participants: participants, rounds: rounds };
+  const compModes = ['none', 'first', 'last', 'extra'];
+  const rawComp = (raw.comp && typeof raw.comp === 'object' && !Array.isArray(raw.comp)) ? raw.comp : {};
+  const comp = { mode: compModes.includes(rawComp.mode) ? rawComp.mode : 'none', amountCents: cleanCents(rawComp.amountCents, false) };
+  const penModes = ['none', 'fixed', 'percent'];
+  const rawPen = (raw.penalty && typeof raw.penalty === 'object' && !Array.isArray(raw.penalty)) ? raw.penalty : {};
+  const penalty = { mode: penModes.includes(rawPen.mode) ? rawPen.mode : 'none', amountCents: cleanCents(rawPen.amountCents, false), percent: cleanPct(rawPen.percent) };
+  const zelle = {};
+  if (raw.zelle && typeof raw.zelle === 'object' && !Array.isArray(raw.zelle)) {
+    for (const p of participants) { const zv = cleanText(raw.zelle[p], 60); if (zv) zelle[p] = zv; }
+  }
+  const history = [];
+  if (Array.isArray(raw.history)) {
+    for (const h of raw.history.slice(-100)) {
+      if (!h || typeof h !== 'object') continue;
+      if (h.kind !== 'swap' && h.kind !== 'started') continue;
+      history.push({ ts: cleanDate(h.ts), kind: h.kind, a: cleanText(h.a, 40), b: cleanText(h.b, 40) });
+    }
+  }
+  const linkToken = (typeof raw.linkToken === 'string' && /^[A-Za-z0-9]{1,40}$/.test(raw.linkToken)) ? raw.linkToken : null;
+  return { name: name, aporteCents: aporte, frequency: frequency, startDate: startDate, participants: participants, rounds: rounds, comp: comp, penalty: penalty, started: raw.started === true, zelle: zelle, history: history, linkToken: linkToken };
 }
 
 function validateData(raw) {
@@ -238,6 +280,16 @@ function validateData(raw) {
   d.settings.reminders = s.reminders !== false;
   d.settings.autoFixed = s.autoFixed !== false;
   d.settings.notifications = s.notifications === true;
+  d.settings.summaryDaily = s.summaryDaily !== false;
+  d.settings.summaryTime = (() => {
+    const v = (typeof s.summaryTime === 'string') ? s.summaryTime : '';
+    const m = /^(\d{2}):(\d{2})$/.exec(v);
+    if (!m) return '08:00';
+    const hh = Number(m[1]); const mm = Number(m[2]);
+    return (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59) ? v : '08:00';
+  })();
+  d.settings.summaryEmail = s.summaryEmail === true;
+  d.settings.summaryTz = (typeof s.summaryTz === 'string') ? s.summaryTz.slice(0, 64) : '';
   d.settings.biometric = s.biometric === true;
   d.settings.pro = s.pro === true;
   d.settings.proWaitlist = s.proWaitlist === true;
@@ -357,6 +409,8 @@ const LANGS = ['es', 'en', 'it', 'pt', 'fr', 'de', 'zh', 'ja', 'ko', 'ru', 'hi',
 const LOCALES = { es: 'es', en: 'en-US', it: 'it-IT', pt: 'pt', fr: 'fr-FR', de: 'de-DE', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ru: 'ru-RU', hi: 'hi-IN', ar: 'ar-EG' };
 const I18N = {
 es: {
+  org_err_san_name: 'Escribe el nombre del san.', rep_promo_footer: 'Controla tus gastos con PETO Finanzas · petofinanzas.com', rep_saved: 'Imagen guardada.', set_sections_summary: '{visible} de {total} visibles',
+  org_err_active_exists: 'Ya hay un san activo («{name}»). Bórralo primero desde su tarjeta si quieres crear otro.',
   app_title: 'PETO Finanzas', back: '← Todas las opciones', greeting: 'Hola', lock_btn: 'Bloquear',
   home_menu_heading: '¿Qué quieres ver?',
   group_daily: 'Día a día', group_plan: 'Planificación', group_accounts: 'Cuentas y compromisos', group_yourapp: 'Tu app',
@@ -364,16 +418,16 @@ es: {
   sec_presupuesto: 'Presupuesto por categoría', sec_pagos: 'Pagos fijos', sec_cuentas: 'Mis cuentas',
   sec_deudas: 'Mis deudas', sec_san: 'Mi san', sec_ajustes: 'Ajustes y personalización',
   menu_open_aria: 'Abrir menú', menu_close_aria: 'Cerrar menú', sec_home: 'Inicio', key_home: 'Tu pantalla principal',
-  set_notif_label: 'Notificaciones con la app cerrada', set_notif_help: 'Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO esté cerrada.',
+  set_notif_label: 'Notificaciones con la app cerrada', set_notif_help: 'Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO Finanzas esté cerrada.',
   set_autofixed_label: 'Registrar pagos fijos automáticamente', set_autofixed_help: 'Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.',
   set_bio_label: 'Desbloqueo con huella', set_bio_help: 'Entra con tu huella además del PIN (necesitas tener un PIN activo).',
-  bio_btn: '👆 Entrar con huella', bio_reason: 'Confirma que eres tú para abrir PETO',
+  bio_btn: '👆 Entrar con huella', bio_reason: 'Confirma que eres tú para abrir PETO Finanzas',
   bio_need_pin: 'La huella necesita un PIN activo: crea tu PIN en Ajustes → Seguridad y luego la huella funcionará al abrir la app.',
   bio_failed: 'La huella no se pudo verificar. Escribe tu PIN.',
   bio_unavailable: 'La huella no está disponible en este teléfono. Escribe tu PIN.',
   bio_not_enrolled: 'Este teléfono no tiene ninguna huella registrada. Regístrala en los ajustes del teléfono o escribe tu PIN.',
   bio_offer_title: '¿Desbloquear con tu huella?',
-  bio_offer_text: 'Acabas de crear tu PIN. Si quieres, puedes entrar a PETO con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?',
+  bio_offer_text: 'Acabas de crear tu PIN. Si quieres, puedes entrar a PETO Finanzas con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?',
   bio_offer_yes: 'Sí, activar la huella',
   bio_offer_no: 'Ahora no',
   bio_activated: 'Listo: el desbloqueo con huella quedó activado.',
@@ -385,12 +439,21 @@ es: {
   backup_need_pass: 'Escribe la contraseña de la copia cifrada antes de importarla.',
   backup_err_pass: 'No se pudo abrir la copia: contraseña incorrecta o archivo dañado.',
   share_btn: 'Compartir resumen', share_copied: 'Resumen copiado. Pégalo donde quieras.',
-  review_title: '¿Te gusta PETO?',
-  review_text: 'Si PETO te ayuda a cuidar tu dinero, una reseña en Google Play nos ayuda muchísimo a llegar a más personas. ¡Gracias!',
+  review_title: '¿Te gusta PETO Finanzas?',
+  review_text: 'Si PETO Finanzas te ayuda a cuidar tu dinero, una reseña en Google Play nos ayuda muchísimo a llegar a más personas. ¡Gracias!',
   review_yes: '⭐ Calificar en Google Play', review_no: 'Ahora no',
-  share_report_title: 'Mi resumen PETO',
+  share_report_title: 'Mi resumen de PETO Finanzas',
   notif_fixed_title: 'Pago fijo mañana', notif_fixed_today: 'Pago fijo hoy', notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'Tu semana en PETO', notif_weekly_body: 'Anota tus gastos e ingresos de la semana para no perder el hilo.',
+  notif_weekly_title: 'Tu semana en PETO Finanzas', notif_weekly_body: 'Anota tus gastos e ingresos de la semana para no perder el hilo.',
+  summary_title: 'Resumen diario',
+  summary_help: 'Un aviso con lo que gastaste ayer y lo que puedes gastar hoy, a la hora que elijas.',
+  summary_notif_label: 'Resumen por notificación',
+  summary_time_label: 'Hora del resumen',
+  summary_email_label: 'Recibir también por correo',
+  summary_email_help: 'Solo con tu cuenta en la nube activa: el mismo resumen llega también a tu correo.',
+  notif_summary_title: '🌅 Tu resumen de PETO Finanzas',
+  notif_summary_body: 'Ayer gastaste {spent} · Hoy puedes gastar {daily}',
+  notif_summary_body_nodaily: 'Ayer gastaste {spent}',
   sec_remesas: 'Remesas', key_remesas: 'Enviado este mes: {amount}',
   rem_intro: 'El dinero que envías a tu gente: cuánto salió en dólares y cuánto llegó en su moneda.',
   rem_usd_label: 'Cantidad enviada ($ USD)', rem_rate_label: 'Tasa ({cur} por $1)', rem_recipient_label: '¿Para quién?',
@@ -413,6 +476,9 @@ es: {
   csv_err_headers: 'No encontré las columnas de fecha y monto en ese archivo.',
   csv_err_big: 'Ese archivo es demasiado grande para importarlo.',
   csv_err_empty: 'Ese archivo no trae movimientos que se puedan importar.',
+  pdf_err_big: 'Ese PDF es muy grande (máximo 8 MB).',
+  pdf_err_notext: 'Ese PDF no tiene texto que pueda leer (parece una foto o escaneo). Prueba con el CSV del banco o anota el gasto con la foto del recibo.',
+  pdf_err_empty: 'No encontré movimientos con fecha y monto en ese PDF. Prueba con el CSV del banco.',
   shared_title: 'Presupuesto compartido',
   shared_preview_note: '🔧 Vista previa del diseño: todavía no se conecta con otras cuentas. Sirve para probar cómo se verá crear un hogar, unirse con un código y ver los miembros.',
   shared_create_label: 'Nombre del hogar', shared_create_btn: 'Crear hogar',
@@ -456,7 +522,7 @@ es: {
   cloud_conflict: 'Hay datos distintos en la nube y en este teléfono. ¿Quieres bajar los de la nube y reemplazar los de este teléfono? (Cancelar = subir los de este teléfono)',
   cloud_wipe_confirm: '¿Borrar TODOS tus datos de la nube? Lo de este teléfono se queda como está.',
   cloud_delete: 'Eliminar mi cuenta',
-  cloud_delete_confirm1: '¿Eliminar tu cuenta de PETO? Se borra tu cuenta, tu copia de datos en la nube y los hogares compartidos que sean tuyos. Los datos de ESTE teléfono se quedan aquí, sin borrarse (puedes borrarlos en Ajustes). No se puede deshacer.',
+  cloud_delete_confirm1: '¿Eliminar tu cuenta de PETO Finanzas? Se borra tu cuenta, tu copia de datos en la nube y los hogares compartidos que sean tuyos. Los datos de ESTE teléfono se quedan aquí, sin borrarse (puedes borrarlos en Ajustes). No se puede deshacer.',
   cloud_delete_confirm2: 'Última confirmación: ¿eliminar tu cuenta para siempre?',
   cloud_deleted: 'Tu cuenta fue eliminada.',
   cloud_delete_err_auth: 'Tu sesión ya no es válida. Entra de nuevo e inténtalo otra vez.',
@@ -558,6 +624,7 @@ es: {
   san_aporte_label: 'Aporte por turno ($)', san_participants_label: 'Participantes (en orden de turno)',
   san_pname_ph: 'Nombre del participante', san_add_participant: 'Agregar', san_create_btn: 'Crear san',
   san_err_participants: 'Agrega al menos 2 participantes.', san_err_dup: 'Ese participante ya está en la lista.',
+  san_err_active_exists: 'Ya hay un san en curso («{name}»). Bórralo primero si quieres crear otro.',
   san_err_pname: 'Escribe el nombre del participante.', san_remove: 'Quitar', san_draft_empty: 'Todavía no agregas participantes.',
   san_week: 'Semana {x} de {n}', san_finished: '🎉 ¡San terminado!',
   san_finished_note: 'Todas las semanas se completaron. Puedes borrar este san y crear uno nuevo.',
@@ -583,13 +650,13 @@ es: {
   pin_off: 'PIN desactivado.', pin_updated: 'PIN actualizado. ✅',
   set_data_title: 'Tus datos', set_data_help: 'Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.',
   data_export: 'Exportar copia (JSON)', data_import: 'Importar copia', data_reset: 'Borrar todos los datos',
-  data_err_big: 'Ese archivo es demasiado grande.', data_err_invalid: 'No se pudo importar: el archivo no es una copia válida de PETO.',
+  data_err_big: 'Ese archivo es demasiado grande.', data_err_invalid: 'No se pudo importar: el archivo no es una copia válida de PETO Finanzas.',
   import_confirm: 'Importar reemplazará TODOS los datos actuales de la app. ¿Seguro?', import_done: 'Copia importada. ✅',
   reset_confirm1: 'Esto borra TODOS tus datos de la app en este teléfono. No se puede deshacer. ¿Seguro?',
   reset_confirm2: 'Última confirmación: ¿borrar todo y empezar de cero?',
   lock_prompt: 'Escribe tu PIN para entrar.', lock_pin_label: 'PIN', lock_enter: 'Entrar',
   lock_note: 'Tus datos están protegidos con tu PIN.', lock_err: 'PIN incorrecto. Inténtalo de nuevo.',
-  ob_title: '¡Bienvenido a PETO!',
+  ob_title: '¡Bienvenido a PETO Finanzas!',
   ob_intro_1: 'Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.',
   ob_intro_2: 'Con tu cuenta en la nube.', ob_intro_3: 'Tus datos se sincronizan con tu teléfono.',
   ob_name_label: '¿Cómo te llamas?', ob_name_ph: 'Tu nombre',
@@ -599,7 +666,7 @@ es: {
   ob_tour1_title: 'Anota un gasto en segundos',
   ob_tour1_text: 'Toca el botón +, escribe la cantidad y la categoría. Nada más: tu gasto queda registrado al instante.',
   ob_tour2_title: '¿Cuánto puedes gastar hoy?',
-  ob_tour2_text: 'PETO reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.',
+  ob_tour2_text: 'PETO Finanzas reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.',
   ob_tour3_title: 'Tu cuenta en la nube (opcional)',
   ob_tour3_text: 'Si quieres, crea una cuenta gratis para ver tus datos también en la web. Sin cuenta, todo queda solo en tu teléfono.',
   ob_tour_next: 'Siguiente', ob_tour_skip: 'Saltar', ob_tour_go: '¡Vamos!',
@@ -644,7 +711,7 @@ es: {
   pro_title: 'PETO Pro',
   pro_card_text: 'La nube sin límites, el informe avanzado, el presupuesto compartido y el modo organizador de san.',
   pro_status_free: 'Ahora tienes el plan Gratis.',
-  pro_status_active: 'Tienes PETO Pro activo. ¡Gracias por apoyar PETO! ⭐',
+  pro_status_active: 'Tienes PETO Pro activo. ¡Gracias por apoyar PETO Finanzas! ⭐',
   pro_status_test: 'PETO Pro está abierto durante la prueba cerrada: tienes acceso completo mientras dure la prueba.',
   pro_status_waitlist: 'Estás en la lista de espera de PETO Pro.',
   pro_btn_see: 'Ver PETO Pro',
@@ -695,9 +762,81 @@ es: {
   shared_err_member: 'Ya eres miembro de este hogar.',
   shared_err_owner_leave: 'Eres el dueño/la dueña del hogar: no puedes salir sin borrarlo. Pide a otro miembro que cree el hogar nuevo.',
   shared_created_live: 'Hogar creado ✅ Comparte el código para invitar a tu hogar.',
-  shared_joined_live: 'Te uniste al hogar ✅'
+  shared_joined_live: 'Te uniste al hogar ✅',
+  org_comp_label: 'Compensación del organizador',
+  org_comp_none: 'Sin compensación',
+  org_comp_first: 'El organizador cobra primero',
+  org_comp_last: 'El organizador cobra de último',
+  org_comp_extra: 'Cuota extra por ronda',
+  org_comp_amount_label: 'Cuota extra por persona ($)',
+  org_comp_line: 'Compensación del organizador: {mode}',
+  org_sim_title: 'Simulación del pote',
+  org_sim_pays: 'Cada participante pone por ronda: {amount}',
+  org_sim_pot: 'Pote de cada ronda: {amount}',
+  org_sim_total_in: 'Total que pone cada quien en todo el san: {amount}',
+  org_sim_extra_org: 'El organizador recibe {amount} extra por ronda',
+  org_sim_first: 'El organizador recibe el pote de la primera ronda',
+  org_sim_last: 'El organizador recibe el pote de la última ronda',
+  org_shuffle_btn: '🎲 Sortear orden',
+  org_shuffled: '🎲 ¡Orden sorteado! Así quedó el turno.',
+  org_shuffle_need: 'Agrega al menos 2 participantes para sortear el orden.',
+  org_shuffle_blocked: 'Ya no se puede sortear: el san ya empezó o tiene pagos registrados.',
+  org_start_btn: 'Iniciar san',
+  org_started_line: 'San en curso · El orden está bloqueado',
+  org_order_title: 'Orden de turnos',
+  org_move_up: 'Subir',
+  org_move_down: 'Bajar',
+  org_swap_blocked: 'Ese turno ya tiene pagos y no se puede cambiar.',
+  org_history_title: 'Historial de cambios',
+  org_history_swap: '{a} y {b} intercambiaron turnos',
+  org_history_started: 'El organizador inició el san',
+  org_pay_pending: 'Pendiente',
+  org_pay_reported: 'Reportado',
+  org_pay_confirmed: 'Confirmado',
+  org_status_btn: 'Estado: {status}',
+  org_receipt_add: '📎 Comprobante',
+  org_receipt_view: 'Ver comprobante',
+  org_receipt_remove: 'Quitar',
+  org_zelle_label: 'Zelle de cada participante (número o correo, opcional)',
+  org_zelle_ph: 'Zelle (opcional)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 Recordatorio por WhatsApp',
+  org_reminder_head: '🤝 {san} · Ronda {x} de {n} · {date}',
+  org_reminder_receiver: '💰 Esta semana cobra {name}',
+  org_reminder_zelle: 'Zelle de {name}: {zelle}',
+  org_reminder_amount: 'Aporte de la ronda: {amount}',
+  org_antifraud: '🛡️ Un san nunca paga intereses ni más de lo aportado.',
+  org_link_btn: '🔗 Enlace de solo lectura',
+  org_link_publish: 'Crear enlace',
+  org_link_update: 'Actualizar enlace',
+  org_link_copied: '¡Enlace copiado!',
+  org_link_need_cloud: 'El enlace necesita tu cuenta en la nube: entra en Ajustes y vuelve a intentarlo.',
+  org_link_ready: 'San del grupo (solo lectura)',
+  org_public_title: 'El enlace está listo para compartir.',
+  org_public_updated: 'Actualizado el {date}',
+  org_public_notfound: 'Este enlace ya no está disponible.',
+  org_penalty_label: 'Regla de atraso',
+  org_penalty_none: 'Sin multa',
+  org_penalty_fixed: 'Multa fija',
+  org_penalty_percent: 'Porcentaje del aporte',
+  org_penalty_amount_label: 'Monto de la multa ($)',
+  org_penalty_percent_label: 'Porcentaje de multa (%)',
+  org_penalty_line_fixed: 'Si alguien se atrasa: multa de {amount}',
+  org_penalty_line_percent: 'Si alguien se atrasa: multa de {percent}% del aporte',
+  set_news_title: 'Novedades',
+  news_c24: 'Compilación 24: tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.',
+  news_c25: 'Compilación 25: widget en la pantalla de inicio y una app mucho más liviana (de 52 MB a 7 MB).',
+  news_c26: 'Compilación 26: widgets en tres tamaños, con opciones por widget y botón para anotar un gasto sin abrir la app.',
+  news_c27: 'Compilación 27: la app en 12 idiomas, siguiendo sola el idioma de tu teléfono.',
+  news_c28: 'Compilación 28: letra más grande aplicada desde el arranque, esta sección de novedades, repaso del italiano y apertura más rápida.',
+  news_c31: 'Compilación 31: el botón o gesto de atrás ahora se mueve dentro de la app: cierra lo que esté abierto y vuelve a la pantalla principal antes de salir.',
+  news_c32: 'Compilación 32: la marca ahora se lee «PETO Finanzas» en toda la app (menú, bloqueo y widgets), el san quedó primero en la lista de Inicio, el enlace público del san abre directo en el estado del grupo y los botones del organizador siempre responden con un mensaje claro.',
+  news_c33: 'Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.',
+  back_exit_hint: 'Pulsa atrás otra vez para salir.'
 },
 en: {
+  org_err_san_name: 'Enter the name of the san.', rep_promo_footer: 'Take control of your spending with PETO Finanzas · petofinanzas.com', rep_saved: 'Image saved.', set_sections_summary: '{visible} of {total} visible',
+  org_err_active_exists: 'There is already an active san (“{name}”). Delete it first from its card if you want to create another one.',
   app_title: 'PETO Finanzas', back: '← All options', greeting: 'Hello', lock_btn: 'Lock',
   home_menu_heading: 'What do you want to see?',
   group_daily: 'Day to day', group_plan: 'Planning', group_accounts: 'Accounts & commitments', group_yourapp: 'Your app',
@@ -705,16 +844,16 @@ en: {
   sec_presupuesto: 'Budget by category', sec_pagos: 'Fixed payments', sec_cuentas: 'My accounts',
   sec_deudas: 'My debts', sec_san: 'My san (tanda)', sec_ajustes: 'Settings & personalization',
   menu_open_aria: 'Open menu', menu_close_aria: 'Close menu', sec_home: 'Home', key_home: 'Your main screen',
-  set_notif_label: 'Notifications when the app is closed', set_notif_help: 'Alerts for your fixed payments the day before and on the day, even when PETO is closed.',
+  set_notif_label: 'Notifications when the app is closed', set_notif_help: 'Alerts for your fixed payments the day before and on the day, even when PETO Finanzas is closed.',
   set_autofixed_label: 'Record fixed payments automatically', set_autofixed_help: 'When a fixed payment is due, the expense is recorded for you. You can undo it right away.',
   set_bio_label: 'Fingerprint unlock', set_bio_help: 'Unlock with your fingerprint as well as your PIN (an active PIN is required).',
-  bio_btn: '👆 Unlock with fingerprint', bio_reason: 'Confirm it is you to open PETO',
+  bio_btn: '👆 Unlock with fingerprint', bio_reason: 'Confirm it is you to open PETO Finanzas',
   bio_need_pin: 'Fingerprint unlock needs an active PIN: create your PIN in Settings → Security and fingerprint will work when you open the app.',
   bio_failed: 'Fingerprint could not be verified. Type your PIN.',
   bio_unavailable: 'Fingerprint is not available on this phone. Type your PIN.',
   bio_not_enrolled: 'This phone has no fingerprint enrolled. Enroll one in the phone settings or type your PIN.',
   bio_offer_title: 'Unlock with your fingerprint?',
-  bio_offer_text: 'You just created your PIN. If you want, you can open PETO with your fingerprint instead of typing your PIN every time. Turn it on now?',
+  bio_offer_text: 'You just created your PIN. If you want, you can open PETO Finanzas with your fingerprint instead of typing your PIN every time. Turn it on now?',
   bio_offer_yes: 'Yes, turn on fingerprint',
   bio_offer_no: 'Not now',
   bio_activated: 'Done: fingerprint unlock is now on.',
@@ -726,12 +865,21 @@ en: {
   backup_need_pass: 'Type the encrypted backup password before importing it.',
   backup_err_pass: 'Could not open the backup: wrong password or damaged file.',
   share_btn: 'Share summary', share_copied: 'Summary copied. Paste it anywhere.',
-  review_title: 'Do you like PETO?',
-  review_text: 'If PETO helps you look after your money, a review on Google Play helps us a lot to reach more people. Thank you!',
+  review_title: 'Do you like PETO Finanzas?',
+  review_text: 'If PETO Finanzas helps you look after your money, a review on Google Play helps us a lot to reach more people. Thank you!',
   review_yes: '⭐ Rate on Google Play', review_no: 'Not now',
-  share_report_title: 'My PETO summary',
+  share_report_title: 'My PETO Finanzas summary',
   notif_fixed_title: 'Fixed payment tomorrow', notif_fixed_today: 'Fixed payment today', notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'Your week in PETO', notif_weekly_body: 'Log this week’s expenses and income to stay on track.',
+  notif_weekly_title: 'Your week in PETO Finanzas', notif_weekly_body: 'Log this week’s expenses and income to stay on track.',
+  summary_title: 'Daily summary',
+  summary_help: 'A heads-up with what you spent yesterday and what you can spend today, at the time you choose.',
+  summary_notif_label: 'Summary by notification',
+  summary_time_label: 'Summary time',
+  summary_email_label: 'Also receive it by email',
+  summary_email_help: 'Only with your cloud account active: the same summary also arrives in your email.',
+  notif_summary_title: '🌅 Your PETO Finanzas summary',
+  notif_summary_body: 'Yesterday you spent {spent} · Today you can spend {daily}',
+  notif_summary_body_nodaily: 'Yesterday you spent {spent}',
   sec_remesas: 'Remittances', key_remesas: 'Sent this month: {amount}',
   rem_intro: 'Money you send to your people: how much left in dollars and how much arrived in their currency.',
   rem_usd_label: 'Amount sent ($ USD)', rem_rate_label: 'Rate ({cur} per $1)', rem_recipient_label: 'For whom?',
@@ -754,6 +902,9 @@ en: {
   csv_err_headers: 'The date and amount columns were not found in that file.',
   csv_err_big: 'That file is too large to import.',
   csv_err_empty: 'That file has no transactions that can be imported.',
+  pdf_err_big: 'That PDF is too large (maximum 8 MB).',
+  pdf_err_notext: 'That PDF has no text I can read (it looks like a photo or scan). Try your bank\'s CSV or log the expense with the receipt photo.',
+  pdf_err_empty: 'I found no transactions with a date and amount in that PDF. Try your bank\'s CSV.',
   shared_title: 'Shared budget',
   shared_preview_note: '🔧 Design preview: it does not connect to other accounts yet. Use it to try how creating a household, joining with a code and seeing members will look.',
   shared_create_label: 'Household name', shared_create_btn: 'Create household',
@@ -797,7 +948,7 @@ en: {
   cloud_conflict: 'The cloud and this phone hold different data. Download the cloud data and replace what is on this phone? (Cancel = upload this phone’s data)',
   cloud_wipe_confirm: 'Delete ALL your cloud data? What is on this phone stays as it is.',
   cloud_delete: 'Delete my account',
-  cloud_delete_confirm1: 'Delete your PETO account? This deletes your account, your copy of the data in the cloud and the shared households you own. The data on THIS phone stays here, untouched (you can erase it in Settings). This cannot be undone.',
+  cloud_delete_confirm1: 'Delete your PETO Finanzas account? This deletes your account, your copy of the data in the cloud and the shared households you own. The data on THIS phone stays here, untouched (you can erase it in Settings). This cannot be undone.',
   cloud_delete_confirm2: 'Final confirmation: delete your account for good?',
   cloud_deleted: 'Your account was deleted.',
   cloud_delete_err_auth: 'Your session is no longer valid. Sign in again and try again.',
@@ -899,6 +1050,7 @@ en: {
   san_aporte_label: 'Contribution per turn ($)', san_participants_label: 'Participants (in turn order)',
   san_pname_ph: "Participant's name", san_add_participant: 'Add', san_create_btn: 'Create san',
   san_err_participants: 'Add at least 2 participants.', san_err_dup: 'That participant is already on the list.',
+  san_err_active_exists: 'There is already a san in progress (“{name}”). Delete it first if you want to create another one.',
   san_err_pname: "Enter the participant's name.", san_remove: 'Remove', san_draft_empty: 'No participants added yet.',
   san_week: 'Week {x} of {n}', san_finished: '🎉 San finished!',
   san_finished_note: 'All weeks are complete. You can delete this san and create a new one.',
@@ -924,13 +1076,13 @@ en: {
   pin_off: 'PIN disabled.', pin_updated: 'PIN updated. ✅',
   set_data_title: 'Your data', set_data_help: 'Your data is stored in this browser and, if you sign in, also in the cloud. Export a backup if you want to keep it somewhere else.',
   data_export: 'Export backup (JSON)', data_import: 'Import backup', data_reset: 'Delete all data',
-  data_err_big: 'That file is too large.', data_err_invalid: 'Could not import: the file is not a valid PETO backup.',
+  data_err_big: 'That file is too large.', data_err_invalid: 'Could not import: the file is not a valid PETO Finanzas backup.',
   import_confirm: 'Importing will replace ALL current app data. Are you sure?', import_done: 'Backup imported. ✅',
   reset_confirm1: 'This deletes ALL your app data on this phone. It cannot be undone. Are you sure?',
   reset_confirm2: 'Final confirmation: delete everything and start over?',
   lock_prompt: 'Enter your PIN to continue.', lock_pin_label: 'PIN', lock_enter: 'Unlock',
   lock_note: 'Your data is protected with your PIN.', lock_err: 'Incorrect PIN. Try again.',
-  ob_title: 'Welcome to PETO!',
+  ob_title: 'Welcome to PETO Finanzas!',
   ob_intro_1: 'Organize your money in minutes: expenses, income, budget, accounts and debts.',
   ob_intro_2: 'With your cloud account.', ob_intro_3: 'Your data syncs with your phone.',
   ob_name_label: 'What is your name?', ob_name_ph: 'Your name',
@@ -940,7 +1092,7 @@ en: {
   ob_tour1_title: 'Log an expense in seconds',
   ob_tour1_text: 'Tap the + button, enter the amount and the category. That is all: your expense is saved right away.',
   ob_tour2_title: 'How much can you spend today?',
-  ob_tour2_text: 'PETO spreads your budget across the days left in the month and tells you one single number: what you can spend today without going over.',
+  ob_tour2_text: 'PETO Finanzas spreads your budget across the days left in the month and tells you one single number: what you can spend today without going over.',
   ob_tour3_title: 'Your cloud account (optional)',
   ob_tour3_text: 'If you want, create a free account to see your data on the web too. Without an account, everything stays only on your phone.',
   ob_tour_next: 'Next', ob_tour_skip: 'Skip', ob_tour_go: 'Let’s go!',
@@ -985,7 +1137,7 @@ en: {
   pro_title: 'PETO Pro',
   pro_card_text: 'Unlimited cloud for your data, the advanced report, the shared budget and the san organizer mode.',
   pro_status_free: 'You are on the Free plan right now.',
-  pro_status_active: 'PETO Pro is active. Thanks for supporting PETO! ⭐',
+  pro_status_active: 'PETO Pro is active. Thanks for supporting PETO Finanzas! ⭐',
   pro_status_test: 'PETO Pro is open during the closed test: you have full access while the test lasts.',
   pro_status_waitlist: 'You are on the PETO Pro waiting list.',
   pro_btn_see: 'See PETO Pro',
@@ -1036,9 +1188,81 @@ en: {
   shared_err_member: 'You are already a member of this household.',
   shared_err_owner_leave: 'You own this household: you cannot leave without deleting it. Ask another member to create the new household.',
   shared_created_live: 'Household created ✅ Share the code to invite your household.',
-  shared_joined_live: 'You joined the household ✅'
+  shared_joined_live: 'You joined the household ✅',
+  org_comp_label: 'Organizer compensation',
+  org_comp_none: 'No compensation',
+  org_comp_first: 'The organizer collects first',
+  org_comp_last: 'The organizer collects last',
+  org_comp_extra: 'Extra fee per round',
+  org_comp_amount_label: 'Extra fee per person ($)',
+  org_comp_line: 'Organizer compensation: {mode}',
+  org_sim_title: 'Pot simulation',
+  org_sim_pays: 'Each participant puts in per round: {amount}',
+  org_sim_pot: 'Pot each round: {amount}',
+  org_sim_total_in: 'Total each person puts in over the whole san: {amount}',
+  org_sim_extra_org: 'The organizer receives an extra {amount} per round',
+  org_sim_first: 'The organizer receives the first round’s pot',
+  org_sim_last: 'The organizer receives the last round’s pot',
+  org_shuffle_btn: '🎲 Shuffle the order',
+  org_shuffled: '🎲 Order shuffled! This is the new turn order.',
+  org_shuffle_need: 'Add at least 2 participants to shuffle the order.',
+  org_shuffle_blocked: 'Shuffling is no longer possible: the san has started or already has payments.',
+  org_start_btn: 'Start the san',
+  org_started_line: 'San in progress · The order is locked',
+  org_order_title: 'Turn order',
+  org_move_up: 'Move up',
+  org_move_down: 'Move down',
+  org_swap_blocked: 'That turn already has payments and cannot be changed.',
+  org_history_title: 'Change history',
+  org_history_swap: '{a} and {b} swapped turns',
+  org_history_started: 'The organizer started the san',
+  org_pay_pending: 'Pending',
+  org_pay_reported: 'Reported',
+  org_pay_confirmed: 'Confirmed',
+  org_status_btn: 'Status: {status}',
+  org_receipt_add: '📎 Receipt',
+  org_receipt_view: 'View receipt',
+  org_receipt_remove: 'Remove',
+  org_zelle_label: 'Each participant’s Zelle (number or email, optional)',
+  org_zelle_ph: 'Zelle (optional)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 WhatsApp reminder',
+  org_reminder_head: '🤝 {san} · Round {x} of {n} · {date}',
+  org_reminder_receiver: '💰 This week {name} collects',
+  org_reminder_zelle: '{name}’s Zelle: {zelle}',
+  org_reminder_amount: 'Round contribution: {amount}',
+  org_antifraud: '🛡️ A san never pays interest or more than what was put in.',
+  org_link_btn: '🔗 Read-only link',
+  org_link_publish: 'Create link',
+  org_link_update: 'Update link',
+  org_link_copied: 'Link copied!',
+  org_link_need_cloud: 'The link needs your cloud account: sign in under Settings and try again.',
+  org_link_ready: 'Group san (read-only)',
+  org_public_title: 'The link is ready to share.',
+  org_public_updated: 'Updated on {date}',
+  org_public_notfound: 'This link is no longer available.',
+  org_penalty_label: 'Late rule',
+  org_penalty_none: 'No penalty',
+  org_penalty_fixed: 'Fixed penalty',
+  org_penalty_percent: 'Percentage of the contribution',
+  org_penalty_amount_label: 'Penalty amount ($)',
+  org_penalty_percent_label: 'Penalty percentage (%)',
+  org_penalty_line_fixed: 'If someone is late: {amount} penalty',
+  org_penalty_line_percent: 'If someone is late: {percent}% of the contribution penalty',
+  set_news_title: 'What’s new',
+  news_c24: 'Build 24: welcome tour, recording streak, savings goals with progress bars and a trend chart.',
+  news_c25: 'Build 25: home-screen widget and a much lighter app (from 52 MB down to 7 MB).',
+  news_c26: 'Build 26: widgets in three sizes, with per-widget options and a button to log an expense without opening the app.',
+  news_c27: 'Build 27: the app in 12 languages, automatically following your phone’s language.',
+  news_c28: 'Build 28: larger text applied from startup, this what’s-new section, a review of the Italian texts and a faster start.',
+  news_c31: 'Build 31: the back button or gesture now moves inside the app: it closes whatever is open and returns to the main screen before exiting.',
+  news_c32: 'Build 32: the brand now reads “PETO Finanzas” across the app (menu, lock screen and widgets), the san moved to the top of the Home list, the public san link opens straight into the group status, and the organizer buttons always answer with a clear message.',
+  news_c33: 'Build 33: creating a san can no longer erase the one in progress — if one is already active, the app says so and protects it (payments, receipts, history and public link) — and the web version is now in sync with the phone.',
+  back_exit_hint: 'Press back again to exit.'
 },
 it: {
+  org_err_san_name: 'Scrivi il nome del san.', rep_promo_footer: 'Controlla le tue spese con PETO Finanzas · petofinanzas.com', rep_saved: 'Immagine salvata.', set_sections_summary: '{visible} di {total} visibili',
+  org_err_active_exists: 'C’è già un san attivo («{name}»). Eliminalo prima dalla sua scheda se vuoi crearne un altro.',
   app_title: 'PETO Finanzas',
   back: '← Tutte le opzioni',
   greeting: 'Ciao',
@@ -1063,19 +1287,19 @@ it: {
   sec_home: 'Home',
   key_home: 'La tua schermata principale',
   set_notif_label: 'Notifiche con l’app chiusa',
-  set_notif_help: 'Avvisi dei tuoi pagamenti fissi un giorno prima e lo stesso giorno, anche se PETO è chiusa.',
+  set_notif_help: 'Avvisi dei tuoi pagamenti fissi un giorno prima e lo stesso giorno, anche se PETO Finanzas è chiusa.',
   set_autofixed_label: 'Registra i pagamenti fissi automaticamente',
   set_autofixed_help: 'Quando un pagamento fisso scade, la spesa si registra da sola. Puoi annullarla subito.',
   set_bio_label: 'Sblocca con l’impronta digitale',
   set_bio_help: 'Entra con la tua impronta digitale oltre al PIN (devi avere un PIN attivo).',
   bio_btn: '👆 Entra con l’impronta digitale',
-  bio_reason: 'Conferma che sei tu per aprire PETO',
+  bio_reason: 'Conferma che sei tu per aprire PETO Finanzas',
   bio_need_pin: 'L’impronta ha bisogno di un PIN attivo: crea il tuo PIN in Impostazioni → Sicurezza e poi l’impronta funzionerà all’apertura dell’app.',
   bio_failed: 'Non è stato possibile verificare l’impronta. Inserisci il PIN.',
   bio_unavailable: 'L’impronta non è disponibile su questo telefono. Inserisci il PIN.',
   bio_not_enrolled: 'Questo telefono non ha nessuna impronta registrata. Registrala nelle impostazioni del telefono o inserisci il PIN.',
   bio_offer_title: 'Sbloccare con l’impronta digitale?',
-  bio_offer_text: 'Hai appena creato il tuo PIN. Se vuoi, puoi entrare in PETO con l’impronta invece di digitare il PIN ogni volta. Lo attiviamo ora?',
+  bio_offer_text: 'Hai appena creato il tuo PIN. Se vuoi, puoi entrare in PETO Finanzas con l’impronta invece di digitare il PIN ogni volta. Lo attiviamo ora?',
   bio_offer_yes: 'Sì, attiva l’impronta',
   bio_offer_no: 'Non ora',
   bio_activated: 'Fatto: lo sblocco con l’impronta è attivo.',
@@ -1089,16 +1313,25 @@ it: {
   backup_err_pass: 'Non è stato possibile aprire la copia: password errata o file danneggiato.',
   share_btn: 'Condividi il riepilogo',
   share_copied: 'Riepilogo copiato. Incollalo dove vuoi.',
-  review_title: 'Ti piace PETO?',
-  review_text: 'Se PETO ti aiuta a prenderti cura dei tuoi soldi, una recensione su Google Play ci aiuta moltissimo a raggiungere più persone. Grazie!',
+  review_title: 'Ti piace PETO Finanzas?',
+  review_text: 'Se PETO Finanzas ti aiuta a prenderti cura dei tuoi soldi, una recensione su Google Play ci aiuta moltissimo a raggiungere più persone. Grazie!',
   review_yes: '⭐ Valuta su Google Play',
   review_no: 'Non ora',
-  share_report_title: 'Il mio riepilogo PETO',
+  share_report_title: 'Il mio riepilogo di PETO Finanzas',
   notif_fixed_title: 'Pagamento fisso domani',
   notif_fixed_today: 'Pagamento fisso oggi',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'La tua settimana su PETO',
+  notif_weekly_title: 'La tua settimana su PETO Finanzas',
   notif_weekly_body: 'Registra le spese e le entrate della settimana per non perdere il filo.',
+  summary_title: 'Riepilogo giornaliero',
+  summary_help: 'Un avviso con quanto hai speso ieri e quanto puoi spendere oggi, all’ora che scegli.',
+  summary_notif_label: 'Riepilogo tramite notifica',
+  summary_time_label: 'Ora del riepilogo',
+  summary_email_label: 'Ricevilo anche via email',
+  summary_email_help: 'Solo con il tuo account cloud attivo: lo stesso riepilogo arriva anche nella tua email.',
+  notif_summary_title: '🌅 Il tuo riepilogo di PETO Finanzas',
+  notif_summary_body: 'Ieri hai speso {spent} · Oggi puoi spendere {daily}',
+  notif_summary_body_nodaily: 'Ieri hai speso {spent}',
   sec_remesas: 'Rimesse',
   key_remesas: 'Inviato questo mese: {amount}',
   rem_intro: 'I soldi che mandi ai tuoi cari: quanto è uscito in dollari e quanto è arrivato nella loro valuta.',
@@ -1132,6 +1365,9 @@ it: {
   csv_err_headers: 'Non ho trovato le colonne di data e importo in quel file.',
   csv_err_big: 'Quel file è troppo grande per essere importato.',
   csv_err_empty: 'Quel file non contiene movimenti importabili.',
+  pdf_err_big: 'Quel PDF è troppo grande (massimo 8 MB).',
+  pdf_err_notext: 'Quel PDF non ha testo leggibile (sembra una foto o una scansione). Prova con il CSV della banca o registra la spesa con la foto dello scontrino.',
+  pdf_err_empty: 'Non ho trovato movimenti con data e importo in quel PDF. Prova con il CSV della banca.',
   shared_title: 'Budget condiviso',
   shared_preview_note: '🔧 Anteprima del design: non si collega ancora ad altri account. Serve per provare come sarà creare una casa, unirsi con un codice e vedere i membri.',
   shared_create_label: 'Nome della casa',
@@ -1157,7 +1393,7 @@ it: {
   privacy_show: 'Mostra importi',
   ins_title: '💡 Idee per i tuoi soldi',
   ins_cat_up: '{cat} è salita del {pct}% rispetto al mese scorso ({from} → {to}).',
-  ins_pace_down: 'Stai andando più tranquillo: il tuo ritmo di spesa è sceso del {pct}% rispetto al mese scorso.',
+  ins_pace_down: 'Stai spendendo più lentamente: il tuo ritmo di spesa è sceso del {pct}% rispetto al mese scorso.',
   ins_pace_up: 'Attenzione: il tuo ritmo di spesa è salito del {pct}% rispetto al mese scorso.',
   ins_biggest: 'La tua spesa più grande del mese: {note} · {amount}.',
   ins_saved: 'Hai risparmiato {amount} questo mese. Continua così!',
@@ -1178,7 +1414,7 @@ it: {
   goal_move_label: 'Importo',
   goal_delete_confirm: 'Eliminare l’obiettivo "{name}"? I tuoi risparmi non vengono toccati: si elimina solo l’obiettivo.',
   err_limit_goals: 'Hai già il massimo di obiettivi.',
-  biz_label: 'È della mia attività',
+  biz_label: 'È per la mia attività',
   biz_title: 'La mia attività questo mese',
   biz_income: 'Entrate dell’attività',
   biz_expenses: 'Spese dell’attività',
@@ -1195,7 +1431,7 @@ it: {
   cloud_wipe: 'Elimina i miei dati dal cloud',
   cloud_who: 'Accesso effettuato come {email}',
   cloud_synced: 'Sincronizzato ✓ · {time}',
-  cloud_never: 'Non è stato ancora sincronizzato.',
+  cloud_never: 'Non è ancora stato sincronizzato.',
   cloud_working: 'In corso…',
   cloud_ok_in: 'Bentornato!',
   cloud_ok_up: 'Account creato! I tuoi dati sono già nel cloud.',
@@ -1207,7 +1443,7 @@ it: {
   cloud_conflict: 'Ci sono dati diversi nel cloud e su questo telefono. Vuoi scaricare quelli del cloud e sostituire quelli di questo telefono? (Annulla = carica quelli di questo telefono)',
   cloud_wipe_confirm: 'Eliminare TUTTI i tuoi dati dal cloud? Quelli di questo telefono restano come sono.',
   cloud_delete: 'Elimina il mio account',
-  cloud_delete_confirm1: 'Eliminare il tuo account PETO? Si eliminano il tuo account, la tua copia dei dati nel cloud e le case condivise create da te. I dati di QUESTO telefono restano qui, senza essere eliminati (puoi cancellarli in Impostazioni). Non si può annullare.',
+  cloud_delete_confirm1: 'Eliminare il tuo account PETO Finanzas? Si eliminano il tuo account, la tua copia dei dati nel cloud e le case condivise create da te. I dati di QUESTO telefono restano qui, senza essere eliminati (puoi cancellarli in Impostazioni). Non si può annullare.',
   cloud_delete_confirm2: 'Ultima conferma: eliminare il tuo account per sempre?',
   cloud_deleted: 'Il tuo account è stato eliminato.',
   cloud_delete_err_auth: 'La tua sessione non è più valida. Accedi di nuovo e riprova.',
@@ -1244,7 +1480,7 @@ it: {
   spend_title: 'Quanto puoi spendere oggi?',
   spend_note: 'Questo è quanto puoi spendere oggi senza sforare.',
   spend_guide: 'Crea il tuo primo budget per categoria e qui vedrai quanto puoi spendere ogni giorno.',
-  spend_left: 'Ti restano {amount} per i {days} giorni che mancano del mese.',
+  spend_left: 'Ti restano {amount} per i {days} giorni rimanenti del mese.',
   spend_left_one: 'Ti resta {amount} per oggi, l’ultimo giorno del mese.',
   spend_over: 'Hai raggiunto il budget del mese.',
   spend_over_by: 'Hai sforato di {amount}.',
@@ -1315,7 +1551,7 @@ it: {
   sav_delete_manual_confirm: 'Eliminare questo risparmio di {amount} del {date}? È un risparmio che hai aggiunto a mano in Risparmi; si elimina solo questa voce.',
   err_limit_savings: 'Hai raggiunto il limite di risparmi salvati.',
   goal_prompt: 'Per cosa stai risparmiando?',
-  goal_prompt_sub: 'Crea un obiettivo e guarda come il tuo risparmio si avvicina a esso.',
+  goal_prompt_sub: 'Crea un obiettivo e guarda il tuo risparmio avvicinarsi all’obiettivo.',
   goal_form_create: 'Crea obiettivo',
   goal_form_edit: 'Modifica obiettivo',
   goal_name_label: 'Nome dell’obiettivo',
@@ -1323,7 +1559,7 @@ it: {
   goal_target_label: 'Importo obiettivo ($)',
   goal_create_btn: 'Crea obiettivo',
   goal_save_btn: 'Salva obiettivo',
-  goal_progress: 'Hai {have} di {target}',
+  goal_progress: 'Hai risparmiato {have} su {target}',
   goal_remaining: 'Ti mancano {amount}',
   goal_edit: 'Modifica obiettivo',
   goal_delete: 'Elimina obiettivo',
@@ -1358,8 +1594,8 @@ it: {
   fix_save: 'Salva pagamento fisso',
   fix_empty: 'Non hai ancora pagamenti fissi.',
   fix_sub: 'Giorno {day} di ogni mese · {month}',
-  fix_mark: 'Segna pagato',
-  fix_unmark: 'Togli il segno',
+  fix_mark: 'Segna come pagato',
+  fix_unmark: 'Segna come non pagato',
   fix_delete_confirm: 'Eliminare il pagamento fisso "{name}"?',
   err_day: 'Il giorno deve essere tra 1 e 31.',
   err_limit_fixed: 'Hai raggiunto il limite di pagamenti fissi.',
@@ -1380,8 +1616,8 @@ it: {
   debt_status_paid: 'Pagato',
   debt_save: 'Salva debito',
   debt_empty: 'Non hai debiti registrati. 🎉',
-  debt_mark_paid: 'Segna pagato',
-  debt_mark_pending: 'Segna in sospeso',
+  debt_mark_paid: 'Segna come pagato',
+  debt_mark_pending: 'Segna come in sospeso',
   debt_delete_confirm: 'Eliminare il debito "{name}"?',
   err_limit_debts: 'Hai raggiunto il limite di debiti.',
   name_label: 'Nome',
@@ -1395,6 +1631,7 @@ it: {
   san_add_participant: 'Aggiungi',
   san_create_btn: 'Crea san',
   san_err_participants: 'Aggiungi almeno 2 partecipanti.',
+  san_err_active_exists: 'C’è già un san in corso («{name}»). Eliminalo prima se vuoi crearne un altro.',
   san_err_dup: 'Questo partecipante è già nella lista.',
   san_err_pname: 'Scrivi il nome del partecipante.',
   san_remove: 'Rimuovi',
@@ -1408,7 +1645,7 @@ it: {
   san_aporte_line: 'Contributo per turno: {amount}',
   san_paid_title: 'Chi ha già pagato questa settimana?',
   san_paid: 'ha già pagato',
-  san_advance: 'Segna settimana completa',
+  san_advance: 'Segna la settimana come completa',
   san_delete: 'Elimina san',
   san_delete_confirm: 'Eliminare il san "{name}"? Si elimina il suo registro di settimane e pagamenti.',
   san_new_btn: 'Crea un nuovo san',
@@ -1431,13 +1668,13 @@ it: {
   wd_5: 'Venerdì',
   wd_6: 'Sabato',
   set_split_title: 'Ripartizione suggerita delle entrate (%)',
-  set_split_help: 'I quattro numeri devono sommare 100. Queste percentuali sono solo un suggerimento su come ripartire le tue entrate: il risparmio non si salva mai da solo, sei sempre tu a scrivere quanto hai risparmiato davvero da ogni entrata.',
+  set_split_help: 'La somma dei quattro numeri deve essere 100. Queste percentuali sono solo un suggerimento su come ripartire le tue entrate: il risparmio non si salva mai da solo, sei sempre tu a scrivere quanto hai risparmiato davvero da ogni entrata.',
   split_ahorro: 'Risparmio',
   split_negocio: 'Attività',
   split_gastos: 'Spese',
   split_familia: 'Famiglia',
   set_save: 'Salva impostazioni',
-  set_err_sum: 'Le percentuali devono sommare 100. Ora sommano {total}.',
+  set_err_sum: 'La somma delle percentuali deve essere 100. Ora è {total}.',
   set_saved: 'Impostazioni salvate. ✅',
   set_sections_title: 'Sezioni visibili',
   set_sections_help: 'Disattiva quelle che non usi per avere una lista più corta.',
@@ -1448,7 +1685,7 @@ it: {
   pin_new_label: 'PIN nuovo (vuoto = rimuovi il PIN)',
   pin_update: 'Aggiorna PIN',
   pin_err_current: 'Il PIN attuale non è corretto.',
-  pin_err_format: 'Il PIN nuovo deve avere da 4 a 6 numeri.',
+  pin_err_format: 'Il PIN nuovo deve avere da 4 a 6 cifre.',
   pin_off: 'PIN disattivato.',
   pin_updated: 'PIN aggiornato. ✅',
   set_data_title: 'I tuoi dati',
@@ -1457,7 +1694,7 @@ it: {
   data_import: 'Importa copia',
   data_reset: 'Elimina tutti i dati',
   data_err_big: 'Quel file è troppo grande.',
-  data_err_invalid: 'Non è stato possibile importare: il file non è una copia valida di PETO.',
+  data_err_invalid: 'Non è stato possibile importare: il file non è una copia valida di PETO Finanzas.',
   import_confirm: 'L’importazione sostituirà TUTTI i dati attuali dell’app. Sei sicuro?',
   import_done: 'Copia importata. ✅',
   reset_confirm1: 'Questo elimina TUTTI i tuoi dati dell’app su questo telefono. Non si può annullare. Sei sicuro?',
@@ -1467,14 +1704,14 @@ it: {
   lock_enter: 'Entra',
   lock_note: 'I tuoi dati sono protetti con il tuo PIN.',
   lock_err: 'PIN errato. Riprova.',
-  ob_title: 'Benvenuto in PETO!',
+  ob_title: 'Benvenuto in PETO Finanzas!',
   ob_intro_1: 'Organizza i tuoi soldi in pochi minuti: spese, entrate, budget, conti e debiti.',
   ob_intro_2: 'Con il tuo account nel cloud.',
   ob_intro_3: 'I tuoi dati si sincronizzano con il tuo telefono.',
   ob_name_label: 'Come ti chiami?',
   ob_name_ph: 'Il tuo nome',
   ob_pin_label: 'Crea un PIN di sicurezza (facoltativo)',
-  ob_pin_ph: 'Da 4 a 6 numeri, o lascialo vuoto',
+  ob_pin_ph: 'Da 4 a 6 cifre, o lascialo vuoto',
   ob_pin2_label: 'Ripeti il PIN',
   ob_pin2_ph: 'Ripeti il PIN',
   ob_start: 'Inizia',
@@ -1482,14 +1719,14 @@ it: {
   ob_tour1_title: 'Annota una spesa in pochi secondi',
   ob_tour1_text: 'Tocca il pulsante +, scrivi l’importo e la categoria. Nient’altro: la spesa viene registrata subito.',
   ob_tour2_title: 'Quanto puoi spendere oggi?',
-  ob_tour2_text: 'PETO divide il tuo budget tra i giorni rimasti del mese e ti mostra un solo numero: quanto puoi spendere oggi senza esagerare.',
+  ob_tour2_text: 'PETO Finanzas divide il tuo budget tra i giorni rimasti del mese e ti mostra un solo numero: quanto puoi spendere oggi senza sforare il budget.',
   ob_tour3_title: 'Il tuo account nel cloud (facoltativo)',
   ob_tour3_text: 'Se vuoi, crea un account gratuito per vedere i tuoi dati anche sul web. Senza account, tutto resta solo sul tuo telefono.',
   ob_tour_next: 'Avanti',
   ob_tour_skip: 'Salta',
   ob_tour_go: 'Andiamo!',
   ob_err_name: 'Scrivi il tuo nome per iniziare.',
-  ob_err_pin_format: 'Il PIN deve avere da 4 a 6 numeri.',
+  ob_err_pin_format: 'Il PIN deve avere da 4 a 6 cifre.',
   ob_err_pin_mismatch: 'I due PIN non coincidono.',
   set_theme_label: 'Tema',
   theme_light: 'Chiaro',
@@ -1503,7 +1740,7 @@ it: {
   undo_done: 'Fatto',
   undo_btn: 'Annulla',
   btn_repeat: 'Ripeti',
-  fab_aria: 'Aggiungi veloce',
+  fab_aria: 'Aggiunta rapida',
   quick_title: 'Cosa vuoi aggiungere?',
   quick_expense: '🧾 Spesa',
   quick_income: '💵 Entrata',
@@ -1526,8 +1763,8 @@ it: {
   chal_streak_one: 'Serie: 1 settimana completata',
   chal_streak_many: 'Serie: {n} settimane completate',
   chal_streak_zero: 'Serie: 0 settimane. Questa può essere la prima!',
-  streak_one: '🔥 1 giorno di fila annotando',
-  streak_many: '🔥 {n} giorni di fila annotando',
+  streak_one: '🔥 1 giorno consecutivo di registrazioni',
+  streak_many: '🔥 {n} giorni consecutivi di registrazioni',
   chal_target_label: 'Obiettivo settimanale di risparmio ($)',
   chal_save: 'Salva obiettivo settimanale',
   rep_title: 'Resoconto del mese',
@@ -1536,11 +1773,11 @@ it: {
   trend_title: 'Andamento delle spese',
   trend_weeks: 'Settimane di questo mese',
   trend_week: 'Settimana {n}',
-  trend_empty: 'Nessuna spesa ancora per mostrare l’andamento.',
+  trend_empty: 'Non ci sono ancora spese per mostrare l’andamento.',
   rep_income: 'Entrate',
   rep_expenses: 'Spese',
   rep_savings: 'Risparmi',
-  rep_top_cat: 'Categoria maggiore',
+  rep_top_cat: 'Categoria principale',
   rep_top3: 'Top 3 categorie',
   rep_goal: 'Obiettivo di risparmio',
   rep_none: 'Nessun movimento',
@@ -1569,7 +1806,7 @@ it: {
   pro_title: 'PETO Pro',
   pro_card_text: 'Il cloud senza limiti per i tuoi dati, il resoconto avanzato, il budget condiviso e la modalità organizzatore del san.',
   pro_status_free: 'Ora hai il piano Gratuito.',
-  pro_status_active: 'Hai PETO Pro attivo. Grazie per sostenere PETO! ⭐',
+  pro_status_active: 'Hai PETO Pro attivo. Grazie per sostenere PETO Finanzas! ⭐',
   pro_status_test: 'PETO Pro è aperto durante il test chiuso: hai accesso completo per tutta la durata del test.',
   pro_status_waitlist: 'Sei nella lista d’attesa di PETO Pro.',
   pro_btn_see: 'Vedi PETO Pro',
@@ -1581,11 +1818,11 @@ it: {
   pro_benefit_org: '🤝 Modalità organizzatore del san: la tanda di tutto il gruppo',
   pro_coming_text: 'L’acquisto in-app arriva con il lancio su Google Play. Intanto puoi iscriverti alla lista d’attesa: ti avviseremo appena potrai attivare Pro a $1.99 al mese.',
   pro_waitlist_btn: 'Iscrivimi alla lista d’attesa',
-  pro_waitlist_done: 'Sei già in lista ✅ Ti avviseremo quando Pro sarà disponibile.',
+  pro_waitlist_done: 'Sei in lista ✅ Ti avviseremo quando Pro sarà disponibile.',
   pro_close: 'Non ora',
   pro_tag: 'PRO',
   adv_title: 'Resoconto avanzato',
-  adv_note: 'Funzione di PETO Pro: questo mese contro il precedente, tutte le categorie ed esportazione del mese in CSV.',
+  adv_note: 'Funzione di PETO Pro: questo mese a confronto con il precedente, tutte le categorie ed esportazione del mese in CSV.',
   adv_open_btn: 'Vedi il resoconto avanzato',
   adv_export_csv: 'Esporta il mese in CSV',
   adv_this_month: 'Questo mese',
@@ -1606,7 +1843,7 @@ it: {
   org_round: 'Turno {x} di {n}',
   org_receiver_line: 'Riceve: {name}',
   org_pending_none: 'Hanno pagato tutti! 🎉',
-  org_pending_list: 'In attesa: {names}',
+  org_pending_list: 'Ancora da pagare: {names}',
   org_totals_title: 'Contributi per partecipante',
   org_paid_rounds: '{paid} di {n} turni pagati',
   org_delete: 'Elimina san organizzato',
@@ -1619,10 +1856,82 @@ it: {
   shared_err_code_live: 'Quel codice non esiste. Controllalo e riprova.',
   shared_err_member: 'Sei già membro di questa casa.',
   shared_err_owner_leave: 'Sei il proprietario/la proprietaria della casa: non puoi uscire senza eliminarla. Chiedi a un altro membro di creare la nuova casa.',
-  shared_created_live: 'Casa creata ✅ Condividi il codice per invitare la tua casa.',
-  shared_joined_live: 'Ti sei unito alla casa ✅'
+  shared_created_live: 'Casa creata ✅ Condividi il codice per invitare i membri della tua casa.',
+  shared_joined_live: 'Ti sei unito alla casa ✅',
+  org_comp_label: 'Compensazione dell’organizzatore',
+  org_comp_none: 'Nessuna compensazione',
+  org_comp_first: 'L’organizzatore riscuote per primo',
+  org_comp_last: 'L’organizzatore riscuote per ultimo',
+  org_comp_extra: 'Quota extra per turno',
+  org_comp_amount_label: 'Quota extra per persona ($)',
+  org_comp_line: 'Compensazione dell’organizzatore: {mode}',
+  org_sim_title: 'Simulazione del montepremi',
+  org_sim_pays: 'Ogni partecipante versa per turno: {amount}',
+  org_sim_pot: 'Montepremi di ogni turno: {amount}',
+  org_sim_total_in: 'Totale versato da ciascuno in tutto il san: {amount}',
+  org_sim_extra_org: 'L’organizzatore riceve {amount} extra per turno',
+  org_sim_first: 'L’organizzatore riceve il montepremi del primo turno',
+  org_sim_last: 'L’organizzatore riceve il montepremi dell’ultimo turno',
+  org_shuffle_btn: '🎲 Sorteggia l’ordine',
+  org_shuffled: '🎲 Ordine sorteggiato! Ecco il nuovo turno.',
+  org_shuffle_need: 'Aggiungi almeno 2 partecipanti per sorteggiare l’ordine.',
+  org_shuffle_blocked: 'Non si può più sorteggiare: il san è già iniziato o ha pagamenti registrati.',
+  org_start_btn: 'Avvia il san',
+  org_started_line: 'San in corso · L’ordine è bloccato',
+  org_order_title: 'Ordine dei turni',
+  org_move_up: 'Sposta su',
+  org_move_down: 'Sposta giù',
+  org_swap_blocked: 'Quel turno ha già pagamenti e non può essere cambiato.',
+  org_history_title: 'Cronologia delle modifiche',
+  org_history_swap: '{a} e {b} si sono scambiati i turni',
+  org_history_started: 'L’organizzatore ha avviato il san',
+  org_pay_pending: 'In attesa',
+  org_pay_reported: 'Segnalato',
+  org_pay_confirmed: 'Confermato',
+  org_status_btn: 'Stato: {status}',
+  org_receipt_add: '📎 Ricevuta',
+  org_receipt_view: 'Vedi ricevuta',
+  org_receipt_remove: 'Rimuovi',
+  org_zelle_label: 'Zelle di ogni partecipante (numero o e-mail, facoltativo)',
+  org_zelle_ph: 'Zelle (facoltativo)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 Promemoria WhatsApp',
+  org_reminder_head: '🤝 {san} · Turno {x} di {n} · {date}',
+  org_reminder_receiver: '💰 Questa settimana riscuote {name}',
+  org_reminder_zelle: 'Zelle di {name}: {zelle}',
+  org_reminder_amount: 'Contributo del turno: {amount}',
+  org_antifraud: '🛡️ Un san non paga mai interessi né più di quanto versato.',
+  org_link_btn: '🔗 Link di sola lettura',
+  org_link_publish: 'Crea link',
+  org_link_update: 'Aggiorna link',
+  org_link_copied: 'Link copiato!',
+  org_link_need_cloud: 'Il link richiede il tuo account cloud: accedi in Impostazioni e riprova.',
+  org_link_ready: 'San del gruppo (sola lettura)',
+  org_public_title: 'Il link è pronto da condividere.',
+  org_public_updated: 'Aggiornato il {date}',
+  org_public_notfound: 'Questo link non è più disponibile.',
+  org_penalty_label: 'Regola per i ritardi',
+  org_penalty_none: 'Nessuna multa',
+  org_penalty_fixed: 'Multa fissa',
+  org_penalty_percent: 'Percentuale del contributo',
+  org_penalty_amount_label: 'Importo della multa ($)',
+  org_penalty_percent_label: 'Percentuale della multa (%)',
+  org_penalty_line_fixed: 'Se qualcuno è in ritardo: multa di {amount}',
+  org_penalty_line_percent: 'Se qualcuno è in ritardo: multa del {percent}% del contributo',
+  set_news_title: 'Novità',
+  news_c24: 'Compilación 24: tutorial di benvenuto, giorni consecutivi di registrazione, obiettivi di risparmio con barra di avanzamento e grafico di tendenza.',
+  news_c25: 'Compilación 25: widget nella schermata iniziale e un’app molto più leggera (da 52 MB a 7 MB).',
+  news_c26: 'Compilación 26: widget in tre misure, con opzioni per ogni widget e un pulsante per registrare una spesa senza aprire l’app.',
+  news_c27: 'Compilación 27: l’app in 12 lingue, con rilevamento automatico della lingua del telefono.',
+  news_c28: 'Compilación 28: testo più grande applicato dall’avvio, questa sezione delle novità, revisione dell’italiano e avvio più rapido.',
+  news_c31: 'Compilación 31: il tasto o gesto indietro ora si muove dentro l’app: chiude ciò che è aperto e torna alla schermata principale prima di uscire.',
+  news_c32: 'Versione 32: il marchio ora è «PETO Finanzas» in tutta l’app (menu, blocco e widget), il san è passato in cima all’elenco della schermata iniziale, il link pubblico del san si apre direttamente sullo stato del gruppo e i pulsanti dell’organizzatore rispondono sempre con un messaggio chiaro.',
+  news_c33: 'Versione 33: creare un san non può più cancellare quello in corso — se ce n’è già uno attivo, l’app lo dice e lo protegge (pagamenti, ricevute, cronologia e link pubblico) — e la versione web è ora sincronizzata con il telefono.',
+  back_exit_hint: 'Premi di nuovo indietro per uscire.'
 },
 pt: {
+  org_err_san_name: 'Digite o nome do san.', rep_promo_footer: 'Controle seus gastos com o PETO Finanzas · petofinanzas.com', rep_saved: 'Imagem salva.', set_sections_summary: '{visible} de {total} visíveis',
+  org_err_active_exists: 'Já existe um san ativo («{name}»). Exclua-o primeiro no cartão dele se quiser criar outro.',
   app_title: 'PETO Finanzas',
   back: '← Todas as opções',
   greeting: 'Olá',
@@ -1647,19 +1956,19 @@ pt: {
   sec_home: 'Início',
   key_home: 'Sua tela principal',
   set_notif_label: 'Notificações com o app fechado',
-  set_notif_help: 'Avisos dos seus pagamentos fixos um dia antes e no próprio dia, mesmo com o PETO fechado.',
+  set_notif_help: 'Avisos dos seus pagamentos fixos um dia antes e no próprio dia, mesmo com o PETO Finanzas fechado.',
   set_autofixed_label: 'Registrar pagamentos fixos automaticamente',
   set_autofixed_help: 'Quando um pagamento fixo vence, o gasto é registrado para você. Você pode desfazer na hora.',
   set_bio_label: 'Desbloqueio com impressão digital',
   set_bio_help: 'Entre com sua impressão digital além do PIN (é necessário um PIN ativo).',
   bio_btn: '👆 Entrar com impressão digital',
-  bio_reason: 'Confirme que é você para abrir o PETO',
+  bio_reason: 'Confirme que é você para abrir o PETO Finanzas',
   bio_need_pin: 'A impressão digital precisa de um PIN ativo: crie seu PIN em Ajustes → Segurança e a digital funcionará ao abrir o app.',
   bio_failed: 'Não foi possível verificar a impressão digital. Digite seu PIN.',
   bio_unavailable: 'A impressão digital não está disponível neste telefone. Digite seu PIN.',
   bio_not_enrolled: 'Este telefone não tem nenhuma impressão digital cadastrada. Cadastre uma nos ajustes do telefone ou digite seu PIN.',
   bio_offer_title: 'Desbloquear com sua impressão digital?',
-  bio_offer_text: 'Você acabou de criar seu PIN. Se quiser, pode abrir o PETO com sua impressão digital em vez de digitar o PIN toda vez. Ativamos agora?',
+  bio_offer_text: 'Você acabou de criar seu PIN. Se quiser, pode abrir o PETO Finanzas com sua impressão digital em vez de digitar o PIN toda vez. Ativamos agora?',
   bio_offer_yes: 'Sim, ativar a impressão digital',
   bio_offer_no: 'Agora não',
   bio_activated: 'Pronto: o desbloqueio com impressão digital está ativado.',
@@ -1673,16 +1982,25 @@ pt: {
   backup_err_pass: 'Não foi possível abrir a cópia: senha incorreta ou arquivo danificado.',
   share_btn: 'Compartilhar resumo',
   share_copied: 'Resumo copiado. Cole onde quiser.',
-  review_title: 'Você gosta do PETO?',
-  review_text: 'Se o PETO te ajuda a cuidar do seu dinheiro, uma avaliação no Google Play nos ajuda muito a alcançar mais pessoas. Obrigado!',
+  review_title: 'Você gosta do PETO Finanzas?',
+  review_text: 'Se o PETO Finanzas te ajuda a cuidar do seu dinheiro, uma avaliação no Google Play nos ajuda muito a alcançar mais pessoas. Obrigado!',
   review_yes: '⭐ Avaliar no Google Play',
   review_no: 'Agora não',
-  share_report_title: 'Meu resumo do PETO',
+  share_report_title: 'Meu resumo do PETO Finanzas',
   notif_fixed_title: 'Pagamento fixo amanhã',
   notif_fixed_today: 'Pagamento fixo hoje',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'Sua semana no PETO',
+  notif_weekly_title: 'Sua semana no PETO Finanzas',
   notif_weekly_body: 'Registre os gastos e a renda desta semana para manter o controle.',
+  summary_title: 'Resumo diário',
+  summary_help: 'Um aviso com o que você gastou ontem e o que pode gastar hoje, na hora que escolher.',
+  summary_notif_label: 'Resumo por notificação',
+  summary_time_label: 'Hora do resumo',
+  summary_email_label: 'Receber também por e-mail',
+  summary_email_help: 'Apenas com sua conta na nuvem ativa: o mesmo resumo também chega ao seu e-mail.',
+  notif_summary_title: '🌅 Seu resumo PETO Finanzas',
+  notif_summary_body: 'Ontem você gastou {spent} · Hoje você pode gastar {daily}',
+  notif_summary_body_nodaily: 'Ontem você gastou {spent}',
   sec_remesas: 'Remessas',
   key_remesas: 'Enviado este mês: {amount}',
   rem_intro: 'Dinheiro que você envia para os seus: quanto saiu em dólares e quanto chegou na moeda deles.',
@@ -1716,6 +2034,9 @@ pt: {
   csv_err_headers: 'As colunas de data e valor não foram encontradas nesse arquivo.',
   csv_err_big: 'Esse arquivo é grande demais para importar.',
   csv_err_empty: 'Esse arquivo não tem transações que possam ser importadas.',
+  pdf_err_big: 'Esse PDF é grande demais (máximo 8 MB).',
+  pdf_err_notext: 'Esse PDF não tem texto que eu consiga ler (parece uma foto ou digitalização). Tente o CSV do banco ou anote o gasto com a foto do recibo.',
+  pdf_err_empty: 'Não encontrei transações com data e valor nesse PDF. Tente o CSV do banco.',
   shared_title: 'Orçamento compartilhado',
   shared_preview_note: '🔧 Prévia do design: ainda não conecta com outras contas. Use para experimentar como vai ficar criar uma casa, entrar com um código e ver os membros.',
   shared_create_label: 'Nome da casa',
@@ -1791,13 +2112,13 @@ pt: {
   cloud_conflict: 'A nuvem e este telefone têm dados diferentes. Baixar os dados da nuvem e substituir os deste telefone? (Cancelar = enviar os dados deste telefone)',
   cloud_wipe_confirm: 'Excluir TODOS os seus dados da nuvem? O que está neste telefone fica como está.',
   cloud_delete: 'Excluir minha conta',
-  cloud_delete_confirm1: 'Excluir sua conta PETO? Isso apaga sua conta, sua cópia dos dados na nuvem e as casas compartilhadas que são suas. Os dados DESTE telefone ficam aqui, intactos (você pode apagá-los em Ajustes). Isso não pode ser desfeito.',
+  cloud_delete_confirm1: 'Excluir sua conta PETO Finanzas? Isso apaga sua conta, sua cópia dos dados na nuvem e as casas compartilhadas que são suas. Os dados DESTE telefone ficam aqui, intactos (você pode apagá-los em Ajustes). Isso não pode ser desfeito.',
   cloud_delete_confirm2: 'Confirmação final: excluir sua conta de vez?',
   cloud_deleted: 'Sua conta foi excluída.',
   cloud_delete_err_auth: 'Sua sessão não é mais válida. Entre de novo e tente outra vez.',
   cloud_unavailable: 'A nuvem não está disponível nesta versão.',
   key_settings: 'Nome, divisão, texto, seções, PIN',
-  footer: 'PETO v0.1 · Funciona sem internet · Seus dados nunca saem do seu telefone',
+  footer: 'PETO Finanzas · Funciona sem internet · A nuvem é opcional: seus dados, sua decisão',
   tile_available: 'Dinheiro disponível',
   tile_available_aria: 'Dinheiro disponível: ir para Minhas contas',
   tile_savings: 'Poupança deste mês',
@@ -1979,6 +2300,7 @@ pt: {
   san_add_participant: 'Adicionar',
   san_create_btn: 'Criar san',
   san_err_participants: 'Adicione pelo menos 2 participantes.',
+  san_err_active_exists: 'Já existe um san em andamento («{name}»). Exclua-o primeiro se quiser criar outro.',
   san_err_dup: 'Esse participante já está na lista.',
   san_err_pname: 'Digite o nome do participante.',
   san_remove: 'Remover',
@@ -2041,7 +2363,7 @@ pt: {
   data_import: 'Importar cópia',
   data_reset: 'Excluir todos os dados',
   data_err_big: 'Esse arquivo é grande demais.',
-  data_err_invalid: 'Não foi possível importar: o arquivo não é uma cópia válida do PETO.',
+  data_err_invalid: 'Não foi possível importar: o arquivo não é uma cópia válida do PETO Finanzas.',
   import_confirm: 'Importar substituirá TODOS os dados atuais do app. Tem certeza?',
   import_done: 'Cópia importada. ✅',
   reset_confirm1: 'Isso apaga TODOS os dados do seu app neste telefone. Não pode ser desfeito. Tem certeza?',
@@ -2051,7 +2373,7 @@ pt: {
   lock_enter: 'Desbloquear',
   lock_note: 'Seus dados ficam somente neste telefone.',
   lock_err: 'PIN incorreto. Tente de novo.',
-  ob_title: 'Bem-vindo ao PETO!',
+  ob_title: 'Bem-vindo ao PETO Finanzas!',
   ob_intro_1: 'Organize seu dinheiro em minutos: gastos, renda, orçamento, contas e dívidas.',
   ob_intro_2: 'Sem conta, sem internet.',
   ob_intro_3: 'Tudo fica guardado só no seu telefone.',
@@ -2066,7 +2388,7 @@ pt: {
   ob_tour1_title: 'Registre um gasto em segundos',
   ob_tour1_text: 'Toque no botão +, digite o valor e a categoria. Só isso: seu gasto fica salvo na hora.',
   ob_tour2_title: 'Quanto você pode gastar hoje?',
-  ob_tour2_text: 'O PETO distribui seu orçamento pelos dias que restam do mês e te diz um único número: o que você pode gastar hoje sem passar do limite.',
+  ob_tour2_text: 'O PETO Finanzas distribui seu orçamento pelos dias que restam do mês e te diz um único número: o que você pode gastar hoje sem passar do limite.',
   ob_tour3_title: 'Sua conta na nuvem (opcional)',
   ob_tour3_text: 'Se quiser, crie uma conta grátis para ver seus dados na web também. Sem conta, tudo fica só no seu telefone.',
   ob_tour_next: 'Seguinte',
@@ -2152,7 +2474,7 @@ pt: {
   pro_title: 'PETO Pro',
   pro_card_text: 'Nuvem ilimitada para seus dados, o relatório avançado, o orçamento compartilhado e o modo organizador de san.',
   pro_status_free: 'Você está no plano Grátis agora.',
-  pro_status_active: 'O PETO Pro está ativo. Obrigado por apoiar o PETO! ⭐',
+  pro_status_active: 'O PETO Pro está ativo. Obrigado por apoiar o PETO Finanzas! ⭐',
   pro_status_test: 'O PETO Pro está aberto durante o teste fechado: você tem acesso completo enquanto o teste durar.',
   pro_status_waitlist: 'Você está na lista de espera do PETO Pro.',
   pro_btn_see: 'Ver PETO Pro',
@@ -2204,9 +2526,81 @@ pt: {
   shared_err_owner_leave: 'Você é o dono desta casa: não pode sair sem excluí-la. Peça a outro membro para criar a nova casa.',
   shared_created_live: 'Casa criada ✅ Compartilhe o código para convidar sua casa.',
   shared_joined_live: 'Você entrou na casa ✅',
-  lang_auto: 'Automático (idioma do telefone)'
+  lang_auto: 'Automático (idioma do telefone)',
+  org_comp_label: 'Compensação do organizador',
+  org_comp_none: 'Sem compensação',
+  org_comp_first: 'O organizador recebe primeiro',
+  org_comp_last: 'O organizador recebe por último',
+  org_comp_extra: 'Taxa extra por rodada',
+  org_comp_amount_label: 'Taxa extra por pessoa ($)',
+  org_comp_line: 'Compensação do organizador: {mode}',
+  org_sim_title: 'Simulação do pote',
+  org_sim_pays: 'Cada participante coloca por rodada: {amount}',
+  org_sim_pot: 'Pote de cada rodada: {amount}',
+  org_sim_total_in: 'Total que cada um coloca em todo o san: {amount}',
+  org_sim_extra_org: 'O organizador recebe {amount} extra por rodada',
+  org_sim_first: 'O organizador recebe o pote da primeira rodada',
+  org_sim_last: 'O organizador recebe o pote da última rodada',
+  org_shuffle_btn: '🎲 Sortear a ordem',
+  org_shuffled: '🎲 Ordem sorteada! Assim ficou o turno.',
+  org_shuffle_need: 'Adicione pelo menos 2 participantes para sortear a ordem.',
+  org_shuffle_blocked: 'Não dá mais para sortear: o san já começou ou já tem pagamentos registrados.',
+  org_start_btn: 'Iniciar o san',
+  org_started_line: 'San em andamento · A ordem está bloqueada',
+  org_order_title: 'Ordem dos turnos',
+  org_move_up: 'Subir',
+  org_move_down: 'Descer',
+  org_swap_blocked: 'Esse turno já tem pagamentos e não pode ser alterado.',
+  org_history_title: 'Histórico de alterações',
+  org_history_swap: '{a} e {b} trocaram de turno',
+  org_history_started: 'O organizador iniciou o san',
+  org_pay_pending: 'Pendente',
+  org_pay_reported: 'Reportado',
+  org_pay_confirmed: 'Confirmado',
+  org_status_btn: 'Estado: {status}',
+  org_receipt_add: '📎 Comprovante',
+  org_receipt_view: 'Ver comprovante',
+  org_receipt_remove: 'Remover',
+  org_zelle_label: 'Zelle de cada participante (número ou e-mail, opcional)',
+  org_zelle_ph: 'Zelle (opcional)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 Lembrete pelo WhatsApp',
+  org_reminder_head: '🤝 {san} · Rodada {x} de {n} · {date}',
+  org_reminder_receiver: '💰 Nesta semana recebe {name}',
+  org_reminder_zelle: 'Zelle de {name}: {zelle}',
+  org_reminder_amount: 'Contribuição da rodada: {amount}',
+  org_antifraud: '🛡️ Um san nunca paga juros nem mais do que foi contribuído.',
+  org_link_btn: '🔗 Link somente leitura',
+  org_link_publish: 'Criar link',
+  org_link_update: 'Atualizar link',
+  org_link_copied: 'Link copiado!',
+  org_link_need_cloud: 'O link precisa da sua conta na nuvem: entre em Configurações e tente novamente.',
+  org_link_ready: 'San do grupo (somente leitura)',
+  org_public_title: 'O link está pronto para compartilhar.',
+  org_public_updated: 'Atualizado em {date}',
+  org_public_notfound: 'Este link não está mais disponível.',
+  org_penalty_label: 'Regra de atraso',
+  org_penalty_none: 'Sem multa',
+  org_penalty_fixed: 'Multa fixa',
+  org_penalty_percent: 'Porcentagem da contribuição',
+  org_penalty_amount_label: 'Valor da multa ($)',
+  org_penalty_percent_label: 'Porcentagem da multa (%)',
+  org_penalty_line_fixed: 'Se alguém atrasar: multa de {amount}',
+  org_penalty_line_percent: 'Se alguém atrasar: multa de {percent}% da contribuição',
+  set_news_title: 'Novidades',
+  news_c24: 'Compilación 24: tutorial de boas-vindas, sequência de dias registrando, metas de poupança com barra de progresso e gráfico de tendência.',
+  news_c25: 'Compilación 25: widget na tela inicial e um app muito mais leve (de 52 MB para 7 MB).',
+  news_c26: 'Compilación 26: widgets em três tamanhos, com opções por widget e botão para registrar uma despesa sem abrir o app.',
+  news_c27: 'Compilación 27: o app em 12 idiomas, seguindo sozinho o idioma do seu telefone.',
+  news_c28: 'Compilación 28: letra maior aplicada desde a abertura, esta seção de novidades, revisão do italiano e abertura mais rápida.',
+  news_c31: 'Compilación 31: o botão ou gesto de voltar agora se move dentro do app: fecha o que estiver aberto e volta à tela principal antes de sair.',
+  news_c32: 'Compilação 32: a marca agora é «PETO Finanzas» em todo o app (menu, bloqueio e widgets), o san ficou em primeiro na lista do Início, o link público do san abre direto no estado do grupo e os botões do organizador sempre respondem com uma mensagem clara.',
+  news_c33: 'Compilação 33: criar um san já não pode apagar o que está em andamento — se já houver um ativo, o app avisa e o protege (pagamentos, comprovantes, histórico e link público) — e a versão web ficou sincronizada com o telefone.',
+  back_exit_hint: 'Toque em voltar outra vez para sair.'
 },
 fr: {
+  org_err_san_name: 'Saisis le nom du san.', rep_promo_footer: 'Contrôle tes dépenses avec PETO Finanzas · petofinanzas.com', rep_saved: 'Image enregistrée.', set_sections_summary: '{visible} sur {total} visibles',
+  org_err_active_exists: 'Il existe déjà un san actif (« {name} »). Supprime-le d’abord depuis sa fiche si tu veux en créer un autre.',
   app_title: 'PETO Finanzas',
   back: '← Toutes les options',
   greeting: 'Bonjour',
@@ -2231,19 +2625,19 @@ fr: {
   sec_home: 'Accueil',
   key_home: 'Ton écran principal',
   set_notif_label: 'Notifications quand l’appli est fermée',
-  set_notif_help: 'Des alertes pour tes paiements fixes la veille et le jour même, même quand PETO est fermée.',
+  set_notif_help: 'Des alertes pour tes paiements fixes la veille et le jour même, même quand PETO Finanzas est fermée.',
   set_autofixed_label: 'Enregistrer les paiements fixes automatiquement',
   set_autofixed_help: 'Quand un paiement fixe arrive à échéance, la dépense est enregistrée pour toi. Tu peux l’annuler aussitôt.',
   set_bio_label: 'Déverrouillage par empreinte digitale',
   set_bio_help: 'Entre avec ton empreinte en plus de ton code PIN (un code PIN actif est nécessaire).',
   bio_btn: '👆 Entrer avec l’empreinte digitale',
-  bio_reason: 'Confirme que c’est bien toi pour ouvrir PETO',
+  bio_reason: 'Confirme que c’est bien toi pour ouvrir PETO Finanzas',
   bio_need_pin: 'L’empreinte digitale nécessite un code PIN actif : crée ton code PIN dans Réglages → Sécurité et l’empreinte fonctionnera à l’ouverture de l’appli.',
   bio_failed: 'L’empreinte n’a pas pu être vérifiée. Tape ton code PIN.',
   bio_unavailable: 'L’empreinte digitale n’est pas disponible sur ce téléphone. Tape ton code PIN.',
   bio_not_enrolled: 'Ce téléphone n’a aucune empreinte enregistrée. Enregistres-en une dans les réglages du téléphone ou tape ton code PIN.',
   bio_offer_title: 'Déverrouiller avec ton empreinte ?',
-  bio_offer_text: 'Tu viens de créer ton code PIN. Si tu veux, tu peux ouvrir PETO avec ton empreinte au lieu de taper ton code PIN à chaque fois. On l’active maintenant ?',
+  bio_offer_text: 'Tu viens de créer ton code PIN. Si tu veux, tu peux ouvrir PETO Finanzas avec ton empreinte au lieu de taper ton code PIN à chaque fois. On l’active maintenant ?',
   bio_offer_yes: 'Oui, activer l’empreinte',
   bio_offer_no: 'Pas maintenant',
   bio_activated: 'C’est fait : le déverrouillage par empreinte est activé.',
@@ -2257,16 +2651,25 @@ fr: {
   backup_err_pass: 'Impossible d’ouvrir la copie : mot de passe incorrect ou fichier endommagé.',
   share_btn: 'Partager le résumé',
   share_copied: 'Résumé copié. Colle-le où tu veux.',
-  review_title: 'Tu aimes PETO ?',
-  review_text: 'Si PETO t’aide à prendre soin de ton argent, un avis sur Google Play nous aide beaucoup à toucher plus de monde. Merci !',
+  review_title: 'Tu aimes PETO Finanzas ?',
+  review_text: 'Si PETO Finanzas t’aide à prendre soin de ton argent, un avis sur Google Play nous aide beaucoup à toucher plus de monde. Merci !',
   review_yes: '⭐ Noter sur Google Play',
   review_no: 'Pas maintenant',
-  share_report_title: 'Mon résumé PETO',
+  share_report_title: 'Mon résumé PETO Finanzas',
   notif_fixed_title: 'Paiement fixe demain',
   notif_fixed_today: 'Paiement fixe aujourd’hui',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'Ta semaine dans PETO',
+  notif_weekly_title: 'Ta semaine dans PETO Finanzas',
   notif_weekly_body: 'Enregistre les dépenses et les revenus de cette semaine pour garder le cap.',
+  summary_title: 'Résumé quotidien',
+  summary_help: 'Un avis avec ce que tu as dépensé hier et ce que tu peux dépenser aujourd’hui, à l’heure que tu choisis.',
+  summary_notif_label: 'Résumé par notification',
+  summary_time_label: 'Heure du résumé',
+  summary_email_label: 'Le recevoir aussi par e-mail',
+  summary_email_help: 'Uniquement avec ton compte cloud actif : le même résumé arrive aussi dans ta boîte e-mail.',
+  notif_summary_title: '🌅 Ton résumé PETO Finanzas',
+  notif_summary_body: 'Hier tu as dépensé {spent} · Aujourd’hui tu peux dépenser {daily}',
+  notif_summary_body_nodaily: 'Hier tu as dépensé {spent}',
   sec_remesas: 'Envois d’argent',
   key_remesas: 'Envoyé ce mois-ci : {amount}',
   rem_intro: 'L’argent que tu envoies à tes proches : combien est parti en dollars et combien est arrivé dans leur devise.',
@@ -2300,6 +2703,9 @@ fr: {
   csv_err_headers: 'Les colonnes de date et de montant n’ont pas été trouvées dans ce fichier.',
   csv_err_big: 'Ce fichier est trop volumineux pour être importé.',
   csv_err_empty: 'Ce fichier ne contient aucune opération importable.',
+  pdf_err_big: 'Ce PDF est trop volumineux (maximum 8 Mo).',
+  pdf_err_notext: 'Ce PDF n’a pas de texte lisible (on dirait une photo ou un scan). Essaie le CSV de la banque ou note la dépense avec la photo du reçu.',
+  pdf_err_empty: 'Je n’ai trouvé aucune opération avec date et montant dans ce PDF. Essaie le CSV de la banque.',
   shared_title: 'Budget partagé',
   shared_preview_note: '🔧 Aperçu du design : il ne se connecte pas encore à d’autres comptes. Utilise-le pour essayer à quoi ressembleront la création d’un foyer, l’entrée avec un code et la liste des membres.',
   shared_create_label: 'Nom du foyer',
@@ -2375,13 +2781,13 @@ fr: {
   cloud_conflict: 'Le cloud et ce téléphone contiennent des données différentes. Télécharger les données du cloud et remplacer celles de ce téléphone ? (Annuler = envoyer les données de ce téléphone)',
   cloud_wipe_confirm: 'Supprimer TOUTES tes données du cloud ? Ce qui est sur ce téléphone reste tel quel.',
   cloud_delete: 'Supprimer mon compte',
-  cloud_delete_confirm1: 'Supprimer ton compte PETO ? Cela supprime ton compte, ta copie des données dans le cloud et les foyers partagés dont tu es propriétaire. Les données de CE téléphone restent ici, intactes (tu peux les effacer dans Réglages). C’est irréversible.',
+  cloud_delete_confirm1: 'Supprimer ton compte PETO Finanzas ? Cela supprime ton compte, ta copie des données dans le cloud et les foyers partagés dont tu es propriétaire. Les données de CE téléphone restent ici, intactes (tu peux les effacer dans Réglages). C’est irréversible.',
   cloud_delete_confirm2: 'Confirmation finale : supprimer ton compte pour de bon ?',
   cloud_deleted: 'Ton compte a été supprimé.',
   cloud_delete_err_auth: 'Ta session n’est plus valable. Reconnecte-toi et réessaie.',
   cloud_unavailable: 'Le cloud n’est pas disponible dans cette version.',
   key_settings: 'Nom, répartition, texte, sections, PIN',
-  footer: 'PETO v0.1 · Fonctionne hors ligne · Tes données ne quittent jamais ton téléphone',
+  footer: 'PETO Finanzas · Fonctionne hors ligne · Le cloud est facultatif : tes données, ton choix',
   tile_available: 'Argent disponible',
   tile_available_aria: 'Argent disponible : aller à Mes comptes',
   tile_savings: 'Épargne de ce mois-ci',
@@ -2563,6 +2969,7 @@ fr: {
   san_add_participant: 'Ajouter',
   san_create_btn: 'Créer le san',
   san_err_participants: 'Ajoute au moins 2 participants.',
+  san_err_active_exists: 'Il existe déjà un san en cours (« {name} »). Supprime-le d’abord si tu veux en créer un autre.',
   san_err_dup: 'Ce participant est déjà sur la liste.',
   san_err_pname: 'Saisis le nom du participant.',
   san_remove: 'Retirer',
@@ -2625,7 +3032,7 @@ fr: {
   data_import: 'Importer une copie',
   data_reset: 'Supprimer toutes les données',
   data_err_big: 'Ce fichier est trop volumineux.',
-  data_err_invalid: 'Importation impossible : le fichier n’est pas une copie PETO valide.',
+  data_err_invalid: 'Importation impossible : le fichier n’est pas une copie PETO Finanzas valide.',
   import_confirm: 'L’importation remplacera TOUTES les données actuelles de l’appli. Tu es sûr ?',
   import_done: 'Copie importée. ✅',
   reset_confirm1: 'Cela supprime TOUTES les données de ton appli sur ce téléphone. C’est irréversible. Tu es sûr ?',
@@ -2635,7 +3042,7 @@ fr: {
   lock_enter: 'Déverrouiller',
   lock_note: 'Tes données restent uniquement sur ce téléphone.',
   lock_err: 'Code PIN incorrect. Réessaie.',
-  ob_title: 'Bienvenue dans PETO !',
+  ob_title: 'Bienvenue dans PETO Finanzas !',
   ob_intro_1: 'Organise ton argent en quelques minutes : dépenses, revenus, budget, comptes et dettes.',
   ob_intro_2: 'Sans compte, sans internet.',
   ob_intro_3: 'Tout est gardé uniquement sur ton téléphone.',
@@ -2650,7 +3057,7 @@ fr: {
   ob_tour1_title: 'Enregistre une dépense en quelques secondes',
   ob_tour1_text: 'Touche le bouton +, saisis le montant et la catégorie. C’est tout : ta dépense est enregistrée tout de suite.',
   ob_tour2_title: 'Combien peux-tu dépenser aujourd’hui ?',
-  ob_tour2_text: 'PETO répartit ton budget sur les jours restants du mois et te donne un seul chiffre : ce que tu peux dépenser aujourd’hui sans dépasser.',
+  ob_tour2_text: 'PETO Finanzas répartit ton budget sur les jours restants du mois et te donne un seul chiffre : ce que tu peux dépenser aujourd’hui sans dépasser.',
   ob_tour3_title: 'Ton compte cloud (facultatif)',
   ob_tour3_text: 'Si tu veux, crée un compte gratuit pour voir aussi tes données sur le web. Sans compte, tout reste uniquement sur ton téléphone.',
   ob_tour_next: 'Suivant',
@@ -2736,7 +3143,7 @@ fr: {
   pro_title: 'PETO Pro',
   pro_card_text: 'Cloud illimité pour tes données, le rapport avancé, le budget partagé et le mode organisateur de san.',
   pro_status_free: 'Tu es sur le plan Gratuit en ce moment.',
-  pro_status_active: 'PETO Pro est actif. Merci de soutenir PETO ! ⭐',
+  pro_status_active: 'PETO Pro est actif. Merci de soutenir PETO Finanzas ! ⭐',
   pro_status_test: 'PETO Pro est ouvert pendant le test fermé : tu as un accès complet tant que le test dure.',
   pro_status_waitlist: 'Tu es sur la liste d’attente de PETO Pro.',
   pro_btn_see: 'Voir PETO Pro',
@@ -2788,9 +3195,81 @@ fr: {
   shared_err_owner_leave: 'Tu es le propriétaire de ce foyer : tu ne peux pas le quitter sans le supprimer. Demande à un autre membre de créer le nouveau foyer.',
   shared_created_live: 'Foyer créé ✅ Partage le code pour inviter ton foyer.',
   shared_joined_live: 'Tu as rejoint le foyer ✅',
-  lang_auto: 'Automatique (langue du téléphone)'
+  lang_auto: 'Automatique (langue du téléphone)',
+  org_comp_label: 'Compensation de l’organisateur',
+  org_comp_none: 'Aucune compensation',
+  org_comp_first: 'L’organisateur encaisse en premier',
+  org_comp_last: 'L’organisateur encaisse en dernier',
+  org_comp_extra: 'Frais supplémentaires par tour',
+  org_comp_amount_label: 'Frais supplémentaires par personne ($)',
+  org_comp_line: 'Compensation de l’organisateur : {mode}',
+  org_sim_title: 'Simulation de la cagnotte',
+  org_sim_pays: 'Chaque participant met par tour : {amount}',
+  org_sim_pot: 'Cagnotte de chaque tour : {amount}',
+  org_sim_total_in: 'Total mis par chacun sur tout le san : {amount}',
+  org_sim_extra_org: 'L’organisateur reçoit {amount} supplémentaires par tour',
+  org_sim_first: 'L’organisateur reçoit la cagnotte du premier tour',
+  org_sim_last: 'L’organisateur reçoit la cagnotte du dernier tour',
+  org_shuffle_btn: '🎲 Tirer l’ordre au sort',
+  org_shuffled: '🎲 Ordre tiré au sort ! Voici le nouveau tour.',
+  org_shuffle_need: 'Ajoutez au moins 2 participants pour tirer l’ordre au sort.',
+  org_shuffle_blocked: 'Le tirage n’est plus possible : le san a déjà commencé ou a des paiements enregistrés.',
+  org_start_btn: 'Démarrer le san',
+  org_started_line: 'San en cours · L’ordre est verrouillé',
+  org_order_title: 'Ordre des tours',
+  org_move_up: 'Monter',
+  org_move_down: 'Descendre',
+  org_swap_blocked: 'Ce tour a déjà des paiements et ne peut pas être modifié.',
+  org_history_title: 'Historique des modifications',
+  org_history_swap: '{a} et {b} ont échangé leurs tours',
+  org_history_started: 'L’organisateur a démarré le san',
+  org_pay_pending: 'En attente',
+  org_pay_reported: 'Signalé',
+  org_pay_confirmed: 'Confirmé',
+  org_status_btn: 'Statut : {status}',
+  org_receipt_add: '📎 Reçu',
+  org_receipt_view: 'Voir le reçu',
+  org_receipt_remove: 'Retirer',
+  org_zelle_label: 'Zelle de chaque participant (numéro ou e-mail, facultatif)',
+  org_zelle_ph: 'Zelle (facultatif)',
+  org_zelle_line: 'Zelle : {zelle}',
+  org_reminder_btn: '📲 Rappel WhatsApp',
+  org_reminder_head: '🤝 {san} · Tour {x} sur {n} · {date}',
+  org_reminder_receiver: '💰 Cette semaine, {name} encaisse',
+  org_reminder_zelle: 'Zelle de {name} : {zelle}',
+  org_reminder_amount: 'Cotisation du tour : {amount}',
+  org_antifraud: '🛡️ Un san ne paie jamais d’intérêts ni plus que ce qui a été mis.',
+  org_link_btn: '🔗 Lien en lecture seule',
+  org_link_publish: 'Créer le lien',
+  org_link_update: 'Mettre à jour le lien',
+  org_link_copied: 'Lien copié !',
+  org_link_need_cloud: 'Le lien nécessite votre compte cloud : connectez-vous dans Réglages et réessayez.',
+  org_link_ready: 'San du groupe (lecture seule)',
+  org_public_title: 'Le lien est prêt à partager.',
+  org_public_updated: 'Mis à jour le {date}',
+  org_public_notfound: 'Ce lien n’est plus disponible.',
+  org_penalty_label: 'Règle de retard',
+  org_penalty_none: 'Aucune pénalité',
+  org_penalty_fixed: 'Pénalité fixe',
+  org_penalty_percent: 'Pourcentage de la cotisation',
+  org_penalty_amount_label: 'Montant de la pénalité ($)',
+  org_penalty_percent_label: 'Pourcentage de pénalité (%)',
+  org_penalty_line_fixed: 'Si quelqu’un est en retard : pénalité de {amount}',
+  org_penalty_line_percent: 'Si quelqu’un est en retard : pénalité de {percent} % de la cotisation',
+  set_news_title: 'Nouveautés',
+  news_c24: 'Compilación 24 : visite de bienvenue, série de jours d’enregistrement, objectifs d’épargne avec barre de progression et graphique de tendance.',
+  news_c25: 'Compilación 25 : widget sur l’écran d’accueil et une appli beaucoup plus légère (de 52 Mo à 7 Mo).',
+  news_c26: 'Compilación 26 : widgets en trois tailles, avec des options par widget et un bouton pour noter une dépense sans ouvrir l’appli.',
+  news_c27: 'Compilación 27 : l’appli en 12 langues, suivant automatiquement la langue de votre téléphone.',
+  news_c28: 'Compilación 28 : texte plus grand appliqué dès le démarrage, cette section des nouveautés, relecture de l’italien et démarrage plus rapide.',
+  news_c31: 'Compilación 31 : le bouton ou le geste retour se déplace maintenant dans l’app : il ferme ce qui est ouvert et revient à l’écran principal avant de quitter.',
+  news_c32: 'Version 32 : la marque affiche désormais « PETO Finanzas » dans toute l’appli (menu, verrouillage et widgets), le san passe en tête de la liste d’accueil, le lien public du san s’ouvre directement sur l’état du groupe et les boutons de l’organisateur répondent toujours par un message clair.',
+  news_c33: 'Version 33 : créer un san ne peut plus effacer celui en cours — s’il y en a déjà un actif, l’appli le dit et le protège (paiements, justificatifs, historique et lien public) — et la version web est maintenant synchronisée avec le téléphone.',
+  back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.'
 },
 de: {
+  org_err_san_name: 'Gib den Namen des Sans ein.', rep_promo_footer: 'Kontrolliere deine Ausgaben mit PETO Finanzas · petofinanzas.com', rep_saved: 'Bild gespeichert.', set_sections_summary: '{visible} von {total} sichtbar',
+  org_err_active_exists: 'Es gibt bereits einen aktiven San („{name}“). Lösche ihn zuerst auf seiner Karte, wenn du einen neuen erstellen willst.',
   app_title: 'PETO Finanzas',
   back: '← Alle Optionen',
   greeting: 'Hallo',
@@ -2815,19 +3294,19 @@ de: {
   sec_home: 'Start',
   key_home: 'Dein Hauptbildschirm',
   set_notif_label: 'Benachrichtigungen bei geschlossener App',
-  set_notif_help: 'Hinweise zu deinen Festzahlungen am Vortag und am Fälligkeitstag, auch wenn PETO geschlossen ist.',
+  set_notif_help: 'Hinweise zu deinen Festzahlungen am Vortag und am Fälligkeitstag, auch wenn PETO Finanzas geschlossen ist.',
   set_autofixed_label: 'Festzahlungen automatisch eintragen',
   set_autofixed_help: 'Wenn eine Festzahlung fällig wird, wird die Ausgabe für dich eingetragen. Du kannst es sofort rückgängig machen.',
   set_bio_label: 'Entsperrung per Fingerabdruck',
   set_bio_help: 'Entsperre mit deinem Fingerabdruck zusätzlich zur PIN (eine aktive PIN ist nötig).',
   bio_btn: '👆 Mit Fingerabdruck entsperren',
-  bio_reason: 'Bestätige, dass du es bist, um PETO zu öffnen',
+  bio_reason: 'Bestätige, dass du es bist, um PETO Finanzas zu öffnen',
   bio_need_pin: 'Die Fingerabdruck-Entsperrung braucht eine aktive PIN: Erstelle deine PIN in Einstellungen → Sicherheit, dann funktioniert der Fingerabdruck beim Öffnen der App.',
   bio_failed: 'Der Fingerabdruck konnte nicht bestätigt werden. Gib deine PIN ein.',
   bio_unavailable: 'Fingerabdruck ist auf diesem Telefon nicht verfügbar. Gib deine PIN ein.',
   bio_not_enrolled: 'Auf diesem Telefon ist kein Fingerabdruck gespeichert. Speichere einen in den Telefoneinstellungen oder gib deine PIN ein.',
   bio_offer_title: 'Mit Fingerabdruck entsperren?',
-  bio_offer_text: 'Du hast gerade deine PIN erstellt. Wenn du möchtest, kannst du PETO mit deinem Fingerabdruck öffnen, statt jedes Mal die PIN zu tippen. Jetzt aktivieren?',
+  bio_offer_text: 'Du hast gerade deine PIN erstellt. Wenn du möchtest, kannst du PETO Finanzas mit deinem Fingerabdruck öffnen, statt jedes Mal die PIN zu tippen. Jetzt aktivieren?',
   bio_offer_yes: 'Ja, Fingerabdruck aktivieren',
   bio_offer_no: 'Nicht jetzt',
   bio_activated: 'Fertig: Die Entsperrung per Fingerabdruck ist jetzt an.',
@@ -2841,16 +3320,25 @@ de: {
   backup_err_pass: 'Die Kopie konnte nicht geöffnet werden: falsches Passwort oder beschädigte Datei.',
   share_btn: 'Übersicht teilen',
   share_copied: 'Übersicht kopiert. Füge sie ein, wo du willst.',
-  review_title: 'Gefällt dir PETO?',
-  review_text: 'Wenn dir PETO hilft, auf dein Geld aufzupassen, hilft uns eine Bewertung bei Google Play sehr, mehr Menschen zu erreichen. Danke!',
+  review_title: 'Gefällt dir PETO Finanzas?',
+  review_text: 'Wenn dir PETO Finanzas hilft, auf dein Geld aufzupassen, hilft uns eine Bewertung bei Google Play sehr, mehr Menschen zu erreichen. Danke!',
   review_yes: '⭐ Bei Google Play bewerten',
   review_no: 'Nicht jetzt',
-  share_report_title: 'Meine PETO-Übersicht',
+  share_report_title: 'Meine PETO Finanzas-Übersicht',
   notif_fixed_title: 'Festzahlung morgen',
   notif_fixed_today: 'Festzahlung heute',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'Deine Woche in PETO',
+  notif_weekly_title: 'Deine Woche in PETO Finanzas',
   notif_weekly_body: 'Trage die Ausgaben und Einnahmen dieser Woche ein, um auf Kurs zu bleiben.',
+  summary_title: 'Tägliche Übersicht',
+  summary_help: 'Ein Hinweis mit dem, was du gestern ausgegeben hast und was du heute ausgeben kannst, zu der von dir gewählten Zeit.',
+  summary_notif_label: 'Übersicht per Benachrichtigung',
+  summary_time_label: 'Uhrzeit der Übersicht',
+  summary_email_label: 'Auch per E-Mail erhalten',
+  summary_email_help: 'Nur mit aktivem Cloud-Konto: dieselbe Übersicht kommt auch per E-Mail bei dir an.',
+  notif_summary_title: '🌅 Deine PETO Finanzas-Übersicht',
+  notif_summary_body: 'Gestern hast du {spent} ausgegeben · Heute kannst du {daily} ausgeben',
+  notif_summary_body_nodaily: 'Gestern hast du {spent} ausgegeben',
   sec_remesas: 'Überweisungen',
   key_remesas: 'Diesen Monat gesendet: {amount}',
   rem_intro: 'Geld, das du an deine Leute sendest: wie viel in Dollar abging und wie viel in ihrer Währung ankam.',
@@ -2884,6 +3372,9 @@ de: {
   csv_err_headers: 'Die Spalten für Datum und Betrag wurden in dieser Datei nicht gefunden.',
   csv_err_big: 'Diese Datei ist zu groß zum Importieren.',
   csv_err_empty: 'Diese Datei enthält keine importierbaren Buchungen.',
+  pdf_err_big: 'Diese PDF ist zu groß (maximal 8 MB).',
+  pdf_err_notext: 'Diese PDF enthält keinen lesbaren Text (sie wirkt wie ein Foto oder Scan). Versuche es mit der CSV deiner Bank oder erfasse die Ausgabe mit dem Belegfoto.',
+  pdf_err_empty: 'Ich habe in dieser PDF keine Buchungen mit Datum und Betrag gefunden. Versuche es mit der CSV deiner Bank.',
   shared_title: 'Gemeinsames Budget',
   shared_preview_note: '🔧 Designvorschau: Es verbindet sich noch nicht mit anderen Konten. Probiere aus, wie es aussehen wird, einen Haushalt zu erstellen, mit einem Code beizutreten und die Mitglieder zu sehen.',
   shared_create_label: 'Name des Haushalts',
@@ -2959,13 +3450,13 @@ de: {
   cloud_conflict: 'Die Cloud und dieses Telefon enthalten unterschiedliche Daten. Die Cloud-Daten herunterladen und die Daten auf diesem Telefon ersetzen? (Abbrechen = Daten dieses Telefons hochladen)',
   cloud_wipe_confirm: 'ALLE deine Daten in der Cloud löschen? Was auf diesem Telefon ist, bleibt, wie es ist.',
   cloud_delete: 'Mein Konto löschen',
-  cloud_delete_confirm1: 'Dein PETO-Konto löschen? Das löscht dein Konto, deine Kopie der Daten in der Cloud und die gemeinsamen Haushalte, die dir gehören. Die Daten auf DIESEM Telefon bleiben hier, unberührt (du kannst sie in den Einstellungen löschen). Das kann nicht rückgängig gemacht werden.',
+  cloud_delete_confirm1: 'Dein PETO Finanzas-Konto löschen? Das löscht dein Konto, deine Kopie der Daten in der Cloud und die gemeinsamen Haushalte, die dir gehören. Die Daten auf DIESEM Telefon bleiben hier, unberührt (du kannst sie in den Einstellungen löschen). Das kann nicht rückgängig gemacht werden.',
   cloud_delete_confirm2: 'Letzte Bestätigung: Dein Konto endgültig löschen?',
   cloud_deleted: 'Dein Konto wurde gelöscht.',
   cloud_delete_err_auth: 'Deine Sitzung ist nicht mehr gültig. Melde dich erneut an und versuche es noch einmal.',
   cloud_unavailable: 'Die Cloud ist in dieser Version nicht verfügbar.',
   key_settings: 'Name, Aufteilung, Text, Abschnitte, PIN',
-  footer: 'PETO v0.1 · Funktioniert offline · Deine Daten verlassen nie dein Telefon',
+  footer: 'PETO Finanzas · Funktioniert offline · Die Cloud ist optional: deine Daten, deine Entscheidung',
   tile_available: 'Verfügbares Geld',
   tile_available_aria: 'Verfügbares Geld: zu Meine Konten',
   tile_savings: 'Ersparnisse in diesem Monat',
@@ -3147,6 +3638,7 @@ de: {
   san_add_participant: 'Hinzufügen',
   san_create_btn: 'San erstellen',
   san_err_participants: 'Füge mindestens 2 Teilnehmer hinzu.',
+  san_err_active_exists: 'Es gibt bereits einen laufenden San („{name}“). Lösche ihn zuerst, wenn du einen neuen erstellen willst.',
   san_err_dup: 'Dieser Teilnehmer ist schon auf der Liste.',
   san_err_pname: 'Gib den Namen des Teilnehmers ein.',
   san_remove: 'Entfernen',
@@ -3209,7 +3701,7 @@ de: {
   data_import: 'Kopie importieren',
   data_reset: 'Alle Daten löschen',
   data_err_big: 'Diese Datei ist zu groß.',
-  data_err_invalid: 'Import nicht möglich: Die Datei ist keine gültige PETO-Kopie.',
+  data_err_invalid: 'Import nicht möglich: Die Datei ist keine gültige PETO Finanzas-Kopie.',
   import_confirm: 'Der Import ersetzt ALLE aktuellen App-Daten. Bist du sicher?',
   import_done: 'Kopie importiert. ✅',
   reset_confirm1: 'Das löscht ALLE deine App-Daten auf diesem Telefon. Das kann nicht rückgängig gemacht werden. Bist du sicher?',
@@ -3219,7 +3711,7 @@ de: {
   lock_enter: 'Entsperren',
   lock_note: 'Deine Daten bleiben nur auf diesem Telefon.',
   lock_err: 'Falsche PIN. Versuche es erneut.',
-  ob_title: 'Willkommen bei PETO!',
+  ob_title: 'Willkommen bei PETO Finanzas!',
   ob_intro_1: 'Organisiere dein Geld in Minuten: Ausgaben, Einnahmen, Budget, Konten und Schulden.',
   ob_intro_2: 'Kein Konto, kein Internet.',
   ob_intro_3: 'Alles wird nur auf deinem Telefon gespeichert.',
@@ -3234,7 +3726,7 @@ de: {
   ob_tour1_title: 'Eine Ausgabe in Sekunden eintragen',
   ob_tour1_text: 'Tippe auf den +-Knopf, gib den Betrag und die Kategorie ein. Das ist alles: Deine Ausgabe ist sofort gespeichert.',
   ob_tour2_title: 'Wie viel kannst du heute ausgeben?',
-  ob_tour2_text: 'PETO verteilt dein Budget auf die verbleibenden Tage des Monats und nennt dir eine einzige Zahl: wie viel du heute ausgeben kannst, ohne drüber zu kommen.',
+  ob_tour2_text: 'PETO Finanzas verteilt dein Budget auf die verbleibenden Tage des Monats und nennt dir eine einzige Zahl: wie viel du heute ausgeben kannst, ohne drüber zu kommen.',
   ob_tour3_title: 'Dein Cloud-Konto (optional)',
   ob_tour3_text: 'Wenn du möchtest, erstelle ein kostenloses Konto, um deine Daten auch im Web zu sehen. Ohne Konto bleibt alles nur auf deinem Telefon.',
   ob_tour_next: 'Weiter',
@@ -3320,7 +3812,7 @@ de: {
   pro_title: 'PETO Pro',
   pro_card_text: 'Unbegrenzte Cloud für deine Daten, der erweiterte Bericht, das gemeinsame Budget und der San-Organisator-Modus.',
   pro_status_free: 'Du bist gerade im Gratis-Plan.',
-  pro_status_active: 'PETO Pro ist aktiv. Danke, dass du PETO unterstützt! ⭐',
+  pro_status_active: 'PETO Pro ist aktiv. Danke, dass du PETO Finanzas unterstützt! ⭐',
   pro_status_test: 'PETO Pro ist während des geschlossenen Tests offen: Du hast vollen Zugang, solange der Test dauert.',
   pro_status_waitlist: 'Du bist auf der Warteliste von PETO Pro.',
   pro_btn_see: 'PETO Pro ansehen',
@@ -3372,9 +3864,81 @@ de: {
   shared_err_owner_leave: 'Du besitzt diesen Haushalt: Du kannst ihn nicht verlassen, ohne ihn zu löschen. Bitte ein anderes Mitglied, den neuen Haushalt zu erstellen.',
   shared_created_live: 'Haushalt erstellt ✅ Teile den Code, um deinen Haushalt einzuladen.',
   shared_joined_live: 'Du bist dem Haushalt beigetreten ✅',
-  lang_auto: 'Automatisch (Telefonsprache)'
+  lang_auto: 'Automatisch (Telefonsprache)',
+  org_comp_label: 'Entschädigung des Organisators',
+  org_comp_none: 'Keine Entschädigung',
+  org_comp_first: 'Der Organisator kassiert zuerst',
+  org_comp_last: 'Der Organisator kassiert zuletzt',
+  org_comp_extra: 'Extragebühr pro Runde',
+  org_comp_amount_label: 'Extragebühr pro Person ($)',
+  org_comp_line: 'Entschädigung des Organisators: {mode}',
+  org_sim_title: 'Topf-Simulation',
+  org_sim_pays: 'Jeder Teilnehmer zahlt pro Runde: {amount}',
+  org_sim_pot: 'Topf jeder Runde: {amount}',
+  org_sim_total_in: 'Gesamtbetrag, den jeder im ganzen San einzahlt: {amount}',
+  org_sim_extra_org: 'Der Organisator erhält {amount} extra pro Runde',
+  org_sim_first: 'Der Organisator erhält den Topf der ersten Runde',
+  org_sim_last: 'Der Organisator erhält den Topf der letzten Runde',
+  org_shuffle_btn: '🎲 Reihenfolge auslosen',
+  org_shuffled: '🎲 Reihenfolge ausgelost! So ist die neue Reihenfolge.',
+  org_shuffle_need: 'Füge mindestens 2 Teilnehmer hinzu, um die Reihenfolge auszulosen.',
+  org_shuffle_blocked: 'Auslosen ist nicht mehr möglich: Der San läuft schon oder hat bereits Zahlungen.',
+  org_start_btn: 'San starten',
+  org_started_line: 'San läuft · Die Reihenfolge ist gesperrt',
+  org_order_title: 'Reihenfolge der Runden',
+  org_move_up: 'Nach oben',
+  org_move_down: 'Nach unten',
+  org_swap_blocked: 'Diese Runde hat bereits Zahlungen und kann nicht geändert werden.',
+  org_history_title: 'Änderungsverlauf',
+  org_history_swap: '{a} und {b} haben die Runden getauscht',
+  org_history_started: 'Der Organisator hat den San gestartet',
+  org_pay_pending: 'Ausstehend',
+  org_pay_reported: 'Gemeldet',
+  org_pay_confirmed: 'Bestätigt',
+  org_status_btn: 'Status: {status}',
+  org_receipt_add: '📎 Beleg',
+  org_receipt_view: 'Beleg ansehen',
+  org_receipt_remove: 'Entfernen',
+  org_zelle_label: 'Zelle jedes Teilnehmers (Nummer oder E-Mail, optional)',
+  org_zelle_ph: 'Zelle (optional)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 WhatsApp-Erinnerung',
+  org_reminder_head: '🤝 {san} · Runde {x} von {n} · {date}',
+  org_reminder_receiver: '💰 Diese Woche kassiert {name}',
+  org_reminder_zelle: 'Zelle von {name}: {zelle}',
+  org_reminder_amount: 'Rundenbeitrag: {amount}',
+  org_antifraud: '🛡️ Ein San zahlt nie Zinsen und nie mehr als eingezahlt wurde.',
+  org_link_btn: '🔗 Nur-Lesen-Link',
+  org_link_publish: 'Link erstellen',
+  org_link_update: 'Link aktualisieren',
+  org_link_copied: 'Link kopiert!',
+  org_link_need_cloud: 'Der Link braucht dein Cloud-Konto: Melde dich in den Einstellungen an und versuche es erneut.',
+  org_link_ready: 'Gruppen-San (nur Lesen)',
+  org_public_title: 'Der Link ist bereit zum Teilen.',
+  org_public_updated: 'Aktualisiert am {date}',
+  org_public_notfound: 'Dieser Link ist nicht mehr verfügbar.',
+  org_penalty_label: 'Verspätungsregel',
+  org_penalty_none: 'Keine Strafe',
+  org_penalty_fixed: 'Feste Strafe',
+  org_penalty_percent: 'Prozentsatz des Beitrags',
+  org_penalty_amount_label: 'Strafbetrag ($)',
+  org_penalty_percent_label: 'Strafprozentsatz (%)',
+  org_penalty_line_fixed: 'Bei Verspätung: Strafe von {amount}',
+  org_penalty_line_percent: 'Bei Verspätung: Strafe von {percent}% des Beitrags',
+  set_news_title: 'Neuigkeiten',
+  news_c24: 'Compilación 24: Willkommens-Tour, Aufzeichnungsserie, Sparziele mit Fortschrittsbalken und Trenddiagramm.',
+  news_c25: 'Compilación 25: Widget auf dem Startbildschirm und eine viel leichtere App (von 52 MB auf 7 MB).',
+  news_c26: 'Compilación 26: Widgets in drei Größen, mit Optionen pro Widget und einer Taste, um eine Ausgabe zu erfassen, ohne die App zu öffnen.',
+  news_c27: 'Compilación 27: die App in 12 Sprachen, automatisch in der Sprache deines Telefons.',
+  news_c28: 'Compilación 28: größere Schrift ab dem Start, dieser Neuigkeiten-Bereich, überarbeitetes Italienisch und ein schnellerer Start.',
+  news_c31: 'Compilación 31: Die Zurück-Taste oder -Geste bewegt sich jetzt in der App: sie schließt Geöffnetes und kehrt vor dem Beenden zum Hauptbildschirm zurück.',
+  news_c32: 'Version 32: Die Marke heißt jetzt überall in der App „PETO Finanzas“ (Menü, Sperrbildschirm und Widgets), der San steht jetzt oben in der Startliste, der öffentliche San-Link öffnet direkt den Gruppenstatus und die Organisator-Schaltflächen antworten immer mit einer klaren Meldung.',
+  news_c33: 'Version 33: Einen San zu erstellen kann den laufenden nicht mehr löschen — ist schon einer aktiv, sagt die App Bescheid und schützt ihn (Zahlungen, Belege, Verlauf und öffentlicher Link) — und die Webversion ist jetzt mit dem Telefon synchron.',
+  back_exit_hint: 'Nochmals Zurück drücken zum Beenden.'
 },
 zh: {
+  org_err_san_name: '请输入 san 的名称。', rep_promo_footer: '用 PETO Finanzas 控制你的支出 · petofinanzas.com', rep_saved: '图片已保存。', set_sections_summary: '共 {total} 个，已显示 {visible} 个',
+  org_err_active_exists: '已有一个正在进行的 san（“{name}”）。如需新建，请先在其卡片中删除它。',
   app_title: 'PETO Finanzas',
   back: '← 全部选项',
   greeting: '你好',
@@ -3399,19 +3963,19 @@ zh: {
   sec_home: '首页',
   key_home: '你的主屏幕',
   set_notif_label: '应用关闭时的通知',
-  set_notif_help: '即使 PETO 已关闭，也会在固定付款的前一天和当天提醒你。',
+  set_notif_help: '即使 PETO Finanzas 已关闭，也会在固定付款的前一天和当天提醒你。',
   set_autofixed_label: '自动记录固定付款',
   set_autofixed_help: '固定付款到期时，支出会自动为你记下。你可以立即撤销。',
   set_bio_label: '指纹解锁',
   set_bio_help: '除 PIN 外还可用指纹进入（需要已启用的 PIN）。',
   bio_btn: '👆 用指纹进入',
-  bio_reason: '确认是你本人，以打开 PETO',
+  bio_reason: '确认是你本人，以打开 PETO Finanzas',
   bio_need_pin: '指纹解锁需要已启用的 PIN：请先在「设置 → 安全」中创建 PIN，之后打开应用时即可用指纹。',
   bio_failed: '指纹无法验证。请输入你的 PIN。',
   bio_unavailable: '这部手机不支持指纹。请输入你的 PIN。',
   bio_not_enrolled: '这部手机没有录入任何指纹。请在手机设置中录入指纹，或输入你的 PIN。',
   bio_offer_title: '用指纹解锁？',
-  bio_offer_text: '你刚刚创建了 PIN。如果你愿意，可以用指纹打开 PETO，不必每次都输入 PIN。现在开启吗？',
+  bio_offer_text: '你刚刚创建了 PIN。如果你愿意，可以用指纹打开 PETO Finanzas，不必每次都输入 PIN。现在开启吗？',
   bio_offer_yes: '好，开启指纹',
   bio_offer_no: '以后再说',
   bio_activated: '完成：指纹解锁已开启。',
@@ -3425,16 +3989,25 @@ zh: {
   backup_err_pass: '无法打开备份：密码错误或文件已损坏。',
   share_btn: '分享汇总',
   share_copied: '汇总已复制。粘贴到任何地方吧。',
-  review_title: '你喜欢 PETO 吗？',
-  review_text: '如果 PETO 帮你管好了钱，在 Google Play 上留个评价能帮我们触达更多人。谢谢！',
+  review_title: '你喜欢 PETO Finanzas 吗？',
+  review_text: '如果 PETO Finanzas 帮你管好了钱，在 Google Play 上留个评价能帮我们触达更多人。谢谢！',
   review_yes: '⭐ 在 Google Play 上评价',
   review_no: '以后再说',
-  share_report_title: '我的 PETO 汇总',
+  share_report_title: '我的 PETO Finanzas 汇总',
   notif_fixed_title: '明天有固定付款',
   notif_fixed_today: '今天有固定付款',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: '你在 PETO 的一周',
+  notif_weekly_title: '你在 PETO Finanzas 的一周',
   notif_weekly_body: '记下本周的支出和收入，保持步调。',
+  summary_title: '每日摘要',
+  summary_help: '在你选择的时间提醒你昨天花了多少、今天可以花多少。',
+  summary_notif_label: '通过通知发送摘要',
+  summary_time_label: '摘要时间',
+  summary_email_label: '同时通过电子邮件接收',
+  summary_email_help: '仅当你的云账户已激活时可用：同一份摘要也会发送到你的电子邮箱。',
+  notif_summary_title: '🌅 你的 PETO Finanzas 摘要',
+  notif_summary_body: '昨天你花了 {spent} · 今天你可以花 {daily}',
+  notif_summary_body_nodaily: '昨天你花了 {spent}',
   sec_remesas: '汇款',
   key_remesas: '本月已发送：{amount}',
   rem_intro: '你寄给亲友的钱：寄出了多少美元，到账多少当地货币。',
@@ -3468,6 +4041,9 @@ zh: {
   csv_err_headers: '在该文件中没有找到日期和金额列。',
   csv_err_big: '该文件太大，无法导入。',
   csv_err_empty: '该文件没有可导入的交易。',
+  pdf_err_big: '该 PDF 太大（最大 8 MB）。',
+  pdf_err_notext: '该 PDF 没有我能读取的文字（看起来像照片或扫描件）。请试试银行的 CSV，或用收据照片记录这笔支出。',
+  pdf_err_empty: '我在该 PDF 中没有找到带日期和金额的交易。请试试银行的 CSV。',
   shared_title: '共享预算',
   shared_preview_note: '🔧 设计预览：尚未与其他账户连接。可以用它体验创建家庭、用代码加入和查看成员的样子。',
   shared_create_label: '家庭名称',
@@ -3543,13 +4119,13 @@ zh: {
   cloud_conflict: '云端和这部手机的数据不同。下载云端数据并替换这部手机的数据吗？（取消 = 上传这部手机的数据）',
   cloud_wipe_confirm: '删除你在云端的全部数据？这部手机上的数据保持不变。',
   cloud_delete: '删除我的账户',
-  cloud_delete_confirm1: '删除你的 PETO 账户？这会删除你的账户、你在云端的数据副本以及你拥有的共享家庭。这部手机上的数据会原样保留（你可以在「设置」中清除）。此操作无法撤销。',
+  cloud_delete_confirm1: '删除你的 PETO Finanzas 账户？这会删除你的账户、你在云端的数据副本以及你拥有的共享家庭。这部手机上的数据会原样保留（你可以在「设置」中清除）。此操作无法撤销。',
   cloud_delete_confirm2: '最后确认：永久删除你的账户？',
   cloud_deleted: '你的账户已删除。',
   cloud_delete_err_auth: '你的会话已失效。请重新登录后再试。',
   cloud_unavailable: '此版本中没有云服务。',
   key_settings: '姓名、分配、文字、版块、PIN',
-  footer: 'PETO v0.1 · 离线可用 · 你的数据从不离开你的手机',
+  footer: 'PETO Finanzas · 离线可用 · 云端可选：你的数据，你做主',
   tile_available: '可用资金',
   tile_available_aria: '可用资金：前往我的账户',
   tile_savings: '本月储蓄',
@@ -3731,6 +4307,7 @@ zh: {
   san_add_participant: '添加',
   san_create_btn: '创建 san',
   san_err_participants: '请至少添加 2 名参与者。',
+  san_err_active_exists: '已有一个进行中的 san（“{name}”）。如需新建，请先删除它。',
   san_err_dup: '该参与者已在名单中。',
   san_err_pname: '请输入参与者姓名。',
   san_remove: '移除',
@@ -3793,7 +4370,7 @@ zh: {
   data_import: '导入备份',
   data_reset: '删除全部数据',
   data_err_big: '该文件太大。',
-  data_err_invalid: '无法导入：该文件不是有效的 PETO 备份。',
+  data_err_invalid: '无法导入：该文件不是有效的 PETO Finanzas 备份。',
   import_confirm: '导入将替换当前应用的全部数据。确定吗？',
   import_done: '备份已导入。✅',
   reset_confirm1: '这会删除这部手机上应用的全部数据。无法撤销。确定吗？',
@@ -3803,7 +4380,7 @@ zh: {
   lock_enter: '解锁',
   lock_note: '你的数据只保存在这部手机上。',
   lock_err: 'PIN 不正确。请再试一次。',
-  ob_title: '欢迎来到 PETO！',
+  ob_title: '欢迎来到 PETO Finanzas！',
   ob_intro_1: '几分钟内打理好你的钱：支出、收入、预算、账户和债务。',
   ob_intro_2: '无需账户，无需网络。',
   ob_intro_3: '一切都只保存在你的手机上。',
@@ -3818,7 +4395,7 @@ zh: {
   ob_tour1_title: '几秒钟记下一笔支出',
   ob_tour1_text: '点 + 按钮，输入金额和类别。就是这么简单：你的支出立即保存。',
   ob_tour2_title: '今天可以花多少？',
-  ob_tour2_text: 'PETO 把你的预算分摊到本月剩余的每一天，只告诉你一个数字：今天不超支可以花多少。',
+  ob_tour2_text: 'PETO Finanzas 把你的预算分摊到本月剩余的每一天，只告诉你一个数字：今天不超支可以花多少。',
   ob_tour3_title: '你的云账户（可选）',
   ob_tour3_text: '如果你愿意，可以创建一个免费账户，在网页上也能查看你的数据。没有账户时，一切都只在你的手机上。',
   ob_tour_next: '下一步',
@@ -3904,7 +4481,7 @@ zh: {
   pro_title: 'PETO Pro',
   pro_card_text: '为你的数据提供无限云存储、高级报告、共享预算和 san 组织者模式。',
   pro_status_free: '你目前使用免费计划。',
-  pro_status_active: 'PETO Pro 已启用。感谢你支持 PETO！⭐',
+  pro_status_active: 'PETO Pro 已启用。感谢你支持 PETO Finanzas！⭐',
   pro_status_test: 'PETO Pro 在封闭测试期间开放：测试期间你拥有完整访问权限。',
   pro_status_waitlist: '你在 PETO Pro 等候名单上。',
   pro_btn_see: '查看 PETO Pro',
@@ -3956,9 +4533,81 @@ zh: {
   shared_err_owner_leave: '你拥有这个家庭：不删除它就无法退出。请让另一位成员创建新家庭。',
   shared_created_live: '家庭已创建 ✅ 分享代码邀请你的家庭。',
   shared_joined_live: '你已加入该家庭 ✅',
-  lang_auto: '自动（手机语言）'
+  lang_auto: '自动（手机语言）',
+  org_comp_label: '组织者补偿',
+  org_comp_none: '无补偿',
+  org_comp_first: '组织者第一个领取',
+  org_comp_last: '组织者最后一个领取',
+  org_comp_extra: '每轮额外费用',
+  org_comp_amount_label: '每人额外费用 ($)',
+  org_comp_line: '组织者补偿：{mode}',
+  org_sim_title: '奖池模拟',
+  org_sim_pays: '每位参与者每轮出资：{amount}',
+  org_sim_pot: '每轮奖池：{amount}',
+  org_sim_total_in: '每人在整个 san 中总共出资：{amount}',
+  org_sim_extra_org: '组织者每轮额外获得 {amount}',
+  org_sim_first: '组织者获得第一轮奖池',
+  org_sim_last: '组织者获得最后一轮奖池',
+  org_shuffle_btn: '🎲 随机排序',
+  org_shuffled: '🎲 已随机排序！这是新的轮次顺序。',
+  org_shuffle_need: '请至少添加 2 位参与者才能随机排序。',
+  org_shuffle_blocked: '无法再随机排序：san 已开始或已有付款记录。',
+  org_start_btn: '开始 san',
+  org_started_line: 'San 进行中 · 顺序已锁定',
+  org_order_title: '轮次顺序',
+  org_move_up: '上移',
+  org_move_down: '下移',
+  org_swap_blocked: '该轮次已有付款，无法更改。',
+  org_history_title: '变更历史',
+  org_history_swap: '{a} 和 {b} 交换了轮次',
+  org_history_started: '组织者已开始 san',
+  org_pay_pending: '待处理',
+  org_pay_reported: '已报告',
+  org_pay_confirmed: '已确认',
+  org_status_btn: '状态：{status}',
+  org_receipt_add: '📎 收据',
+  org_receipt_view: '查看收据',
+  org_receipt_remove: '移除',
+  org_zelle_label: '每位参与者的 Zelle（号码或邮箱，可选）',
+  org_zelle_ph: 'Zelle（可选）',
+  org_zelle_line: 'Zelle：{zelle}',
+  org_reminder_btn: '📲 WhatsApp 提醒',
+  org_reminder_head: '🤝 {san} · 第 {x} 轮，共 {n} 轮 · {date}',
+  org_reminder_receiver: '💰 本周由 {name} 领取',
+  org_reminder_zelle: '{name} 的 Zelle：{zelle}',
+  org_reminder_amount: '本轮出资：{amount}',
+  org_antifraud: '🛡️ San 从不支付利息，也不会超过出资总额。',
+  org_link_btn: '🔗 只读链接',
+  org_link_publish: '创建链接',
+  org_link_update: '更新链接',
+  org_link_copied: '链接已复制！',
+  org_link_need_cloud: '该链接需要你的云账户：请在设置中登录后重试。',
+  org_link_ready: '群组 san（只读）',
+  org_public_title: '链接已准备好分享。',
+  org_public_updated: '更新于 {date}',
+  org_public_notfound: '此链接已不可用。',
+  org_penalty_label: '迟交规则',
+  org_penalty_none: '无罚款',
+  org_penalty_fixed: '固定罚款',
+  org_penalty_percent: '出资百分比',
+  org_penalty_amount_label: '罚款金额 ($)',
+  org_penalty_percent_label: '罚款百分比 (%)',
+  org_penalty_line_fixed: '如有人迟交：罚款 {amount}',
+  org_penalty_line_percent: '如有人迟交：罚款为出资的 {percent}%',
+  set_news_title: '更新内容',
+  news_c24: 'Compilación 24：欢迎导览、连续记录天数、带进度条的储蓄目标和趋势图表。',
+  news_c25: 'Compilación 25：主屏幕小部件，以及体积小得多的应用（从 52 MB 降到 7 MB）。',
+  news_c26: 'Compilación 26：三种尺寸的小部件，每个小部件可单独设置，还有无需打开应用即可记一笔支出的按钮。',
+  news_c27: 'Compilación 27：应用支持 12 种语言，自动跟随手机的语言。',
+  news_c28: 'Compilación 28：启动即应用大号文字、这个更新内容板块、意大利语文本校订，以及更快的启动速度。',
+  news_c31: 'Compilación 31：返回键或返回手势现在会在应用内移动：先关闭打开的内容，回到主屏幕，然后才退出。',
+  news_c32: '第 32 版：品牌名称现已在整个应用中统一为“PETO Finanzas”（菜单、锁定屏幕和小部件），san 已移到主页列表顶部，san 公开链接可直接打开群组状态，组织者按钮始终会给出明确提示。',
+  news_c33: '第 33 版：新建 san 不再会误删正在进行的 san——如果已有一个活跃的 san，应用会明确提示并保护它（付款、凭证、历史和公开链接）——网页版现已与手机同步。',
+  back_exit_hint: '再按一次返回即可退出。'
 },
 ja: {
+  org_err_san_name: 'sanの名前を入力してください。', rep_promo_footer: 'PETO Finanzasで支出を管理しよう · petofinanzas.com', rep_saved: '画像を保存しました。', set_sections_summary: '{total}件中{visible}件を表示',
+  org_err_active_exists: 'すでにアクティブな san（「{name}」）があります。新しく作るには、まずそのカードから削除してください。',
   app_title: 'PETO Finanzas',
   back: '← すべてのオプション',
   greeting: 'こんにちは',
@@ -3983,19 +4632,19 @@ ja: {
   sec_home: 'ホーム',
   key_home: 'メイン画面',
   set_notif_label: 'アプリを閉じているときの通知',
-  set_notif_help: 'PETOを閉じていても、固定支払いの前日と当日に知らせます。',
+  set_notif_help: 'PETO Finanzasを閉じていても、固定支払いの前日と当日に知らせます。',
   set_autofixed_label: '固定支払いを自動で記録',
   set_autofixed_help: '固定支払いの期日が来ると、支出が自動で記録されます。すぐに元に戻すこともできます。',
   set_bio_label: '指紋ロック解除',
   set_bio_help: 'PINに加えて指紋でも入れるようにします（有効なPINが必要です）。',
   bio_btn: '👆 指紋で入る',
-  bio_reason: 'PETOを開くために本人確認をしてください',
+  bio_reason: 'PETO Finanzasを開くために本人確認をしてください',
   bio_need_pin: '指紋ロック解除には有効なPINが必要です。「設定 → セキュリティ」でPINを作成すると、アプリを開くときに指紋が使えます。',
   bio_failed: '指紋を確認できませんでした。PINを入力してください。',
   bio_unavailable: 'このスマートフォンでは指紋は使えません。PINを入力してください。',
   bio_not_enrolled: 'このスマートフォンには指紋が登録されていません。スマートフォンの設定で登録するか、PINを入力してください。',
   bio_offer_title: '指紋でロック解除しますか？',
-  bio_offer_text: 'PINを作成しました。よければ、毎回PINを入力する代わりに指紋でPETOを開けます。今すぐオンにしますか？',
+  bio_offer_text: 'PINを作成しました。よければ、毎回PINを入力する代わりに指紋でPETO Finanzasを開けます。今すぐオンにしますか？',
   bio_offer_yes: 'はい、指紋をオンにする',
   bio_offer_no: '後で',
   bio_activated: '完了：指紋ロック解除がオンになりました。',
@@ -4009,16 +4658,25 @@ ja: {
   backup_err_pass: 'バックアップを開けませんでした：パスワードが違うか、ファイルが壊れています。',
   share_btn: '概要を共有',
   share_copied: '概要をコピーしました。どこにでも貼り付けてください。',
-  review_title: 'PETOは気に入りましたか？',
-  review_text: 'PETOがお金の管理に役立っているなら、Google Playでのレビューがより多くの人に届ける大きな助けになります。ありがとうございます！',
+  review_title: 'PETO Finanzasは気に入りましたか？',
+  review_text: 'PETO Finanzasがお金の管理に役立っているなら、Google Playでのレビューがより多くの人に届ける大きな助けになります。ありがとうございます！',
   review_yes: '⭐ Google Playで評価',
   review_no: '後で',
-  share_report_title: '私のPETO概要',
+  share_report_title: '私のPETO Finanzas概要',
   notif_fixed_title: '明日は固定支払い',
   notif_fixed_today: '今日は固定支払い',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'PETOでのあなたの1週間',
+  notif_weekly_title: 'PETO Finanzasでのあなたの1週間',
   notif_weekly_body: '今週の支出と収入を記録して、ペースを保ちましょう。',
+  summary_title: '毎日のまとめ',
+  summary_help: '選んだ時間に、昨日使った金額と今日使える金額をお知らせします。',
+  summary_notif_label: '通知でまとめを受け取る',
+  summary_time_label: 'まとめの時刻',
+  summary_email_label: 'メールでも受け取る',
+  summary_email_help: 'クラウドアカウントが有効な場合のみ：同じまとめがメールにも届きます。',
+  notif_summary_title: '🌅 あなたの PETO Finanzas まとめ',
+  notif_summary_body: '昨日は {spent} を使いました · 今日は {daily} まで使えます',
+  notif_summary_body_nodaily: '昨日は {spent} を使いました',
   sec_remesas: '送金',
   key_remesas: '今月の送金：{amount}',
   rem_intro: 'あなたの大切な人へ送るお金：ドルでいくら出て、相手の通貨でいくら届いたか。',
@@ -4052,6 +4710,9 @@ ja: {
   csv_err_headers: 'そのファイルに日付と金額の列が見つかりませんでした。',
   csv_err_big: 'そのファイルは大きすぎて読み込めません。',
   csv_err_empty: 'そのファイルには読み込める明細がありません。',
+  pdf_err_big: 'そのPDFは大きすぎます（最大8 MB）。',
+  pdf_err_notext: 'そのPDFには読み取れるテキストがありません（写真やスキャンのようです）。銀行のCSVを試すか、レシートの写真で支出を記録してください。',
+  pdf_err_empty: 'そのPDFに日付と金額のある明細が見つかりませんでした。銀行のCSVをお試しください。',
   shared_title: '共有予算',
   shared_preview_note: '🔧 デザインプレビュー：まだ他のアカウントには接続しません。世帯の作成、コードでの参加、メンバーの表示がどうなるか試すためのものです。',
   shared_create_label: '世帯の名前',
@@ -4127,13 +4788,13 @@ ja: {
   cloud_conflict: 'クラウドとこのスマートフォンでデータが異なります。クラウドのデータをダウンロードして、このスマートフォンのデータと置き換えますか？（キャンセル＝このスマートフォンのデータをアップロード）',
   cloud_wipe_confirm: 'クラウド上のあなたのデータをすべて削除しますか？このスマートフォン上のデータはそのままです。',
   cloud_delete: '私のアカウントを削除',
-  cloud_delete_confirm1: 'PETOアカウントを削除しますか？アカウント、クラウド上のデータのコピー、あなたが所有する共有世帯が削除されます。このスマートフォン上のデータはそのまま残ります（設定で消去できます）。これは取り消せません。',
+  cloud_delete_confirm1: 'PETO Finanzasアカウントを削除しますか？アカウント、クラウド上のデータのコピー、あなたが所有する共有世帯が削除されます。このスマートフォン上のデータはそのまま残ります（設定で消去できます）。これは取り消せません。',
   cloud_delete_confirm2: '最終確認：アカウントを完全に削除しますか？',
   cloud_deleted: 'アカウントが削除されました。',
   cloud_delete_err_auth: 'セッションの有効期限が切れました。再度ログインして、もう一度お試しください。',
   cloud_unavailable: 'このバージョンではクラウドは利用できません。',
   key_settings: '名前、配分、文字、セクション、PIN',
-  footer: 'PETO v0.1 · オフラインで動作 · データがスマートフォンの外に出ることはありません',
+  footer: 'PETO Finanzas · オフラインで動作 · クラウドは任意：あなたのデータ、あなたの選択',
   tile_available: '利用可能なお金',
   tile_available_aria: '利用可能なお金：私の口座へ',
   tile_savings: '今月の貯蓄',
@@ -4315,6 +4976,7 @@ ja: {
   san_add_participant: '追加',
   san_create_btn: 'sanを作成',
   san_err_participants: '参加者を2人以上追加してください。',
+  san_err_active_exists: 'すでに進行中の san（「{name}」）があります。新しく作るには、まず削除してください。',
   san_err_dup: 'その参加者は既にリストにいます。',
   san_err_pname: '参加者の名前を入力してください。',
   san_remove: '削除',
@@ -4377,7 +5039,7 @@ ja: {
   data_import: 'バックアップを読み込む',
   data_reset: 'すべてのデータを削除',
   data_err_big: 'そのファイルは大きすぎます。',
-  data_err_invalid: '読み込めません：そのファイルは有効なPETOバックアップではありません。',
+  data_err_invalid: '読み込めません：そのファイルは有効なPETO Finanzasバックアップではありません。',
   import_confirm: '読み込むと現在のアプリデータがすべて置き換わります。よろしいですか？',
   import_done: 'バックアップを読み込みました。✅',
   reset_confirm1: 'このスマートフォン上のアプリデータがすべて削除されます。取り消せません。よろしいですか？',
@@ -4387,7 +5049,7 @@ ja: {
   lock_enter: 'ロック解除',
   lock_note: 'データはこのスマートフォンだけに残ります。',
   lock_err: 'PINが違います。もう一度お試しください。',
-  ob_title: 'PETOへようこそ！',
+  ob_title: 'PETO Finanzasへようこそ！',
   ob_intro_1: '支出、収入、予算、口座、借金を、数分で整理できます。',
   ob_intro_2: 'アカウント不要、インターネット不要。',
   ob_intro_3: 'すべてこのスマートフォンだけに保存されます。',
@@ -4402,7 +5064,7 @@ ja: {
   ob_tour1_title: '数秒で支出を記録',
   ob_tour1_text: '+ボタンをタップし、金額とカテゴリを入力します。それだけです。支出はすぐ保存されます。',
   ob_tour2_title: '今日はいくら使えますか？',
-  ob_tour2_text: 'PETOは予算を月の残りの日に割り振り、1つの数字だけを伝えます。予算を超えずに今日使える金額です。',
+  ob_tour2_text: 'PETO Finanzasは予算を月の残りの日に割り振り、1つの数字だけを伝えます。予算を超えずに今日使える金額です。',
   ob_tour3_title: 'あなたのクラウドアカウント（任意）',
   ob_tour3_text: 'よければ、無料アカウントを作成して、Webでもデータを見られます。アカウントがなければ、すべてこのスマートフォンだけに残ります。',
   ob_tour_next: '次へ',
@@ -4488,7 +5150,7 @@ ja: {
   pro_title: 'PETO Pro',
   pro_card_text: 'データの無制限クラウド、高度なレポート、共有予算、san主催者モード。',
   pro_status_free: '現在は無料プランです。',
-  pro_status_active: 'PETO Proが有効です。PETOの応援ありがとうございます！⭐',
+  pro_status_active: 'PETO Proが有効です。PETO Finanzasの応援ありがとうございます！⭐',
   pro_status_test: 'クローズドテスト中はPETO Proが開放されています。テストの間、フルアクセスがあります。',
   pro_status_waitlist: 'PETO Proの待機リストに登録されています。',
   pro_btn_see: 'PETO Proを見る',
@@ -4540,9 +5202,81 @@ ja: {
   shared_err_owner_leave: 'あなたはこの世帯のオーナーです。削除せずに退出はできません。他のメンバーに新しい世帯を作成してもらってください。',
   shared_created_live: '世帯が作成されました ✅ コードを共有して世帯を招待しましょう。',
   shared_joined_live: '世帯に参加しました ✅',
-  lang_auto: '自動（スマートフォンの言語）'
+  lang_auto: '自動（スマートフォンの言語）',
+  org_comp_label: '主催者への報酬',
+  org_comp_none: '報酬なし',
+  org_comp_first: '主催者が最初に受け取る',
+  org_comp_last: '主催者が最後に受け取る',
+  org_comp_extra: 'ラウンドごとの追加料金',
+  org_comp_amount_label: '1人あたりの追加料金 ($)',
+  org_comp_line: '主催者への報酬：{mode}',
+  org_sim_title: 'ポット試算',
+  org_sim_pays: '各参加者がラウンドごとに拠出：{amount}',
+  org_sim_pot: '各ラウンドのポット：{amount}',
+  org_sim_total_in: '各人が san 全体で拠出する合計：{amount}',
+  org_sim_extra_org: '主催者はラウンドごとに {amount} を追加で受け取る',
+  org_sim_first: '主催者は最初のラウンドのポットを受け取る',
+  org_sim_last: '主催者は最後のラウンドのポットを受け取る',
+  org_shuffle_btn: '🎲 順番をシャッフル',
+  org_shuffled: '🎲 順番をシャッフルしました！新しい順番です。',
+  org_shuffle_need: '順番をシャッフルするには参加者を2人以上追加してください。',
+  org_shuffle_blocked: 'シャッフルできません：sanは開始済みか、支払い記録があります。',
+  org_start_btn: 'San を開始',
+  org_started_line: 'San 進行中 · 順番はロックされています',
+  org_order_title: 'ターンの順番',
+  org_move_up: '上へ',
+  org_move_down: '下へ',
+  org_swap_blocked: 'そのターンにはすでに支払いがあり、変更できません。',
+  org_history_title: '変更履歴',
+  org_history_swap: '{a} と {b} がターンを交換しました',
+  org_history_started: '主催者が san を開始しました',
+  org_pay_pending: '保留中',
+  org_pay_reported: '報告済み',
+  org_pay_confirmed: '確認済み',
+  org_status_btn: 'ステータス：{status}',
+  org_receipt_add: '📎 レシート',
+  org_receipt_view: 'レシートを見る',
+  org_receipt_remove: '削除',
+  org_zelle_label: '各参加者の Zelle（番号またはメール、任意）',
+  org_zelle_ph: 'Zelle（任意）',
+  org_zelle_line: 'Zelle：{zelle}',
+  org_reminder_btn: '📲 WhatsApp リマインダー',
+  org_reminder_head: '🤝 {san} · {n} ラウンド中 {x} ラウンド目 · {date}',
+  org_reminder_receiver: '💰 今週は {name} が受け取ります',
+  org_reminder_zelle: '{name} の Zelle：{zelle}',
+  org_reminder_amount: 'ラウンドの拠出額：{amount}',
+  org_antifraud: '🛡️ San が利息や拠出額を超えて支払うことはありません。',
+  org_link_btn: '🔗 読み取り専用リンク',
+  org_link_publish: 'リンクを作成',
+  org_link_update: 'リンクを更新',
+  org_link_copied: 'リンクをコピーしました！',
+  org_link_need_cloud: 'リンクにはクラウドアカウントが必要です：設定でサインインして再試行してください。',
+  org_link_ready: 'グループ san（読み取り専用）',
+  org_public_title: 'リンクを共有する準備ができました。',
+  org_public_updated: '{date} に更新',
+  org_public_notfound: 'このリンクはもう利用できません。',
+  org_penalty_label: '遅延ルール',
+  org_penalty_none: '罰金なし',
+  org_penalty_fixed: '固定罰金',
+  org_penalty_percent: '拠出額の割合',
+  org_penalty_amount_label: '罰金額 ($)',
+  org_penalty_percent_label: '罰金の割合 (%)',
+  org_penalty_line_fixed: '遅れた場合：{amount} の罰金',
+  org_penalty_line_percent: '遅れた場合：拠出額の {percent}% の罰金',
+  set_news_title: '新着情報',
+  news_c24: 'Compilación 24：ウェルカムツアー、記録の連続日数、進捗バー付きの貯蓄目標と傾向グラフ。',
+  news_c25: 'Compilación 25：ホーム画面ウィジェットと、はるかに軽くなったアプリ（52 MBから7 MBへ）。',
+  news_c26: 'Compilación 26：3サイズのウィジェット、ウィジェットごとの設定、アプリを開かずに支出を記録できるボタン。',
+  news_c27: 'Compilación 27：アプリが12言語に対応し、スマートフォンの言語に自動で合わせます。',
+  news_c28: 'Compilación 28：起動時から適用される大きな文字、この新着情報セクション、イタリア語の見直しと高速な起動。',
+  news_c31: 'Compilación 31：戻るボタンやジェスチャーがアプリ内で動くようになりました：開いているものを閉じ、メイン画面に戻ってから終了します。',
+  news_c32: 'バージョン32：ブランド名がアプリ全体（メニュー、ロック画面、ウィジェット）で「PETO Finanzas」に統一され、sanがホームのリストの一番上に移動し、sanの公開リンクはグループの状態を直接開き、主催者ボタンは常に明確なメッセージで応答します。',
+  news_c33: 'バージョン33：sanを新規作成しても、進行中のsanが消えることはなくなりました。すでにアクティブなsanがある場合、アプリが知らせて保護します（支払い、領収書、履歴、公開リンク）。ウェブ版もスマートフォンと同期されました。',
+  back_exit_hint: 'もう一度戻るを押すと終了します。'
 },
 ko: {
+  org_err_san_name: 'san 이름을 입력하세요.', rep_promo_footer: 'PETO Finanzas로 지출을 관리하세요 · petofinanzas.com', rep_saved: '이미지가 저장되었습니다.', set_sections_summary: '{total}개 중 {visible}개 표시',
+  org_err_active_exists: '이미 활성 san("{name}")이 있습니다. 새로 만들려면 먼저 해당 카드에서 삭제하세요.',
   app_title: 'PETO Finanzas',
   back: '← 모든 옵션',
   greeting: '안녕하세요',
@@ -4567,19 +5301,19 @@ ko: {
   sec_home: '홈',
   key_home: '메인 화면',
   set_notif_label: '앱이 닫혀 있을 때 알림',
-  set_notif_help: 'PETO가 닫혀 있어도 고정 지출 전날과 당일에 알려줍니다.',
+  set_notif_help: 'PETO Finanzas가 닫혀 있어도 고정 지출 전날과 당일에 알려줍니다.',
   set_autofixed_label: '고정 지출 자동 기록',
   set_autofixed_help: '고정 지출 기한이 되면 지출이 자동으로 기록됩니다. 바로 되돌릴 수도 있습니다.',
   set_bio_label: '지문 잠금 해제',
   set_bio_help: 'PIN과 함께 지문으로도 들어갑니다(활성화된 PIN 필요).',
   bio_btn: '👆 지문으로 들어가기',
-  bio_reason: 'PETO를 열기 위해 본인임을 확인하세요',
+  bio_reason: 'PETO Finanzas를 열기 위해 본인임을 확인하세요',
   bio_need_pin: '지문 잠금 해제에는 활성화된 PIN이 필요합니다. 설정 → 보안에서 PIN을 만들면 앱을 열 때 지문이 작동합니다.',
   bio_failed: '지문을 확인할 수 없습니다. PIN을 입력하세요.',
   bio_unavailable: '이 휴대전화에서는 지문을 사용할 수 없습니다. PIN을 입력하세요.',
   bio_not_enrolled: '이 휴대전화에는 등록된 지문이 없습니다. 휴대전화 설정에서 등록하거나 PIN을 입력하세요.',
   bio_offer_title: '지문으로 잠금을 풀까요?',
-  bio_offer_text: '방금 PIN을 만들었습니다. 원하면 매번 PIN을 입력하는 대신 지문으로 PETO를 열 수 있습니다. 지금 켤까요?',
+  bio_offer_text: '방금 PIN을 만들었습니다. 원하면 매번 PIN을 입력하는 대신 지문으로 PETO Finanzas를 열 수 있습니다. 지금 켤까요?',
   bio_offer_yes: '네, 지문 켜기',
   bio_offer_no: '나중에',
   bio_activated: '완료: 지문 잠금 해제가 켜졌습니다.',
@@ -4593,16 +5327,25 @@ ko: {
   backup_err_pass: '백업을 열 수 없습니다: 비밀번호가 틀렸거나 파일이 손상되었습니다.',
   share_btn: '요약 공유',
   share_copied: '요약이 복사되었습니다. 원하는 곳에 붙여넣으세요.',
-  review_title: 'PETO가 마음에 드세요?',
-  review_text: 'PETO가 돈 관리에 도움이 된다면 Google Play 리뷰가 더 많은 사람에게 닿는 큰 힘이 됩니다. 감사합니다!',
+  review_title: 'PETO Finanzas가 마음에 드세요?',
+  review_text: 'PETO Finanzas가 돈 관리에 도움이 된다면 Google Play 리뷰가 더 많은 사람에게 닿는 큰 힘이 됩니다. 감사합니다!',
   review_yes: '⭐ Google Play에서 평가하기',
   review_no: '나중에',
-  share_report_title: '내 PETO 요약',
+  share_report_title: '내 PETO Finanzas 요약',
   notif_fixed_title: '내일 고정 지출',
   notif_fixed_today: '오늘 고정 지출',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'PETO에서의 한 주',
+  notif_weekly_title: 'PETO Finanzas에서의 한 주',
   notif_weekly_body: '이번 주 지출과 수입을 기록해 흐름을 유지하세요.',
+  summary_title: '일일 요약',
+  summary_help: '선택한 시간에 어제 쓴 금액과 오늘 쓸 수 있는 금액을 알려줍니다.',
+  summary_notif_label: '알림으로 요약 받기',
+  summary_time_label: '요약 시간',
+  summary_email_label: '이메일로도 받기',
+  summary_email_help: '클라우드 계정이 활성화된 경우에만: 같은 요약이 이메일로도 도착합니다.',
+  notif_summary_title: '🌅 당신의 PETO Finanzas 요약',
+  notif_summary_body: '어제 {spent}를 썼습니다 · 오늘은 {daily}까지 쓸 수 있습니다',
+  notif_summary_body_nodaily: '어제 {spent}를 썼습니다',
   sec_remesas: '송금',
   key_remesas: '이번 달 보낸 금액: {amount}',
   rem_intro: '소중한 사람들에게 보내는 돈: 달러로 얼마가 나갔고 그들의 통화로 얼마가 도착했는지.',
@@ -4636,6 +5379,9 @@ ko: {
   csv_err_headers: '그 파일에서 날짜와 금액 열을 찾지 못했습니다.',
   csv_err_big: '그 파일은 너무 커서 가져올 수 없습니다.',
   csv_err_empty: '그 파일에는 가져올 수 있는 거래가 없습니다.',
+  pdf_err_big: '그 PDF는 너무 큽니다(최대 8MB).',
+  pdf_err_notext: '그 PDF에는 읽을 수 있는 텍스트가 없습니다(사진이나 스캔으로 보입니다). 은행 CSV를 시도하거나 영수증 사진으로 지출을 기록하세요.',
+  pdf_err_empty: '그 PDF에서 날짜와 금액이 있는 거래를 찾지 못했습니다. 은행 CSV를 시도하세요.',
   shared_title: '공유 예산',
   shared_preview_note: '🔧 디자인 미리보기: 아직 다른 계정과 연결되지 않습니다. 가구를 만들고, 코드로 참여하고, 구성원을 보는 모습이 어떨지 체험해 보세요.',
   shared_create_label: '가구 이름',
@@ -4711,13 +5457,13 @@ ko: {
   cloud_conflict: '클라우드와 이 휴대전화의 데이터가 다릅니다. 클라우드 데이터를 내려받아 이 휴대전화의 데이터를 바꿀까요?(취소 = 이 휴대전화의 데이터 올리기)',
   cloud_wipe_confirm: '클라우드에 있는 모든 데이터를 삭제할까요? 이 휴대전화에 있는 것은 그대로 둡니다.',
   cloud_delete: '내 계정 삭제',
-  cloud_delete_confirm1: 'PETO 계정을 삭제할까요? 계정, 클라우드에 있는 데이터 사본, 소유한 공유 가구가 삭제됩니다. 이 휴대전화에 있는 데이터는 그대로 남습니다(설정에서 지울 수 있습니다). 되돌릴 수 없습니다.',
+  cloud_delete_confirm1: 'PETO Finanzas 계정을 삭제할까요? 계정, 클라우드에 있는 데이터 사본, 소유한 공유 가구가 삭제됩니다. 이 휴대전화에 있는 데이터는 그대로 남습니다(설정에서 지울 수 있습니다). 되돌릴 수 없습니다.',
   cloud_delete_confirm2: '최종 확인: 계정을 완전히 삭제할까요?',
   cloud_deleted: '계정이 삭제되었습니다.',
   cloud_delete_err_auth: '세션이 더 이상 유효하지 않습니다. 다시 로그인하고 시도하세요.',
   cloud_unavailable: '이 버전에서는 클라우드를 사용할 수 없습니다.',
   key_settings: '이름, 분배, 글자, 섹션, PIN',
-  footer: 'PETO v0.1 · 오프라인으로 작동 · 데이터는 휴대전화 밖으로 나가지 않습니다',
+  footer: 'PETO Finanzas · 오프라인으로 작동 · 클라우드는 선택 사항: 내 데이터, 내 결정',
   tile_available: '사용 가능한 돈',
   tile_available_aria: '사용 가능한 돈: 내 계좌로 이동',
   tile_savings: '이번 달 저축',
@@ -4899,6 +5645,7 @@ ko: {
   san_add_participant: '추가',
   san_create_btn: 'san 만들기',
   san_err_participants: '참가자를 최소 2명 추가하세요.',
+  san_err_active_exists: '이미 진행 중인 san("{name}")이 있습니다. 새로 만들려면 먼저 삭제하세요.',
   san_err_dup: '그 참가자는 이미 목록에 있습니다.',
   san_err_pname: '참가자의 이름을 입력하세요.',
   san_remove: '제거',
@@ -4961,7 +5708,7 @@ ko: {
   data_import: '백업 가져오기',
   data_reset: '모든 데이터 삭제',
   data_err_big: '그 파일은 너무 큽니다.',
-  data_err_invalid: '가져올 수 없습니다. 그 파일은 유효한 PETO 백업이 아닙니다.',
+  data_err_invalid: '가져올 수 없습니다. 그 파일은 유효한 PETO Finanzas 백업이 아닙니다.',
   import_confirm: '가져오면 현재 앱 데이터가 모두 바뀝니다. 확실한가요?',
   import_done: '백업을 가져왔습니다. ✅',
   reset_confirm1: '이 휴대전화의 앱 데이터가 모두 삭제됩니다. 되돌릴 수 없습니다. 확실한가요?',
@@ -4971,7 +5718,7 @@ ko: {
   lock_enter: '잠금 해제',
   lock_note: '데이터는 이 휴대전화에만 남습니다.',
   lock_err: 'PIN이 틀립니다. 다시 시도하세요.',
-  ob_title: 'PETO에 오신 것을 환영합니다!',
+  ob_title: 'PETO Finanzas에 오신 것을 환영합니다!',
   ob_intro_1: '몇 분 만에 돈을 정리하세요: 지출, 수입, 예산, 계좌와 빚.',
   ob_intro_2: '계정도, 인터넷도 필요 없습니다.',
   ob_intro_3: '모든 것은 이 휴대전화에만 저장됩니다.',
@@ -4986,7 +5733,7 @@ ko: {
   ob_tour1_title: '몇 초 만에 지출 기록',
   ob_tour1_text: '+ 버튼을 누르고 금액과 카테고리를 입력하세요. 그게 다입니다. 지출이 바로 저장됩니다.',
   ob_tour2_title: '오늘 얼마를 쓸 수 있나요?',
-  ob_tour2_text: 'PETO는 예산을 이번 달 남은 날들에 나누고 단 하나의 숫자만 알려줍니다. 오늘 예산을 넘지 않고 쓸 수 있는 금액입니다.',
+  ob_tour2_text: 'PETO Finanzas는 예산을 이번 달 남은 날들에 나누고 단 하나의 숫자만 알려줍니다. 오늘 예산을 넘지 않고 쓸 수 있는 금액입니다.',
   ob_tour3_title: '클라우드 계정(선택)',
   ob_tour3_text: '원하면 무료 계정을 만들어 웹에서도 데이터를 볼 수 있습니다. 계정이 없으면 모든 것이 이 휴대전화에만 남습니다.',
   ob_tour_next: '다음',
@@ -5072,7 +5819,7 @@ ko: {
   pro_title: 'PETO Pro',
   pro_card_text: '데이터를 위한 무제한 클라우드, 고급 보고서, 공유 예산, 그리고 san 주최자 모드.',
   pro_status_free: '지금은 무료 요금제입니다.',
-  pro_status_active: 'PETO Pro가 활성화되어 있습니다. PETO를 응원해 주셔서 감사합니다! ⭐',
+  pro_status_active: 'PETO Pro가 활성화되어 있습니다. PETO Finanzas를 응원해 주셔서 감사합니다! ⭐',
   pro_status_test: '비공개 테스트 동안 PETO Pro가 열려 있습니다. 테스트가 지속되는 동안 전체 접근 권한이 있습니다.',
   pro_status_waitlist: 'PETO Pro 대기자 명단에 있습니다.',
   pro_btn_see: 'PETO Pro 보기',
@@ -5124,9 +5871,81 @@ ko: {
   shared_err_owner_leave: '이 가구의 소유자입니다. 삭제하지 않고는 나갈 수 없습니다. 다른 구성원에게 새 가구를 만들어 달라고 하세요.',
   shared_created_live: '가구가 만들어졌습니다 ✅ 코드를 공유해 가구를 초대하세요.',
   shared_joined_live: '가구에 참여했습니다 ✅',
-  lang_auto: '자동(휴대전화 언어)'
+  lang_auto: '자동(휴대전화 언어)',
+  org_comp_label: '주최자 보상',
+  org_comp_none: '보상 없음',
+  org_comp_first: '주최자가 먼저 받음',
+  org_comp_last: '주최자가 마지막에 받음',
+  org_comp_extra: '라운드별 추가 요금',
+  org_comp_amount_label: '1인당 추가 요금 ($)',
+  org_comp_line: '주최자 보상: {mode}',
+  org_sim_title: '팟 시뮬레이션',
+  org_sim_pays: '각 참가자가 라운드마다 내는 금액: {amount}',
+  org_sim_pot: '각 라운드의 팟: {amount}',
+  org_sim_total_in: '각자가 전체 san에서 내는 총액: {amount}',
+  org_sim_extra_org: '주최자가 라운드마다 {amount}를 추가로 받음',
+  org_sim_first: '주최자가 첫 라운드의 팟을 받음',
+  org_sim_last: '주최자가 마지막 라운드의 팟을 받음',
+  org_shuffle_btn: '🎲 순서 섞기',
+  org_shuffled: '🎲 순서를 섞었습니다! 새 순서입니다.',
+  org_shuffle_need: '순서를 섞으려면 참가자를 2명 이상 추가하세요.',
+  org_shuffle_blocked: '더 이상 섞을 수 없습니다: san이 시작되었거나 결제 기록이 있습니다.',
+  org_start_btn: 'San 시작',
+  org_started_line: 'San 진행 중 · 순서가 잠겼습니다',
+  org_order_title: '차례 순서',
+  org_move_up: '위로',
+  org_move_down: '아래로',
+  org_swap_blocked: '그 차례는 이미 결제가 있어 변경할 수 없습니다.',
+  org_history_title: '변경 내역',
+  org_history_swap: '{a}님과 {b}님이 차례를 바꿨습니다',
+  org_history_started: '주최자가 san을 시작했습니다',
+  org_pay_pending: '대기 중',
+  org_pay_reported: '보고됨',
+  org_pay_confirmed: '확인됨',
+  org_status_btn: '상태: {status}',
+  org_receipt_add: '📎 영수증',
+  org_receipt_view: '영수증 보기',
+  org_receipt_remove: '제거',
+  org_zelle_label: '각 참가자의 Zelle(번호 또는 이메일, 선택)',
+  org_zelle_ph: 'Zelle(선택)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 WhatsApp 알림',
+  org_reminder_head: '🤝 {san} · {n}라운드 중 {x}라운드 · {date}',
+  org_reminder_receiver: '💰 이번 주는 {name}님이 받습니다',
+  org_reminder_zelle: '{name}님의 Zelle: {zelle}',
+  org_reminder_amount: '라운드 납입금: {amount}',
+  org_antifraud: '🛡️ San은 이자를 지급하지 않으며 납입액보다 많이 지급하지 않습니다.',
+  org_link_btn: '🔗 읽기 전용 링크',
+  org_link_publish: '링크 만들기',
+  org_link_update: '링크 업데이트',
+  org_link_copied: '링크가 복사되었습니다!',
+  org_link_need_cloud: '링크를 만들려면 클라우드 계정이 필요합니다: 설정에서 로그인한 뒤 다시 시도하세요.',
+  org_link_ready: '그룹 san(읽기 전용)',
+  org_public_title: '링크를 공유할 준비가 되었습니다.',
+  org_public_updated: '{date}에 업데이트됨',
+  org_public_notfound: '이 링크는 더 이상 사용할 수 없습니다.',
+  org_penalty_label: '연체 규칙',
+  org_penalty_none: '벌금 없음',
+  org_penalty_fixed: '고정 벌금',
+  org_penalty_percent: '납입금의 비율',
+  org_penalty_amount_label: '벌금 금액 ($)',
+  org_penalty_percent_label: '벌금 비율 (%)',
+  org_penalty_line_fixed: '늦으면: {amount} 벌금',
+  org_penalty_line_percent: '늦으면: 납입금의 {percent}% 벌금',
+  set_news_title: '새 소식',
+  news_c24: 'Compilación 24: 환영 투어, 기록 연속 일수, 진행 표시줄이 있는 저축 목표와 추세 그래프.',
+  news_c25: 'Compilación 25: 홈 화면 위젯과 훨씬 가벼워진 앱(52MB에서 7MB로).',
+  news_c26: 'Compilación 26: 세 가지 크기의 위젯, 위젯별 옵션, 앱을 열지 않고 지출을 기록하는 버튼.',
+  news_c27: 'Compilación 27: 12개 언어를 지원하고 휴대전화 언어를 자동으로 따라가는 앱.',
+  news_c28: 'Compilación 28: 시작부터 적용되는 큰 글자, 이 새 소식 섹션, 이탈리아어 검토와 더 빠른 시작.',
+  news_c31: 'Compilación 31: 뒤로 가기 버튼이나 제스처가 이제 앱 안에서 이동합니다: 열려 있는 것을 닫고 메인 화면으로 돌아간 뒤 종료합니다.',
+  news_c32: '버전 32: 이제 앱 전체(메뉴, 잠금 화면, 위젯)에서 브랜드가 "PETO Finanzas"로 표시되고, san이 홈 목록 맨 위로 이동했으며, san 공개 링크가 그룹 상태를 바로 열고, 조직자 버튼이 항상 명확한 메시지로 응답합니다.',
+  news_c33: '버전 33: san을 새로 만들어도 진행 중인 san이 지워지지 않습니다. 이미 활성 san이 있으면 앱이 알려주고 보호합니다(결제, 영수증, 기록, 공개 링크). 웹 버전도 이제 휴대전화와 동기화됩니다.',
+  back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.'
 },
 ru: {
+  org_err_san_name: 'Введите название сана.', rep_promo_footer: 'Контролируйте свои расходы с PETO Finanzas · petofinanzas.com', rep_saved: 'Изображение сохранено.', set_sections_summary: 'Видимо {visible} из {total}',
+  org_err_active_exists: 'Уже есть активный san («{name}»). Сначала удалите его на его карточке, если хотите создать другой.',
   app_title: 'PETO Finanzas',
   back: '← Все параметры',
   greeting: 'Здравствуйте',
@@ -5151,19 +5970,19 @@ ru: {
   sec_home: 'Главная',
   key_home: 'Ваш главный экран',
   set_notif_label: 'Уведомления при закрытом приложении',
-  set_notif_help: 'Напоминания о ваших постоянных платежах за день и в день оплаты, даже когда PETO закрыто.',
+  set_notif_help: 'Напоминания о ваших постоянных платежах за день и в день оплаты, даже когда PETO Finanzas закрыто.',
   set_autofixed_label: 'Записывать постоянные платежи автоматически',
   set_autofixed_help: 'Когда наступает срок постоянного платежа, расход записывается за вас. Его можно сразу отменить.',
   set_bio_label: 'Вход по отпечатку пальца',
   set_bio_help: 'Вход по отпечатку пальца в дополнение к PIN (нужен активный PIN).',
   bio_btn: '👆 Войти по отпечатку',
-  bio_reason: 'Подтвердите, что это вы, чтобы открыть PETO',
+  bio_reason: 'Подтвердите, что это вы, чтобы открыть PETO Finanzas',
   bio_need_pin: 'Для входа по отпечатку нужен активный PIN: создайте PIN в «Настройки → Безопасность», и отпечаток будет работать при открытии приложения.',
   bio_failed: 'Не удалось подтвердить отпечаток. Введите ваш PIN.',
   bio_unavailable: 'Отпечаток пальца недоступен на этом телефоне. Введите ваш PIN.',
   bio_not_enrolled: 'На этом телефоне не зарегистрирован ни один отпечаток. Зарегистрируйте его в настройках телефона или введите PIN.',
   bio_offer_title: 'Входить по отпечатку пальца?',
-  bio_offer_text: 'Вы только что создали PIN. Если хотите, можете открывать PETO отпечатком пальца вместо ввода PIN каждый раз. Включить сейчас?',
+  bio_offer_text: 'Вы только что создали PIN. Если хотите, можете открывать PETO Finanzas отпечатком пальца вместо ввода PIN каждый раз. Включить сейчас?',
   bio_offer_yes: 'Да, включить отпечаток',
   bio_offer_no: 'Не сейчас',
   bio_activated: 'Готово: вход по отпечатку пальца включён.',
@@ -5177,16 +5996,25 @@ ru: {
   backup_err_pass: 'Не удалось открыть копию: неверный пароль или повреждённый файл.',
   share_btn: 'Поделиться сводкой',
   share_copied: 'Сводка скопирована. Вставьте её куда угодно.',
-  review_title: 'Вам нравится PETO?',
-  review_text: 'Если PETO помогает вам беречь деньги, отзыв в Google Play очень поможет нам охватить больше людей. Спасибо!',
+  review_title: 'Вам нравится PETO Finanzas?',
+  review_text: 'Если PETO Finanzas помогает вам беречь деньги, отзыв в Google Play очень поможет нам охватить больше людей. Спасибо!',
   review_yes: '⭐ Оценить в Google Play',
   review_no: 'Не сейчас',
-  share_report_title: 'Моя сводка PETO',
+  share_report_title: 'Моя сводка PETO Finanzas',
   notif_fixed_title: 'Постоянный платёж завтра',
   notif_fixed_today: 'Постоянный платёж сегодня',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'Ваша неделя в PETO',
+  notif_weekly_title: 'Ваша неделя в PETO Finanzas',
   notif_weekly_body: 'Записывайте расходы и доходы этой недели, чтобы не сбиться с курса.',
+  summary_title: 'Ежедневная сводка',
+  summary_help: 'Напоминание о том, сколько вы потратили вчера и сколько можете потратить сегодня, в выбранное вами время.',
+  summary_notif_label: 'Сводка уведомлением',
+  summary_time_label: 'Время сводки',
+  summary_email_label: 'Получать также по почте',
+  summary_email_help: 'Только при активной облачной учётной записи: та же сводка приходит и на вашу почту.',
+  notif_summary_title: '🌅 Ваша сводка PETO Finanzas',
+  notif_summary_body: 'Вчера вы потратили {spent} · Сегодня вы можете потратить {daily}',
+  notif_summary_body_nodaily: 'Вчера вы потратили {spent}',
   sec_remesas: 'Переводы',
   key_remesas: 'Отправлено в этом месяце: {amount}',
   rem_intro: 'Деньги, которые вы отправляете своим близким: сколько ушло в долларах и сколько пришло в их валюте.',
@@ -5220,6 +6048,9 @@ ru: {
   csv_err_headers: 'В этом файле не найдены столбцы даты и суммы.',
   csv_err_big: 'Этот файл слишком большой для импорта.',
   csv_err_empty: 'В этом файле нет операций, которые можно импортировать.',
+  pdf_err_big: 'Этот PDF слишком большой (максимум 8 МБ).',
+  pdf_err_notext: 'В этом PDF нет текста, который я мог бы прочитать (похоже на фото или скан). Попробуйте CSV банка или запишите расход по фото чека.',
+  pdf_err_empty: 'Я не нашёл в этом PDF операций с датой и суммой. Попробуйте CSV банка.',
   shared_title: 'Общий бюджет',
   shared_preview_note: '🔧 Предпросмотр дизайна: пока не подключается к другим аккаунтам. Используйте, чтобы попробовать, как будет выглядеть создание домохозяйства, вступление по коду и список участников.',
   shared_create_label: 'Название домохозяйства',
@@ -5295,13 +6126,13 @@ ru: {
   cloud_conflict: 'В облаке и на этом телефоне разные данные. Загрузить данные из облака и заменить те, что на этом телефоне? (Отмена = загрузить данные этого телефона)',
   cloud_wipe_confirm: 'Удалить ВСЕ ваши данные из облака? То, что на этом телефоне, останется как есть.',
   cloud_delete: 'Удалить мой аккаунт',
-  cloud_delete_confirm1: 'Удалить ваш аккаунт PETO? Это удалит ваш аккаунт, вашу копию данных в облаке и общие домохозяйства, которыми вы владеете. Данные на ЭТОМ телефоне останутся здесь нетронутыми (их можно стереть в настройках). Это нельзя отменить.',
+  cloud_delete_confirm1: 'Удалить ваш аккаунт PETO Finanzas? Это удалит ваш аккаунт, вашу копию данных в облаке и общие домохозяйства, которыми вы владеете. Данные на ЭТОМ телефоне останутся здесь нетронутыми (их можно стереть в настройках). Это нельзя отменить.',
   cloud_delete_confirm2: 'Окончательное подтверждение: удалить аккаунт навсегда?',
   cloud_deleted: 'Ваш аккаунт был удалён.',
   cloud_delete_err_auth: 'Ваша сессия больше недействительна. Войдите снова и попробуйте ещё раз.',
   cloud_unavailable: 'Облако недоступно в этой версии.',
   key_settings: 'Имя, распределение, текст, разделы, PIN',
-  footer: 'PETO v0.1 · Работает офлайн · Ваши данные никогда не покидают ваш телефон',
+  footer: 'PETO Finanzas · Работает офлайн · Облако необязательно: ваши данные — ваш выбор',
   tile_available: 'Доступные деньги',
   tile_available_aria: 'Доступные деньги: перейти в Мои счета',
   tile_savings: 'Сбережения в этом месяце',
@@ -5483,6 +6314,7 @@ ru: {
   san_add_participant: 'Добавить',
   san_create_btn: 'Создать сан',
   san_err_participants: 'Добавьте не менее 2 участников.',
+  san_err_active_exists: 'Уже есть текущий san («{name}»). Сначала удалите его, если хотите создать другой.',
   san_err_dup: 'Этот участник уже в списке.',
   san_err_pname: 'Введите имя участника.',
   san_remove: 'Убрать',
@@ -5545,7 +6377,7 @@ ru: {
   data_import: 'Импорт копии',
   data_reset: 'Удалить все данные',
   data_err_big: 'Этот файл слишком большой.',
-  data_err_invalid: 'Не удалось импортировать: файл не является действительной копией PETO.',
+  data_err_invalid: 'Не удалось импортировать: файл не является действительной копией PETO Finanzas.',
   import_confirm: 'Импорт заменит ВСЕ текущие данные приложения. Вы уверены?',
   import_done: 'Копия импортирована. ✅',
   reset_confirm1: 'Это удалит ВСЕ данные вашего приложения на этом телефоне. Это нельзя отменить. Вы уверены?',
@@ -5555,7 +6387,7 @@ ru: {
   lock_enter: 'Разблокировать',
   lock_note: 'Ваши данные остаются только на этом телефоне.',
   lock_err: 'Неверный PIN. Попробуйте снова.',
-  ob_title: 'Добро пожаловать в PETO!',
+  ob_title: 'Добро пожаловать в PETO Finanzas!',
   ob_intro_1: 'Наведите порядок в деньгах за несколько минут: расходы, доходы, бюджет, счета и долги.',
   ob_intro_2: 'Без аккаунта, без интернета.',
   ob_intro_3: 'Всё хранится только на вашем телефоне.',
@@ -5570,7 +6402,7 @@ ru: {
   ob_tour1_title: 'Запишите расход за секунды',
   ob_tour1_text: 'Нажмите кнопку +, введите сумму и категорию. Это всё: ваш расход сразу сохраняется.',
   ob_tour2_title: 'Сколько можно потратить сегодня?',
-  ob_tour2_text: 'PETO распределяет ваш бюджет по оставшимся дням месяца и называет одно-единственное число: сколько вы можете потратить сегодня, не выходя за рамки.',
+  ob_tour2_text: 'PETO Finanzas распределяет ваш бюджет по оставшимся дням месяца и называет одно-единственное число: сколько вы можете потратить сегодня, не выходя за рамки.',
   ob_tour3_title: 'Ваш облачный аккаунт (необязательно)',
   ob_tour3_text: 'Если хотите, создайте бесплатный аккаунт, чтобы видеть ваши данные и в вебе. Без аккаунта всё остаётся только на вашем телефоне.',
   ob_tour_next: 'Далее',
@@ -5656,7 +6488,7 @@ ru: {
   pro_title: 'PETO Pro',
   pro_card_text: 'Безлимитное облако для ваших данных, расширенный отчёт, общий бюджет и режим организатора сана.',
   pro_status_free: 'Сейчас вы на бесплатном плане.',
-  pro_status_active: 'PETO Pro активен. Спасибо за поддержку PETO! ⭐',
+  pro_status_active: 'PETO Pro активен. Спасибо за поддержку PETO Finanzas! ⭐',
   pro_status_test: 'PETO Pro открыт во время закрытого теста: у вас полный доступ, пока длится тест.',
   pro_status_waitlist: 'Вы в списке ожидания PETO Pro.',
   pro_btn_see: 'Смотреть PETO Pro',
@@ -5708,9 +6540,81 @@ ru: {
   shared_err_owner_leave: 'Вы владеете этим домохозяйством: вы не можете выйти, не удалив его. Попросите другого участника создать новое домохозяйство.',
   shared_created_live: 'Домохозяйство создано ✅ Поделитесь кодом, чтобы пригласить ваше домохозяйство.',
   shared_joined_live: 'Вы вступили в домохозяйство ✅',
-  lang_auto: 'Автоматически (язык телефона)'
+  lang_auto: 'Автоматически (язык телефона)',
+  org_comp_label: 'Компенсация организатора',
+  org_comp_none: 'Без компенсации',
+  org_comp_first: 'Организатор получает первым',
+  org_comp_last: 'Организатор получает последним',
+  org_comp_extra: 'Дополнительный взнос за раунд',
+  org_comp_amount_label: 'Дополнительный взнос с человека ($)',
+  org_comp_line: 'Компенсация организатора: {mode}',
+  org_sim_title: 'Симуляция банка',
+  org_sim_pays: 'Каждый участник вносит за раунд: {amount}',
+  org_sim_pot: 'Банк каждого раунда: {amount}',
+  org_sim_total_in: 'Всего каждый вносит за весь san: {amount}',
+  org_sim_extra_org: 'Организатор получает дополнительно {amount} за раунд',
+  org_sim_first: 'Организатор получает банк первого раунда',
+  org_sim_last: 'Организатор получает банк последнего раунда',
+  org_shuffle_btn: '🎲 Перемешать порядок',
+  org_shuffled: '🎲 Порядок перемешан! Вот новый порядок ходов.',
+  org_shuffle_need: 'Добавьте не менее 2 участников, чтобы перемешать порядок.',
+  org_shuffle_blocked: 'Перемешать больше нельзя: san уже начался или в нём есть платежи.',
+  org_start_btn: 'Начать san',
+  org_started_line: 'San идёт · Порядок заблокирован',
+  org_order_title: 'Порядок ходов',
+  org_move_up: 'Вверх',
+  org_move_down: 'Вниз',
+  org_swap_blocked: 'У этого хода уже есть платежи, его нельзя изменить.',
+  org_history_title: 'История изменений',
+  org_history_swap: '{a} и {b} поменялись ходами',
+  org_history_started: 'Организатор начал san',
+  org_pay_pending: 'Ожидает',
+  org_pay_reported: 'Сообщено',
+  org_pay_confirmed: 'Подтверждено',
+  org_status_btn: 'Статус: {status}',
+  org_receipt_add: '📎 Чек',
+  org_receipt_view: 'Посмотреть чек',
+  org_receipt_remove: 'Убрать',
+  org_zelle_label: 'Zelle каждого участника (номер или почта, необязательно)',
+  org_zelle_ph: 'Zelle (необязательно)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 Напоминание в WhatsApp',
+  org_reminder_head: '🤝 {san} · Раунд {x} из {n} · {date}',
+  org_reminder_receiver: '💰 На этой неделе получает {name}',
+  org_reminder_zelle: 'Zelle участника {name}: {zelle}',
+  org_reminder_amount: 'Взнос раунда: {amount}',
+  org_antifraud: '🛡️ San никогда не платит проценты и не больше внесённого.',
+  org_link_btn: '🔗 Ссылка только для чтения',
+  org_link_publish: 'Создать ссылку',
+  org_link_update: 'Обновить ссылку',
+  org_link_copied: 'Ссылка скопирована!',
+  org_link_need_cloud: 'Для ссылки нужен облачный аккаунт: войдите в Настройках и попробуйте снова.',
+  org_link_ready: 'Групповой san (только чтение)',
+  org_public_title: 'Ссылка готова к отправке.',
+  org_public_updated: 'Обновлено {date}',
+  org_public_notfound: 'Эта ссылка больше недоступна.',
+  org_penalty_label: 'Правило опоздания',
+  org_penalty_none: 'Без штрафа',
+  org_penalty_fixed: 'Фиксированный штраф',
+  org_penalty_percent: 'Процент от взноса',
+  org_penalty_amount_label: 'Сумма штрафа ($)',
+  org_penalty_percent_label: 'Процент штрафа (%)',
+  org_penalty_line_fixed: 'При опоздании: штраф {amount}',
+  org_penalty_line_percent: 'При опоздании: штраф {percent}% от взноса',
+  set_news_title: 'Что нового',
+  news_c24: 'Compilación 24: ознакомительный тур, серия дней записей, цели накоплений с полосой прогресса и график тенденции.',
+  news_c25: 'Compilación 25: виджет на главном экране и намного более лёгкое приложение (с 52 МБ до 7 МБ).',
+  news_c26: 'Compilación 26: виджеты трёх размеров, с настройками для каждого и кнопкой записи расхода без открытия приложения.',
+  news_c27: 'Compilación 27: приложение на 12 языках, автоматически следует за языком телефона.',
+  news_c28: 'Compilación 28: крупный текст с самого запуска, этот раздел новостей, проверка итальянских текстов и более быстрый старт.',
+  news_c31: 'Compilación 31: кнопка или жест «назад» теперь перемещаются внутри приложения: закрывают открытое и возвращают на главный экран перед выходом.',
+  news_c32: 'Версия 32: бренд теперь отображается как «PETO Finanzas» по всему приложению (меню, экран блокировки и виджеты), san переехал наверх списка главного экрана, публичная ссылка san открывает сразу статус группы, а кнопки организатора всегда отвечают понятным сообщением.',
+  news_c33: 'Версия 33: создание san больше не может стереть текущий — если один уже активен, приложение сообщает об этом и защищает его (платежи, чеки, историю и публичную ссылку) — а веб-версия теперь синхронизирована с телефоном.',
+  back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.'
 },
 hi: {
+  org_err_san_name: 'San का नाम लिखें।', rep_promo_footer: 'PETO Finanzas के साथ अपने खर्चों पर नियंत्रण रखें · petofinanzas.com', rep_saved: 'छवि सहेजी गई।', set_sections_summary: '{total} में से {visible} दिख रहे हैं',
+  org_err_active_exists: 'पहले से एक सक्रिय san है ("{name}")। नया बनाने के लिए पहले उसे उसके कार्ड से हटाएँ।',
   app_title: 'PETO Finanzas',
   back: '← सभी विकल्प',
   greeting: 'नमस्ते',
@@ -5735,19 +6639,19 @@ hi: {
   sec_home: 'होम',
   key_home: 'आपकी मुख्य स्क्रीन',
   set_notif_label: 'ऐप बंद होने पर सूचनाएँ',
-  set_notif_help: 'PETO बंद होने पर भी, आपके निश्चित भुगतानों की सूचना एक दिन पहले और उसी दिन।',
+  set_notif_help: 'PETO Finanzas बंद होने पर भी, आपके निश्चित भुगतानों की सूचना एक दिन पहले और उसी दिन।',
   set_autofixed_label: 'निश्चित भुगतान स्वचालित दर्ज करें',
   set_autofixed_help: 'जब कोई निश्चित भुगतान देय होता है, तो खर्च आपके लिए दर्ज हो जाता है। आप तुरंत उसे वापस कर सकते हैं।',
   set_bio_label: 'फ़िंगरप्रिंट अनलॉक',
   set_bio_help: 'PIN के साथ फ़िंगरप्रिंट से भी प्रवेश करें (सक्रिय PIN आवश्यक है)।',
   bio_btn: '👆 फ़िंगरप्रिंट से प्रवेश करें',
-  bio_reason: 'PETO खोलने के लिए पुष्टि करें कि यह आप ही हैं',
+  bio_reason: 'PETO Finanzas खोलने के लिए पुष्टि करें कि यह आप ही हैं',
   bio_need_pin: 'फ़िंगरप्रिंट अनलॉक के लिए सक्रिय PIN चाहिए: सेटिंग → सुरक्षा में अपना PIN बनाएँ, फिर ऐप खोलते समय फ़िंगरप्रिंट काम करेगा।',
   bio_failed: 'फ़िंगरप्रिंट सत्यापित नहीं हो सका। अपना PIN लिखें।',
   bio_unavailable: 'इस फ़ोन पर फ़िंगरप्रिंट उपलब्ध नहीं है। अपना PIN लिखें।',
   bio_not_enrolled: 'इस फ़ोन में कोई फ़िंगरप्रिंट दर्ज नहीं है। फ़ोन की सेटिंग में दर्ज करें या अपना PIN लिखें।',
   bio_offer_title: 'फ़िंगरप्रिंट से अनलॉक करें?',
-  bio_offer_text: 'आपने अभी अपना PIN बनाया है। चाहें तो हर बार PIN लिखने के बजाय फ़िंगरप्रिंट से PETO खोल सकते हैं। अभी चालू करें?',
+  bio_offer_text: 'आपने अभी अपना PIN बनाया है। चाहें तो हर बार PIN लिखने के बजाय फ़िंगरप्रिंट से PETO Finanzas खोल सकते हैं। अभी चालू करें?',
   bio_offer_yes: 'हाँ, फ़िंगरप्रिंट चालू करें',
   bio_offer_no: 'अभी नहीं',
   bio_activated: 'हो गया: फ़िंगरप्रिंट अनलॉक अब चालू है।',
@@ -5761,16 +6665,25 @@ hi: {
   backup_err_pass: 'बैकअप नहीं खुल सका: गलत पासवर्ड या क्षतिग्रस्त फ़ाइल।',
   share_btn: 'सारांश साझा करें',
   share_copied: 'सारांश कॉपी हो गया। कहीं भी चिपकाएँ।',
-  review_title: 'क्या आपको PETO पसंद है?',
-  review_text: 'अगर PETO आपके पैसे की देखभाल में मदद करता है, तो Google Play पर समीक्षा हमें ज़्यादा लोगों तक पहुँचने में बहुत मदद करेगी। धन्यवाद!',
+  review_title: 'क्या आपको PETO Finanzas पसंद है?',
+  review_text: 'अगर PETO Finanzas आपके पैसे की देखभाल में मदद करता है, तो Google Play पर समीक्षा हमें ज़्यादा लोगों तक पहुँचने में बहुत मदद करेगी। धन्यवाद!',
   review_yes: '⭐ Google Play पर रेट करें',
   review_no: 'अभी नहीं',
-  share_report_title: 'मेरा PETO सारांश',
+  share_report_title: 'मेरा PETO Finanzas सारांश',
   notif_fixed_title: 'कल निश्चित भुगतान',
   notif_fixed_today: 'आज निश्चित भुगतान',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'PETO में आपका सप्ताह',
+  notif_weekly_title: 'PETO Finanzas में आपका सप्ताह',
   notif_weekly_body: 'इस सप्ताह के खर्च और आय दर्ज करें ताकि हिसाब बना रहे।',
+  summary_title: 'दैनिक सारांश',
+  summary_help: 'आपके चुने समय पर, कल आपने कितना खर्च किया और आज कितना खर्च कर सकते हैं, इसकी सूचना।',
+  summary_notif_label: 'सूचना द्वारा सारांश',
+  summary_time_label: 'सारांश का समय',
+  summary_email_label: 'ईमेल से भी प्राप्त करें',
+  summary_email_help: 'केवल आपका क्लाउड खाता सक्रिय होने पर: वही सारांश आपके ईमेल पर भी आता है।',
+  notif_summary_title: '🌅 आपका PETO Finanzas सारांश',
+  notif_summary_body: 'कल आपने {spent} खर्च किए · आज आप {daily} खर्च कर सकते हैं',
+  notif_summary_body_nodaily: 'कल आपने {spent} खर्च किए',
   sec_remesas: 'प्रेषण',
   key_remesas: 'इस माह भेजा: {amount}',
   rem_intro: 'आप अपने लोगों को जो पैसे भेजते हैं: डॉलर में कितने गए और उनकी मुद्रा में कितने पहुँचे।',
@@ -5804,6 +6717,9 @@ hi: {
   csv_err_headers: 'उस फ़ाइल में तारीख और राशि के कॉलम नहीं मिले।',
   csv_err_big: 'वह फ़ाइल आयात करने के लिए बहुत बड़ी है।',
   csv_err_empty: 'उस फ़ाइल में आयात योग्य कोई लेन-देन नहीं है।',
+  pdf_err_big: 'वह PDF बहुत बड़ा है (अधिकतम 8 MB)।',
+  pdf_err_notext: 'उस PDF में पढ़ा जा सकने वाला टेक्स्ट नहीं है (यह फ़ोटो या स्कैन लगता है)। बैंक का CSV आज़माएँ या रसीद की फ़ोटो से खर्च दर्ज करें।',
+  pdf_err_empty: 'मुझे उस PDF में तारीख और राशि वाला कोई लेन-देन नहीं मिला। बैंक का CSV आज़माएँ।',
   shared_title: 'साझा बजट',
   shared_preview_note: '🔧 डिज़ाइन पूर्वावलोकन: यह अभी अन्य खातों से नहीं जुड़ता। इसका उपयोग यह आज़माने के लिए करें कि घर बनाना, कोड से जुड़ना और सदस्यों को देखना कैसा दिखेगा।',
   shared_create_label: 'घर का नाम',
@@ -5879,13 +6795,13 @@ hi: {
   cloud_conflict: 'क्लाउड और इस फ़ोन में अलग-अलग डेटा है। क्लाउड का डेटा डाउनलोड करके इस फ़ोन के डेटा से बदलें? (रद्द = इस फ़ोन का डेटा अपलोड करें)',
   cloud_wipe_confirm: 'क्लाउड में आपका सारा डेटा हटाएँ? इस फ़ोन पर जो है, वह वैसा ही रहेगा।',
   cloud_delete: 'मेरा खाता हटाएँ',
-  cloud_delete_confirm1: 'अपना PETO खाता हटाएँ? इससे आपका खाता, क्लाउड में आपके डेटा की प्रति और आपके स्वामित्व वाले साझा घर हट जाएँगे। इस फ़ोन का डेटा यहीं, अछूता रहेगा (आप सेटिंग में उसे मिटा सकते हैं)। यह वापस नहीं हो सकता।',
+  cloud_delete_confirm1: 'अपना PETO Finanzas खाता हटाएँ? इससे आपका खाता, क्लाउड में आपके डेटा की प्रति और आपके स्वामित्व वाले साझा घर हट जाएँगे। इस फ़ोन का डेटा यहीं, अछूता रहेगा (आप सेटिंग में उसे मिटा सकते हैं)। यह वापस नहीं हो सकता।',
   cloud_delete_confirm2: 'अंतिम पुष्टि: अपना खाता हमेशा के लिए हटाएँ?',
   cloud_deleted: 'आपका खाता हटा दिया गया।',
   cloud_delete_err_auth: 'आपका सत्र अब मान्य नहीं है। फिर से साइन इन करके कोशिश करें।',
   cloud_unavailable: 'इस संस्करण में क्लाउड उपलब्ध नहीं है।',
   key_settings: 'नाम, बँटवारा, अक्षर, अनुभाग, PIN',
-  footer: 'PETO v0.1 · ऑफ़लाइन काम करता है · आपका डेटा कभी आपके फ़ोन से बाहर नहीं जाता',
+  footer: 'PETO Finanzas · ऑफ़लाइन काम करता है · क्लाउड वैकल्पिक है: आपका डेटा, आपका फ़ैसला',
   tile_available: 'उपलब्ध पैसे',
   tile_available_aria: 'उपलब्ध पैसे: मेरे खातों पर जाएँ',
   tile_savings: 'इस माह की बचत',
@@ -6067,6 +6983,7 @@ hi: {
   san_add_participant: 'जोड़ें',
   san_create_btn: 'San बनाएँ',
   san_err_participants: 'कम से कम 2 प्रतिभागी जोड़ें।',
+  san_err_active_exists: 'पहले से एक san चल रहा है ("{name}")। नया बनाने के लिए पहले उसे हटाएँ।',
   san_err_dup: 'वह प्रतिभागी पहले से सूची में है।',
   san_err_pname: 'प्रतिभागी का नाम लिखें।',
   san_remove: 'हटाएँ',
@@ -6129,7 +7046,7 @@ hi: {
   data_import: 'बैकअप आयात करें',
   data_reset: 'सारा डेटा हटाएँ',
   data_err_big: 'वह फ़ाइल बहुत बड़ी है।',
-  data_err_invalid: 'आयात नहीं हो सका: वह फ़ाइल मान्य PETO बैकअप नहीं है।',
+  data_err_invalid: 'आयात नहीं हो सका: वह फ़ाइल मान्य PETO Finanzas बैकअप नहीं है।',
   import_confirm: 'आयात करने से ऐप का सारा वर्तमान डेटा बदल जाएगा। क्या आप निश्चित हैं?',
   import_done: 'बैकअप आयात हुआ। ✅',
   reset_confirm1: 'इससे इस फ़ोन पर आपके ऐप का सारा डेटा हट जाएगा। यह वापस नहीं हो सकता। क्या आप निश्चित हैं?',
@@ -6139,7 +7056,7 @@ hi: {
   lock_enter: 'अनलॉक करें',
   lock_note: 'आपका डेटा केवल इस फ़ोन पर रहता है।',
   lock_err: 'गलत PIN। फिर से कोशिश करें।',
-  ob_title: 'PETO में आपका स्वागत है!',
+  ob_title: 'PETO Finanzas में आपका स्वागत है!',
   ob_intro_1: 'मिनटों में अपने पैसे व्यवस्थित करें: खर्च, आय, बजट, खाते और कर्ज़।',
   ob_intro_2: 'कोई खाता नहीं, कोई इंटरनेट नहीं।',
   ob_intro_3: 'सब कुछ केवल आपके फ़ोन पर रहता है।',
@@ -6154,7 +7071,7 @@ hi: {
   ob_tour1_title: 'सेकंडों में खर्च दर्ज करें',
   ob_tour1_text: '+ बटन दबाएँ, राशि और श्रेणी लिखें। बस इतना ही: आपका खर्च तुरंत सहेजा जाता है।',
   ob_tour2_title: 'आज आप कितना खर्च कर सकते हैं?',
-  ob_tour2_text: 'PETO आपके बजट को माह के बचे दिनों में बाँटता है और आपको एक ही संख्या बताता है: आज बिना सीमा पार किए आप कितना खर्च कर सकते हैं।',
+  ob_tour2_text: 'PETO Finanzas आपके बजट को माह के बचे दिनों में बाँटता है और आपको एक ही संख्या बताता है: आज बिना सीमा पार किए आप कितना खर्च कर सकते हैं।',
   ob_tour3_title: 'आपका क्लाउड खाता (वैकल्पिक)',
   ob_tour3_text: 'चाहें तो मुफ़्त खाता बनाएँ ताकि वेब पर भी अपना डेटा देख सकें। बिना खाते के सब कुछ केवल आपके फ़ोन पर रहता है।',
   ob_tour_next: 'आगे',
@@ -6240,7 +7157,7 @@ hi: {
   pro_title: 'PETO Pro',
   pro_card_text: 'आपके डेटा के लिए असीमित क्लाउड, उन्नत रिपोर्ट, साझा बजट और san आयोजक मोड।',
   pro_status_free: 'आप अभी मुफ़्त योजना पर हैं।',
-  pro_status_active: 'PETO Pro सक्रिय है। PETO का समर्थन करने के लिए धन्यवाद! ⭐',
+  pro_status_active: 'PETO Pro सक्रिय है। PETO Finanzas का समर्थन करने के लिए धन्यवाद! ⭐',
   pro_status_test: 'बंद परीक्षण के दौरान PETO Pro खुला है: जब तक परीक्षण चले, आपके पास पूरी पहुँच है।',
   pro_status_waitlist: 'आप PETO Pro की प्रतीक्षा सूची में हैं।',
   pro_btn_see: 'PETO Pro देखें',
@@ -6292,9 +7209,81 @@ hi: {
   shared_err_owner_leave: 'आप इस घर के मालिक हैं: इसे हटाए बिना आप नहीं छोड़ सकते। किसी अन्य सदस्य से नया घर बनाने को कहें।',
   shared_created_live: 'घर बन गया ✅ अपने घर को आमंत्रित करने के लिए कोड साझा करें।',
   shared_joined_live: 'आप घर से जुड़ गए ✅',
-  lang_auto: 'स्वचालित (फ़ोन की भाषा)'
+  lang_auto: 'स्वचालित (फ़ोन की भाषा)',
+  org_comp_label: 'आयोजक मुआवज़ा',
+  org_comp_none: 'कोई मुआवज़ा नहीं',
+  org_comp_first: 'आयोजक सबसे पहले लेता है',
+  org_comp_last: 'आयोजक सबसे आखिर में लेता है',
+  org_comp_extra: 'प्रति राउंड अतिरिक्त शुल्क',
+  org_comp_amount_label: 'प्रति व्यक्ति अतिरिक्त शुल्क ($)',
+  org_comp_line: 'आयोजक मुआवज़ा: {mode}',
+  org_sim_title: 'पॉट सिमुलेशन',
+  org_sim_pays: 'प्रत्येक प्रतिभागी प्रति राउंड देता है: {amount}',
+  org_sim_pot: 'प्रत्येक राउंड का पॉट: {amount}',
+  org_sim_total_in: 'पूरे san में प्रत्येक व्यक्ति कुल देता है: {amount}',
+  org_sim_extra_org: 'आयोजक को प्रति राउंड {amount} अतिरिक्त मिलता है',
+  org_sim_first: 'आयोजक को पहले राउंड का पॉट मिलता है',
+  org_sim_last: 'आयोजक को आखिरी राउंड का पॉट मिलता है',
+  org_shuffle_btn: '🎲 क्रम शफ़ल करें',
+  org_shuffled: '🎲 क्रम शफ़ल हो गया! यह नया क्रम है।',
+  org_shuffle_need: 'क्रम शफ़ल करने के लिए कम से कम 2 प्रतिभागी जोड़ें।',
+  org_shuffle_blocked: 'अब शफ़ल नहीं हो सकता: san शुरू हो चुका है या उसमें भुगतान दर्ज हैं।',
+  org_start_btn: 'San शुरू करें',
+  org_started_line: 'San चल रहा है · क्रम लॉक है',
+  org_order_title: 'बारी का क्रम',
+  org_move_up: 'ऊपर',
+  org_move_down: 'नीचे',
+  org_swap_blocked: 'उस बारी में पहले से भुगतान हैं और उसे बदला नहीं जा सकता।',
+  org_history_title: 'बदलाव इतिहास',
+  org_history_swap: '{a} और {b} ने बारी बदली',
+  org_history_started: 'आयोजक ने san शुरू किया',
+  org_pay_pending: 'लंबित',
+  org_pay_reported: 'रिपोर्ट किया गया',
+  org_pay_confirmed: 'पुष्टि हुई',
+  org_status_btn: 'स्थिति: {status}',
+  org_receipt_add: '📎 रसीद',
+  org_receipt_view: 'रसीद देखें',
+  org_receipt_remove: 'हटाएँ',
+  org_zelle_label: 'प्रत्येक प्रतिभागी का Zelle (नंबर या ईमेल, वैकल्पिक)',
+  org_zelle_ph: 'Zelle (वैकल्पिक)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 WhatsApp रिमाइंडर',
+  org_reminder_head: '🤝 {san} · राउंड {x} / {n} · {date}',
+  org_reminder_receiver: '💰 इस सप्ताह {name} को मिलेगा',
+  org_reminder_zelle: '{name} का Zelle: {zelle}',
+  org_reminder_amount: 'राउंड योगदान: {amount}',
+  org_antifraud: '🛡️ San कभी ब्याज या जमा राशि से ज़्यादा नहीं देता।',
+  org_link_btn: '🔗 केवल पढ़ने वाला लिंक',
+  org_link_publish: 'लिंक बनाएँ',
+  org_link_update: 'लिंक अपडेट करें',
+  org_link_copied: 'लिंक कॉपी हो गया!',
+  org_link_need_cloud: 'लिंक के लिए आपका क्लाउड खाता चाहिए: सेटिंग में साइन इन करके फिर कोशिश करें।',
+  org_link_ready: 'समूह san (केवल पढ़ने के लिए)',
+  org_public_title: 'लिंक साझा करने के लिए तैयार है।',
+  org_public_updated: '{date} को अपडेट हुआ',
+  org_public_notfound: 'यह लिंक अब उपलब्ध नहीं है।',
+  org_penalty_label: 'देरी का नियम',
+  org_penalty_none: 'कोई जुर्माना नहीं',
+  org_penalty_fixed: 'तय जुर्माना',
+  org_penalty_percent: 'योगदान का प्रतिशत',
+  org_penalty_amount_label: 'जुर्माने की राशि ($)',
+  org_penalty_percent_label: 'जुर्माने का प्रतिशत (%)',
+  org_penalty_line_fixed: 'देरी होने पर: {amount} जुर्माना',
+  org_penalty_line_percent: 'देरी होने पर: योगदान का {percent}% जुर्माना',
+  set_news_title: 'नया क्या है',
+  news_c24: 'Compilación 24: स्वागत टूर, रिकॉर्डिंग की लगातार श्रृंखला, प्रगति पट्टी वाले बचत लक्ष्य और रुझान ग्राफ़.',
+  news_c25: 'Compilación 25: होम स्क्रीन विजेट और बहुत हल्का ऐप (52 MB से 7 MB तक).',
+  news_c26: 'Compilación 26: तीन आकारों के विजेट, हर विजेट के विकल्प और ऐप खोले बिना खर्च लिखने का बटन.',
+  news_c27: 'Compilación 27: ऐप 12 भाषाओं में, अपने आप आपके फ़ोन की भाषा के अनुसार.',
+  news_c28: 'Compilación 28: शुरुआत से लागू बड़ा टेक्स्ट, यह नया-क्या-है अनुभाग, इतालवी पाठों की समीक्षा और तेज़ शुरुआत.',
+  news_c31: 'Compilación 31: बैक बटन या जेस्चर अब ऐप के अंदर चलता है: जो खुला है उसे बंद करता है और बाहर निकलने से पहले मुख्य स्क्रीन पर लौटता है।',
+  news_c32: 'संस्करण 32: अब पूरे ऐप (मेनू, लॉक स्क्रीन और विजेट) में ब्रांड "PETO Finanzas" दिखता है, san होम सूची में सबसे ऊपर आ गया है, san का सार्वजनिक लिंक सीधे समूह की स्थिति खोलता है और आयोजक बटन हमेशा स्पष्ट संदेश के साथ जवाब देते हैं।',
+  news_c33: 'संस्करण 33: नया san बनाना अब चल रहे san को नहीं मिटा सकता — अगर पहले से एक सक्रिय है, तो ऐप बताता है और उसे सुरक्षित रखता है (भुगतान, रसीदें, इतिहास और सार्वजनिक लिंक) — और वेब संस्करण अब फ़ोन के साथ सिंक हो गया है।',
+  back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।'
 },
 ar: {
+  org_err_san_name: 'اكتب اسم الـ san.', rep_promo_footer: 'تحكّم في مصاريفك مع PETO Finanzas · petofinanzas.com', rep_saved: 'تم حفظ الصورة.', set_sections_summary: '{visible} من {total} ظاهرة',
+  org_err_active_exists: 'يوجد سان نشط بالفعل («{name}»). احذفه أولاً من بطاقته إذا أردت إنشاء آخر.',
   app_title: 'PETO Finanzas',
   back: '← كل الخيارات',
   greeting: 'مرحبًا',
@@ -6319,19 +7308,19 @@ ar: {
   sec_home: 'الرئيسية',
   key_home: 'شاشتك الرئيسية',
   set_notif_label: 'الإشعارات والتطبيق مغلق',
-  set_notif_help: 'تنبيهات بدفعاتك الثابتة قبلها بيوم وفي يومها، حتى عندما يكون PETO مغلقًا.',
+  set_notif_help: 'تنبيهات بدفعاتك الثابتة قبلها بيوم وفي يومها، حتى عندما يكون PETO Finanzas مغلقًا.',
   set_autofixed_label: 'تسجيل الدفعات الثابتة تلقائيًا',
   set_autofixed_help: 'عند استحقاق دفعة ثابتة، يُسجَّل المصروف عنك تلقائيًا. ويمكنك التراجع فورًا.',
   set_bio_label: 'فتح القفل بالبصمة',
   set_bio_help: 'ادخل ببصمتك بالإضافة إلى رمز PIN (يلزم رمز PIN مفعّل).',
   bio_btn: '👆 ادخل بالبصمة',
-  bio_reason: 'أكّد أنك أنت لفتح PETO',
+  bio_reason: 'أكّد أنك أنت لفتح PETO Finanzas',
   bio_need_pin: 'فتح القفل بالبصمة يحتاج إلى رمز PIN مفعّل: أنشئ رمز PIN في الإعدادات ← الأمان وستعمل البصمة عند فتح التطبيق.',
   bio_failed: 'تعذّر التحقق من البصمة. اكتب رمز PIN.',
   bio_unavailable: 'البصمة غير متاحة في هذا الهاتف. اكتب رمز PIN.',
   bio_not_enrolled: 'لا توجد بصمة مسجّلة في هذا الهاتف. سجّل واحدة في إعدادات الهاتف أو اكتب رمز PIN.',
   bio_offer_title: 'فتح القفل ببصمتك؟',
-  bio_offer_text: 'لقد أنشأت للتو رمز PIN. إذا أردت، يمكنك فتح PETO ببصمتك بدلًا من كتابة الرمز في كل مرة. هل نفعّله الآن؟',
+  bio_offer_text: 'لقد أنشأت للتو رمز PIN. إذا أردت، يمكنك فتح PETO Finanzas ببصمتك بدلًا من كتابة الرمز في كل مرة. هل نفعّله الآن؟',
   bio_offer_yes: 'نعم، فعّل البصمة',
   bio_offer_no: 'ليس الآن',
   bio_activated: 'تم: فتح القفل بالبصمة أصبح مفعّلًا.',
@@ -6345,16 +7334,25 @@ ar: {
   backup_err_pass: 'تعذّر فتح النسخة: كلمة مرور خاطئة أو ملف تالف.',
   share_btn: 'مشاركة الملخص',
   share_copied: 'تم نسخ الملخص. الصقه في أي مكان.',
-  review_title: 'هل يعجبك PETO؟',
-  review_text: 'إذا كان PETO يساعدك في العناية بأموالك، فتقييمك على Google Play يساعدنا كثيرًا في الوصول إلى المزيد من الناس. شكرًا!',
+  review_title: 'هل يعجبك PETO Finanzas؟',
+  review_text: 'إذا كان PETO Finanzas يساعدك في العناية بأموالك، فتقييمك على Google Play يساعدنا كثيرًا في الوصول إلى المزيد من الناس. شكرًا!',
   review_yes: '⭐ التقييم على Google Play',
   review_no: 'ليس الآن',
-  share_report_title: 'ملخصي في PETO',
+  share_report_title: 'ملخصي في PETO Finanzas',
   notif_fixed_title: 'دفعة ثابتة غدًا',
   notif_fixed_today: 'دفعة ثابتة اليوم',
   notif_fixed_body: '{name} · {amount}',
-  notif_weekly_title: 'أسبوعك في PETO',
+  notif_weekly_title: 'أسبوعك في PETO Finanzas',
   notif_weekly_body: 'سجّل مصروفات ودخل هذا الأسبوع لتبقى على المسار.',
+  summary_title: 'الملخص اليومي',
+  summary_help: 'تنبيه بما أنفقته أمس وما يمكنك إنفاقه اليوم، في الوقت الذي تختاره.',
+  summary_notif_label: 'الملخص عبر الإشعار',
+  summary_time_label: 'وقت الملخص',
+  summary_email_label: 'استلامه أيضًا عبر البريد الإلكتروني',
+  summary_email_help: 'فقط مع تفعيل حسابك السحابي: يصل الملخص نفسه أيضًا إلى بريدك الإلكتروني.',
+  notif_summary_title: '🌅 ملخص PETO Finanzas الخاص بك',
+  notif_summary_body: 'أمس أنفقت {spent} · اليوم يمكنك إنفاق {daily}',
+  notif_summary_body_nodaily: 'أمس أنفقت {spent}',
   sec_remesas: 'الحوالات',
   key_remesas: 'أُرسل هذا الشهر: {amount}',
   rem_intro: 'الأموال التي ترسلها إلى أهلك: كم خرج بالدولار وكم وصل بعملتهم.',
@@ -6388,6 +7386,9 @@ ar: {
   csv_err_headers: 'لم يتم العثور على عمودي التاريخ والمبلغ في ذلك الملف.',
   csv_err_big: 'ذلك الملف كبير جدًا للاستيراد.',
   csv_err_empty: 'لا يحتوي ذلك الملف على معاملات يمكن استيرادها.',
+  pdf_err_big: 'ملف PDF هذا كبير جدًا (الحد الأقصى 8 ميغابايت).',
+  pdf_err_notext: 'لا يحتوي ملف PDF هذا على نص يمكنني قراءته (يبدو كصورة أو مسح ضوئي). جرّب ملف CSV من البنك أو سجّل المصروف بصورة الإيصال.',
+  pdf_err_empty: 'لم أجد حركات بتاريخ ومبلغ في ملف PDF هذا. جرّب ملف CSV من البنك.',
   shared_title: 'ميزانية مشتركة',
   shared_preview_note: '🔧 معاينة للتصميم: لا يتصل بعد بحسابات أخرى. استخدمه لتجربة كيف سيبدو إنشاء منزل والانضمام برمز ورؤية الأعضاء.',
   shared_create_label: 'اسم المنزل',
@@ -6463,13 +7464,13 @@ ar: {
   cloud_conflict: 'السحابة وهذا الهاتف فيهما بيانات مختلفة. تنزيل بيانات السحابة واستبدال ما في هذا الهاتف؟ (إلغاء = رفع بيانات هذا الهاتف)',
   cloud_wipe_confirm: 'حذف كل بياناتك من السحابة؟ ما في هذا الهاتف يبقى كما هو.',
   cloud_delete: 'حذف حسابي',
-  cloud_delete_confirm1: 'حذف حسابك في PETO؟ سيحذف هذا حسابك ونسخة بياناتك في السحابة والمنازل المشتركة التي تملكها. البيانات في هذا الهاتف تبقى هنا دون مساس (يمكنك مسحها من الإعدادات). لا يمكن التراجع عن هذا.',
+  cloud_delete_confirm1: 'حذف حسابك في PETO Finanzas؟ سيحذف هذا حسابك ونسخة بياناتك في السحابة والمنازل المشتركة التي تملكها. البيانات في هذا الهاتف تبقى هنا دون مساس (يمكنك مسحها من الإعدادات). لا يمكن التراجع عن هذا.',
   cloud_delete_confirm2: 'تأكيد أخير: حذف حسابك نهائيًا؟',
   cloud_deleted: 'تم حذف حسابك.',
   cloud_delete_err_auth: 'جلستك لم تعد صالحة. سجّل الدخول من جديد وحاول مرة أخرى.',
   cloud_unavailable: 'السحابة غير متاحة في هذا الإصدار.',
   key_settings: 'الاسم، التقسيم، النص، الأقسام، PIN',
-  footer: 'PETO v0.1 · يعمل دون إنترنت · بياناتك لا تغادر هاتفك أبدًا',
+  footer: 'PETO Finanzas · يعمل دون إنترنت · السحابة اختيارية: بياناتك، قرارك',
   tile_available: 'الأموال المتاحة',
   tile_available_aria: 'الأموال المتاحة: الذهاب إلى حساباتي',
   tile_savings: 'مدّخرات هذا الشهر',
@@ -6651,6 +7652,7 @@ ar: {
   san_add_participant: 'إضافة',
   san_create_btn: 'إنشاء san',
   san_err_participants: 'أضف مشاركين اثنين على الأقل.',
+  san_err_active_exists: 'يوجد سان جارٍ بالفعل («{name}»). احذفه أولاً إذا أردت إنشاء آخر.',
   san_err_dup: 'ذلك المشارك موجود في القائمة بالفعل.',
   san_err_pname: 'اكتب اسم المشارك.',
   san_remove: 'إزالة',
@@ -6713,7 +7715,7 @@ ar: {
   data_import: 'استيراد نسخة',
   data_reset: 'حذف كل البيانات',
   data_err_big: 'ذلك الملف كبير جدًا.',
-  data_err_invalid: 'تعذّر الاستيراد: ذلك الملف ليس نسخة PETO صالحة.',
+  data_err_invalid: 'تعذّر الاستيراد: ذلك الملف ليس نسخة PETO Finanzas صالحة.',
   import_confirm: 'الاستيراد سيستبدل كل بيانات التطبيق الحالية. هل أنت متأكد؟',
   import_done: 'تم استيراد النسخة. ✅',
   reset_confirm1: 'سيحذف هذا كل بيانات تطبيقك على هذا الهاتف. لا يمكن التراجع عنه. هل أنت متأكد؟',
@@ -6723,7 +7725,7 @@ ar: {
   lock_enter: 'فتح القفل',
   lock_note: 'بياناتك تبقى على هذا الهاتف فقط.',
   lock_err: 'رمز PIN غير صحيح. حاول مجددًا.',
-  ob_title: 'مرحبًا بك في PETO!',
+  ob_title: 'مرحبًا بك في PETO Finanzas!',
   ob_intro_1: 'نظّم أموالك في دقائق: مصروفات، دخل، ميزانية، حسابات وديون.',
   ob_intro_2: 'بدون حساب، بدون إنترنت.',
   ob_intro_3: 'كل شيء يُحفظ على هاتفك فقط.',
@@ -6738,7 +7740,7 @@ ar: {
   ob_tour1_title: 'سجّل مصروفًا في ثوانٍ',
   ob_tour1_text: 'المس زر +، واكتب المبلغ والفئة. هذا كل شيء: يُحفظ مصروفك فورًا.',
   ob_tour2_title: 'كم يمكنك أن تنفق اليوم؟',
-  ob_tour2_text: 'يوزّع PETO ميزانيتك على الأيام المتبقية من الشهر ويخبرك برقم واحد فقط: كم يمكنك أن تنفق اليوم دون تجاوز الحد.',
+  ob_tour2_text: 'يوزّع PETO Finanzas ميزانيتك على الأيام المتبقية من الشهر ويخبرك برقم واحد فقط: كم يمكنك أن تنفق اليوم دون تجاوز الحد.',
   ob_tour3_title: 'حسابك السحابي (اختياري)',
   ob_tour3_text: 'إذا أردت، أنشئ حسابًا مجانيًا لترى بياناتك على الويب أيضًا. بدون حساب، يبقى كل شيء على هاتفك فقط.',
   ob_tour_next: 'التالي',
@@ -6824,7 +7826,7 @@ ar: {
   pro_title: 'PETO Pro',
   pro_card_text: 'سحابة غير محدودة لبياناتك، التقرير المتقدّم، الميزانية المشتركة ووضع منظّم الـ san.',
   pro_status_free: 'أنت على الخطة المجانية الآن.',
-  pro_status_active: 'PETO Pro مفعّل. شكرًا لدعمك PETO! ⭐',
+  pro_status_active: 'PETO Pro مفعّل. شكرًا لدعمك PETO Finanzas! ⭐',
   pro_status_test: 'PETO Pro مفتوح أثناء الاختبار المغلق: لديك وصول كامل ما دام الاختبار قائمًا.',
   pro_status_waitlist: 'أنت على قائمة انتظار PETO Pro.',
   pro_btn_see: 'عرض PETO Pro',
@@ -6876,7 +7878,77 @@ ar: {
   shared_err_owner_leave: 'أنت مالك هذا المنزل: لا يمكنك المغادرة دون حذفه. اطلب من عضو آخر إنشاء المنزل الجديد.',
   shared_created_live: 'تم إنشاء المنزل ✅ شارك الرمز لدعوة منزلك.',
   shared_joined_live: 'انضممت إلى المنزل ✅',
-  lang_auto: 'تلقائي (لغة الهاتف)'
+  lang_auto: 'تلقائي (لغة الهاتف)',
+  org_comp_label: 'تعويض المنظم',
+  org_comp_none: 'بدون تعويض',
+  org_comp_first: 'المنظم يقبض أولًا',
+  org_comp_last: 'المنظم يقبض أخيرًا',
+  org_comp_extra: 'رسوم إضافية لكل جولة',
+  org_comp_amount_label: 'رسوم إضافية لكل شخص ($)',
+  org_comp_line: 'تعويض المنظم: {mode}',
+  org_sim_title: 'محاكاة الوعاء',
+  org_sim_pays: 'كل مشارك يضع في كل جولة: {amount}',
+  org_sim_pot: 'وعاء كل جولة: {amount}',
+  org_sim_total_in: 'المجموع الذي يضعه كل شخص في كامل الـ san: {amount}',
+  org_sim_extra_org: 'يتلقى المنظم {amount} إضافية في كل جولة',
+  org_sim_first: 'يتلقى المنظم وعاء الجولة الأولى',
+  org_sim_last: 'يتلقى المنظم وعاء الجولة الأخيرة',
+  org_shuffle_btn: '🎲 خلط الترتيب',
+  org_shuffled: '🎲 تم خلط الترتيب! هذا هو الترتيب الجديد.',
+  org_shuffle_need: 'أضف مشاركَين على الأقل لخلط الترتيب.',
+  org_shuffle_blocked: 'لم يعد الخلط ممكنًا: بدأ السان أو توجد مدفوعات مسجلة.',
+  org_start_btn: 'بدء الـ san',
+  org_started_line: 'الـ san جارٍ · الترتيب مقفل',
+  org_order_title: 'ترتيب الأدوار',
+  org_move_up: 'لأعلى',
+  org_move_down: 'لأسفل',
+  org_swap_blocked: 'ذلك الدور فيه مدفوعات بالفعل ولا يمكن تغييره.',
+  org_history_title: 'سجل التغييرات',
+  org_history_swap: 'تبادل {a} و{b} الأدوار',
+  org_history_started: 'بدأ المنظم الـ san',
+  org_pay_pending: 'قيد الانتظار',
+  org_pay_reported: 'تم الإبلاغ',
+  org_pay_confirmed: 'تم التأكيد',
+  org_status_btn: 'الحالة: {status}',
+  org_receipt_add: '📎 الإيصال',
+  org_receipt_view: 'عرض الإيصال',
+  org_receipt_remove: 'إزالة',
+  org_zelle_label: 'Zelle لكل مشارك (رقم أو بريد، اختياري)',
+  org_zelle_ph: 'Zelle (اختياري)',
+  org_zelle_line: 'Zelle: {zelle}',
+  org_reminder_btn: '📲 تذكير واتساب',
+  org_reminder_head: '🤝 {san} · الجولة {x} من {n} · {date}',
+  org_reminder_receiver: '💰 هذا الأسبوع يقبض {name}',
+  org_reminder_zelle: 'Zelle الخاص بـ {name}: {zelle}',
+  org_reminder_amount: 'مساهمة الجولة: {amount}',
+  org_antifraud: '🛡️ الـ san لا يدفع فوائد أبدًا ولا أكثر مما تم وضعه.',
+  org_link_btn: '🔗 رابط للقراءة فقط',
+  org_link_publish: 'إنشاء الرابط',
+  org_link_update: 'تحديث الرابط',
+  org_link_copied: 'تم نسخ الرابط!',
+  org_link_need_cloud: 'يحتاج الرابط إلى حسابك السحابي: سجّل الدخول في الإعدادات وحاول مجددًا.',
+  org_link_ready: 'San المجموعة (للقراءة فقط)',
+  org_public_title: 'الرابط جاهز للمشاركة.',
+  org_public_updated: 'تم التحديث في {date}',
+  org_public_notfound: 'هذا الرابط لم يعد متاحًا.',
+  org_penalty_label: 'قاعدة التأخير',
+  org_penalty_none: 'بدون غرامة',
+  org_penalty_fixed: 'غرامة ثابتة',
+  org_penalty_percent: 'نسبة من المساهمة',
+  org_penalty_amount_label: 'مبلغ الغرامة ($)',
+  org_penalty_percent_label: 'نسبة الغرامة (%)',
+  org_penalty_line_fixed: 'إذا تأخر أحد: غرامة {amount}',
+  org_penalty_line_percent: 'إذا تأخر أحد: غرامة {percent}% من المساهمة',
+  set_news_title: 'ما الجديد',
+  news_c24: 'Compilación 24: جولة ترحيبية، سلسلة أيام التسجيل، أهداف ادخار مع شريط تقدم ورسم بياني للاتجاه.',
+  news_c25: 'Compilación 25: ودجت على الشاشة الرئيسية وتطبيق أخف بكثير (من 52 ميغابايت إلى 7 ميغابايت).',
+  news_c26: 'Compilación 26: ودجت بثلاثة أحجام، مع خيارات لكل ودجت وزر لتسجيل مصروف دون فتح التطبيق.',
+  news_c27: 'Compilación 27: التطبيق بـ12 لغة، يتبع تلقائيًا لغة هاتفك.',
+  news_c28: 'Compilación 28: نص أكبر يُطبَّق من بدء التشغيل، قسم «ما الجديد» هذا، مراجعة النصوص الإيطالية وبدء أسرع.',
+  news_c31: 'Compilación 31: زر الرجوع أو إيماءته يتحرك الآن داخل التطبيق: يغلق ما هو مفتوح ويعود إلى الشاشة الرئيسية قبل الخروج.',
+  news_c32: 'الإصدار 32: تظهر العلامة الآن باسم «PETO Finanzas» في التطبيق بأكمله (القائمة وشاشة القفل والأدوات)، وأصبح السان في أعلى قائمة الشاشة الرئيسية، ويفتح الرابط العام للسان حالة المجموعة مباشرة، وترد أزرار المنظّم دائمًا برسالة واضحة.',
+  news_c33: 'الإصدار 33: إنشاء سان لم يعد بإمكانه مسح السان الجاري — إذا كان هناك سان نشط، يخبرك التطبيق ويحميه (المدفوعات والإيصالات والسجل والرابط العام) — وأصبحت نسخة الويب متزامنة الآن مع الهاتف.',
+  back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.'
 }
 };
 /* Resuelve el idioma automático: coincidencia exacta con un idioma
@@ -6906,7 +7978,7 @@ function t(key, vars) {
    personalizadas se muestran tal como la persona las escribió. */
 function catName(cat) { return DEFAULT_CATEGORIES.includes(cat) ? t('cat_' + cat) : cat; }
 function applyStaticI18n() {
-  document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = t(n.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n]').forEach((n) => { const k = n.getAttribute('data-i18n'); n.textContent = k === 'footer' ? t('footer') + ' · ' + BUILD_LABEL : t(k); });
   document.querySelectorAll('[data-i18n-ph]').forEach((n) => { n.setAttribute('placeholder', t(n.getAttribute('data-i18n-ph'))); });
   document.querySelectorAll('[data-i18n-aria]').forEach((n) => { n.setAttribute('aria-label', t(n.getAttribute('data-i18n-aria'))); });
   document.documentElement.lang = lang();
@@ -7131,6 +8203,70 @@ function closeMenu() {
   document.getElementById('btn-menu').setAttribute('aria-expanded', 'false');
 }
 
+/* ---------------- Botón / gesto de atrás del teléfono (Compilación 31) ----------------
+   Pedido de Sterlin: que el atrás navegue DENTRO de la app en vez de
+   cerrarla de golpe. Lo escucha el plugin App de Capacitor
+   (@capacitor/app, evento «backButton»): al registrar el listener,
+   Android ya no aplica su comportamiento por defecto y la app decide
+   cada pulsación con handleHardwareBack(). En web no hay plugin y no
+   se toca nada: el historial del navegador sigue mandando.
+   Orden de cada pulsación (de lo más externo a lo más interno):
+   1. Pantallas raíz (visor público del san, bloqueo o bienvenida,
+      cuando #app-shell está oculto): salir, como siempre.
+   2. Menú lateral abierto: cerrarlo.
+   3. Visor de foto abierto: cerrarlo.
+   4. Hoja inferior abierta (selector «+», oferta de huella o muro
+      Pro): cerrarla.
+   5. Vista previa de importar (CSV/PDF) visible: cancelarla.
+   6. Panel «Secciones visibles» abierto en Ajustes: plegarlo.
+   7. Cualquier sección que no sea la principal: volver a ella.
+   8. Ya en la principal: la primera pulsación avisa con un mensaje
+      breve («Pulsa atrás otra vez para salir») y solo la segunda,
+      dentro de 2,5 s, sale con App.exitApp(). Nadie queda atrapado:
+      dos atrás seguidos salen, sin más fricción.
+   handleHardwareBack() devuelve qué hizo ('exit', 'drawer', 'photo',
+   'sheet', 'panel', 'home' o 'arm-exit') para que las pruebas lo
+   verifiquen sin teléfono. */
+let backExitArmedAt = 0;
+function handleHardwareBack() {
+  const shell = document.getElementById('app-shell');
+  if (!shell || shell.hidden) return 'exit';
+  const drawer = document.getElementById('menu-drawer-wrap');
+  if (drawer && !drawer.hidden) { closeMenu(); return 'drawer'; }
+  const photo = document.getElementById('photo-overlay');
+  if (photo && !photo.hidden) { photo.hidden = true; return 'photo'; }
+  for (const id of ['quick-chooser', 'bio-offer', 'pro-paywall']) {
+    const sheet = document.getElementById(id);
+    if (sheet && !sheet.hidden) { sheet.hidden = true; return 'sheet'; }
+  }
+  const csvPrev = document.getElementById('csv-preview');
+  if (csvPrev && !csvPrev.hidden) { onCsvCancel(); return 'panel'; }
+  if (currentView === 'ajustes') {
+    const body = document.getElementById('sections-body');
+    if (body && !body.hidden) { toggleSectionsBody(); return 'panel'; }
+  }
+  if (currentView !== 'home') { showView('home'); return 'home'; }
+  const now = Date.now();
+  if (now - backExitArmedAt < 2500) { backExitArmedAt = 0; return 'exit'; }
+  backExitArmedAt = now;
+  showToastMsg(t('back_exit_hint'));
+  return 'arm-exit';
+}
+function initHardwareBack() {
+  const App = capPlugin('App');
+  if (!App || typeof App.addListener !== 'function') return;
+  try {
+    App.addListener('backButton', () => {
+      if (handleHardwareBack() === 'exit') {
+        try {
+          const p = App.exitApp();
+          if (p && typeof p.catch === 'function') p.catch(() => { /* sin salida nativa no se insiste */ });
+        } catch (e) { /* sin salida nativa no se insiste */ }
+      }
+    });
+  } catch (e) { /* sin listener, Android aplica su comportamiento de siempre */ }
+}
+
 function monthIncomes(key) { return db.incomes.filter((i) => monthKeyOf(i.date) === key); }
 function monthExpenses(key) { return db.expenses.filter((e) => monthKeyOf(e.date) === key); }
 function sumCents(list) { return list.reduce((t, x) => t + x.amountCents, 0); }
@@ -7180,9 +8316,20 @@ function menuKeyText(id) {
     return t('key_remesas', { amount: fmt(m.reduce((t2, r) => t2 + r.usdCents, 0)) });
   }
   if (id === 'san') {
-    if (!db.san) return t('key_san_none');
-    if (db.san.currentWeek >= db.san.participants.length) return t('key_san_done');
-    return t('key_san', { x: db.san.currentWeek + 1, n: db.san.participants.length, name: db.san.participants[db.san.currentWeek] });
+    if (db.san) {
+      if (db.san.currentWeek >= db.san.participants.length) return t('key_san_done');
+      return t('key_san', { x: db.san.currentWeek + 1, n: db.san.participants.length, name: db.san.participants[db.san.currentWeek] });
+    }
+    /* Compilación 32: si solo hay san del organizador, el subtítulo
+       también va vivo: ronda actual, quién recibe y la fecha. */
+    if (db.sanOrg) {
+      const org = db.sanOrg;
+      const n = org.participants.length;
+      const cur = orgCurrentRound(org);
+      if (cur >= n) return t('key_san_done');
+      return t('key_san', { x: cur + 1, n: n, name: org.participants[cur] }) + ' · ' + prettyDate(orgRoundDate(org, cur));
+    }
+    return t('key_san_none');
   }
   return '';
 }
@@ -7345,7 +8492,7 @@ function syncWidgetSummary(info) {
     if (!W || typeof W.setSummary !== 'function') return;
     let amount, note;
     if (!info) {
-      amount = 'PETO';
+      amount = 'PETO Finanzas';
       note = t('spend_guide');
     } else {
       amount = fmt(info.daily);
@@ -7445,6 +8592,23 @@ function renderStreak() {
   if (n >= 1) pill.textContent = n === 1 ? t('streak_one') : t('streak_many', { n: n });
 }
 
+/* Una entrada de la lista de secciones de Inicio (icono, nombre y
+   subtítulo de estado vivo). La usan tanto el san destacado como los
+   grupos; data-section identifica la entrada en el DOM. */
+function homeMenuItem(def) {
+  const item = el('button', 'menu-item');
+  item.type = 'button';
+  item.setAttribute('data-section', def.id);
+  item.appendChild(el('span', 'menu-icon', def.icon));
+  const text = el('span', 'menu-text');
+  text.appendChild(el('span', 'menu-name', t('sec_' + def.id)));
+  text.appendChild(el('span', 'menu-key', menuKeyText(def.id)));
+  item.appendChild(text);
+  item.appendChild(el('span', 'menu-arrow', '›'));
+  item.addEventListener('click', () => showView(def.id));
+  return item;
+}
+
 function renderHome() {
   const key = currentMonthKey();
   document.getElementById('sum-available').textContent = fmt(availableMoney(key));
@@ -7477,8 +8641,24 @@ function renderHome() {
 
   const menu = document.getElementById('menu-list');
   clearNode(menu);
+  /* Compilación 32 (pedido de Sterlin): el san va PRIMERO en la lista
+     de secciones de Inicio, destacado sobre los grupos — quedaba al
+     final, dentro de «Cuentas y compromisos», y había que bajar mucho
+     para encontrarlo. El orden de la lista no se guarda en los datos
+     (sale de SECTION_DEFS al dibujar), así que las instalaciones
+     existentes reciben el cambio sin migración de datos y sin
+     duplicar la entrada: el san se dibuja una sola vez, aquí, y se
+     salta en su grupo. La visibilidad guardada sí manda: con la
+     sección apagada en Ajustes no aparece ni primero ni en el grupo. */
+  const sanDef = SECTION_DEFS.find((d) => d.id === 'san');
+  if (sanDef && db.settings.sections.san !== false) {
+    const firstGroup = el('div', 'menu-group');
+    firstGroup.appendChild(homeMenuItem(sanDef));
+    menu.appendChild(firstGroup);
+  }
   const groups = [];
   for (const def of SECTION_DEFS) {
+    if (def.id === 'san') continue;
     if (db.settings.sections[def.id] === false) continue;
     if (!groups.includes(def.group)) groups.push(def.group);
   }
@@ -7487,17 +8667,9 @@ function renderHome() {
     wrap.appendChild(el('p', 'menu-group-title', t('group_' + group)));
     const list = el('div', 'menu-group');
     for (const def of SECTION_DEFS) {
+      if (def.id === 'san') continue;
       if (def.group !== group || db.settings.sections[def.id] === false) continue;
-      const item = el('button', 'menu-item');
-      item.type = 'button';
-      item.appendChild(el('span', 'menu-icon', def.icon));
-      const text = el('span', 'menu-text');
-      text.appendChild(el('span', 'menu-name', t('sec_' + def.id)));
-      text.appendChild(el('span', 'menu-key', menuKeyText(def.id)));
-      item.appendChild(text);
-      item.appendChild(el('span', 'menu-arrow', '›'));
-      item.addEventListener('click', () => showView(def.id));
-      list.appendChild(item);
+      list.appendChild(homeMenuItem(def));
     }
     wrap.appendChild(list);
     menu.appendChild(wrap);
@@ -8446,6 +9618,12 @@ function onSanAddParticipant() {
 }
 function onSanCreateSubmit(ev) {
   ev.preventDefault();
+  /* Compilación 33: el mismo candado que en el organizador — con un
+     san personal en curso, este submit no lo reemplaza en silencio
+     (antes se llevaba los pagos marcados sin ningún aviso). Para
+     crear otro hay que borrar primero el actual (onSanDelete pide
+     confirmación) o cerrarlo y usar «Crear un san nuevo». */
+  if (db.san) { showError('san-error', t('san_err_active_exists', { name: db.san.name })); return; }
   const name = cleanText(document.getElementById('san-name').value, 60);
   if (!name) { showError('san-error', t('err_name')); return; }
   const cents = parseAmount(document.getElementById('san-amount').value, false);
@@ -8519,6 +9697,176 @@ function orgTotalReunido() {
   }
   return total;
 }
+
+/* --- Compilación 30 «Paquete San»: compensación, simulación, estados --- */
+function orgCompMode(org) { return (org && org.comp && ['none', 'first', 'last', 'extra'].includes(org.comp.mode)) ? org.comp.mode : 'none'; }
+function orgCompLabel(orgOrMode) {
+  const m = typeof orgOrMode === 'string' ? orgOrMode : orgCompMode(orgOrMode);
+  return t('org_comp_' + m);
+}
+function orgPenaltyLine(org) {
+  if (!org || !org.penalty) return '';
+  if (org.penalty.mode === 'fixed') return t('org_penalty_line_fixed', { amount: fmtMoney(org.penalty.amountCents) });
+  if (org.penalty.mode === 'percent') return t('org_penalty_line_percent', { percent: org.penalty.percent });
+  return '';
+}
+/* Simulación pura del pote: con cuota extra E, cada quien pone
+   aporte+E por ronda, el pote sigue siendo n*aporte y el organizador
+   se queda con n*E por ronda. Sin extra, todo es n*aporte. */
+function orgSimulation(n, aporteCents, comp) {
+  const nn = Math.max(0, Math.trunc(Number(n)) || 0);
+  const ap = cleanCents(aporteCents, false);
+  const extra = (comp && comp.mode === 'extra') ? cleanCents(comp.amountCents, false) : 0;
+  const perRoundPay = ap + extra;
+  return { perRoundPay: perRoundPay, pot: nn * ap, totalIn: nn * perRoundPay, orgExtraPerRound: nn * extra };
+}
+function orgPayStatus(org, i, name) {
+  const r = org && org.rounds ? org.rounds[i] : null;
+  if (!r) return 'pending';
+  if (r.paid && r.paid[name]) return 'confirmed';
+  const inf = r.info && r.info[name];
+  if (inf && inf.st === 'reported') return 'reported';
+  if (inf && inf.st === 'confirmed') return 'confirmed';
+  return 'pending';
+}
+/* Mantiene el invariante paid[name]===true ⇔ estado confirmado. */
+function orgSetPayStatus(org, i, name, st) {
+  if (!org || !org.rounds || !org.rounds[i] || !org.participants.includes(name)) return false;
+  const r = org.rounds[i];
+  if (!r.info || typeof r.info !== 'object') r.info = {};
+  const prev = r.info[name] || {};
+  if (st === 'confirmed') {
+    r.paid[name] = true;
+    r.info[name] = { st: 'confirmed' };
+    if (prev.photo) r.info[name].photo = prev.photo;
+  } else if (st === 'reported') {
+    delete r.paid[name];
+    r.info[name] = { st: 'reported' };
+    if (prev.photo) r.info[name].photo = prev.photo;
+  } else {
+    delete r.paid[name];
+    delete r.info[name];
+  }
+  return true;
+}
+function orgRoundHasActivity(org, i) {
+  const r = org && org.rounds ? org.rounds[i] : null;
+  if (!r) return false;
+  if (r.paid && Object.keys(r.paid).some((k) => r.paid[k])) return true;
+  if (r.info && Object.keys(r.info).length) return true;
+  return false;
+}
+/* Intercambia dos turnos vecinos SOLO si ninguna de las dos rondas
+   afectadas tiene pagos ni estados; registra el cambio en history. */
+function orgMoveTurn(org, idx, dir) {
+  if (!org || !Array.isArray(org.participants)) return false;
+  const j = idx + dir;
+  if (idx < 0 || j < 0 || idx >= org.participants.length || j >= org.participants.length) return false;
+  if (orgRoundHasActivity(org, idx) || orgRoundHasActivity(org, j)) return false;
+  const a = org.participants[idx];
+  const b = org.participants[j];
+  org.participants[idx] = b;
+  org.participants[j] = a;
+  const ra = org.rounds[idx];
+  org.rounds[idx] = org.rounds[j];
+  org.rounds[j] = ra;
+  if (!Array.isArray(org.history)) org.history = [];
+  org.history.push({ ts: todayStr(), kind: 'swap', a: a, b: b });
+  if (org.history.length > 100) org.history = org.history.slice(-100);
+  return true;
+}
+function orgShuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    try {
+      const buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      j = buf[0] % (i + 1);
+    } catch (e) { /* Math.random basta como respaldo */ }
+    const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+/* Texto del recordatorio de WhatsApp para la ronda actual. */
+function orgReminderText(org) {
+  if (!org) return '';
+  const n = org.participants.length;
+  const cur = orgCurrentRound(org);
+  if (cur >= n) return '🤝 ' + org.name + ' · ' + t('san_finished');
+  const receiver = org.participants[cur];
+  const lines = [];
+  lines.push(t('org_reminder_head', { san: org.name, x: cur + 1, n: n, date: prettyDate(orgRoundDate(org, cur)) }));
+  lines.push(t('org_reminder_receiver', { name: receiver }));
+  const z = org.zelle && org.zelle[receiver];
+  if (z) lines.push(t('org_reminder_zelle', { name: receiver, zelle: z }));
+  const sim = orgSimulation(n, org.aporteCents, org.comp);
+  lines.push(t('org_reminder_amount', { amount: fmtMoney(sim.perRoundPay) }));
+  const pending = org.participants.filter((pp) => orgPayStatus(org, cur, pp) !== 'confirmed');
+  if (pending.length) lines.push('⏳ ' + pending.join(', '));
+  return lines.join('\n');
+}
+/* Foto del estado público: SIN fotos de comprobantes, solo estados. */
+function orgPublicSnapshot(org) {
+  if (!org) return null;
+  return {
+    v: 1,
+    name: org.name,
+    aporteCents: org.aporteCents,
+    frequency: org.frequency,
+    startDate: org.startDate,
+    comp: org.comp ? { mode: org.comp.mode, amountCents: org.comp.amountCents } : { mode: 'none', amountCents: 0 },
+    penalty: org.penalty ? { mode: org.penalty.mode, amountCents: org.penalty.amountCents, percent: org.penalty.percent } : { mode: 'none', amountCents: 0, percent: 0 },
+    participants: org.participants.map((nm) => ({ name: nm, zelle: (org.zelle && org.zelle[nm]) || '' })),
+    rounds: org.participants.map((unused, i) => ({
+      confirmed: org.participants.filter((pp) => orgPayStatus(org, i, pp) === 'confirmed'),
+      reported: org.participants.filter((pp) => orgPayStatus(org, i, pp) === 'reported')
+    })),
+    history: Array.isArray(org.history) ? org.history.slice(-100) : [],
+    updatedAt: new Date().toISOString()
+  };
+}
+function sanPublicLink(org) {
+  if (!org || !org.linkToken) return '';
+  return 'https://roblessantossterlin-lgtm.github.io/petofinanzas/app/#san=' + org.linkToken;
+}
+async function sanPublishLink(silent) {
+  const org = db && db.sanOrg;
+  const msg = document.getElementById('org-link-msg');
+  if (!org) return false;
+  const sb = supa();
+  if (!sb || !cloudUser) {
+    if (!silent && msg) msg.textContent = t('org_link_need_cloud');
+    return false;
+  }
+  if (!org.linkToken) {
+    const a = new Uint8Array(12);
+    crypto.getRandomValues(a);
+    org.linkToken = Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('');
+    save();
+  }
+  try {
+    const res = await sb.from('san_public_links').upsert(
+      { token: org.linkToken, user_id: cloudUser.id, data: orgPublicSnapshot(org) },
+      { onConflict: 'token' });
+    if (res && res.error) {
+      if (!silent && msg) msg.textContent = t('cloud_err_generic');
+      return false;
+    }
+    if (msg) msg.textContent = t('org_link_ready');
+    return true;
+  } catch (e) {
+    if (!silent && msg) msg.textContent = t('cloud_err_generic');
+    return false;
+  }
+}
+function orgMaybeRepublish() {
+  if (db && db.sanOrg && db.sanOrg.linkToken && cloudUser) {
+    sanPublishLink(true).catch(() => { /* best-effort: nunca rompe la app */ });
+  }
+}
+let orgReceiptTarget = null;
+const orgReceiptOpen = {};
+
 function orgParticipantPaidRounds(org, name) {
   return org.rounds.filter((r) => r.paid[name]).length;
 }
@@ -8528,10 +9876,74 @@ function resetSanOrgForm() {
   form.reset();
   const pname = document.getElementById('org-pname');
   if (pname) pname.value = '';
+  const pzelle = document.getElementById('org-pzelle');
+  if (pzelle) pzelle.value = '';
   const start = document.getElementById('org-start');
   if (start) start.value = todayStr();
   sanOrgDraft = [];
   showError('org-error', '');
+  orgShuffleMsg('org-draft-shuffle-msg', null);
+}
+
+function readOrgCompFromForm() {
+  const modeEl = document.getElementById('org-comp');
+  const mode = modeEl && ['none', 'first', 'last', 'extra'].includes(modeEl.value) ? modeEl.value : 'none';
+  const amtEl = document.getElementById('org-comp-amount');
+  const cents = amtEl ? parseAmount(amtEl.value, false) : null;
+  return { mode: mode, amountCents: mode === 'extra' ? (cents || 0) : 0 };
+}
+function readOrgPenaltyFromForm() {
+  const modeEl = document.getElementById('org-penalty');
+  const mode = modeEl && ['none', 'fixed', 'percent'].includes(modeEl.value) ? modeEl.value : 'none';
+  const amtEl = document.getElementById('org-penalty-amount');
+  const pctEl = document.getElementById('org-penalty-percent');
+  const cents = amtEl ? parseAmount(amtEl.value, false) : null;
+  const pct = pctEl ? cleanPct(pctEl.value) : 0;
+  return { mode: mode, amountCents: mode === 'fixed' ? (cents || 0) : 0, percent: mode === 'percent' ? pct : 0 };
+}
+function updateOrgFormVisibility() {
+  const comp = readOrgCompFromForm();
+  const pen = readOrgPenaltyFromForm();
+  const cw = document.getElementById('org-comp-amount-wrap');
+  if (cw) cw.hidden = comp.mode !== 'extra';
+  const paw = document.getElementById('org-penalty-amount-wrap');
+  if (paw) paw.hidden = pen.mode !== 'fixed';
+  const ppw = document.getElementById('org-penalty-percent-wrap');
+  if (ppw) ppw.hidden = pen.mode !== 'percent';
+}
+function orgSimLines(n, aporteCents, comp) {
+  const sim = orgSimulation(n, aporteCents, comp);
+  const lines = [
+    t('org_sim_pays', { amount: fmt(sim.perRoundPay) }),
+    t('org_sim_pot', { amount: fmt(sim.pot) }),
+    t('org_sim_total_in', { amount: fmt(sim.totalIn) })
+  ];
+  if (comp && comp.mode === 'extra') lines.push(t('org_sim_extra_org', { amount: fmt(sim.orgExtraPerRound) }));
+  else if (comp && comp.mode === 'first') lines.push(t('org_sim_first'));
+  else if (comp && comp.mode === 'last') lines.push(t('org_sim_last'));
+  return lines;
+}
+function updateOrgSim() {
+  updateOrgFormVisibility();
+  const box = document.getElementById('org-sim');
+  if (!box) return;
+  clearNode(box);
+  const amtEl = document.getElementById('org-amount');
+  const amt = amtEl ? parseAmount(amtEl.value, false) : null;
+  if (!amt || sanOrgDraft.length < 1) return;
+  box.appendChild(el('h4', null, t('org_sim_title')));
+  for (const line of orgSimLines(sanOrgDraft.length, amt, readOrgCompFromForm())) {
+    box.appendChild(el('p', 'muted small', line));
+  }
+}
+function renderOrgHistoryInto(box, history) {
+  clearNode(box);
+  if (!history || !history.length) return;
+  box.appendChild(el('h4', null, t('org_history_title')));
+  for (const h of history.slice().reverse()) {
+    if (h.kind === 'swap') box.appendChild(el('p', 'muted small', t('org_history_swap', { a: h.a, b: h.b }) + ' · ' + prettyDate(h.ts)));
+    else if (h.kind === 'started') box.appendChild(el('p', 'muted small', t('org_history_started') + ' · ' + prettyDate(h.ts)));
+  }
 }
 function renderSanOrg() {
   const locked = document.getElementById('org-locked');
@@ -8547,20 +9959,22 @@ function renderSanOrg() {
   if (!has) {
     const ul = document.getElementById('org-draft-list');
     clearNode(ul);
-    for (const name of sanOrgDraft) {
+    for (const item of sanOrgDraft) {
       const li = el('li', 'item');
       const mainLi = el('div', 'item-main');
-      mainLi.appendChild(el('div', 'item-title', name));
+      mainLi.appendChild(el('div', 'item-title', item.name));
+      if (item.zelle) mainLi.appendChild(el('div', 'item-sub', item.zelle));
       li.appendChild(mainLi);
       const acts = el('div', 'item-actions');
       acts.appendChild(actionButton(t('san_remove'), 'btn-ghost', () => {
-        sanOrgDraft = sanOrgDraft.filter((x) => x !== name);
+        sanOrgDraft = sanOrgDraft.filter((x) => x.name !== item.name);
         renderSanOrg();
       }));
       li.appendChild(acts);
       ul.appendChild(li);
     }
     document.getElementById('org-draft-empty').hidden = sanOrgDraft.length > 0;
+    updateOrgSim();
     return;
   }
   const org = db.sanOrg;
@@ -8570,6 +9984,50 @@ function renderSanOrg() {
     t('san_aporte_line', { amount: fmt(org.aporteCents) }) + ' · ' + t('org_freq_' + org.frequency);
   document.getElementById('org-total-line').textContent =
     t('san_total_line', { amount: fmt(orgTotalReunido()) });
+  const startedLine = document.getElementById('org-started-line');
+  if (startedLine) { startedLine.hidden = !org.started; startedLine.textContent = t('org_started_line'); }
+  const compLine = document.getElementById('org-comp-line');
+  if (compLine) {
+    compLine.hidden = orgCompMode(org) === 'none';
+    compLine.textContent = orgCompMode(org) === 'none' ? '' : t('org_comp_line', { mode: orgCompLabel(org) });
+  }
+  const simBox = document.getElementById('org-sim-active');
+  if (simBox) {
+    clearNode(simBox);
+    for (const line of orgSimLines(n, org.aporteCents, org.comp)) simBox.appendChild(el('p', 'muted small', line));
+  }
+  const penLine = document.getElementById('org-penalty-line');
+  if (penLine) { const pl = orgPenaltyLine(org); penLine.hidden = !pl; penLine.textContent = pl; }
+  /* Compilación 32: el botón se busca por su propio id (org-start-btn).
+     Antes compartía id con el input de fecha del formulario y
+     getElementById devolvía el input: el botón quedaba sin handler y
+     sin ocultar, y el clic que «iniciaba» era el del campo de fecha. */
+  const startBtn = document.getElementById('org-start-btn');
+  if (startBtn) startBtn.hidden = !!org.started;
+  const anyActivity = org.participants.some((unused, i) => orgRoundHasActivity(org, i));
+  const shuffleBtn = document.getElementById('org-shuffle-active');
+  if (shuffleBtn) shuffleBtn.hidden = !!org.started || anyActivity;
+  /* Orden de turnos: subir/bajar con bloqueo si hay pagos. */
+  const orderBox = document.getElementById('org-order');
+  if (orderBox) {
+    clearNode(orderBox);
+    org.participants.forEach((name, i) => {
+      const li = el('li', 'item');
+      const mainLi = el('div', 'item-main');
+      mainLi.appendChild(el('div', 'item-title', (i + 1) + '. ' + name));
+      mainLi.appendChild(el('div', 'item-sub', prettyDate(orgRoundDate(org, i))));
+      li.appendChild(mainLi);
+      const acts = el('div', 'item-actions');
+      const up = actionButton(t('org_move_up'), 'btn-ghost', () => onOrgMoveTurn(i, -1));
+      if (i === 0) up.disabled = true;
+      const down = actionButton(t('org_move_down'), 'btn-ghost', () => onOrgMoveTurn(i, 1));
+      if (i === n - 1) down.disabled = true;
+      acts.appendChild(up);
+      acts.appendChild(down);
+      li.appendChild(acts);
+      orderBox.appendChild(li);
+    });
+  }
   const roundsBox = document.getElementById('org-rounds');
   clearNode(roundsBox);
   org.participants.forEach((receiver, i) => {
@@ -8577,75 +10035,217 @@ function renderSanOrg() {
     const paidCount = orgRoundPaidCount(org, i);
     card.appendChild(el('h4', null, t('org_round', { x: i + 1, n: n }) + ' · ' + prettyDate(orgRoundDate(org, i))));
     card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
+    const recvZelle = org.zelle && org.zelle[receiver];
+    if (recvZelle) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: recvZelle })));
     card.appendChild(el('p', 'muted', t('san_week_collected', {
       amount: fmt(paidCount * org.aporteCents), target: fmt(n * org.aporteCents)
     })));
-    const pending = org.participants.filter((p) => !org.rounds[i].paid[p]);
+    const pending = org.participants.filter((pp) => orgPayStatus(org, i, pp) !== 'confirmed');
     card.appendChild(el('p', 'muted small', pending.length
       ? t('org_pending_list', { names: pending.join(', ') })
       : t('org_pending_none')));
-    for (const p of org.participants) {
-      const row = el('label', 'toggle-row');
-      row.appendChild(el('span', null, p + ' · ' + t('san_paid')));
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.checked = org.rounds[i].paid[p] === true;
-      cb.setAttribute('aria-label', p);
-      cb.addEventListener('change', () => {
-        if (cb.checked) org.rounds[i].paid[p] = true; else delete org.rounds[i].paid[p];
-        save(); renderSanOrg();
+    for (const pp of org.participants) {
+      const st = orgPayStatus(org, i, pp);
+      const row = el('div', 'toggle-row');
+      row.appendChild(el('span', null, pp));
+      const chip = actionButton(t('org_status_btn', { status: t('org_pay_' + st) }), 'btn-ghost', () => {
+        const next = st === 'pending' ? 'reported' : (st === 'reported' ? 'confirmed' : 'pending');
+        orgSetPayStatus(org, i, pp, next);
+        save(); renderSanOrg(); orgMaybeRepublish();
       });
-      row.appendChild(cb);
+      chip.setAttribute('data-org-status', st);
+      chip.setAttribute('data-org-name', pp);
+      row.appendChild(chip);
+      const recBtn = actionButton(t('org_receipt_add'), 'btn-ghost', () => {
+        orgReceiptTarget = { round: i, name: pp };
+        const fi = document.getElementById('org-receipt-file');
+        if (fi) { fi.value = ''; fi.click(); }
+      });
+      row.appendChild(recBtn);
       card.appendChild(row);
+      const info = org.rounds[i].info && org.rounds[i].info[pp];
+      if (info && info.photo) {
+        const key = i + ':' + pp;
+        const viewBtn = actionButton(t('org_receipt_view'), 'btn-ghost', () => {
+          orgReceiptOpen[key] = !orgReceiptOpen[key];
+          renderSanOrg();
+        });
+        card.appendChild(viewBtn);
+        const rmBtn = actionButton(t('org_receipt_remove'), 'btn-ghost', () => {
+          if (org.rounds[i].info && org.rounds[i].info[pp]) delete org.rounds[i].info[pp].photo;
+          save(); renderSanOrg(); orgMaybeRepublish();
+        });
+        card.appendChild(rmBtn);
+        if (orgReceiptOpen[key]) {
+          const img = document.createElement('img');
+          img.className = 'receipt-preview';
+          img.alt = '';
+          img.src = info.photo;
+          card.appendChild(img);
+        }
+      }
     }
     roundsBox.appendChild(card);
   });
   const totals = document.getElementById('org-totals');
   clearNode(totals);
-  for (const p of org.participants) {
-    const paidRounds = orgParticipantPaidRounds(org, p);
+  for (const pp of org.participants) {
+    const paidRounds = orgParticipantPaidRounds(org, pp);
     const li = el('li', 'item');
     const mainLi = el('div', 'item-main');
-    mainLi.appendChild(el('div', 'item-title', p));
+    mainLi.appendChild(el('div', 'item-title', pp));
     mainLi.appendChild(el('div', 'item-sub', t('org_paid_rounds', { paid: paidRounds, n: n })));
     li.appendChild(mainLi);
     li.appendChild(el('div', 'item-amount', fmt(paidRounds * org.aporteCents)));
     totals.appendChild(li);
   }
+  const histBox = document.getElementById('org-history');
+  if (histBox) renderOrgHistoryInto(histBox, org.history);
+  const linkPub = document.getElementById('org-link-publish');
+  if (linkPub) linkPub.textContent = org.linkToken ? t('org_link_update') : t('org_link_publish');
+  const linkCopy = document.getElementById('org-link-copy');
+  if (linkCopy) linkCopy.hidden = !org.linkToken;
 }
+function onOrgMoveTurn(idx, dir) {
+  const org = db.sanOrg;
+  if (!org) return;
+  const msg = document.getElementById('org-swap-msg');
+  if (orgMoveTurn(org, idx, dir)) {
+    if (msg) msg.textContent = '';
+    save(); renderSanOrg(); orgMaybeRepublish();
+  } else if (msg) {
+    msg.textContent = t('org_swap_blocked');
+  }
+}
+/* Compilación 32: ningún botón de esta pantalla queda mudo. El sorteo
+   siempre deja un mensaje visible: confirmación cuando se sortea y el
+   motivo exacto cuando no se puede (con 2 participantes el orden
+   sorteado coincide la mitad de las veces y sin mensaje el botón
+   parecía no responder). */
+function orgShuffleMsg(id, key) {
+  const m = document.getElementById(id);
+  if (m) m.textContent = key ? t(key) : '';
+}
+function onOrgShuffleDraft() {
+  if (sanOrgDraft.length < 2) { orgShuffleMsg('org-draft-shuffle-msg', 'org_shuffle_need'); return; }
+  orgShuffleArray(sanOrgDraft);
+  renderSanOrg();
+  orgShuffleMsg('org-draft-shuffle-msg', 'org_shuffled');
+}
+function onOrgShuffleActive() {
+  const org = db.sanOrg;
+  if (!org) return;
+  if (org.started || org.participants.some((unused, i) => orgRoundHasActivity(org, i))) {
+    orgShuffleMsg('org-shuffle-msg', 'org_shuffle_blocked');
+    return;
+  }
+  orgShuffleArray(org.participants);
+  save(); renderSanOrg(); orgMaybeRepublish();
+  orgShuffleMsg('org-shuffle-msg', 'org_shuffled');
+}
+function onSanOrgStart() {
+  const org = db.sanOrg;
+  if (!org || org.started) return;
+  org.started = true;
+  if (!Array.isArray(org.history)) org.history = [];
+  org.history.push({ ts: todayStr(), kind: 'started', a: '', b: '' });
+  save(); renderSanOrg(); orgMaybeRepublish();
+  orgShuffleMsg('org-shuffle-msg', null);
+}
+function onOrgReminder() {
+  const org = db.sanOrg;
+  if (!org) return;
+  window.open('https://wa.me/?text=' + encodeURIComponent(orgReminderText(org)));
+}
+async function onOrgLinkPublish() {
+  await sanPublishLink(false);
+  renderSanOrg();
+}
+function onOrgLinkCopy() {
+  const org = db.sanOrg;
+  if (!org || !org.linkToken) return;
+  const url = sanPublicLink(org);
+  const msg = document.getElementById('org-link-msg');
+  const done = () => { if (msg) msg.textContent = t('org_link_copied'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(() => { shareText(org.name, url); done(); });
+  } else {
+    shareText(org.name, url);
+    done();
+  }
+}
+
+
 function onSanOrgAddParticipant() {
   const input = document.getElementById('org-pname');
   const name = cleanText(input.value, 40);
-  if (!name) { showError('org-error', t('san_err_pname')); return; }
-  if (sanOrgDraft.some((x) => x.toLowerCase() === name.toLowerCase())) {
+  if (!name || !/[\p{L}\p{N}]/u.test(name)) { showError('org-error', t('san_err_pname')); return; }
+  if (sanOrgDraft.some((x) => x.name.toLowerCase() === name.toLowerCase())) {
     showError('org-error', t('san_err_dup')); return;
   }
-  sanOrgDraft.push(name);
+  const pz = document.getElementById('org-pzelle');
+  const zelle = pz ? cleanText(pz.value, 60) : '';
+  sanOrgDraft.push({ name: name, zelle: zelle });
   input.value = '';
+  if (pz) pz.value = '';
   showError('org-error', '');
   renderSanOrg();
 }
+
+
 function onSanOrgCreateSubmit(ev) {
   ev.preventDefault();
+  /* Compilación 33: con un san del organizador ACTIVO, crear está
+     bloqueado aquí, en el handler, no solo ocultando el formulario.
+     La revisión de la Fase 2 demostró que un submit que llegara con
+     un san en curso lo reemplazaba en silencio: se perdían los pagos,
+     las fotos de comprobante, el historial y el token del enlace
+     público (linkToken quedaba null y el enlace moría). Para crear
+     otro hay que borrar primero el actual (esa baja sí pide
+     confirmación: onSanOrgDelete). */
+  if (db.sanOrg) { showError('org-error', t('org_err_active_exists', { name: db.sanOrg.name })); return; }
   if (!requirePro()) return; /* función Pro: sin Pro, muro y no se crea nada */
   const name = cleanText(document.getElementById('org-name').value, 60);
-  if (!name) { showError('org-error', t('err_name')); return; }
+  if (!name) { showError('org-error', t('org_err_san_name')); return; }
   const cents = parseAmount(document.getElementById('org-amount').value, false);
   if (cents === null) { showError('org-error', t('err_amount')); return; }
+  const pendingInput = document.getElementById('org-pname');
+  const pending = pendingInput ? cleanText(pendingInput.value, 40) : '';
+  if (pending) {
+    if (/[\p{L}\p{N}]/u.test(pending)) {
+      if (sanOrgDraft.some((x) => x.name.toLowerCase() === pending.toLowerCase())) {
+        showError('org-error', t('san_err_dup')); return;
+      }
+      const pz = document.getElementById('org-pzelle');
+      sanOrgDraft.push({ name: pending, zelle: pz ? cleanText(pz.value, 60) : '' });
+    }
+    pendingInput.value = '';
+  }
   if (sanOrgDraft.length < 2) { showError('org-error', t('san_err_participants')); return; }
   const freqSel = document.getElementById('org-freq').value;
   const startRaw = document.getElementById('org-start').value;
+  const participants = sanOrgDraft.map((x) => x.name);
+  const zelle = {};
+  for (const x of sanOrgDraft) if (x.zelle) zelle[x.name] = x.zelle;
   db.sanOrg = {
     name: name,
     aporteCents: cents,
     frequency: ORG_FREQUENCIES.includes(freqSel) ? freqSel : 'semanal',
     startDate: /^\d{4}-\d{2}-\d{2}$/.test(startRaw || '') ? startRaw : todayStr(),
-    participants: sanOrgDraft.slice(),
-    rounds: sanOrgDraft.map(() => ({ paid: {} }))
+    participants: participants,
+    rounds: participants.map(() => ({ paid: {}, info: {} })),
+    comp: readOrgCompFromForm(),
+    penalty: readOrgPenaltyFromForm(),
+    started: false,
+    zelle: zelle,
+    history: [],
+    linkToken: null
   };
   resetSanOrgForm();
   save(); renderSanOrg();
 }
+
+
 function onSanOrgDelete() {
   if (!db.sanOrg) return;
   if (!window.confirm(t('org_delete_confirm', { name: db.sanOrg.name }))) return;
@@ -8660,12 +10260,17 @@ function orgShareLines() {
   const n = org.participants.length;
   const lines = ['🤝 ' + org.name + ' · ' + t('org_share_title')];
   lines.push(t('san_aporte_line', { amount: fmtMoney(org.aporteCents) }) + ' · ' + t('org_freq_' + org.frequency));
+  if (org.comp && org.comp.mode !== 'none') lines.push(t('org_comp_line', { mode: orgCompLabel(org) }));
+  const penLineShare = orgPenaltyLine(org);
+  if (penLineShare) lines.push(penLineShare);
   const cur = orgCurrentRound(org);
   if (cur >= n) {
     lines.push(t('san_finished'));
   } else {
     lines.push(t('org_round', { x: cur + 1, n: n }) + ' · ' + prettyDate(orgRoundDate(org, cur)));
     lines.push(t('org_receiver_line', { name: org.participants[cur] }));
+    const recvZ = org.zelle && org.zelle[org.participants[cur]];
+    if (recvZ) lines.push(t('org_zelle_line', { zelle: recvZ }));
     lines.push(t('san_week_collected', {
       amount: fmtMoney(orgRoundPaidCount(org, cur) * org.aporteCents),
       target: fmtMoney(n * org.aporteCents)
@@ -8674,6 +10279,7 @@ function orgShareLines() {
     if (pending.length) lines.push('⏳ ' + pending.join(', '));
   }
   lines.push(t('san_total_line', { amount: fmtMoney(orgTotalReunido()) }));
+  lines.push(t('org_antifraud'));
   return lines;
 }
 function onShareSanOrg() {
@@ -8748,7 +10354,119 @@ async function shareSanOrgPng() {
 }
 
 
+
+/* --- Visor público de solo lectura (#san=TOKEN) ---
+   Sin sesión: usa el cliente anónimo de Supabase y la función
+   get_san_public, que devuelve solo la foto sin comprobantes. */
+/* Compilación 32: modo visor público del san (#san=<token>). Con la
+   bandera activa, el arranque NO reconcilia la nube ni refresca la
+   facturación: la reconciliación podría redibujar la app (o abrir el
+   diálogo de conflicto) por encima del visor de un participante que
+   abrió el enlace en un navegador nuevo. */
+let SAN_PUBLIC_MODE = false;
+async function initSanPublic(token) {
+  /* token === undefined → se extrae del hash con la regex estricta
+     (compatibilidad); token === null → la URL traía #san= pero el
+     token no es válido: se muestra el visor con «no disponible». */
+  if (token === undefined) {
+    const m = /^#san=([A-Za-z0-9]+)$/.exec(location.hash || '');
+    token = m ? m[1] : null;
+  }
+  SAN_PUBLIC_MODE = true;
+  const pub = document.getElementById('san-public');
+  const box = document.getElementById('san-public-body');
+  const shell = document.getElementById('app-shell');
+  const onb = document.getElementById('view-onboarding');
+  const lock = document.getElementById('view-lock');
+  if (shell) shell.hidden = true;
+  if (onb) onb.hidden = true;
+  if (lock) lock.hidden = true;
+  if (pub) pub.hidden = false;
+  if (!box) return true;
+  clearNode(box);
+  box.appendChild(el('h2', null, t('org_public_title')));
+  let data = null;
+  const sb = supa();
+  if (sb && token) {
+    try {
+      const res = await sb.rpc('get_san_public', { p_token: token });
+      if (res && !res.error) data = res.data;
+    } catch (e) { /* sin red o sin función: se muestra «no disponible» */ }
+  }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    box.appendChild(el('p', 'muted', t('org_public_notfound')));
+    return true;
+  }
+  const names = (Array.isArray(data.participants) ? data.participants : []).map((pp) =>
+    (pp && typeof pp === 'object') ? String(pp.name || '') : String(pp || '')).filter((x) => x);
+  const zelleMap = {};
+  (Array.isArray(data.participants) ? data.participants : []).forEach((pp) => {
+    if (pp && typeof pp === 'object' && pp.name && pp.zelle) zelleMap[String(pp.name)] = String(pp.zelle);
+  });
+  const fakeOrg = {
+    startDate: typeof data.startDate === 'string' ? data.startDate : todayStr(),
+    frequency: ORG_FREQUENCIES.includes(data.frequency) ? data.frequency : 'semanal',
+    participants: names
+  };
+  box.appendChild(el('h3', null, String(data.name || '')));
+  const aporte = cleanCents(data.aporteCents, false);
+  box.appendChild(el('p', 'muted', t('san_aporte_line', { amount: fmtMoney(aporte) }) + ' · ' + t('org_freq_' + fakeOrg.frequency)));
+  if (data.comp && data.comp.mode && data.comp.mode !== 'none') {
+    box.appendChild(el('p', 'muted', t('org_comp_line', { mode: orgCompLabel(data.comp.mode) })));
+  }
+  const penPub = orgPenaltyLine({ penalty: data.penalty });
+  if (penPub) box.appendChild(el('p', 'muted', penPub));
+  box.appendChild(el('p', 'muted small', t('org_antifraud')));
+  const rounds = Array.isArray(data.rounds) ? data.rounds : [];
+  names.forEach((receiver, i) => {
+    const card = el('div', 'card');
+    card.appendChild(el('h4', null, t('org_round', { x: i + 1, n: names.length }) + ' · ' + prettyDate(orgRoundDate(fakeOrg, i))));
+    card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
+    if (zelleMap[receiver]) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: zelleMap[receiver] })));
+    const rd = rounds[i] && typeof rounds[i] === 'object' ? rounds[i] : {};
+    const conf = Array.isArray(rd.confirmed) ? rd.confirmed : [];
+    const repo = Array.isArray(rd.reported) ? rd.reported : [];
+    for (const nm of names) {
+      const st = conf.includes(nm) ? 'confirmed' : (repo.includes(nm) ? 'reported' : 'pending');
+      card.appendChild(el('p', 'muted small', nm + ' · ' + t('org_pay_' + st)));
+    }
+    box.appendChild(card);
+  });
+  if (Array.isArray(data.history) && data.history.length) {
+    const hb = el('div', null);
+    renderOrgHistoryInto(hb, data.history);
+    box.appendChild(hb);
+  }
+  if (data.updatedAt) {
+    const dstr = String(data.updatedAt).slice(0, 10);
+    box.appendChild(el('p', 'muted small', t('org_public_updated', { date: prettyDate(dstr) })));
+  }
+  return true;
+}
+
 /* ---------------- AJUSTES ---------------- */
+/* Resumen «{visible} de {total} visibles» de la tarjeta plegable de
+   secciones: cuenta con la misma fuente que las casillas
+   (SECTION_DEFS + settings.sections; visible = flag !== false). */
+function updateSectionsSummary() {
+  const summary = document.getElementById('sections-summary');
+  if (!summary || !db || !db.settings || !db.settings.sections) return;
+  const total = SECTION_DEFS.length;
+  const visible = SECTION_DEFS.filter((def) => db.settings.sections[def.id] !== false).length;
+  summary.textContent = t('set_sections_summary', { visible: visible, total: total });
+}
+/* Abre/cierra el cuerpo de la tarjeta de secciones y sincroniza
+   aria-expanded y el chevrones (▸ cerrado / ▾ abierto). */
+function toggleSectionsBody() {
+  const head = document.getElementById('sections-toggle');
+  const body = document.getElementById('sections-body');
+  if (!head || !body) return;
+  const open = body.hidden;
+  body.hidden = !open;
+  head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const chevron = head.querySelector('.sections-chevron');
+  if (chevron) chevron.textContent = open ? '▾' : '▸';
+}
 function renderSettings() {
   renderCloudCard();
   renderProCard();
@@ -8776,6 +10494,14 @@ function renderSettings() {
   document.getElementById('set-reminders').checked = db.settings.reminders !== false;
   document.getElementById('set-notifications').checked = db.settings.notifications === true;
   document.getElementById('set-autofixed').checked = db.settings.autoFixed !== false;
+  const setSummaryEl = document.getElementById('set-summary');
+  if (setSummaryEl) setSummaryEl.checked = db.settings.summaryDaily !== false;
+  const setSummaryTimeEl = document.getElementById('set-summary-time');
+  if (setSummaryTimeEl) setSummaryTimeEl.value = db.settings.summaryTime || '08:00';
+  const setSummaryEmailEl = document.getElementById('set-summary-email');
+  if (setSummaryEmailEl) setSummaryEmailEl.checked = db.settings.summaryEmail === true;
+  const summaryEmailRowEl = document.getElementById('summary-email-row');
+  if (summaryEmailRowEl) summaryEmailRowEl.hidden = !cloudUser;
   document.getElementById('set-biometric').checked = db.settings.biometric === true;
   document.getElementById('split-ahorro').value = db.settings.split.ahorro;
   document.getElementById('split-negocio').value = db.settings.split.negocio;
@@ -8798,10 +10524,12 @@ function renderSettings() {
     cb.addEventListener('change', () => {
       db.settings.sections[def.id] = cb.checked;
       save();
+      updateSectionsSummary();
     });
     row.appendChild(cb);
     wrap.appendChild(row);
   }
+  updateSectionsSummary();
 }
 function onSettingsSubmit(ev) {
   ev.preventDefault();
@@ -8828,6 +10556,20 @@ function onSettingsSubmit(ev) {
   const notifWas = db.settings.notifications === true;
   db.settings.notifications = document.getElementById('set-notifications').checked === true;
   db.settings.autoFixed = document.getElementById('set-autofixed').checked === true;
+  const summaryCbEl = document.getElementById('set-summary');
+  if (summaryCbEl) db.settings.summaryDaily = summaryCbEl.checked === true;
+  const summaryTimeEl = document.getElementById('set-summary-time');
+  if (summaryTimeEl) {
+    const tv = summaryTimeEl.value;
+    const tm = /^(\d{2}):(\d{2})$/.exec(tv || '');
+    db.settings.summaryTime = (tm && Number(tm[1]) >= 0 && Number(tm[1]) <= 23 && Number(tm[2]) >= 0 && Number(tm[2]) <= 59) ? tv : '08:00';
+  }
+  const summaryEmailCbEl = document.getElementById('set-summary-email');
+  if (summaryEmailCbEl) db.settings.summaryEmail = summaryEmailCbEl.checked === true;
+  try {
+    const tzNow = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tzNow) db.settings.summaryTz = tzNow;
+  } catch (e) { /* sin zona detectable: se conserva la anterior */ }
   db.settings.biometric = document.getElementById('set-biometric').checked === true;
   if (db.settings.biometric && !db.settings.pinHash) window.alert(t('bio_need_pin'));
   const themeVal = document.getElementById('set-theme').value;
@@ -8843,11 +10585,25 @@ function onSettingsSubmit(ev) {
   } else {
     scheduleNotifications();
   }
+  if (db.settings.summaryDaily !== false) {
+    ensureNotifPermission().then(() => scheduleDailySummary());
+  } else {
+    scheduleDailySummary();
+  }
   showError('set-error', '');
   window.alert(t('set_saved'));
 }
 function applyTextSize() {
   document.documentElement.classList.toggle('text-large', db.settings.textSize === 'grande');
+}
+/* Ejecuta fn justo después del primer pintado del navegador, para que
+   el trabajo no esencial no bloquee la apertura (Compilación 28). */
+function afterFirstPaint(fn) {
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => setTimeout(fn, 0));
+  } else {
+    setTimeout(fn, 30);
+  }
 }
 async function onPinSubmit(ev) {
   ev.preventDefault();
@@ -9093,6 +10849,22 @@ function csvFindDuplicate(row) {
   return list.some((x) => x.date === row.date && x.amountCents === row.amountCents &&
     csvDescSimilar(row.description, x.note || ''));
 }
+/* Paso compartido CSV/PDF: categoría sugerida + duplicado + inclusión.
+   Es el mismo paso que usaba csvBuildRows por dentro; se extrajo para
+   que las filas del PDF pasen por la idéntica categorización/dedupe. */
+function csvEnrichRows(rows) {
+  for (const row of rows) {
+    if (row.kind === 'gasto') {
+      try { row.category = csvGuessCategory(row.description); } catch (e) { row.category = 'Otros'; }
+      if (!row.category) row.category = 'Otros';
+    } else {
+      row.category = '';
+    }
+    try { row.duplicate = csvFindDuplicate(row); } catch (e) { row.duplicate = false; }
+    row.include = !row.duplicate;
+  }
+  return rows;
+}
 function csvBuildRows(text) {
   const delim = csvDetectDelim(text);
   const table = csvTokenize(text, delim);
@@ -9130,14 +10902,12 @@ function csvBuildRows(text) {
     const kind = cents < 0 ? 'gasto' : 'ingreso';
     const row = {
       date: date, description: desc, kind: kind, amountCents: amountCents,
-      category: kind === 'gasto' ? csvGuessCategory(desc) : '',
-      duplicate: false, include: true
+      category: '', duplicate: false, include: true
     };
-    row.duplicate = csvFindDuplicate(row);
-    row.include = !row.duplicate;
     rows.push(row);
     if (rows.length >= 1000) break;
   }
+  csvEnrichRows(rows);
   if (!rows.length) return { error: 'csv_err_empty' };
   return { rows: rows };
 }
@@ -9183,11 +10953,238 @@ function renderCsvPreview() {
   wrap.hidden = false;
   renderCsvSummary();
 }
+/* ---------------- Importar PDF del banco (Compilación 29) ----------------
+   El PDF se lee con pdf.js (vendor/pdfjs/) en el propio dispositivo y
+   sus líneas pasan a la MISMA vista previa que el CSV: parseStatementLines
+   devuelve filas con la forma exacta de csvBuildRows y csvEnrichRows les
+   aplica la misma categoría sugerida y la misma deduplicación.
+   Heurísticas de parseStatementLines:
+   - Fechas: MM/DD/YYYY y MM/DD/YY (si el primer número >12 y el segundo
+     <=12 se interpreta DD/MM), DD/MM inequívoco, «Oct 12, 2026»,
+     «12 Oct 2026» y «Oct 12 2026» con meses en inglés y español, y
+     MM/DD sin año usando el año más frecuente del documento (o el
+     año en curso si no hay ninguna fecha completa). Fechas inválidas
+     (mes >12 tras el intercambio, día >31 o fecha inexistente) se saltan.
+   - Montos: el PRIMER token de monto de la línea es el movimiento y el
+     segundo (saldo) se ignora. Tokens: $1,234.56, 1,234.56, (1,234.56),
+     -1,234.56, 1,234.56- y +1,234.56. La fecha se extrae antes de buscar
+     montos para que sus cifras no se confundan con un monto.
+   - Signo/tipo: paréntesis o «-» = gasto; «+» = ingreso; sin signo
+     explícito manda el encabezado de sección vigente (withdrawal/
+     retiro/cargo/débito/debit = gasto; deposit/depósito/abono/crédito/
+     credit = ingreso, detectado en líneas sin monto); sin sección,
+     heurística por descripción (deposit, payroll, interest, refund,
+     zelle, direct dep y equivalentes en español = ingreso; resto = gasto).
+     amountCents siempre es positivo.
+   - Descripción: la línea sin el token de fecha ni los de monto,
+     espacios colapsados, sin puntuación colgando en los extremos,
+     máximo 120 caracteres.
+   - Se saltan: líneas sin monto o sin fecha, saldos inicial/final,
+     totales, número de cuenta, «página N» y el periodo del estado. */
+let pdfJsPromise = null;
+function loadPdfJs() {
+  if (pdfJsPromise) return pdfJsPromise;
+  pdfJsPromise = new Promise((resolve, reject) => {
+    const finish = () => {
+      try {
+        if (typeof window === 'undefined' || !window.pdfjsLib) { reject(new Error('pdfjs no disponible')); return; }
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
+        resolve(window.pdfjsLib);
+      } catch (e) { reject(e); }
+    };
+    if (typeof window !== 'undefined' && window.pdfjsLib) { finish(); return; }
+    const script = document.createElement('script');
+    script.src = 'vendor/pdfjs/pdf.min.js';
+    script.onload = finish;
+    script.onerror = () => reject(new Error('pdfjs no disponible'));
+    document.head.appendChild(script);
+  });
+  return pdfJsPromise;
+}
+async function extractPdfLines(arrayBuffer) {
+  const lib = (typeof window !== 'undefined' && window.pdfjsLib) || null;
+  if (!lib) throw new Error('pdfjs no disponible');
+  const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
+  const out = [];
+  for (let pgn = 1; pgn <= pdf.numPages; pgn++) {
+    const page = await pdf.getPage(pgn);
+    const tc = await page.getTextContent();
+    const groups = [];
+    for (const item of (tc.items || [])) {
+      if (!item || typeof item.str !== 'string') continue;
+      const y = item.transform ? item.transform[5] : 0;
+      const x = item.transform ? item.transform[4] : 0;
+      let g = groups.find((gg) => Math.abs(gg.y - y) <= 2);
+      if (!g) { g = { y: y, items: [] }; groups.push(g); }
+      g.items.push({ x: x, str: item.str });
+    }
+    groups.sort((a, b) => b.y - a.y);
+    for (const g of groups) {
+      g.items.sort((a, b) => a.x - b.x);
+      const txt = g.items.map((it) => it.str).join(' ').replace(/\s+/g, ' ').trim();
+      if (txt) out.push(txt);
+    }
+  }
+  return out;
+}
+function pdfNormText(s) {
+  return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+function pdfMonthNumber(name) {
+  const key = pdfNormText(name).slice(0, 3);
+  const months = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12, ene: 1, abr: 4, ago: 8, dic: 12 };
+  return months[key] || 0;
+}
+function pdfMostFrequentYear(lines) {
+  const tally = {};
+  const add = (y) => { const yy = y < 100 ? y + 2000 : y; tally[yy] = (tally[yy] || 0) + 1; };
+  for (const line of (lines || [])) {
+    const s = String(line == null ? '' : line);
+    let m;
+    const reNum = /\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})\b/g;
+    while ((m = reNum.exec(s)) !== null) add(Number(m[3]));
+    const reMonA = /\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3,})\.?\s+(\d{1,2})(?:st|nd|rd|th)?\s*,?\s+(\d{4})\b/g;
+    while ((m = reMonA.exec(s)) !== null) { if (pdfMonthNumber(m[1])) add(Number(m[3])); }
+    const reMonB = /\b(\d{1,2})\s+([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3,})\.?\s*,?\s+(\d{4})\b/g;
+    while ((m = reMonB.exec(s)) !== null) { if (pdfMonthNumber(m[2])) add(Number(m[3])); }
+  }
+  let best = null, bestN = 0;
+  for (const y of Object.keys(tally)) { if (tally[y] > bestN) { bestN = tally[y]; best = Number(y); } }
+  return best || new Date().getFullYear();
+}
+function pdfFindDate(line, fallbackYear) {
+  const s = String(line == null ? '' : line);
+  let m = /\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})\b/.exec(s);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    let y = Number(m[3]);
+    if (y < 100) y += 2000;
+    const mo = (a > 12 && b <= 12) ? b : a;
+    const d = (a > 12 && b <= 12) ? a : b;
+    const iso = csvDateOk(y, mo, d);
+    return iso ? { date: iso, text: m[0], index: m.index } : null;
+  }
+  const candidates = [];
+  const ma = /\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3,})\.?\s+(\d{1,2})(?:st|nd|rd|th)?\s*,?\s+(\d{4})\b/.exec(s);
+  if (ma && pdfMonthNumber(ma[1])) candidates.push({ m: ma, mo: pdfMonthNumber(ma[1]), d: Number(ma[2]), y: Number(ma[3]) });
+  const mb = /\b(\d{1,2})\s+([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3,})\.?\s*,?\s+(\d{4})\b/.exec(s);
+  if (mb && pdfMonthNumber(mb[2])) candidates.push({ m: mb, mo: pdfMonthNumber(mb[2]), d: Number(mb[1]), y: Number(mb[3]) });
+  if (candidates.length) {
+    candidates.sort((x, z) => x.m.index - z.m.index);
+    const c = candidates[0];
+    const iso = csvDateOk(c.y, c.mo, c.d);
+    return iso ? { date: iso, text: c.m[0], index: c.m.index } : null;
+  }
+  m = /\b(\d{1,2})\/(\d{1,2})(?![\/\d])/.exec(s);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    const mo = (a > 12 && b <= 12) ? b : a;
+    const d = (a > 12 && b <= 12) ? a : b;
+    const iso = csvDateOk(fallbackYear, mo, d);
+    return iso ? { date: iso, text: m[0], index: m.index } : null;
+  }
+  return null;
+}
+function pdfAmountRegex() {
+  return /\(\s*\$?\s*[+-]?\d[\d,]*(?:\.\d{1,2})?\s*\)|\$\s*[+-]?\d[\d,]*(?:\.\d{1,2})?|[+-]\s?\d[\d,]*(?:\.\d{1,2})|\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d[\d]*\.\d{2}/g;
+}
+function pdfSectionOf(norm) {
+  if (/\b(withdrawal|withdrawals|retiro|retiros|cargo|cargos|debito|debitos|debit|debits)\b/.test(norm)) return 'gasto';
+  if (/\b(deposit|deposits|deposito|depositos|abono|abonos|credito|creditos|credit|credits)\b/.test(norm)) return 'ingreso';
+  return null;
+}
+function parseStatementLines(lines) {
+  const input = Array.isArray(lines) ? lines : [];
+  const fallbackYear = pdfMostFrequentYear(input);
+  const rows = [];
+  let section = null;
+  const skipPhrases = ['beginning balance', 'ending balance', 'opening balance', 'closing balance',
+    'saldo inicial', 'saldo final', 'balance inicial', 'balance final', 'saldo anterior',
+    'account number', 'numero de cuenta', 'statement period',
+    'total deposits', 'total withdrawals', 'total deposit', 'total withdrawal',
+    'total credits', 'total debits', 'total depositos', 'total retiros'];
+  for (const rawLine of input) {
+    const line = String(rawLine == null ? '' : rawLine).replace(/\s+/g, ' ').trim();
+    if (!line) continue;
+    const norm = pdfNormText(line);
+    if (/^(page|pagina)\s+\d+/.test(norm.trim())) continue;
+    if (skipPhrases.some((ph) => norm.includes(ph))) continue;
+    const found = pdfFindDate(line, fallbackYear);
+    if (!found) {
+      if (!pdfAmountRegex().test(line)) {
+        const sec = pdfSectionOf(norm);
+        if (sec) section = sec;
+      }
+      continue;
+    }
+    const rest = (line.slice(0, found.index) + ' ' + line.slice(found.index + found.text.length)).replace(/\s+/g, ' ');
+    const amounts = rest.match(pdfAmountRegex());
+    if (!amounts || !amounts.length) continue;
+    const firstToken = amounts[0];
+    const signed = csvParseAmountCell(firstToken);
+    if (!signed) continue;
+    const amountCents = Math.abs(signed);
+    if (!amountCents || amountCents > MAX_MONEY_CENTS) continue;
+    let desc = rest.replace(pdfAmountRegex(), ' ').replace(/\s+/g, ' ').trim();
+    desc = cleanText(desc, 120);
+    desc = desc.replace(/^[\-–—:;,.|/]+|[\-–—:;,.|/]+$/g, '').trim() || '—';
+    let kind;
+    const hasParen = firstToken.includes('(') && firstToken.includes(')');
+    const hasMinus = firstToken.includes('-');
+    const hasPlus = firstToken.includes('+');
+    if (hasParen || hasMinus || signed < 0) kind = 'gasto';
+    else if (hasPlus) kind = 'ingreso';
+    else if (section) kind = section;
+    else {
+      const dnorm = pdfNormText(desc);
+      const incomeWords = ['deposit', 'deposito', 'payroll', 'interest', 'interes', 'refund', 'reembolso', 'zelle', 'direct dep', 'nomina', 'devolucion', 'abono'];
+      kind = incomeWords.some((w) => dnorm.includes(w)) ? 'ingreso' : 'gasto';
+    }
+    rows.push({ date: found.date, description: desc, kind: kind, amountCents: amountCents, category: '', duplicate: false, include: true });
+    if (rows.length >= 1000) break;
+  }
+  return csvEnrichRows(rows);
+}
 function onCsvFile(ev) {
   const file = ev.target.files && ev.target.files[0];
   ev.target.value = '';
   if (!file) return;
   const wrap = document.getElementById('csv-preview');
+  const isPdf = /\.pdf$/i.test(file.name || '') || file.type === 'application/pdf';
+  if (isPdf) {
+    if (file.size > 8000000) {
+      csvPending = [];
+      clearNode(document.getElementById('csv-rows'));
+      document.getElementById('csv-summary').textContent = '';
+      wrap.hidden = false;
+      showError('csv-error', t('pdf_err_big'));
+      return;
+    }
+    const pdfReader = new FileReader();
+    pdfReader.onload = async () => {
+      const failPdf = (key) => {
+        csvPending = [];
+        clearNode(document.getElementById('csv-rows'));
+        document.getElementById('csv-summary').textContent = '';
+        wrap.hidden = false;
+        showError('csv-error', t(key));
+      };
+      try {
+        try { await loadPdfJs(); } catch (e) { failPdf('csv_err_parse'); return; }
+        let pdfLines;
+        try { pdfLines = await extractPdfLines(pdfReader.result); } catch (e) { failPdf('csv_err_parse'); return; }
+        const totalText = (pdfLines || []).join('').replace(/\s+/g, '');
+        if (totalText.length < 40) { failPdf('pdf_err_notext'); return; }
+        const pdfRows = parseStatementLines(pdfLines);
+        if (!pdfRows.length) { failPdf('pdf_err_empty'); return; }
+        csvPending = pdfRows;
+        renderCsvPreview();
+      } catch (e) { failPdf('csv_err_parse'); }
+    };
+    pdfReader.onerror = () => { showError('csv-error', t('csv_err_parse')); wrap.hidden = false; };
+    pdfReader.readAsArrayBuffer(file);
+    return;
+  }
   if (file.size > 2000000) {
     csvPending = [];
     clearNode(document.getElementById('csv-rows'));
@@ -9334,6 +11331,69 @@ async function scheduleNotifications() {
   } catch (e) { /* sin notificaciones disponibles: la app sigue igual */ }
 }
 
+/* --- Resumen diario (Compilación 29, Bloque 1) ---
+   Aviso propio, con su propio interruptor (settings.summaryDaily,
+   activo por defecto): NO depende del interruptor general de
+   notificaciones. Se programa una sola notificación local para la
+   próxima hora elegida, con lo gastado ayer y el diario de ese día. */
+function localDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function dailySummaryData(fireDate) {
+  const fire = (fireDate instanceof Date && !Number.isNaN(fireDate.getTime())) ? fireDate : new Date();
+  const yest = new Date(fire.getFullYear(), fire.getMonth(), fire.getDate() - 1);
+  const yesterdayStr = localDateStr(yest);
+  if (!db) return { spentCents: 0, dailyCents: null, yesterdayStr: yesterdayStr };
+  const spentCents = sumCents(db.expenses.filter((e) => e.date === yesterdayStr));
+  const key = fire.getFullYear() + '-' + String(fire.getMonth() + 1).padStart(2, '0');
+  const total = monthlyBudgetTotalCents(key);
+  let dailyCents = null;
+  if (total > 0) {
+    const fireStr = localDateStr(fire);
+    const spentMonth = sumCents(monthExpenses(key).filter((e) => e.date <= fireStr));
+    const left = total - spentMonth;
+    const daysLeft = daysInMonth(key) - fire.getDate() + 1;
+    dailyCents = left > 0 ? Math.floor(left / daysLeft) : 0;
+  }
+  return { spentCents: spentCents, dailyCents: dailyCents, yesterdayStr: yesterdayStr };
+}
+function nextSummaryFire(timeStr) {
+  const m = /^(\d{2}):(\d{2})$/.exec(typeof timeStr === 'string' ? timeStr : '');
+  let hh = 8; let mm = 0;
+  if (m) {
+    const h = Number(m[1]); const n = Number(m[2]);
+    if (h >= 0 && h <= 23 && n >= 0 && n <= 59) { hh = h; mm = n; }
+  }
+  const now = new Date();
+  const fire = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0, 0);
+  if (fire <= now) fire.setDate(fire.getDate() + 1);
+  return fire;
+}
+let lastSummarySig = '';
+async function scheduleDailySummary() {
+  const LN = capPlugin('LocalNotifications');
+  if (!LN || !db) return;
+  const id = notifId('daily-summary');
+  try {
+    if (db.settings.summaryDaily === false) {
+      try { await LN.cancel({ notifications: [{ id: id }] }); } catch (e) { /* sin pendientes: nada que cancelar */ }
+      lastSummarySig = '';
+      return;
+    }
+    const fire = nextSummaryFire(db.settings.summaryTime || '08:00');
+    const data = dailySummaryData(fire);
+    const fireDateStr = localDateStr(fire);
+    const sig = [db.settings.summaryTime || '08:00', db.settings.lang, fireDateStr, data.spentCents, data.dailyCents].join('|');
+    if (sig === lastSummarySig) return;
+    try { await LN.cancel({ notifications: [{ id: id }] }); } catch (e) { /* sin pendientes: nada que cancelar */ }
+    const body = data.dailyCents == null
+      ? t('notif_summary_body_nodaily', { spent: fmt(data.spentCents) })
+      : t('notif_summary_body', { spent: fmt(data.spentCents), daily: fmt(data.dailyCents) });
+    await LN.schedule({ notifications: [{ id: id, title: t('notif_summary_title'), body: body, schedule: { at: fire } }] });
+    lastSummarySig = sig;
+  } catch (e) { /* sin notificaciones disponibles: la app sigue igual */ }
+}
+
 /* --- Desbloqueo con huella ---
    Diagnóstico del fallo en el teléfono real (23-oct-2026: Sterlin SÍ
    tiene PIN creado y aun así la huella nunca aparecía ni se pedía):
@@ -9370,7 +11430,7 @@ function bioIsNative() {
 async function bioAuthenticate(BA) {
   const opts = {
     reason: t('bio_reason'),
-    androidTitle: 'PETO',
+    androidTitle: 'PETO Finanzas',
     androidSubtitle: t('bio_btn'),
     cancelTitle: t('btn_cancel'),
     /* Respaldo del plugin: si la huella falla o queda bloqueada, el
@@ -9586,7 +11646,7 @@ async function shareText(title, text) {
 }
 function onShareReport() {
   const d = reportData(chartMonth);
-  const lines = ['📋 PETO — ' + d.month,
+  const lines = ['📋 PETO Finanzas — ' + d.month,
     t('rep_income') + ': ' + fmtMoney(d.income),
     t('rep_expenses') + ': ' + fmtMoney(d.expenses),
     t('rep_savings') + ': ' + fmtMoney(d.savings)];
@@ -10111,6 +12171,8 @@ function cloudStatus(msg) {
   if (s) s.textContent = msg || '';
 }
 function renderCloudCard() {
+  const summaryRowCloud = document.getElementById('summary-email-row');
+  if (summaryRowCloud) summaryRowCloud.hidden = !cloudUser;
   const out = document.getElementById('cloud-signedout');
   const inn = document.getElementById('cloud-signedin');
   if (!out || !inn) return;
@@ -10736,6 +12798,20 @@ function hideUndoToast() {
   if (toast) toast.hidden = true;
   if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
 }
+/* Aviso breve genérico (mismo patrón visual que el de deshacer, pero
+   sin botón ni snapshot): lo usa, p. ej., el guardado nativo del
+   informe. Vive en su propio elemento (#msg-toast) para no tocar
+   showUndoToast ni su temporizador. */
+let msgToastTimer = null;
+function showToastMsg(msg) {
+  const toast = document.getElementById('msg-toast');
+  if (!toast) return;
+  const text = document.getElementById('msg-toast-text');
+  if (text) text.textContent = msg;
+  toast.hidden = false;
+  if (msgToastTimer) clearTimeout(msgToastTimer);
+  msgToastTimer = setTimeout(() => { toast.hidden = true; msgToastTimer = null; }, 4000);
+}
 function onUndo() {
   if (!undoSnapshot) return;
   const clean = validateData(JSON.parse(undoSnapshot));
@@ -10806,7 +12882,7 @@ function renderChallenge() {
       : st.streak > 1 ? t('chal_streak_many', { n: st.streak })
       : t('chal_streak_zero')));
   card.appendChild(actionButton(t('chal_share'), 'btn-secondary', () => {
-    const lines = ['🔥 PETO', t('chal_progress', { have: fmtMoney(st.thisWeek), target: fmtMoney(st.target) })];
+    const lines = ['🔥 PETO Finanzas', t('chal_progress', { have: fmtMoney(st.thisWeek), target: fmtMoney(st.target) })];
     lines.push(st.streak === 1 ? t('chal_streak_one')
       : st.streak > 1 ? t('chal_streak_many', { n: st.streak })
       : t('chal_streak_zero'));
@@ -10940,15 +13016,16 @@ function buildReportCanvas() {
   ];
   if (d.goal) mainLines.push([t('rep_goal') + ' · ' + d.goal.name, d.goal.pct + '%']);
   const top = d.topCats || [];
-  const height = 190 + mainLines.length * 52 + (top.length ? 80 + top.length * 46 : 0) + 24;
+  const height = 190 + mainLines.length * 52 + (top.length ? 80 + top.length * 46 : 0) + 24 + 88;
   const canvas = document.createElement('canvas');
   canvas.width = 800; canvas.height = height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
   const P = canvasPalette();
+  const BRAND_GREEN = '#0b6e4f';
   ctx.fillStyle = P.bg; ctx.fillRect(0, 0, 800, height);
-  ctx.fillStyle = P.header; ctx.fillRect(0, 0, 800, 96);
-  ctx.fillStyle = P.headerText; ctx.font = 'bold 34px sans-serif';
+  ctx.fillStyle = BRAND_GREEN; ctx.fillRect(0, 0, 800, 96);
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
   ctx.fillText(t('app_title'), 40, 58);
   ctx.fillStyle = P.ink; ctx.font = 'bold 30px sans-serif';
   ctx.fillText(d.month, 40, 150);
@@ -10971,13 +13048,33 @@ function buildReportCanvas() {
       y += 46;
     });
   }
+  ctx.fillStyle = BRAND_GREEN; ctx.fillRect(0, height - 64, 800, 64);
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 24px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(t('rep_promo_footer'), 400, height - 24);
+  ctx.textAlign = 'left';
   return canvas;
 }
-/* Descarga el informe como imagen PNG. */
-function downloadReportPng() {
+/* Descarga el informe como imagen PNG. En la app nativa guarda el
+   archivo con el plugin Filesystem (en DOCUMENTS): el <a download>
+   web no hace nada en Android. Sin plugin, o si el guardado nativo
+   falla, se usa la descarga web de siempre como respaldo. */
+async function downloadReportPng() {
+  const canvas = buildReportCanvas();
+  if (!canvas) return;
+  const FS = capPlugin('Filesystem');
+  if (FS && canvas.toDataURL) {
+    try {
+      const data = canvas.toDataURL('image/png').split(',')[1];
+      if (data) {
+        await FS.writeFile({ path: 'informe-' + chartMonth + '.png', data: data, directory: 'DOCUMENTS' });
+        showToastMsg(t('rep_saved'));
+        maybeAskReview();
+        return;
+      }
+    } catch (e) { /* guardado nativo falló: se cae a la descarga web */ }
+  }
   try {
-    const canvas = buildReportCanvas();
-    if (!canvas) return;
     const finish = (url) => {
       if (!url) return;
       const a = document.createElement('a');
@@ -10986,6 +13083,7 @@ function downloadReportPng() {
       document.body.appendChild(a);
       a.click();
       a.remove();
+      showToastMsg(t('rep_saved'));
     };
     if (canvas.toBlob) canvas.toBlob((blob) => { if (blob) finish(URL.createObjectURL(blob)); });
     else if (canvas.toDataURL) finish(canvas.toDataURL('image/png'));
@@ -10999,6 +13097,22 @@ function downloadReportPng() {
 async function shareReportPng() {
   const canvas = buildReportCanvas();
   if (!canvas) return;
+  const FS = capPlugin('Filesystem');
+  const SH = capPlugin('Share');
+  if (FS && SH && canvas.toDataURL) {
+    try {
+      const data = canvas.toDataURL('image/png').split(',')[1];
+      if (data) {
+        const path = 'informe-' + chartMonth + '.png';
+        await FS.writeFile({ path: path, data: data, directory: 'CACHE' });
+        const uriRes = await FS.getUri({ directory: 'CACHE', path: path });
+        const uri = uriRes && uriRes.uri ? uriRes.uri : uriRes;
+        await SH.share({ title: t('share_report_title'), url: uri });
+        maybeAskReview();
+        return;
+      }
+    } catch (e) { return; /* compartir nativo cancelado/falló: no forzar la descarga */ }
+  }
   try {
     const blob = await new Promise((resolve) => {
       if (canvas.toBlob) canvas.toBlob(resolve, 'image/png');
@@ -11539,8 +13653,18 @@ function enterApp() {
   const posted = autoPostFixed();
   showView('home');
   if (posted > 0) showUndoToast();
-  scheduleNotifications();
-  checkBudgetAlerts();
+  /* Compilación 28 (apertura más rápida): programar notificaciones y
+     revisar las alertas de presupuesto no hacen falta para pintar
+     Inicio; van justo después del primer pintado. */
+  afterFirstPaint(() => {
+    scheduleNotifications();
+    checkBudgetAlerts();
+    if (db && db.settings.summaryDaily !== false) {
+      ensureNotifPermission().then(() => scheduleDailySummary());
+    } else {
+      scheduleDailySummary();
+    }
+  });
   checkWidgetPendingAction();
 }
 async function onLockSubmit(ev) {
@@ -11629,6 +13753,18 @@ function wireEvents() {
   document.getElementById('debt-form').addEventListener('submit', onDebtSubmit);
   document.getElementById('settings-form').addEventListener('submit', onSettingsSubmit);
   document.getElementById('pin-form').addEventListener('submit', onPinSubmit);
+  /* Tarjeta «Secciones visibles» plegable: clic o Enter/espacio en la
+     cabecera abre/cierra el cuerpo (cerrado por defecto). */
+  const sectionsToggleEl = document.getElementById('sections-toggle');
+  if (sectionsToggleEl) {
+    sectionsToggleEl.addEventListener('click', toggleSectionsBody);
+    sectionsToggleEl.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar') {
+        ev.preventDefault();
+        toggleSectionsBody();
+      }
+    });
+  }
   /* La casilla de huella vive en la tarjeta de Seguridad, FUERA del
      #settings-form: su valor solo llegaba a db.settings.biometric al
      pulsar «Guardar ajustes» (botón de OTRA tarjeta). Marcarla y pulsar
@@ -11741,6 +13877,45 @@ function wireEvents() {
   document.getElementById('org-form').addEventListener('submit', onSanOrgCreateSubmit);
   document.getElementById('org-add-participant').addEventListener('click', onSanOrgAddParticipant);
   document.getElementById('org-delete').addEventListener('click', onSanOrgDelete);
+  const orgShuffleBtn = document.getElementById('org-shuffle');
+  if (orgShuffleBtn) orgShuffleBtn.addEventListener('click', onOrgShuffleDraft);
+  const orgShuffleActiveBtn = document.getElementById('org-shuffle-active');
+  if (orgShuffleActiveBtn) orgShuffleActiveBtn.addEventListener('click', onOrgShuffleActive);
+  const orgStartBtn = document.getElementById('org-start-btn');
+  if (orgStartBtn) orgStartBtn.addEventListener('click', onSanOrgStart);
+  const orgReminderBtn = document.getElementById('org-reminder');
+  if (orgReminderBtn) orgReminderBtn.addEventListener('click', onOrgReminder);
+  const orgLinkPubBtn = document.getElementById('org-link-publish');
+  if (orgLinkPubBtn) orgLinkPubBtn.addEventListener('click', onOrgLinkPublish);
+  const orgLinkCopyBtn = document.getElementById('org-link-copy');
+  if (orgLinkCopyBtn) orgLinkCopyBtn.addEventListener('click', onOrgLinkCopy);
+  const orgCompSel = document.getElementById('org-comp');
+  if (orgCompSel) orgCompSel.addEventListener('change', updateOrgSim);
+  const orgPenSel = document.getElementById('org-penalty');
+  if (orgPenSel) orgPenSel.addEventListener('change', updateOrgSim);
+  const orgAmtInput = document.getElementById('org-amount');
+  if (orgAmtInput) orgAmtInput.addEventListener('input', updateOrgSim);
+  const orgCompAmtInput = document.getElementById('org-comp-amount');
+  if (orgCompAmtInput) orgCompAmtInput.addEventListener('input', updateOrgSim);
+  const orgReceiptFile = document.getElementById('org-receipt-file');
+  if (orgReceiptFile) orgReceiptFile.addEventListener('change', (ev) => {
+    const file = ev.target.files && ev.target.files[0];
+    const tgt = orgReceiptTarget;
+    orgReceiptTarget = null;
+    ev.target.value = '';
+    if (!file || !tgt || !db.sanOrg) return;
+    processReceiptFile(file, (url) => {
+      if (!url || !db.sanOrg || !db.sanOrg.rounds[tgt.round]) return;
+      const org = db.sanOrg;
+      const cur = orgPayStatus(org, tgt.round, tgt.name);
+      const keep = cur === 'confirmed' ? 'confirmed' : 'reported';
+      if (!org.rounds[tgt.round].info) org.rounds[tgt.round].info = {};
+      org.rounds[tgt.round].info[tgt.name] = { st: keep, photo: url };
+      if (keep === 'confirmed') org.rounds[tgt.round].paid[tgt.name] = true;
+      else delete org.rounds[tgt.round].paid[tgt.name];
+      save(); renderSanOrg(); orgMaybeRepublish();
+    });
+  });
   document.getElementById('btn-share-org').addEventListener('click', onShareSanOrg);
   document.getElementById('btn-share-org-img').addEventListener('click', shareSanOrgPng);
   document.getElementById('goal2-form').addEventListener('submit', onGoal2Submit);
@@ -11796,7 +13971,27 @@ function wireEvents() {
 
 function init() {
   load();
+  /* Compilación 32: precedencia total del enlace público del san.
+     Si la URL trae #san= (aunque el token venga truncado o con
+     caracteres de más), el arranque va DIRECTO al visor público de
+     solo lectura: sin bienvenida, sin nombre, sin PIN y sin exigir
+     datos locales. Un token inválido muestra el mensaje amable del
+     visor («no disponible»), nunca la bienvenida. */
+  if ((location.hash || '').indexOf('#san=') === 0) {
+    const mSan = /^#san=([A-Za-z0-9]+)$/.exec(location.hash || '');
+    applyTextSize();
+    applyStaticI18n();
+    initSanPublic(mSan ? mSan[1] : null);
+    return;
+  }
+  if (db && db.settings && !db.settings.summaryTz) {
+    try { db.settings.summaryTz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* sin zona detectable */ }
+  }
   applyTheme();
+  /* Compilación 28: el tamaño del texto se aplica desde el arranque,
+     también en la pantalla de bloqueo y la bienvenida (antes solo se
+     aplicaba al entrar). El tamaño no revela ningún dato. */
+  applyTextSize();
   wireEvents();
   resetExpenseForm();
   resetIncomeForm();
@@ -11822,13 +14017,19 @@ function init() {
 }
 
 init();
-cloudBoot();
+/* Compilación 31: el botón/gesto de atrás navega dentro de la app
+   (sin plugin, en web, no hace nada). */
+initHardwareBack();
+/* La nube se reconcilia justo después del primer pintado, para no
+   competir con la apertura (Compilación 28); mientras tanto la app
+   funciona local, como siempre. */
+afterFirstPaint(() => { if (!SAN_PUBLIC_MODE) cloudBoot(); });
 
 /* PETO Pro: refresco perezoso del estado de facturación al arrancar.
    PetoBilling.refresh() no hace nada si el puente nativo de compras
    no está presente (web, prueba o compilaciones sin el plugin), y si
    la tienda no responde deja intacto el estado Pro guardado. */
-PetoBilling.refresh().catch(() => { /* sin tienda, la app sigue igual */ });
+if (!SAN_PUBLIC_MODE) PetoBilling.refresh().catch(() => { /* sin tienda, la app sigue igual */ });
 
 /* PWA: el service worker solo cachea los archivos de la propia app. */
 /* --- Service worker SOLO en web; en la app nativa es un peligro ---

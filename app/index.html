@@ -20,8 +20,8 @@
 <!-- ============ PANTALLA DE BLOQUEO (PIN) ============ -->
 <section id="view-lock" class="view lock-view" hidden>
   <div class="lock-card">
-    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO">
-    <h1>PETO</h1>
+    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO Finanzas">
+    <h1>PETO Finanzas</h1>
     <p class="muted" data-i18n="lock_prompt">Escribe tu PIN para entrar.</p>
     <form id="lock-form" autocomplete="off">
       <label class="sr-only" for="lock-pin" data-i18n="lock_pin_label">PIN</label>
@@ -32,15 +32,15 @@
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 27</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 33</p>
   </div>
 </section>
 
 <!-- ============ BIENVENIDA / PRIMER USO ============ -->
 <section id="view-onboarding" class="view" hidden>
   <div class="onboarding-card">
-    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO">
-    <h1 data-i18n="ob_title">¡Bienvenido a PETO!</h1>
+    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO Finanzas">
+    <h1 data-i18n="ob_title">¡Bienvenido a PETO Finanzas!</h1>
     <p><span data-i18n="ob_intro_1">Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.</span>
        <strong data-i18n="ob_intro_2">Con tu cuenta en la nube.</strong>
        <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
@@ -53,7 +53,7 @@
       <div class="ob-step" data-ob-step="2" hidden>
         <p class="ob-step-icon" aria-hidden="true">💸</p>
         <h2 data-i18n="ob_tour2_title">¿Cuánto puedes gastar hoy?</h2>
-        <p data-i18n="ob_tour2_text">PETO reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.</p>
+        <p data-i18n="ob_tour2_text">PETO Finanzas reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.</p>
       </div>
       <div class="ob-step" data-ob-step="3" hidden>
         <p class="ob-step-icon" aria-hidden="true">☁️</p>
@@ -104,8 +104,8 @@
   <header class="app-header">
     <button id="btn-menu" class="btn-menu" type="button" data-i18n-aria="menu_open_aria" aria-label="Abrir menú" aria-expanded="false">☰</button>
     <div class="header-text">
+      <h1 class="app-title" data-i18n="app_title">PETO Finanzas</h1>
       <p id="greeting" class="greeting">Hola</p>
-      <h1 class="app-title">PETO</h1>
     </div>
     <button id="btn-privacy" class="btn-menu" type="button" data-i18n-aria="privacy_hide" aria-label="Ocultar montos">👁</button>
     <button id="btn-lock-now" class="btn btn-ghost" type="button" hidden data-i18n="lock_btn">Bloquear</button>
@@ -117,7 +117,7 @@
     <aside id="menu-drawer" class="menu-drawer">
       <div class="drawer-head">
         <div>
-          <p class="drawer-brand">PETO</p>
+          <p class="drawer-brand">PETO Finanzas</p>
           <p id="drawer-user" class="muted small"></p>
         </div>
         <button id="btn-menu-close" class="btn btn-ghost" type="button" data-i18n-aria="menu_close_aria" aria-label="Cerrar menú">✕</button>
@@ -227,7 +227,7 @@
       <h3 data-i18n="csv_title">Importar estado de cuenta (CSV)</h3>
       <p class="muted small" data-i18n="csv_help">Sube el archivo CSV de tu banco y revisa todo en una vista previa antes de importar: nada se guarda hasta que confirmes.</p>
       <label for="csv-file" data-i18n="csv_file_label">Archivo CSV del banco</label>
-      <input id="csv-file" type="file" accept=".csv,text/csv,text/plain">
+      <input id="csv-file" type="file" accept=".csv,.pdf,text/csv,text/plain,application/pdf">
       <div id="csv-preview" hidden>
         <p class="total-line" data-i18n="csv_preview_title">Vista previa de la importación</p>
         <p id="csv-summary" class="muted small"></p>
@@ -637,11 +637,44 @@
             </select>
             <label for="org-start" data-i18n="org_start_label">Fecha de la primera ronda</label>
             <input id="org-start" type="date">
+            <label for="org-comp" data-i18n="org_comp_label">Compensación del organizador</label>
+            <select id="org-comp">
+              <option value="none" data-i18n="org_comp_none">Sin compensación</option>
+              <option value="first" data-i18n="org_comp_first">El organizador cobra primero</option>
+              <option value="last" data-i18n="org_comp_last">El organizador cobra de último</option>
+              <option value="extra" data-i18n="org_comp_extra">Cuota extra por ronda</option>
+            </select>
+            <div id="org-comp-amount-wrap" hidden>
+              <label for="org-comp-amount" data-i18n="org_comp_amount_label">Cuota extra por persona ($)</label>
+              <input id="org-comp-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+            </div>
+            <label for="org-penalty" data-i18n="org_penalty_label">Regla de atraso</label>
+            <select id="org-penalty">
+              <option value="none" data-i18n="org_penalty_none">Sin multa</option>
+              <option value="fixed" data-i18n="org_penalty_fixed">Multa fija</option>
+              <option value="percent" data-i18n="org_penalty_percent">Porcentaje del aporte</option>
+            </select>
+            <div id="org-penalty-amount-wrap" hidden>
+              <label for="org-penalty-amount" data-i18n="org_penalty_amount_label">Monto de la multa ($)</label>
+              <input id="org-penalty-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+            </div>
+            <div id="org-penalty-percent-wrap" hidden>
+              <label for="org-penalty-percent" data-i18n="org_penalty_percent_label">Porcentaje de multa (%)</label>
+              <input id="org-penalty-percent" type="number" inputmode="decimal" min="1" max="100" step="1" placeholder="10">
+            </div>
+            <div id="org-sim"></div>
+            <p class="muted small" data-i18n="org_antifraud">🛡️ Un san nunca paga intereses ni más de lo aportado.</p>
             <label data-i18n="san_participants_label">Participantes (en orden de turno)</label>
+            <label data-i18n="org_zelle_label">Zelle de cada participante (número o correo, opcional)</label>
             <div class="budget-input-row">
               <input id="org-pname" type="text" maxlength="40" data-i18n-ph="san_pname_ph" placeholder="Nombre del participante">
+              <input id="org-pzelle" type="text" maxlength="60" data-i18n-ph="org_zelle_ph" placeholder="Zelle (opcional)">
               <button id="org-add-participant" type="button" class="btn btn-secondary" data-i18n="san_add_participant">Agregar</button>
             </div>
+            <div class="form-actions">
+              <button id="org-shuffle" type="button" class="btn btn-secondary" data-i18n="org_shuffle_btn">🎲 Sortear orden</button>
+            </div>
+            <p id="org-draft-shuffle-msg" class="muted small" role="status"></p>
             <ul id="org-draft-list" class="item-list"></ul>
             <p id="org-draft-empty" class="muted small" data-i18n="san_draft_empty">Todavía no agregas participantes.</p>
             <p id="org-error" class="error" role="alert" hidden></p>
@@ -654,10 +687,32 @@
           <h4 id="org-title-line"></h4>
           <p id="org-meta-line" class="muted"></p>
           <p id="org-total-line" class="total-line"></p>
+          <p id="org-started-line" class="total-line" hidden></p>
+          <p id="org-comp-line" class="muted" hidden></p>
+          <div id="org-sim-active"></div>
+          <p id="org-penalty-line" class="muted" hidden></p>
+          <p class="muted small" data-i18n="org_antifraud">🛡️ Un san nunca paga intereses ni más de lo aportado.</p>
+          <div class="form-actions">
+            <button id="org-start-btn" type="button" class="btn btn-primary" data-i18n="org_start_btn">Iniciar san</button>
+            <button id="org-shuffle-active" type="button" class="btn btn-secondary" data-i18n="org_shuffle_btn">🎲 Sortear orden</button>
+          </div>
+          <p id="org-shuffle-msg" class="muted small" role="status"></p>
+          <h4 data-i18n="org_order_title">Orden de turnos</h4>
+          <ul id="org-order" class="item-list"></ul>
+          <p id="org-swap-msg" class="error" role="alert"></p>
           <div id="org-rounds"></div>
+          <div id="org-history"></div>
+          <h4 data-i18n="org_link_btn">🔗 Enlace de solo lectura</h4>
+          <div class="form-actions">
+            <button id="org-link-publish" type="button" class="btn btn-secondary">Crear enlace</button>
+            <button id="org-link-copy" type="button" class="btn btn-secondary" hidden>Copiar enlace</button>
+          </div>
+          <p id="org-link-msg" class="muted small" aria-live="polite"></p>
+          <input id="org-receipt-file" type="file" accept="image/*" hidden>
           <h4 data-i18n="org_totals_title">Aportes por participante</h4>
           <ul id="org-totals" class="item-list"></ul>
           <div class="form-actions">
+            <button id="org-reminder" type="button" class="btn btn-secondary" data-i18n="org_reminder_btn">📲 Recordatorio por WhatsApp</button>
             <button id="btn-share-org" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
             <button id="btn-share-org-img" type="button" class="btn btn-secondary" data-i18n="rep_share_image">Compartir imagen</button>
             <button id="org-delete" type="button" class="btn btn-ghost" data-i18n="org_delete">Borrar san organizado</button>
@@ -722,12 +777,22 @@
         <span data-i18n="set_notif_label">Notificaciones con la app cerrada</span>
         <input type="checkbox" id="set-notifications">
       </label>
-      <p class="muted small" data-i18n="set_notif_help">Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO esté cerrada.</p>
+      <p class="muted small" data-i18n="set_notif_help">Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO Finanzas esté cerrada.</p>
       <label class="toggle-row">
         <span data-i18n="set_autofixed_label">Registrar pagos fijos automáticamente</span>
         <input type="checkbox" id="set-autofixed">
       </label>
       <p class="muted small" data-i18n="set_autofixed_help">Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.</p>
+
+      <h3 data-i18n="summary_title">Resumen diario</h3>
+      <p class="muted small" data-i18n="summary_help">Un aviso con lo que gastaste ayer y lo que puedes gastar hoy, a la hora que elijas.</p>
+      <label class="toggle-row"><span data-i18n="summary_notif_label">Resumen por notificación</span><input type="checkbox" id="set-summary"></label>
+      <label for="set-summary-time" data-i18n="summary_time_label">Hora del resumen</label>
+      <input id="set-summary-time" type="time">
+      <div id="summary-email-row" hidden>
+        <label class="toggle-row"><span data-i18n="summary_email_label">Recibir también por correo</span><input type="checkbox" id="set-summary-email"></label>
+        <p class="muted small" data-i18n="summary_email_help">Solo con tu cuenta en la nube activa: el mismo resumen llega también a tu correo.</p>
+      </div>
 
       <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
       <p class="muted small" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
@@ -771,9 +836,15 @@
     </form>
 
     <section class="card form-card">
-      <h3 data-i18n="set_sections_title">Secciones visibles</h3>
-      <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
-      <div id="section-toggles"></div>
+      <div class="sections-head" id="sections-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="sections-body">
+        <h3 data-i18n="set_sections_title">Secciones visibles</h3>
+        <span class="sections-summary muted small" id="sections-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▸</span>
+      </div>
+      <div id="sections-body" hidden>
+        <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
+        <div id="section-toggles"></div>
+      </div>
     </section>
 
     <section class="card form-card" id="pro-card">
@@ -849,7 +920,20 @@
       <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 27</p>
+    <section class="card form-card" id="settings-news">
+      <h3 data-i18n="set_news_title">Novedades</h3>
+      <ul class="news-list">
+        <li data-i18n="news_c33">Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.</li>
+        <li data-i18n="news_c32">Compilación 32: la marca ahora se lee «PETO Finanzas» en toda la app (menú, bloqueo y widgets), el san quedó primero en la lista de Inicio, el enlace público del san abre directo en el estado del grupo y los botones del organizador siempre responden con un mensaje claro.</li>
+        <li data-i18n="news_c31">Compilación 31: el botón o gesto de atrás ahora se mueve dentro de la app: cierra lo que esté abierto y vuelve a la pantalla principal antes de salir.</li>
+        <li data-i18n="news_c28">Compilación 28: letra más grande aplicada desde el arranque, esta sección de novedades, repaso del italiano y apertura más rápida.</li>
+        <li data-i18n="news_c27">Compilación 27: la app en 12 idiomas, siguiendo sola el idioma de tu teléfono.</li>
+        <li data-i18n="news_c26">Compilación 26: widgets en tres tamaños, con opciones por widget y botón para anotar un gasto sin abrir la app.</li>
+        <li data-i18n="news_c25">Compilación 25: widget en la pantalla de inicio y una app mucho más liviana (de 52 MB a 7 MB).</li>
+        <li data-i18n="news_c24">Compilación 24: tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
+      </ul>
+    </section>
+    <p class="muted small build-label" id="settings-build-label">Compilación 33</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
@@ -871,7 +955,7 @@
   <div id="bio-offer" class="chooser" hidden>
     <div class="chooser-card">
       <h3 data-i18n="bio_offer_title">¿Desbloquear con tu huella?</h3>
-      <p class="muted" data-i18n="bio_offer_text">Acabas de crear tu PIN. Si quieres, puedes entrar a PETO con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?</p>
+      <p class="muted" data-i18n="bio_offer_text">Acabas de crear tu PIN. Si quieres, puedes entrar a PETO Finanzas con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?</p>
       <p id="bio-offer-error" class="error" role="alert" hidden></p>
       <button id="bio-offer-yes" type="button" class="btn btn-primary btn-big" data-i18n="bio_offer_yes">Sí, activar la huella</button>
       <button id="bio-offer-no" type="button" class="btn btn-ghost" data-i18n="bio_offer_no">Ahora no</button>
@@ -895,11 +979,20 @@
     <button id="undo-btn" type="button" class="btn btn-small btn-secondary" data-i18n="undo_btn">Deshacer</button>
   </div>
 
+  <div id="msg-toast" class="undo-toast" hidden>
+    <span id="msg-toast-text"></span>
+  </div>
+
   <div id="photo-overlay" class="photo-overlay" hidden>
     <img id="photo-overlay-img" alt="">
     <button id="photo-overlay-close" type="button" class="btn btn-secondary" data-i18n="photo_close">Cerrar</button>
   </div>
 </div>
+
+<section id="san-public" hidden>
+  <h2 data-i18n="org_public_title">San del grupo (solo lectura)</h2>
+  <div id="san-public-body"></div>
+</section>
 
 <script src="vendor/supabase.js"></script>
 <script src="web.js"></script>

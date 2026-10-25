@@ -1,4 +1,4 @@
-/* PETO v0.1 — estilos (sin recursos externos) */
+/* PETO Finanzas — estilos (sin recursos externos) */
 :root{
   --accent:#0b6e4f;
   --accent-dark:#084c36;
@@ -17,7 +17,9 @@
 }
 *{box-sizing:border-box}
 html{font-size:16px}
-html.text-large{font-size:19px}
+html.text-large{font-size:18.5px}
+.news-list{margin:.4rem 0 0;padding-left:1.1rem}
+.news-list li{margin:.3rem 0}
 body{
   margin:0;
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
@@ -208,6 +210,12 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .toggle-row:last-child{border-bottom:none}
 .toggle-row input[type="checkbox"]{width:28px;height:28px;accent-color:var(--accent)}
 
+/* ---------- Secciones visibles (plegable) ---------- */
+.sections-head{display:flex;align-items:center;gap:.6rem;cursor:pointer}
+.sections-head h3{margin:0}
+.sections-summary{margin-left:auto}
+.sections-chevron{opacity:.7}
+
 /* ---------- Bloqueo y bienvenida ---------- */
 .lock-view,.onboarding-card{padding-top:8vh}
 .lock-card,.onboarding-card{
@@ -238,6 +246,10 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
   background:var(--card);color:var(--ink);
 }
 .lock-card .btn{width:100%}
+/* Compilación 32: el título del bloqueo ahora es «PETO Finanzas»
+   (antes «PETO»): tamaño contenido para que quepa en una sola línea
+   sin apretarse en pantallas estrechas. */
+.lock-card h1{font-size:1.8rem}
 
 @media (max-width:380px){
   .summary-strip{grid-template-columns:1fr 1fr 1fr;gap:.4rem}
