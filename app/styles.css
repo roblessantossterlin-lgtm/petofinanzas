@@ -281,6 +281,19 @@ html[data-theme="oscuro"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:
   html[data-theme="auto"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:#f5b478;--accent-soft:#3a2812}
 }
 
+/* ---------- Deslizar para refrescar (Compilación 35) ----------
+   Indicador circular estilo nativo (Material): aparece desde arriba
+   siguiendo el dedo, la flecha gira con el avance y al soltar pasado
+   el umbral gira sin parar mientras pullToRefresh() trabaja. */
+#ptr-indicator{position:fixed;top:10px;left:50%;z-index:1200;width:42px;height:42px;border-radius:50%;background:var(--card);color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;opacity:0;pointer-events:none;transform:translate(-50%,-84px)}
+#ptr-indicator.ptr-anim{transition:transform .18s ease,opacity .18s ease}
+#ptr-indicator .ptr-arrow{display:inline-block}
+#ptr-indicator.ptr-spinning .ptr-arrow{animation:ptrspin .7s linear infinite}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
+/* Panel en línea «Ya pagué» del visor público del san (Compilación 35). */
+.san-pub-panel{margin:.4rem 0 .6rem;padding:.6rem;border:1px solid var(--line);border-radius:10px}
+.san-pub-panel .btn{margin:.2rem .3rem .2rem 0}
+
 /* ---------- Botón flotante + y selector rápido ---------- */
 #app-shell{padding-bottom:5.5rem}
 .fab{

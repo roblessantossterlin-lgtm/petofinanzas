@@ -1,20 +1,22 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 34) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 35) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 34: el logo nuevo
-   de PETO Finanzas — la «P» blanca con barras y flecha en verde
-   suave sobre fondo esmeralda — ya en el icono, la pantalla de
-   bloqueo y toda la app; sin cambios de lógica (671 claves por
-   idioma, con la línea news_c34 nueva en los 12 idiomas). Sobre la
-   base de la Compilación 33 ya sincronizada (todo el Paquete San
-   con el visor público #san=, importar PDF, resumen diario,
-   «Secciones visibles», la marca «PETO Finanzas» completa y las
-   guardas anti-sobreescritura del san). */
+   Sincronizado el 25-oct-2026 con la Compilación 35: el enlace
+   público del san se vuelve participativo (quien lo abre puede
+   reportar su pago con el botón «Ya pagué» y foto opcional; la
+   función del servidor ya está aplicada), el visor
+   público con el tema oscuro forzado y sin el título duplicado,
+   la fusión anti-pérdida al republicar, el lector de PDF
+   corregido (los Zelle salientes entran como gasto), deslizar
+   para refrescar y el enlace siempre con el token completo
+   (681 claves por idioma, con la línea news_c35 y las claves
+   nuevas del visor en los 12 idiomas). Sobre la base de la
+   Compilación 34 ya sincronizada (el logo nuevo esmeralda). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -26,7 +28,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 34'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 35'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -811,6 +813,15 @@ es: {
   org_public_title: 'El enlace está listo para compartir.',
   org_public_updated: 'Actualizado el {date}',
   org_public_notfound: 'Este enlace ya no está disponible.',
+  org_pub_pay_btn: 'Ya pagué',
+  org_pub_confirm: '¿Ya pagaste tu aporte de esta ronda? El organizador lo confirmará.',
+  org_pub_attach: '📎 Adjuntar foto del comprobante (opcional)',
+  org_pub_send: 'Enviar reporte',
+  org_pub_sent: '¡Listo! Tu pago quedó como reportado.',
+  org_pub_reported_note: 'Reportado · esperando confirmación',
+  org_pub_err: 'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.',
+  org_pub_err_confirmed: 'Este pago ya fue confirmado por el organizador.',
+  org_pub_err_photo: 'La foto es demasiado grande; prueba con una más pequeña.',
   org_penalty_label: 'Regla de atraso',
   org_penalty_none: 'Sin multa',
   org_penalty_fixed: 'Multa fija',
@@ -829,6 +840,7 @@ es: {
   news_c32: 'Compilación 32: la marca ahora se lee «PETO Finanzas» en toda la app (menú, bloqueo y widgets), el san quedó primero en la lista de Inicio, el enlace público del san abre directo en el estado del grupo y los botones del organizador siempre responden con un mensaje claro.',
   news_c33: 'Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.',
   news_c34: 'Compilación 34: nuevo logo de PETO Finanzas — la «P» blanca con barras y flecha en verde suave sobre fondo esmeralda, ya en el icono, la pantalla de bloqueo y toda la app.',
+  news_c35: 'Compilación 35: desde el enlace público del san ya puedes reportar tu pago con «Ya pagué» y adjuntar tu comprobante (el organizador lo confirma), el visor se ve con el tema oscuro, la app se refresca deslizando hacia abajo y el lector de PDF ya no confunde los Zelle que envías con ingresos.',
   back_exit_hint: 'Pulsa atrás otra vez para salir.'
 },
 en: {
@@ -1238,6 +1250,15 @@ en: {
   org_public_title: 'The link is ready to share.',
   org_public_updated: 'Updated on {date}',
   org_public_notfound: 'This link is no longer available.',
+  org_pub_pay_btn: 'I paid',
+  org_pub_confirm: 'Did you already pay your share for this round? The organizer will confirm it.',
+  org_pub_attach: '📎 Attach receipt photo (optional)',
+  org_pub_send: 'Send report',
+  org_pub_sent: 'Done! Your payment was reported.',
+  org_pub_reported_note: 'Reported · awaiting confirmation',
+  org_pub_err: 'Could not send. Check your connection and try again.',
+  org_pub_err_confirmed: 'This payment was already confirmed by the organizer.',
+  org_pub_err_photo: 'That photo is too large; try a smaller one.',
   org_penalty_label: 'Late rule',
   org_penalty_none: 'No penalty',
   org_penalty_fixed: 'Fixed penalty',
@@ -1256,6 +1277,7 @@ en: {
   news_c32: 'Build 32: the brand now reads “PETO Finanzas” across the app (menu, lock screen and widgets), the san moved to the top of the Home list, the public san link opens straight into the group status, and the organizer buttons always answer with a clear message.',
   news_c33: 'Build 33: creating a san can no longer erase the one in progress — if one is already active, the app says so and protects it (payments, receipts, history and public link) — and the web version is now in sync with the phone.',
   news_c34: 'Build 34: new PETO Finanzas logo — the white “P” with bars and arrow in soft green on an emerald background, now on the icon, the lock screen and across the app.',
+  news_c35: 'Build 35: from the public san link you can now report your payment with “I paid” and attach your receipt (the organizer confirms it), the viewer uses the dark theme, the app refreshes by pulling down, and the PDF reader no longer mistakes Zelle payments you send for income.',
   back_exit_hint: 'Press back again to exit.'
 },
 it: {
@@ -1908,6 +1930,15 @@ it: {
   org_public_title: 'Il link è pronto da condividere.',
   org_public_updated: 'Aggiornato il {date}',
   org_public_notfound: 'Questo link non è più disponibile.',
+  org_pub_pay_btn: 'Ho pagato',
+  org_pub_confirm: 'Hai già pagato la tua quota di questo turno? L’organizzatore lo confermerà.',
+  org_pub_attach: '📎 Allega la foto della ricevuta (facoltativo)',
+  org_pub_send: 'Invia segnalazione',
+  org_pub_sent: 'Fatto! Il tuo pagamento è stato segnalato.',
+  org_pub_reported_note: 'Segnalato · in attesa di conferma',
+  org_pub_err: 'Invio non riuscito. Controlla la connessione e riprova.',
+  org_pub_err_confirmed: 'Questo pagamento è già stato confermato dall’organizzatore.',
+  org_pub_err_photo: 'La foto è troppo grande; provane una più piccola.',
   org_penalty_label: 'Regola per i ritardi',
   org_penalty_none: 'Nessuna multa',
   org_penalty_fixed: 'Multa fissa',
@@ -1926,6 +1957,7 @@ it: {
   news_c32: 'Versione 32: il marchio ora è «PETO Finanzas» in tutta l’app (menu, blocco e widget), il san è passato in cima all’elenco della schermata iniziale, il link pubblico del san si apre direttamente sullo stato del gruppo e i pulsanti dell’organizzatore rispondono sempre con un messaggio chiaro.',
   news_c33: 'Versione 33: creare un san non può più cancellare quello in corso — se ce n’è già uno attivo, l’app lo dice e lo protegge (pagamenti, ricevute, cronologia e link pubblico) — e la versione web è ora sincronizzata con il telefono.',
   news_c34: 'Versione 34: nuovo logo di PETO Finanzas — la «P» bianca con barre e freccia in verde chiaro su fondo smeraldo, ora nell’icona, nella schermata di blocco e in tutta l’app.',
+  news_c35: 'Versione 35: dal link pubblico del san ora puoi segnalare il tuo pagamento con «Ho pagato» e allegare la ricevuta (la conferma è dell’organizzatore), il visualizzatore usa il tema scuro, l’app si aggiorna scorrendo verso il basso e il lettore PDF non confonde più gli Zelle che invii con entrate.',
   back_exit_hint: 'Premi di nuovo indietro per uscire.'
 },
 pt: {
@@ -2578,6 +2610,15 @@ pt: {
   org_public_title: 'O link está pronto para compartilhar.',
   org_public_updated: 'Atualizado em {date}',
   org_public_notfound: 'Este link não está mais disponível.',
+  org_pub_pay_btn: 'Já paguei',
+  org_pub_confirm: 'Você já pagou sua parte desta rodada? O organizador vai confirmar.',
+  org_pub_attach: '📎 Anexar foto do comprovante (opcional)',
+  org_pub_send: 'Enviar reporte',
+  org_pub_sent: 'Pronto! Seu pagamento foi reportado.',
+  org_pub_reported_note: 'Reportado · aguardando confirmação',
+  org_pub_err: 'Não foi possível enviar. Verifique sua conexão e tente de novo.',
+  org_pub_err_confirmed: 'Este pagamento já foi confirmado pelo organizador.',
+  org_pub_err_photo: 'A foto é grande demais; tente uma menor.',
   org_penalty_label: 'Regra de atraso',
   org_penalty_none: 'Sem multa',
   org_penalty_fixed: 'Multa fixa',
@@ -2596,6 +2637,7 @@ pt: {
   news_c32: 'Compilação 32: a marca agora é «PETO Finanzas» em todo o app (menu, bloqueio e widgets), o san ficou em primeiro na lista do Início, o link público do san abre direto no estado do grupo e os botões do organizador sempre respondem com uma mensagem clara.',
   news_c33: 'Compilação 33: criar um san já não pode apagar o que está em andamento — se já houver um ativo, o app avisa e o protege (pagamentos, comprovantes, histórico e link público) — e a versão web ficou sincronizada com o telefone.',
   news_c34: 'Compilação 34: novo logo do PETO Finanzas — o “P” branco com barras e seta em verde suave sobre fundo esmeralda, já no ícone, na tela de bloqueio e em todo o app.',
+  news_c35: 'Compilação 35: pelo link público do san agora você pode reportar seu pagamento com «Já paguei» e anexar o comprovante (o organizador confirma), o visualizador usa o tema escuro, o app atualiza ao puxar para baixo e o leitor de PDF não confunde mais os Zelle que você envia com receita.',
   back_exit_hint: 'Toque em voltar outra vez para sair.'
 },
 fr: {
@@ -3248,6 +3290,15 @@ fr: {
   org_public_title: 'Le lien est prêt à partager.',
   org_public_updated: 'Mis à jour le {date}',
   org_public_notfound: 'Ce lien n’est plus disponible.',
+  org_pub_pay_btn: 'J’ai payé',
+  org_pub_confirm: 'Avez-vous déjà payé votre part de ce tour ? L’organisateur le confirmera.',
+  org_pub_attach: '📎 Joindre la photo du reçu (facultatif)',
+  org_pub_send: 'Envoyer',
+  org_pub_sent: 'C’est fait ! Votre paiement a été signalé.',
+  org_pub_reported_note: 'Signalé · en attente de confirmation',
+  org_pub_err: 'Envoi impossible. Vérifiez votre connexion et réessayez.',
+  org_pub_err_confirmed: 'Ce paiement a déjà été confirmé par l’organisateur.',
+  org_pub_err_photo: 'La photo est trop lourde ; essayez-en une plus petite.',
   org_penalty_label: 'Règle de retard',
   org_penalty_none: 'Aucune pénalité',
   org_penalty_fixed: 'Pénalité fixe',
@@ -3266,6 +3317,7 @@ fr: {
   news_c32: 'Version 32 : la marque affiche désormais « PETO Finanzas » dans toute l’appli (menu, verrouillage et widgets), le san passe en tête de la liste d’accueil, le lien public du san s’ouvre directement sur l’état du groupe et les boutons de l’organisateur répondent toujours par un message clair.',
   news_c33: 'Version 33 : créer un san ne peut plus effacer celui en cours — s’il y en a déjà un actif, l’appli le dit et le protège (paiements, justificatifs, historique et lien public) — et la version web est maintenant synchronisée avec le téléphone.',
   news_c34: 'Version 34 : nouveau logo de PETO Finanzas — le «P» blanc avec barres et flèche en vert doux sur fond émeraude, désormais sur l’icône, l’écran de verrouillage et dans toute l’appli.',
+  news_c35: 'Version 35 : depuis le lien public du san, vous pouvez maintenant signaler votre paiement avec « J’ai payé » et joindre votre reçu (l’organisateur confirme), la vue publique utilise le thème sombre, l’appli se rafraîchit en tirant vers le bas et le lecteur PDF ne confond plus les Zelle que vous envoyez avec des revenus.',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.'
 },
 de: {
@@ -3918,6 +3970,15 @@ de: {
   org_public_title: 'Der Link ist bereit zum Teilen.',
   org_public_updated: 'Aktualisiert am {date}',
   org_public_notfound: 'Dieser Link ist nicht mehr verfügbar.',
+  org_pub_pay_btn: 'Bezahlt',
+  org_pub_confirm: 'Hast du deinen Anteil für diese Runde schon bezahlt? Der Organisator bestätigt ihn.',
+  org_pub_attach: '📎 Foto des Belegs anhängen (optional)',
+  org_pub_send: 'Meldung senden',
+  org_pub_sent: 'Fertig! Deine Zahlung wurde gemeldet.',
+  org_pub_reported_note: 'Gemeldet · wartet auf Bestätigung',
+  org_pub_err: 'Senden fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.',
+  org_pub_err_confirmed: 'Diese Zahlung wurde vom Organisator bereits bestätigt.',
+  org_pub_err_photo: 'Das Foto ist zu groß; versuche ein kleineres.',
   org_penalty_label: 'Verspätungsregel',
   org_penalty_none: 'Keine Strafe',
   org_penalty_fixed: 'Feste Strafe',
@@ -3936,6 +3997,7 @@ de: {
   news_c32: 'Version 32: Die Marke heißt jetzt überall in der App „PETO Finanzas“ (Menü, Sperrbildschirm und Widgets), der San steht jetzt oben in der Startliste, der öffentliche San-Link öffnet direkt den Gruppenstatus und die Organisator-Schaltflächen antworten immer mit einer klaren Meldung.',
   news_c33: 'Version 33: Einen San zu erstellen kann den laufenden nicht mehr löschen — ist schon einer aktiv, sagt die App Bescheid und schützt ihn (Zahlungen, Belege, Verlauf und öffentlicher Link) — und die Webversion ist jetzt mit dem Telefon synchron.',
   news_c34: 'Version 34: neues Logo von PETO Finanzas — das weiße „P“ mit Balken und Pfeil in sanftem Grün auf Smaragdgrün, jetzt auf dem Symbol, dem Sperrbildschirm und in der ganzen App.',
+  news_c35: 'Version 35: Über den öffentlichen San-Link kannst du jetzt deine Zahlung mit „Bezahlt“ melden und deinen Beleg anhängen (der Organisator bestätigt), die öffentliche Ansicht nutzt das dunkle Design, die App aktualisiert sich durch Herunterziehen und der PDF-Leser verwechselt gesendete Zelle-Zahlungen nicht mehr mit Einnahmen.',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.'
 },
 zh: {
@@ -4588,6 +4650,15 @@ zh: {
   org_public_title: '链接已准备好分享。',
   org_public_updated: '更新于 {date}',
   org_public_notfound: '此链接已不可用。',
+  org_pub_pay_btn: '我已付款',
+  org_pub_confirm: '你已经支付了这一轮的份额吗？组织者会确认。',
+  org_pub_attach: '📎 附上收据照片（可选）',
+  org_pub_send: '发送报告',
+  org_pub_sent: '完成！你的付款已报告。',
+  org_pub_reported_note: '已报告 · 等待确认',
+  org_pub_err: '发送失败。请检查网络后重试。',
+  org_pub_err_confirmed: '这笔付款已被组织者确认。',
+  org_pub_err_photo: '照片太大；请换一张更小的。',
   org_penalty_label: '迟交规则',
   org_penalty_none: '无罚款',
   org_penalty_fixed: '固定罚款',
@@ -4606,6 +4677,7 @@ zh: {
   news_c32: '第 32 版：品牌名称现已在整个应用中统一为“PETO Finanzas”（菜单、锁定屏幕和小部件），san 已移到主页列表顶部，san 公开链接可直接打开群组状态，组织者按钮始终会给出明确提示。',
   news_c33: '第 33 版：新建 san 不再会误删正在进行的 san——如果已有一个活跃的 san，应用会明确提示并保护它（付款、凭证、历史和公开链接）——网页版现已与手机同步。',
   news_c34: '第 34 版：PETO Finanzas 全新标志——翠绿底色上白色的“P”配浅绿色柱条与箭头，现已出现在图标、锁屏和整个应用中。',
+  news_c35: '第 35 版：通过 san 公开链接，现在可以用"我已付款"报告付款并附上收据（由组织者确认）；公开查看器采用深色主题；下拉即可刷新应用；PDF 读取器不再把你发出的 Zelle 付款误认为收入。',
   back_exit_hint: '再按一次返回即可退出。'
 },
 ja: {
@@ -5258,6 +5330,15 @@ ja: {
   org_public_title: 'リンクを共有する準備ができました。',
   org_public_updated: '{date} に更新',
   org_public_notfound: 'このリンクはもう利用できません。',
+  org_pub_pay_btn: '支払いました',
+  org_pub_confirm: 'このラウンドの負担分はもう支払いましたか？主催者が確認します。',
+  org_pub_attach: '📎 領収書の写真を添付（任意）',
+  org_pub_send: '報告を送信',
+  org_pub_sent: '完了！支払いを報告しました。',
+  org_pub_reported_note: '報告済み · 確認待ち',
+  org_pub_err: '送信できませんでした。接続を確認してもう一度お試しください。',
+  org_pub_err_confirmed: 'この支払いは主催者がすでに確認済みです。',
+  org_pub_err_photo: '写真が大きすぎます。小さいものをお試しください。',
   org_penalty_label: '遅延ルール',
   org_penalty_none: '罰金なし',
   org_penalty_fixed: '固定罰金',
@@ -5276,6 +5357,7 @@ ja: {
   news_c32: 'バージョン32：ブランド名がアプリ全体（メニュー、ロック画面、ウィジェット）で「PETO Finanzas」に統一され、sanがホームのリストの一番上に移動し、sanの公開リンクはグループの状態を直接開き、主催者ボタンは常に明確なメッセージで応答します。',
   news_c33: 'バージョン33：sanを新規作成しても、進行中のsanが消えることはなくなりました。すでにアクティブなsanがある場合、アプリが知らせて保護します（支払い、領収書、履歴、公開リンク）。ウェブ版もスマートフォンと同期されました。',
   news_c34: 'バージョン34：PETO Finanzasの新しいロゴ——エメラルドの背景に白い「P」と淡い緑のバーと矢印が、アイコン、ロック画面、アプリ全体に登場しました。',
+  news_c35: 'バージョン35：sanの公開リンクから「支払いました」で支払いを報告し、領収書を添付できるようになりました（確認は主催者）。公開ビューアはダークテーマになり、下に引っ張るとアプリが更新され、PDFリーダーが送信したZelle支払いを収入と間違えなくなりました。',
   back_exit_hint: 'もう一度戻るを押すと終了します。'
 },
 ko: {
@@ -5928,6 +6010,15 @@ ko: {
   org_public_title: '링크를 공유할 준비가 되었습니다.',
   org_public_updated: '{date}에 업데이트됨',
   org_public_notfound: '이 링크는 더 이상 사용할 수 없습니다.',
+  org_pub_pay_btn: '결제했어요',
+  org_pub_confirm: '이번 라운드의 몫을 이미 결제하셨나요? 주최자가 확인할 거예요.',
+  org_pub_attach: '📎 영수증 사진 첨부(선택)',
+  org_pub_send: '보고 보내기',
+  org_pub_sent: '완료! 결제가 보고되었습니다.',
+  org_pub_reported_note: '보고됨 · 확인 대기 중',
+  org_pub_err: '보낼 수 없습니다. 연결을 확인하고 다시 시도하세요.',
+  org_pub_err_confirmed: '이 결제는 주최자가 이미 확인했습니다.',
+  org_pub_err_photo: '사진이 너무 큽니다. 더 작은 사진으로 시도하세요.',
   org_penalty_label: '연체 규칙',
   org_penalty_none: '벌금 없음',
   org_penalty_fixed: '고정 벌금',
@@ -5946,6 +6037,7 @@ ko: {
   news_c32: '버전 32: 이제 앱 전체(메뉴, 잠금 화면, 위젯)에서 브랜드가 "PETO Finanzas"로 표시되고, san이 홈 목록 맨 위로 이동했으며, san 공개 링크가 그룹 상태를 바로 열고, 조직자 버튼이 항상 명확한 메시지로 응답합니다.',
   news_c33: '버전 33: san을 새로 만들어도 진행 중인 san이 지워지지 않습니다. 이미 활성 san이 있으면 앱이 알려주고 보호합니다(결제, 영수증, 기록, 공개 링크). 웹 버전도 이제 휴대전화와 동기화됩니다.',
   news_c34: '버전 34: PETO Finanzas의 새 로고 — 에메랄드 배경에 흰색 "P"와 연한 녹색 막대와 화살표가 이제 아이콘, 잠금 화면, 앱 전체에 적용됩니다.',
+  news_c35: '버전 35: san 공개 링크에서 "결제했어요"로 결제를 보고하고 영수증을 첨부할 수 있습니다(주최자가 확인). 공개 뷰어는 다크 테마를 사용하고, 아래로 당기면 앱이 새로고침되며, PDF 리더가 보낸 Zelle 결제를 수입으로 착각하지 않습니다.',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.'
 },
 ru: {
@@ -6598,6 +6690,15 @@ ru: {
   org_public_title: 'Ссылка готова к отправке.',
   org_public_updated: 'Обновлено {date}',
   org_public_notfound: 'Эта ссылка больше недоступна.',
+  org_pub_pay_btn: 'Я заплатил',
+  org_pub_confirm: 'Вы уже заплатили свою долю за этот раунд? Организатор её подтвердит.',
+  org_pub_attach: '📎 Приложить фото чека (необязательно)',
+  org_pub_send: 'Отправить отчёт',
+  org_pub_sent: 'Готово! Ваш платёж отмечен как отправленный.',
+  org_pub_reported_note: 'Отправлено · ожидает подтверждения',
+  org_pub_err: 'Не удалось отправить. Проверьте соединение и попробуйте ещё раз.',
+  org_pub_err_confirmed: 'Этот платёж уже подтверждён организатором.',
+  org_pub_err_photo: 'Фото слишком большое; попробуйте меньшее.',
   org_penalty_label: 'Правило опоздания',
   org_penalty_none: 'Без штрафа',
   org_penalty_fixed: 'Фиксированный штраф',
@@ -6616,6 +6717,7 @@ ru: {
   news_c32: 'Версия 32: бренд теперь отображается как «PETO Finanzas» по всему приложению (меню, экран блокировки и виджеты), san переехал наверх списка главного экрана, публичная ссылка san открывает сразу статус группы, а кнопки организатора всегда отвечают понятным сообщением.',
   news_c33: 'Версия 33: создание san больше не может стереть текущий — если один уже активен, приложение сообщает об этом и защищает его (платежи, чеки, историю и публичную ссылку) — а веб-версия теперь синхронизирована с телефоном.',
   news_c34: 'Версия 34: новый логотип PETO Finanzas — белая «P» с полосками и стрелкой нежно-зелёного цвета на изумрудном фоне, теперь на значке, экране блокировки и во всём приложении.',
+  news_c35: 'Версия 35: по публичной ссылке san теперь можно сообщить о платеже кнопкой «Я заплатил» и приложить чек (подтверждает организатор), публичный просмотр в тёмной теме, приложение обновляется свайпом вниз, а PDF-читалка больше не путает отправленные вами платежи Zelle с доходом.',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.'
 },
 hi: {
@@ -7268,6 +7370,15 @@ hi: {
   org_public_title: 'लिंक साझा करने के लिए तैयार है।',
   org_public_updated: '{date} को अपडेट हुआ',
   org_public_notfound: 'यह लिंक अब उपलब्ध नहीं है।',
+  org_pub_pay_btn: 'मैंने भुगतान किया',
+  org_pub_confirm: 'क्या आपने इस राउंड का अपना हिस्सा चुका दिया है? आयोजक इसकी पुष्टि करेगा।',
+  org_pub_attach: '📎 रसीद की फ़ोटो जोड़ें (वैकल्पिक)',
+  org_pub_send: 'रिपोर्ट भेजें',
+  org_pub_sent: 'हो गया! आपका भुगतान रिपोर्ट कर दिया गया है।',
+  org_pub_reported_note: 'रिपोर्ट किया गया · पुष्टि की प्रतीक्षा',
+  org_pub_err: 'भेजा नहीं जा सका। अपना कनेक्शन जाँचकर फिर से कोशिश करें।',
+  org_pub_err_confirmed: 'इस भुगतान की पुष्टि आयोजक पहले ही कर चुका है।',
+  org_pub_err_photo: 'फ़ोटो बहुत बड़ी है; छोटी वाली आज़माएँ।',
   org_penalty_label: 'देरी का नियम',
   org_penalty_none: 'कोई जुर्माना नहीं',
   org_penalty_fixed: 'तय जुर्माना',
@@ -7286,6 +7397,7 @@ hi: {
   news_c32: 'संस्करण 32: अब पूरे ऐप (मेनू, लॉक स्क्रीन और विजेट) में ब्रांड "PETO Finanzas" दिखता है, san होम सूची में सबसे ऊपर आ गया है, san का सार्वजनिक लिंक सीधे समूह की स्थिति खोलता है और आयोजक बटन हमेशा स्पष्ट संदेश के साथ जवाब देते हैं।',
   news_c33: 'संस्करण 33: नया san बनाना अब चल रहे san को नहीं मिटा सकता — अगर पहले से एक सक्रिय है, तो ऐप बताता है और उसे सुरक्षित रखता है (भुगतान, रसीदें, इतिहास और सार्वजनिक लिंक) — और वेब संस्करण अब फ़ोन के साथ सिंक हो गया है।',
   news_c34: 'संस्करण 34: PETO Finanzas का नया लोगो — पन्ना हरे रंग की पृष्ठभूमि पर हल्के हरे रंग की पट्टियों और तीर वाला सफ़ेद "P", अब आइकन, लॉक स्क्रीन और पूरे ऐप में।',
+  news_c35: 'संस्करण 35: san के सार्वजनिक लिंक से अब आप "मैंने भुगतान किया" से अपने भुगतान की रिपोर्ट कर सकते हैं और रसीद जोड़ सकते हैं (आयोजक पुष्टि करता है), सार्वजनिक व्यूअर डार्क थीम में है, नीचे खींचने से ऐप रीफ़्रेश होता है, और PDF रीडर अब आपके भेजे Zelle भुगतान को आय नहीं समझता।',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।'
 },
 ar: {
@@ -7938,6 +8050,15 @@ ar: {
   org_public_title: 'الرابط جاهز للمشاركة.',
   org_public_updated: 'تم التحديث في {date}',
   org_public_notfound: 'هذا الرابط لم يعد متاحًا.',
+  org_pub_pay_btn: 'دفعت',
+  org_pub_confirm: 'هل دفعت حصتك في هذه الجولة بالفعل؟ سيؤكدها المنظم.',
+  org_pub_attach: '📎 إرفاق صورة الإيصال (اختياري)',
+  org_pub_send: 'إرسال الإبلاغ',
+  org_pub_sent: 'تم! تم الإبلاغ عن دفعتك.',
+  org_pub_reported_note: 'تم الإبلاغ · بانتظار التأكيد',
+  org_pub_err: 'تعذر الإرسال. تحقق من اتصالك وحاول مجددًا.',
+  org_pub_err_confirmed: 'لقد أكد المنظم هذه الدفعة بالفعل.',
+  org_pub_err_photo: 'الصورة كبيرة جدًا؛ جرّب صورة أصغر.',
   org_penalty_label: 'قاعدة التأخير',
   org_penalty_none: 'بدون غرامة',
   org_penalty_fixed: 'غرامة ثابتة',
@@ -7956,6 +8077,7 @@ ar: {
   news_c32: 'الإصدار 32: تظهر العلامة الآن باسم «PETO Finanzas» في التطبيق بأكمله (القائمة وشاشة القفل والأدوات)، وأصبح السان في أعلى قائمة الشاشة الرئيسية، ويفتح الرابط العام للسان حالة المجموعة مباشرة، وترد أزرار المنظّم دائمًا برسالة واضحة.',
   news_c33: 'الإصدار 33: إنشاء سان لم يعد بإمكانه مسح السان الجاري — إذا كان هناك سان نشط، يخبرك التطبيق ويحميه (المدفوعات والإيصالات والسجل والرابط العام) — وأصبحت نسخة الويب متزامنة الآن مع الهاتف.',
   news_c34: 'الإصدار 34: شعار PETO Finanzas الجديد — حرف «P» الأبيض مع أشرطة وسهم باللون الأخضر الفاتح على خلفية زمردية، الآن في الأيقونة وشاشة القفل وفي التطبيق بأكمله.',
+  news_c35: 'الإصدار 35: من رابط san العام يمكنك الآن الإبلاغ عن دفعتك بزر «دفعت» وإرفاق الإيصال (يؤكده المنظم)، وأصبح العارض العام بالمظهر الداكن، ويُحدَّث التطبيق بالسحب لأسفل، وقارئ PDF لم يعد يخلط مدفوعات Zelle التي ترسلها بالدخل.',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.'
 }
 };
@@ -9837,6 +9959,43 @@ function sanPublicLink(org) {
   if (!org || !org.linkToken) return '';
   return 'https://roblessantossterlin-lgtm.github.io/petofinanzas/app/#san=' + org.linkToken;
 }
+/* Compilación 35 · Invariante anti-pérdida: los reportes que los
+   participantes hacen desde el enlace público viven SOLO en la foto
+   del servidor. Antes de volver a publicar, el organizador importa a
+   su base local todo pago «Reportado» (o con foto de comprobante) del
+   servidor que localmente siga «Pendiente», para que la foto nueva
+   que sube lo conserve en vez de pisarlo. Devuelve true si la base
+   local cambió. No toca confirmados ni pendientes del servidor. */
+function mergeSanPublicReports(org, snap) {
+  if (!org || !snap || !Array.isArray(snap.rounds)) return false;
+  let changed = false;
+  snap.rounds.forEach((rd, i) => {
+    if (!rd || typeof rd !== 'object' || !org.rounds || !org.rounds[i]) return;
+    const reported = Array.isArray(rd.reported) ? rd.reported : [];
+    for (const nm of reported) {
+      if (!org.participants.includes(nm)) continue;
+      if (orgPayStatus(org, i, nm) !== 'pending') continue;
+      if (orgSetPayStatus(org, i, nm, 'reported')) changed = true;
+    }
+    const photos = (rd.photos && typeof rd.photos === 'object' && !Array.isArray(rd.photos)) ? rd.photos : {};
+    for (const nm of Object.keys(photos)) {
+      if (!org.participants.includes(nm)) continue;
+      const ph = photos[nm];
+      /* Mismo saneado que cleanSanOrg: solo data:image/ y ≤700 000. */
+      if (typeof ph !== 'string' || ph.indexOf('data:image/') !== 0 || ph.length > 700000) continue;
+      if (orgPayStatus(org, i, nm) === 'pending') {
+        if (orgSetPayStatus(org, i, nm, 'reported')) changed = true;
+      }
+      if (orgPayStatus(org, i, nm) === 'reported') {
+        const r = org.rounds[i];
+        if (!r.info || typeof r.info !== 'object') r.info = {};
+        if (!r.info[nm]) r.info[nm] = { st: 'reported' };
+        if (r.info[nm].photo !== ph) { r.info[nm].photo = ph; changed = true; }
+      }
+    }
+  });
+  return changed;
+}
 async function sanPublishLink(silent) {
   const org = db && db.sanOrg;
   const msg = document.getElementById('org-link-msg');
@@ -9846,11 +10005,30 @@ async function sanPublishLink(silent) {
     if (!silent && msg) msg.textContent = t('org_link_need_cloud');
     return false;
   }
+  const hadToken = !!org.linkToken;
   if (!org.linkToken) {
     const a = new Uint8Array(12);
     crypto.getRandomValues(a);
     org.linkToken = Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('');
     save();
+  }
+  /* Compilación 35: ANTES de subir, leer la foto actual del servidor
+     y fusionar sus reportes (si la lectura falla, se aborta la
+     publicación: mejor no publicar que pisar un reporte). */
+  if (hadToken) {
+    let serverSnap = null;
+    try {
+      const cur = await sb.from('san_public_links').select('data').eq('token', org.linkToken).maybeSingle();
+      if (cur && cur.error) {
+        if (!silent && msg) msg.textContent = t('cloud_err_generic');
+        return false;
+      }
+      if (cur && cur.data && cur.data.data && typeof cur.data.data === 'object') serverSnap = cur.data.data;
+    } catch (e) {
+      if (!silent && msg) msg.textContent = t('cloud_err_generic');
+      return false;
+    }
+    if (serverSnap && mergeSanPublicReports(org, serverSnap)) save();
   }
   try {
     const res = await sb.from('san_public_links').upsert(
@@ -10372,6 +10550,13 @@ async function shareSanOrgPng() {
    diálogo de conflicto) por encima del visor de un participante que
    abrió el enlace en un navegador nuevo. */
 let SAN_PUBLIC_MODE = false;
+/* Compilación 35: el visor público es PARTICIPATIVO. El token, la
+   foto del san y el aviso tras reportar viven en estas variables para
+   poder redibujar el visor (renderSanPublic) tras cada reporte sin
+   volver a pedir la foto al servidor. */
+let sanPublicToken = null;
+let sanPublicData = null;
+let sanPublicFlash = '';
 async function initSanPublic(token) {
   /* token === undefined → se extrae del hash con la regex estricta
      (compatibilidad); token === null → la URL traía #san= pero el
@@ -10381,6 +10566,15 @@ async function initSanPublic(token) {
     token = m ? m[1] : null;
   }
   SAN_PUBLIC_MODE = true;
+  sanPublicToken = token;
+  /* Compilación 35 (Bloque 2.3): el visor se presenta SIEMPRE con el
+     tema oscuro de la app (acento verde), sin depender de los ajustes
+     locales del visitante: se fijan los atributos que pinta
+     applyTheme() sin tocar la base local (que aquí ni siquiera es la
+     del visitante). */
+  const de = document.documentElement;
+  if (de.setAttribute) { de.setAttribute('data-theme', 'oscuro'); de.setAttribute('data-accent', 'verde'); }
+  if (de.dataset) { de.dataset.theme = 'oscuro'; de.dataset.accent = 'verde'; }
   const pub = document.getElementById('san-public');
   const box = document.getElementById('san-public-body');
   const shell = document.getElementById('app-shell');
@@ -10391,8 +10585,6 @@ async function initSanPublic(token) {
   if (lock) lock.hidden = true;
   if (pub) pub.hidden = false;
   if (!box) return true;
-  clearNode(box);
-  box.appendChild(el('h2', null, t('org_public_title')));
   let data = null;
   const sb = supa();
   if (sb && token) {
@@ -10401,9 +10593,29 @@ async function initSanPublic(token) {
       if (res && !res.error) data = res.data;
     } catch (e) { /* sin red o sin función: se muestra «no disponible» */ }
   }
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+  sanPublicData = (data && typeof data === 'object' && !Array.isArray(data)) ? data : null;
+  renderSanPublic();
+  return true;
+}
+/* Dibuja el visor desde sanPublicData. Encabezado: la marca y el
+   nombre del san. Compilación 35 (Bloque 2.1): el texto de
+   org_public_title («El enlace está listo para compartir.») es el
+   estado del enlace en la pantalla del ORGANIZADOR y aquí no se
+   pinta ninguna vez (antes salía dos: el h2 estático del esqueleto
+   y el que agregaba el arranque). */
+function renderSanPublic() {
+  const box = document.getElementById('san-public-body');
+  if (!box) return;
+  clearNode(box);
+  box.appendChild(el('h2', null, t('app_title')));
+  const data = sanPublicData;
+  if (!data) {
     box.appendChild(el('p', 'muted', t('org_public_notfound')));
-    return true;
+    return;
+  }
+  if (sanPublicFlash) {
+    box.appendChild(el('p', 'total-line', sanPublicFlash));
+    sanPublicFlash = '';
   }
   const names = (Array.isArray(data.participants) ? data.participants : []).map((pp) =>
     (pp && typeof pp === 'object') ? String(pp.name || '') : String(pp || '')).filter((x) => x);
@@ -10436,7 +10648,14 @@ async function initSanPublic(token) {
     const repo = Array.isArray(rd.reported) ? rd.reported : [];
     for (const nm of names) {
       const st = conf.includes(nm) ? 'confirmed' : (repo.includes(nm) ? 'reported' : 'pending');
-      card.appendChild(el('p', 'muted small', nm + ' · ' + t('org_pay_' + st)));
+      if (st === 'reported') {
+        /* Sin botón: ya reportó y espera la confirmación del organizador. */
+        card.appendChild(el('p', 'muted small', nm + ' · ' + t('org_pub_reported_note')));
+      } else if (st === 'pending') {
+        card.appendChild(sanPublicPendingRow(i, nm));
+      } else {
+        card.appendChild(el('p', 'muted small', nm + ' · ' + t('org_pay_' + st)));
+      }
     }
     box.appendChild(card);
   });
@@ -10449,7 +10668,97 @@ async function initSanPublic(token) {
     const dstr = String(data.updatedAt).slice(0, 10);
     box.appendChild(el('p', 'muted small', t('org_public_updated', { date: prettyDate(dstr) })));
   }
-  return true;
+}
+/* Fila de un participante PENDIENTE en el visor: su estado y la acción
+   «Ya pagué». Al tocarla se despliega el panel en línea (confirmación
+   breve + foto opcional del comprobante, comprimida con la misma
+   processReceiptFile de los recibos del organizador). */
+function sanPublicPendingRow(roundIdx, nm) {
+  const wrap = el('div', null);
+  const panel = el('div', 'san-pub-panel');
+  panel.hidden = true;
+  panel.appendChild(el('p', 'muted small', t('org_pub_confirm')));
+  let pendingPhoto = null;
+  const photoLine = el('p', 'muted small', '');
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.hidden = true;
+  const attachLabel = el('label', 'btn btn-small btn-ghost', t('org_pub_attach'));
+  attachLabel.appendChild(fileInput);
+  panel.appendChild(attachLabel);
+  panel.appendChild(photoLine);
+  fileInput.addEventListener('change', () => {
+    const f = fileInput.files && fileInput.files[0];
+    fileInput.value = '';
+    if (!f) return;
+    processReceiptFile(f, (url) => {
+      if (url) { pendingPhoto = url; photoLine.textContent = '📎 ' + (f.name || '✓'); }
+    });
+  });
+  const errLine = el('p', 'error', '');
+  errLine.hidden = true;
+  const sendBtn = actionButton(t('org_pub_send'), 'btn-primary', async () => {
+    sendBtn.disabled = true;
+    errLine.hidden = true;
+    const r = await sanPublicReport(sanPublicToken, nm, roundIdx, pendingPhoto);
+    if (r.ok) {
+      /* La copia local aprende el reporte y el visor se redibuja: la
+         fila pasa a «Reportado · esperando confirmación», sin botón. */
+      const data = sanPublicData;
+      if (data) {
+        if (!Array.isArray(data.rounds)) data.rounds = [];
+        if (!data.rounds[roundIdx] || typeof data.rounds[roundIdx] !== 'object') data.rounds[roundIdx] = { confirmed: [], reported: [] };
+        if (!Array.isArray(data.rounds[roundIdx].reported)) data.rounds[roundIdx].reported = [];
+        if (!data.rounds[roundIdx].reported.includes(nm)) data.rounds[roundIdx].reported.push(nm);
+        if (pendingPhoto) {
+          if (!data.rounds[roundIdx].photos || typeof data.rounds[roundIdx].photos !== 'object') data.rounds[roundIdx].photos = {};
+          data.rounds[roundIdx].photos[nm] = pendingPhoto;
+        }
+      }
+      sanPublicFlash = t('org_pub_sent');
+      renderSanPublic();
+    } else {
+      sendBtn.disabled = false;
+      errLine.textContent = r.error === 'already_confirmed' ? t('org_pub_err_confirmed')
+        : (r.error === 'photo_too_big' ? t('org_pub_err_photo') : t('org_pub_err'));
+      errLine.hidden = false;
+    }
+  });
+  const cancelBtn = actionButton(t('btn_cancel'), 'btn-ghost', () => {
+    panel.hidden = true;
+    payBtn.disabled = false;
+  });
+  panel.appendChild(sendBtn);
+  panel.appendChild(cancelBtn);
+  panel.appendChild(errLine);
+  const row = el('div', 'toggle-row');
+  row.appendChild(el('span', null, nm + ' · ' + t('org_pay_pending')));
+  const payBtn = actionButton(t('org_pub_pay_btn'), 'btn-primary', () => {
+    panel.hidden = false;
+    payBtn.disabled = true;
+  });
+  row.appendChild(payBtn);
+  wrap.appendChild(row);
+  wrap.appendChild(panel);
+  return wrap;
+}
+/* Único canal de escritura del visor: la RPC san_public_report del
+   servidor (migración supabase/san-public-report.sql). Solo permite
+   pendiente → reportado con foto opcional; confirmar, desmarcar o
+   tocar montos/orden/participantes es imposible con el token. */
+async function sanPublicReport(token, participant, round, photo) {
+  const sb = supa();
+  if (!sb || !token) return { ok: false, error: 'offline' };
+  try {
+    const res = await sb.rpc('san_public_report', {
+      p_token: token, p_participant: participant, p_round: round, p_photo: photo || null
+    });
+    if (res && res.error) return { ok: false, error: 'rpc' };
+    const d = res && res.data;
+    if (d && d.ok === true) return { ok: true };
+    return { ok: false, error: (d && d.error) || 'unknown' };
+  } catch (e) { return { ok: false, error: 'network' }; }
 }
 
 /* ---------------- AJUSTES ---------------- */
@@ -10978,11 +11287,14 @@ function renderCsvPreview() {
      -1,234.56, 1,234.56- y +1,234.56. La fecha se extrae antes de buscar
      montos para que sus cifras no se confundan con un monto.
    - Signo/tipo: paréntesis o «-» = gasto; «+» = ingreso; sin signo
-     explícito manda el encabezado de sección vigente (withdrawal/
+     explícito mandan primero las FRASES de dirección de la descripción
+     (Compilación 35: «payment to»/«pago a»/«zelle to» = gasto;
+     «payment from»/«pago de»/«zelle from» = ingreso; «card payment» =
+     gasto), luego el encabezado de sección vigente (withdrawal/
      retiro/cargo/débito/debit = gasto; deposit/depósito/abono/crédito/
-     credit = ingreso, detectado en líneas sin monto); sin sección,
+     credit = ingreso, detectado en líneas sin monto) y por último la
      heurística por descripción (deposit, payroll, interest, refund,
-     zelle, direct dep y equivalentes en español = ingreso; resto = gasto).
+     direct dep y equivalentes en español = ingreso; resto = gasto).
      amountCents siempre es positivo.
    - Descripción: la línea sin el token de fecha ni los de monto,
      espacios colapsados, sin puntuación colgando en los extremos,
@@ -11142,11 +11454,27 @@ function parseStatementLines(lines) {
     const hasPlus = firstToken.includes('+');
     if (hasParen || hasMinus || signed < 0) kind = 'gasto';
     else if (hasPlus) kind = 'ingreso';
-    else if (section) kind = section;
     else {
       const dnorm = pdfNormText(desc);
-      const incomeWords = ['deposit', 'deposito', 'payroll', 'interest', 'interes', 'refund', 'reembolso', 'zelle', 'direct dep', 'nomina', 'devolucion', 'abono'];
-      kind = incomeWords.some((w) => dnorm.includes(w)) ? 'ingreso' : 'gasto';
+      /* Compilación 35: las FRASES de dirección mandan sobre la
+         palabra suelta y sobre la sección. En el estado real de SoFi,
+         «Direct Payment Zelle® Payment to Mami» entró como INGRESO
+         porque la lista de palabras incluía «zelle» a secas: un Zelle
+         QUE SALE («payment to», «pago a», «zelle to», «sent to») es un
+         GASTO; solo es ingreso si el dinero ENTRA («payment from»,
+         «pago de», «zelle from», «received from»). Un «Card Payment»
+         (pago con tarjeta) también es gasto: pagar la tarjeta no es
+         un depósito. */
+      const outPhrases = ['payment to', 'pago a', 'zelle to', 'sent to', 'transfer to', 'enviado a', 'envio a'];
+      const inPhrases = ['payment from', 'pago de', 'zelle from', 'received from', 'transfer from', 'recibido de'];
+      if (outPhrases.some((w) => dnorm.includes(w))) kind = 'gasto';
+      else if (inPhrases.some((w) => dnorm.includes(w))) kind = 'ingreso';
+      else if (/\bcard payment\b/.test(dnorm)) kind = 'gasto';
+      else if (section) kind = section;
+      else {
+        const incomeWords = ['deposit', 'deposito', 'payroll', 'interest', 'interes', 'refund', 'reembolso', 'direct dep', 'nomina', 'devolucion', 'abono'];
+        kind = incomeWords.some((w) => dnorm.includes(w)) ? 'ingreso' : 'gasto';
+      }
     }
     rows.push({ date: found.date, description: desc, kind: kind, amountCents: amountCents, category: '', duplicate: false, include: true });
     if (rows.length >= 1000) break;
@@ -13737,7 +14065,117 @@ async function onOnboardingSubmit(ev) {
 }
 
 /* ---------------- Inicio ---------------- */
+/* ---------------- Deslizar para refrescar (Compilación 35) ----------
+   Pull-to-refresh SIN plugin nuevo y SIN recargar la página (recargar
+   mandaría a la pantalla de bloqueo con PIN y perdería la navegación).
+   Enfoque: gesto JS sobre el WebView — arrastre hacia abajo con la
+   vista arriba del todo, solo dentro de las vistas principales
+   (main.view), con indicador circular de aspecto nativo. Al soltar
+   pasado el umbral se ejecuta el refresco REAL de la app:
+   pullToRefresh() redibuja la vista actual y, si hay sesión en la
+   nube, baja los datos nuevos (sin bloquear si no hay internet y sin
+   pisar cambios locales sin subir: solo aplica lo remoto si el local
+   no está sucio). No compite con el scroll normal (solo actúa en el
+   tope, dy>0) ni con el gesto de atrás de la Compilación 31 (botón/
+   gesto del sistema, otro canal). En modo público (#san=) no se
+   conecta: wireEvents nunca corre allí, y el guard lo refuerza. */
+let ptrRefreshing = false;
+async function pullToRefresh() {
+  if (ptrRefreshing) return false;
+  ptrRefreshing = true;
+  try {
+    showView(currentView);
+    const sb = supa();
+    if (sb && cloudUser) {
+      try {
+        const res = await sb.from('user_data')
+          .select('data, updated_at').eq('user_id', cloudUser.id).maybeSingle();
+        const row = res && !res.error ? res.data : null;
+        if (row && !cloudState.dirty &&
+            (!cloudState.lastRemoteAt || row.updated_at !== cloudState.lastRemoteAt)) {
+          cloudApplyRemote(row); /* ya guarda y redibuja todo */
+        }
+      } catch (e) { /* sin internet: vale el refresco local */ }
+    }
+  } finally { ptrRefreshing = false; }
+  return true;
+}
+function initPullToRefresh() {
+  const ind = document.getElementById('ptr-indicator');
+  const arrow = ind ? ind.querySelector('.ptr-arrow') : null;
+  if (!ind || !arrow) return;
+  const THRESHOLD = 70;
+  let startY = null;
+  let pullDy = 0;
+  let tracking = false;
+  const pointY = (ev) => {
+    const src = (ev.touches && ev.touches.length) ? ev.touches[0]
+      : (ev.changedTouches && ev.changedTouches.length) ? ev.changedTouches[0] : ev;
+    return src && typeof src.clientY === 'number' ? src.clientY : null;
+  };
+  const eligible = (ev) => {
+    if (SAN_PUBLIC_MODE || ptrRefreshing) return false;
+    const shell = document.getElementById('app-shell');
+    if (!shell || shell.hidden) return false;
+    const drawer = document.getElementById('menu-drawer-wrap');
+    if (drawer && !drawer.hidden) return false;
+    const photo = document.getElementById('photo-overlay');
+    if (photo && !photo.hidden) return false;
+    if ((window.scrollY || 0) > 0) return false;
+    const tgt = ev.target;
+    if (tgt && tgt.closest) {
+      if (!tgt.closest('main.view')) return false;
+      if (tgt.closest('input, select, textarea')) return false;
+    }
+    return true;
+  };
+  const paint = (dy, spinning) => {
+    const shown = spinning ? 96 : Math.min(Math.max(dy, 0) * 0.7, 96);
+    ind.style.transform = 'translate(-50%, ' + Math.round(shown - 84) + 'px)';
+    ind.style.opacity = (dy > 4 || spinning) ? '1' : '0';
+    arrow.style.transform = spinning ? '' : 'rotate(' + Math.round(Math.max(dy, 0) * 2.2) + 'deg)';
+    ind.classList.toggle('ptr-spinning', !!spinning);
+  };
+  document.addEventListener('touchstart', (ev) => {
+    tracking = false;
+    pullDy = 0;
+    if (!eligible(ev)) { startY = null; return; }
+    startY = pointY(ev);
+    tracking = startY !== null;
+    if (tracking) ind.classList.remove('ptr-anim');
+  }, { passive: true });
+  document.addEventListener('touchmove', (ev) => {
+    if (!tracking || startY === null) return;
+    if ((window.scrollY || 0) > 0) { tracking = false; paint(0, false); return; }
+    const y = pointY(ev);
+    if (y === null) return;
+    pullDy = y - startY;
+    if (pullDy <= 0) { paint(0, false); return; }
+    if (ev.cancelable && ev.preventDefault) ev.preventDefault();
+    paint(pullDy, false);
+  }, { passive: false });
+  const endPull = async () => {
+    if (!tracking) return;
+    tracking = false;
+    const dy = pullDy;
+    pullDy = 0;
+    startY = null;
+    ind.classList.add('ptr-anim');
+    if (dy >= THRESHOLD) {
+      paint(THRESHOLD, true);
+      const t0 = Date.now();
+      try { await pullToRefresh(); } catch (e) { /* el refresco nunca rompe la app */ }
+      const wait = 550 - (Date.now() - t0);
+      if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    }
+    paint(0, false);
+  };
+  document.addEventListener('touchend', endPull);
+  document.addEventListener('touchcancel', endPull);
+}
+
 function wireEvents() {
+  initPullToRefresh();
   document.getElementById('lock-form').addEventListener('submit', onLockSubmit);
   document.getElementById('onboarding-form').addEventListener('submit', onOnboardingSubmit);
   const obTourNextBtn = document.getElementById('ob-tour-next');
