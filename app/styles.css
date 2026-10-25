@@ -327,6 +327,11 @@ html[data-theme="oscuro"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:
   border:1px solid var(--line);flex:0 0 auto;
 }
 .receipt-preview{max-width:100%;max-height:180px;border-radius:10px;margin-top:.5rem;display:block}
+/* Acordeón de rondas del organizador (Compilación 37): la cabecera
+   de cada ronda es el mando que la abre o la cierra; la flecha va
+   a la derecha y la tarjeta retraída queda compacta. */
+.org-round-head{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.org-round-chevron{opacity:.65;flex:0 0 auto}
 .photo-overlay{
   position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.85);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:1rem;
@@ -413,6 +418,27 @@ html[data-theme="oscuro"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:
    acción. El relleno inferior del contenedor (solo en estrechas)
    evita que la barra tape la última tarjeta. */
 #san-public{max-width:640px;margin:0 auto;padding:1rem 1rem 2rem}
+/* Mini barra de marca pegajosa (Compilación 37): franja fina fija
+   arriba (44px) con el icono, la marca y el enlace «Probar». Solo
+   existe en el modo público y solo se muestra (clase .pub-top-show)
+   cuando el hero ya no se ve; la sección compensa su alto con la
+   clase .pub-top-on para que nunca tape el contenido. Entra con un
+   deslizamiento suave; con «reducir movimiento» aparece sin más. */
+#san-public-topbar{
+  position:fixed;top:0;left:0;right:0;z-index:66;height:44px;
+  display:flex;align-items:center;gap:.55rem;padding:0 .8rem;
+  background:linear-gradient(135deg,#002d13 0%,#00421C 55%,#0b6e4f 100%);
+  color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.3);
+  transform:translateY(-110%);transition:transform .25s ease;
+}
+#san-public-topbar.pub-top-show{transform:none}
+#san-public.pub-top-on{padding-top:calc(1rem + 44px)}
+.pub-topbar-logo{width:26px;height:26px;border-radius:7px;flex:0 0 auto}
+.pub-topbar-brand{font-weight:800;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pub-topbar-try{
+  color:#fff;font-weight:700;font-size:.85rem;text-decoration:none;white-space:nowrap;
+  border:1px solid #cdeeda;border-radius:999px;padding:.28rem .7rem;flex:0 0 auto;
+}
 .pub-hero{
   display:flex;align-items:center;gap:.9rem;
   background:linear-gradient(135deg,#002d13 0%,#00421C 48%,#0b6e4f 100%);
@@ -480,6 +506,7 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 @media (prefers-reduced-motion: reduce){
   .pub-anim{animation:none}
   .pub-progress-fill{transition:none}
+  #san-public-topbar{transition:none}
 }
 .insight-line{display:flex;align-items:center;gap:.7rem;margin:.45rem 0}
 .goal-extra{margin:.7rem 0}

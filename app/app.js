@@ -1,21 +1,19 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 36) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 37) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 36: nueva sección
-   Podcast (episodios de «Finanzas Personales» desde el feed con
-   reproductor integrado y lista guardada sin conexión; la CSP
-   abre connect-src y media-src a muse.ai, igual que en el
-   teléfono), la bienvenida que avanza sola lámina a lámina y la
-   vista pública del enlace del san renovada como vitrina (hero
-   de marca, avance de pagos y acceso para probar la app), con
-   las claves nuevas sec_podcast y pub_* en los 12 idiomas
-   (703 claves por idioma, con la línea news_c36). Sobre la base
-   de la Compilación 35 ya sincronizada (enlace participativo). */
+   Sincronizado el 25-oct-2026 con la Compilación 37: Widgets v3
+   (los widgets son nativos de Android; su código y las claves
+   widget_* viajan aquí como paridad, sin ejecutarse en el
+   navegador), la mini barra de marca del visor público del san,
+   fija arriba al bajar por el enlace, y el acordeón de rondas
+   del organizador, con solo la de esta semana abierta
+   (709 claves por idioma, con la línea news_c37). Sobre la base
+   de la Compilación 36 ya sincronizada (Podcast y vitrina). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -27,7 +25,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 36'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 37'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -747,6 +745,8 @@ es: {
   org_receiver_line: 'Recibe: {name}',
   org_pending_none: '¡Todos pagaron! 🎉',
   org_pending_list: 'Pendientes: {names}',
+  org_pending_count_one: 'Queda 1 pendiente',
+  org_pending_count_many: 'Quedan {n} pendientes',
   org_totals_title: 'Aportes por participante',
   org_paid_rounds: '{paid} de {n} rondas pagadas',
   org_delete: 'Borrar san organizado',
@@ -863,6 +863,10 @@ es: {
   pub_bar_try: 'Probar la app',
   pub_footer: 'Hecho con PETO Finanzas · petofinanzas.com',
   news_c36: 'Compilación 36: nueva sección Podcast — escucha «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet — la bienvenida ahora avanza sola, lámina a lámina — y la vista del enlace renovada: el san se presenta con su avance y acceso directo para probar la app.',
+  news_c37: 'Compilación 37: widgets renovados — degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san — y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy — y la marca siempre visible al bajar por el enlace público del san — y las rondas del organizador ahora se pliegan en acordeón, con solo la de esta semana abierta.',
+  widget_today: 'hoy',
+  widget_san_next: 'Próximo turno: {name} · {date}',
+  widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Pulsa atrás otra vez para salir.'
 },
 en: {
@@ -1206,6 +1210,8 @@ en: {
   org_receiver_line: 'Receives: {name}',
   org_pending_none: 'Everyone has paid! 🎉',
   org_pending_list: 'Still to pay: {names}',
+  org_pending_count_one: '1 still to pay',
+  org_pending_count_many: '{n} still to pay',
   org_totals_title: 'Contributions per participant',
   org_paid_rounds: '{paid} of {n} rounds paid',
   org_delete: 'Delete organized san',
@@ -1322,6 +1328,10 @@ en: {
   pub_bar_try: 'Try the app',
   pub_footer: 'Made with PETO Finanzas · petofinanzas.com',
   news_c36: 'Build 36: new Podcast section — listen to “Finanzas Personales” without leaving the app, with a built-in player and the list saved for when there is no internet — the welcome now moves on its own, slide by slide — and the link view, renewed: the san is showcased with its progress and a direct way to try the app.',
+  news_c37: 'Build 37: redesigned widgets — brand gradient, a progress bar that changes color with your budget and your san’s next-turn line — plus a brand-new app-icon-sized widget with what you can spend today — and the brand stays in view as you scroll the public san link — and the organizer’s rounds now fold into an accordion, with only this week’s open.',
+  widget_today: 'today',
+  widget_san_next: 'Next turn: {name} · {date}',
+  widget_san_next_nodate: 'Next turn: {name}',
   back_exit_hint: 'Press back again to exit.'
 },
 it: {
@@ -1908,6 +1918,8 @@ it: {
   org_receiver_line: 'Riceve: {name}',
   org_pending_none: 'Hanno pagato tutti! 🎉',
   org_pending_list: 'Ancora da pagare: {names}',
+  org_pending_count_one: 'Ne manca 1',
+  org_pending_count_many: 'Ne mancano {n}',
   org_totals_title: 'Contributi per partecipante',
   org_paid_rounds: '{paid} di {n} turni pagati',
   org_delete: 'Elimina san organizzato',
@@ -2024,6 +2036,10 @@ it: {
   pub_bar_try: 'Prova l’app',
   pub_footer: 'Fatto con PETO Finanzas · petofinanzas.com',
   news_c36: 'Versione 36: nuova sezione Podcast — ascolta «Finanzas Personales» senza uscire dall’app, con lettore integrato e l’elenco salvato per quando non c’è internet — la schermata di benvenuto ora avanza da sola, diapositiva dopo diapositiva — e la vista del link rinnovata: il san si presenta con il suo avanzamento e l’accesso diretto per provare l’app.',
+  news_c37: 'Versione 37: widget ridisegnati — gradiente del marchio, barra di avanzamento che cambia colore in base al budget e la riga del prossimo turno del tuo san — e un widget nuovo grande quanto un’icona, con quanto puoi spendere oggi — e il marchio resta visibile mentre scorri il link pubblico del san — e i turni dell’organizzatore ora si piegano a fisarmonica, con aperto solo quello di questa settimana.',
+  widget_today: 'oggi',
+  widget_san_next: 'Prossimo turno: {name} · {date}',
+  widget_san_next_nodate: 'Prossimo turno: {name}',
   back_exit_hint: 'Premi di nuovo indietro per uscire.'
 },
 pt: {
@@ -2609,6 +2625,8 @@ pt: {
   org_receiver_line: 'Recebe: {name}',
   org_pending_none: 'Todos pagaram! 🎉',
   org_pending_list: 'Falta pagar: {names}',
+  org_pending_count_one: 'Falta 1',
+  org_pending_count_many: 'Faltam {n}',
   org_totals_title: 'Contribuições por participante',
   org_paid_rounds: '{paid} de {n} rodadas pagas',
   org_delete: 'Excluir san organizado',
@@ -2726,6 +2744,10 @@ pt: {
   pub_bar_try: 'Testar o app',
   pub_footer: 'Feito com PETO Finanzas · petofinanzas.com',
   news_c36: 'Compilação 36: nova seção Podcast — ouça «Finanzas Personales» sem sair do app, com reprodutor integrado e a lista salva para quando não há internet — a boas-vindas agora avança sozinha, tela a tela — e a vista do link renovada: o san se apresenta com seu progresso e acesso direto para testar o app.',
+  news_c37: 'Compilação 37: widgets renovados — degradê da marca, barra de progresso que muda de cor conforme seu orçamento e a linha do próximo turno do seu san — e um widget novo do tamanho de um ícone, com o que você pode gastar hoje — e a marca sempre visível ao rolar o link público do san — e as rodadas do organizador agora dobram em acordeão, com só a desta semana aberta.',
+  widget_today: 'hoje',
+  widget_san_next: 'Próximo turno: {name} · {date}',
+  widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Toque em voltar outra vez para sair.'
 },
 fr: {
@@ -3311,6 +3333,8 @@ fr: {
   org_receiver_line: 'Reçoit : {name}',
   org_pending_none: 'Tout le monde a payé ! 🎉',
   org_pending_list: 'Reste à payer : {names}',
+  org_pending_count_one: 'Plus que 1 à payer',
+  org_pending_count_many: 'Plus que {n} à payer',
   org_totals_title: 'Contributions par participant',
   org_paid_rounds: '{paid} tours payés sur {n}',
   org_delete: 'Supprimer le san organisé',
@@ -3428,6 +3452,10 @@ fr: {
   pub_bar_try: 'Essayer l’appli',
   pub_footer: 'Fait avec PETO Finanzas · petofinanzas.com',
   news_c36: 'Version 36 : nouvelle section Podcast — écoutez « Finanzas Personales » sans quitter l’appli, avec lecteur intégré et la liste enregistrée pour quand il n’y a pas internet — l’écran d’accueil avance maintenant tout seul, diapositive après diapositive — et la vue du lien renouvelée : le san se présente avec sa progression et un accès direct pour essayer l’appli.',
+  news_c37: 'Version 37 : widgets repensés — dégradé de la marque, barre de progression qui change de couleur selon votre budget et la ligne du prochain tour de votre san — et un nouveau widget de la taille d’une icône, avec ce que vous pouvez dépenser aujourd’hui — et la marque reste visible quand on fait défiler le lien public du san — et les tours de l’organisateur se plient en accordéon, avec seul celui de cette semaine ouvert.',
+  widget_today: 'aujourd’hui',
+  widget_san_next: 'Prochain tour : {name} · {date}',
+  widget_san_next_nodate: 'Prochain tour : {name}',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.'
 },
 de: {
@@ -4013,6 +4041,8 @@ de: {
   org_receiver_line: 'Erhält: {name}',
   org_pending_none: 'Alle haben gezahlt! 🎉',
   org_pending_list: 'Noch zu zahlen: {names}',
+  org_pending_count_one: 'Noch 1 offen',
+  org_pending_count_many: 'Noch {n} offen',
   org_totals_title: 'Beiträge pro Teilnehmer',
   org_paid_rounds: '{paid} von {n} Runden bezahlt',
   org_delete: 'Organisierten San löschen',
@@ -4130,6 +4160,10 @@ de: {
   pub_bar_try: 'App testen',
   pub_footer: 'Gemacht mit PETO Finanzas · petofinanzas.com',
   news_c36: 'Version 36: neuer Bereich Podcast — höre „Finanzas Personales“, ohne die App zu verlassen, mit integriertem Player und gespeicherter Liste für Zeiten ohne Internet — der Willkommensbildschirm wechselt jetzt von selbst, Folie für Folie — und die erneuerte Link-Ansicht: Der San zeigt seinen Fortschritt und einen direkten Zugang, um die App zu testen.',
+  news_c37: 'Version 37: Widgets im neuen Look — Marken-Farbverlauf, ein Fortschrittsbalken, der je nach Budget die Farbe wechselt, und die Zeile zum nächsten Zug deines San — plus ein neues Widget in App-Symbol-Größe mit deinem heutigen Budget — und die Marke bleibt beim Scrollen im öffentlichen San-Link sichtbar — und die Runden des Organisators klappen jetzt als Akkordeon, mit nur der dieser Woche offen.',
+  widget_today: 'heute',
+  widget_san_next: 'Nächster Zug: {name} · {date}',
+  widget_san_next_nodate: 'Nächster Zug: {name}',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.'
 },
 zh: {
@@ -4715,6 +4749,8 @@ zh: {
   org_receiver_line: '领取者：{name}',
   org_pending_none: '大家都付了！🎉',
   org_pending_list: '尚未付款：{names}',
+  org_pending_count_one: '还剩 1 人未付',
+  org_pending_count_many: '还剩 {n} 人未付',
   org_totals_title: '每位参与者的出资',
   org_paid_rounds: '已付 {paid} / {n} 轮',
   org_delete: '删除有组织的 san',
@@ -4832,6 +4868,10 @@ zh: {
   pub_bar_try: '试用应用',
   pub_footer: '由 PETO Finanzas 制作 · petofinanzas.com',
   news_c36: '第 36 版：新增播客版块——无需离开应用即可收听《Finanzas Personales》，内置播放器，列表会保存以便离线查看；欢迎页现在会自动逐页切换；链接视图也焕然一新：san 展示进度，并可直接试用应用。',
+  news_c37: '第 37 版：小部件全新设计——品牌渐变、会随预算变色的进度条，以及 san 下一轮的提示行——还有一个全新的、只有一个图标大小的小部件，显示你今天能花多少；在 san 公开链接中下滑时，品牌始终可见；组织者的轮次现在折叠成手风琴，仅展开本周一轮。',
+  widget_today: '今日',
+  widget_san_next: '下一轮：{name} · {date}',
+  widget_san_next_nodate: '下一轮：{name}',
   back_exit_hint: '再按一次返回即可退出。'
 },
 ja: {
@@ -5417,6 +5457,8 @@ ja: {
   org_receiver_line: '受け取る人：{name}',
   org_pending_none: '全員払いました！🎉',
   org_pending_list: 'まだの人：{names}',
+  org_pending_count_one: 'あと1人未払い',
+  org_pending_count_many: 'あと{n}人未払い',
   org_totals_title: '参加者ごとの拠出金',
   org_paid_rounds: '{n}ラウンド中{paid}ラウンド支払い済み',
   org_delete: '組織化されたsanを削除',
@@ -5534,6 +5576,10 @@ ja: {
   pub_bar_try: 'アプリを試す',
   pub_footer: 'PETO Finanzas で作成 · petofinanzas.com',
   news_c36: 'バージョン36：新しいポッドキャストセクション——アプリを離れずに「Finanzas Personales」を聴けます。プレーヤー内蔵、リストはオフライン用に保存。ようこそ画面は自動で切り替わるようになりました。リンク表示も一新：sanの進み具合と、アプリを試す直接アクセス付き。',
+  news_c37: 'バージョン37：ウィジェットを一新——ブランドのグラデーション、予算に合わせて色が変わる進捗バー、sanの次のターンの行——そして、今日使える金額を表示するアイコンサイズの新しいウィジェット。公開リンクをスクロールしてもブランドが常に表示されます。主催者のラウンドはアコーディオン式になり、今週分だけが開きます。',
+  widget_today: '今日',
+  widget_san_next: '次のターン：{name} · {date}',
+  widget_san_next_nodate: '次のターン：{name}',
   back_exit_hint: 'もう一度戻るを押すと終了します。'
 },
 ko: {
@@ -6119,6 +6165,8 @@ ko: {
   org_receiver_line: '받는 사람: {name}',
   org_pending_none: '모두 냈습니다! 🎉',
   org_pending_list: '아직 내지 않음: {names}',
+  org_pending_count_one: '1명 남음',
+  org_pending_count_many: '{n}명 남음',
   org_totals_title: '참가자별 기여금',
   org_paid_rounds: '{n}라운드 중 {paid}라운드 납부됨',
   org_delete: '조직된 san 삭제',
@@ -6236,6 +6284,10 @@ ko: {
   pub_bar_try: '앱 사용해 보기',
   pub_footer: 'PETO Finanzas로 제작 · petofinanzas.com',
   news_c36: '버전 36: 새로운 팟캐스트 섹션 — 앱을 떠나지 않고 "Finanzas Personales"를 들을 수 있고, 내장 플레이어와 오프라인용 저장 목록을 제공합니다. 시작 화면이 이제 슬라이드마다 자동으로 넘어갑니다. 링크 화면도 새로워졌습니다: san의 진행 상황과 앱을 바로 써볼 수 있는 접근을 보여줍니다.',
+  news_c37: '버전 37: 새로워진 위젯 — 브랜드 그라데이션, 예산에 따라 색이 바뀌는 진행 바, san 다음 차례 줄 — 그리고 오늘 쓸 수 있는 금액을 보여주는 아이콘 크기의 새 위젯. 공개 san 링크를 스크롤해도 브랜드가 계속 보입니다. 주최자 라운드는 아코디언으로 접히고, 이번 주 것만 열립니다.',
+  widget_today: '오늘',
+  widget_san_next: '다음 차례: {name} · {date}',
+  widget_san_next_nodate: '다음 차례: {name}',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.'
 },
 ru: {
@@ -6821,6 +6873,8 @@ ru: {
   org_receiver_line: 'Получает: {name}',
   org_pending_none: 'Все оплатили! 🎉',
   org_pending_list: 'Ещё не оплатили: {names}',
+  org_pending_count_one: 'Остался 1',
+  org_pending_count_many: 'Осталось: {n}',
   org_totals_title: 'Взносы по участникам',
   org_paid_rounds: 'Оплачено {paid} из {n} раундов',
   org_delete: 'Удалить организованный сан',
@@ -6938,6 +6992,10 @@ ru: {
   pub_bar_try: 'Попробовать приложение',
   pub_footer: 'Сделано в PETO Finanzas · petofinanzas.com',
   news_c36: 'Версия 36: новый раздел «Подкаст» — слушайте «Finanzas Personales», не выходя из приложения, со встроенным плеером и сохранённым списком на случай отсутствия интернета — экран приветствия теперь листается сам, слайд за слайдом — и обновлённый вид ссылки: san показывает свой прогресс и прямой доступ, чтобы попробовать приложение.',
+  news_c37: 'Версия 37: обновлённые виджеты — градиент бренда, полоса прогресса, меняющая цвет в зависимости от бюджета, и строка следующего хода вашего san — плюс новый виджет размером со значок с суммой на сегодня. А в публичной ссылке san бренд остаётся на виду при прокрутке. Раунды организатора теперь складываются аккордеоном: открыт только раунд этой недели.',
+  widget_today: 'сегодня',
+  widget_san_next: 'Следующий ход: {name} · {date}',
+  widget_san_next_nodate: 'Следующий ход: {name}',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.'
 },
 hi: {
@@ -7523,6 +7581,8 @@ hi: {
   org_receiver_line: 'पाता है: {name}',
   org_pending_none: 'सबने दे दिया! 🎉',
   org_pending_list: 'अभी देना बाकी: {names}',
+  org_pending_count_one: '1 बाकी है',
+  org_pending_count_many: '{n} बाकी हैं',
   org_totals_title: 'प्रतिभागी अनुसार योगदान',
   org_paid_rounds: '{n} चक्रों में से {paid} दिए गए',
   org_delete: 'संगठित san हटाएँ',
@@ -7640,6 +7700,10 @@ hi: {
   pub_bar_try: 'ऐप आज़माएँ',
   pub_footer: 'PETO Finanzas से बनाया गया · petofinanzas.com',
   news_c36: 'संस्करण 36: नया पॉडकास्ट सेक्शन — ऐप छोड़े बिना "Finanzas Personales" सुनें, इन-बिल्ट प्लेयर और बिना इंटरनेट के लिए सहेजी गई सूची के साथ — स्वागत स्क्रीन अब खुद-ब-खुद स्लाइड-दर-स्लाइड आगे बढ़ती है — और लिंक का नया रूप: san अपनी प्रगति और ऐप आज़माने का सीधा एक्सेस दिखाता है।',
+  news_c37: 'संस्करण 37: नए रूप में विजेट — ब्रांड ग्रेडिएंट, आपके बजट के अनुसार रंग बदलने वाली प्रगति पट्टी और आपके san की अगली बारी की पंक्ति — साथ ही एक नया आइकन-आकार का विजेट, जिसमें आज आप कितना खर्च कर सकते हैं। और san के सार्वजनिक लिंक में स्क्रॉल करते समय ब्रांड हमेशा दिखता है। आयोजक के राउंड अब अकॉर्डियन में मुड़ते हैं: केवल इस सप्ताह वाला खुला रहता है।',
+  widget_today: 'आज',
+  widget_san_next: 'अगली बारी: {name} · {date}',
+  widget_san_next_nodate: 'अगली बारी: {name}',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।'
 },
 ar: {
@@ -8225,6 +8289,8 @@ ar: {
   org_receiver_line: 'يستلم: {name}',
   org_pending_none: 'دفع الجميع! 🎉',
   org_pending_list: 'ما زال عليهم الدفع: {names}',
+  org_pending_count_one: 'تبقّى 1',
+  org_pending_count_many: 'تبقّى {n}',
   org_totals_title: 'المساهمات حسب المشارك',
   org_paid_rounds: 'دُفعت {paid} من {n} جولات',
   org_delete: 'حذف الـ san المنظّم',
@@ -8342,6 +8408,10 @@ ar: {
   pub_bar_try: 'جرّب التطبيق',
   pub_footer: 'صُنع بواسطة PETO Finanzas · petofinanzas.com',
   news_c36: 'الإصدار 36: قسم بودكاست جديد — استمع إلى «Finanzas Personales» دون مغادرة التطبيق، مع مشغّل مدمج وقائمة محفوظة لأوقات عدم وجود إنترنت — شاشة الترحيب الآن تتقدّم من تلقاء نفسها، شريحة بعد شريحة — ومظهر الرابط متجدد: يعرض san تقدّمه ووصولًا مباشرًا لتجربة التطبيق.',
+  news_c37: 'الإصدار 37: ويدجت بمظهر جديد — تدرّج العلامة، شريط تقدّم يتغيّر لونه حسب ميزانيتك وسطر الدور التالي في san الخاص بك — وويدجت جديد بحجم أيقونة يعرض ما يمكنك إنفاقه اليوم. وتبقى العلامة ظاهرة أثناء التمرير في رابط san العام. وجولات المنظّم الآن تُطوى كالأكورديون: جولة هذا الأسبوع فقط مفتوحة.',
+  widget_today: 'اليوم',
+  widget_san_next: 'الدور التالي: {name} · {date}',
+  widget_san_next_nodate: 'الدور التالي: {name}',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.'
 }
 };
@@ -8884,7 +8954,21 @@ function renderSpendToday() {
    propio PetoWidget los guarda en el teléfono y el widget de la
    pantalla de inicio los pinta sin abrir la app. Sin plugin (web o
    iOS) no hace nada. Los textos van ya formateados y en el idioma de
-   la app; la racha viaja como texto listo («🔥 12»). */
+   la app; la racha viaja como texto listo («🔥 12»). Widgets v3 suma:
+   el porcentaje de uso del presupuesto del mes (para la barra y el
+   punto de estado que pinta el lado nativo), la línea del próximo
+   turno del san si hay uno activo y la etiqueta «hoy» del widget
+   Tamaño app. */
+
+/* Punto de color por categoría para los últimos gastos del widget
+   Grande: cada categoría base tiene su círculo; las personalizadas
+   y cualquier otra caen en el círculo blanco. */
+const WIDGET_CAT_DOTS = {
+  'Renta': '🟣', 'Comida': '🟢', 'Comida fuera': '🟠', 'Gasolina': '🔵',
+  'Transporte': '🟡', 'Salud': '🔴', 'Ropa': '🟤', 'Otros': '⚪'
+};
+function widgetCatDot(cat) { return WIDGET_CAT_DOTS[cat] || '⚪'; }
+
 function syncWidgetSummary(info) {
   try {
     const W = capPlugin('PetoWidget');
@@ -8904,8 +8988,8 @@ function syncWidgetSummary(info) {
     } catch (e) { /* sin racha: va vacío */ }
     /* Widgets v2 (tamaño Grande): cuánto queda del mes, con las
        mismas frases de la tarjeta de Inicio, y los últimos 3 gastos
-       de hoy ya formateados («• Café — $4.50»). Todo se compone con
-       claves y formatos existentes: ninguna clave i18n nueva. */
+       de hoy ya formateados (desde Widgets v3: «🟢 Café  $4.50», con
+       punto de color por categoría y montos alineados). */
     let monthLeft = '';
     if (info) {
       if (info.left < 0) {
@@ -8920,14 +9004,45 @@ function syncWidgetSummary(info) {
     try {
       const today = todayStr();
       const todays = (db && db.expenses) ? db.expenses.filter((e) => e.date === today) : [];
-      recent = todays.slice(-3).reverse().map((e) => {
-        const label = e.note ? e.note : catName(e.category);
-        return '• ' + label + ' — ' + fmt(e.amountCents);
-      }).join('\n');
+      /* Widgets v3: cada gasto con su punto de color por categoría y
+         los montos alineados a la derecha (etiquetas y montos se
+         rellenan con espacios al ancho mayor de las tres líneas). */
+      const rows = todays.slice(-3).reverse().map((e) => ({
+        dot: widgetCatDot(e.category),
+        label: e.note ? e.note : catName(e.category),
+        amt: fmt(e.amountCents)
+      }));
+      const labelW = rows.reduce((m, r2) => Math.max(m, r2.label.length), 0);
+      const amtW = rows.reduce((m, r2) => Math.max(m, r2.amt.length), 0);
+      recent = rows.map((r2) =>
+        r2.dot + ' ' + r2.label.padEnd(labelW) + '  ' + r2.amt.padStart(amtW)).join('\n');
     } catch (e) { recent = ''; }
+    /* Widgets v3: porcentaje de uso del presupuesto del mes (la
+       barra y el punto del lado nativo cambian de color con los
+       cortes 80/100 de las alertas). Sin presupuesto: -1. */
+    const progressPct = info ? Math.round(info.spent / info.total * 100) : -1;
+    /* Widgets v3: línea del próximo turno del san, solo si hay un
+       san activo sin terminar. El personal no guarda fechas: va sin
+       fecha. El del organizador lleva quién recibe y cuándo, con
+       las mismas funciones de la tarjeta del san en Inicio. */
+    let sanText = '';
+    try {
+      if (db && db.san && db.san.currentWeek < db.san.participants.length) {
+        sanText = t('widget_san_next_nodate', { name: db.san.participants[db.san.currentWeek] });
+      } else if (db && db.sanOrg) {
+        const org = db.sanOrg;
+        const cur = orgCurrentRound(org);
+        if (cur < org.participants.length) {
+          sanText = t('widget_san_next', {
+            name: org.participants[cur], date: prettyDate(orgRoundDate(org, cur))
+          });
+        }
+      }
+    } catch (e) { sanText = ''; }
     const r = W.setSummary({
       amountText: amount, noteText: note, streakText: streak,
-      recentText: recent, monthLeftText: monthLeft
+      recentText: recent, monthLeftText: monthLeft,
+      progressPct: progressPct, sanText: sanText, todayLabel: t('widget_today')
     });
     if (r && typeof r.catch === 'function') r.catch(function () {});
   } catch (e) { /* el widget nunca debe romper la app */ }
@@ -10321,6 +10436,32 @@ function orgMaybeRepublish() {
 }
 let orgReceiptTarget = null;
 const orgReceiptOpen = {};
+/* Compilación 37: acordeón de rondas del organizador. Solo una
+   ronda va expandida a la vez (orgOpenRound; -1 = ninguna) y las
+   demás se ven como tarjeta compacta. Al aparecer un san (clave
+   nueva: nombre|fecha|nº de participantes) la expandida por
+   defecto es la que está corriendo; la elección del usuario manda
+   mientras el san sea el mismo. */
+let orgOpenRound = -1;
+let orgOpenRoundFor = null;
+function orgRoundKey(org) {
+  return org.name + '|' + org.startDate + '|' + org.participants.length;
+}
+/* La ronda que está corriendo: sin iniciar, la primera; si no, la
+   primera sin completar cuya fecha ya llegó; si las incompletas
+   son futuras, la primera incompleta; si están todas completas,
+   la última. */
+function orgRunningRound(org) {
+  const n = org.participants.length;
+  if (!n) return -1;
+  if (!org.started) return 0;
+  const today = todayStr();
+  for (let i = 0; i < n; i++) {
+    if (orgRoundPaidCount(org, i) < n && orgRoundDate(org, i) <= today) return i;
+  }
+  const cur = orgCurrentRound(org);
+  return cur >= n ? n - 1 : cur;
+}
 
 function orgParticipantPaidRounds(org, name) {
   return org.rounds.filter((r) => r.paid[name]).length;
@@ -10412,6 +10553,8 @@ function renderSanOrg() {
   document.getElementById('org-create-wrap').hidden = has;
   document.getElementById('org-active-wrap').hidden = !has;
   if (!has) {
+    orgOpenRound = -1;
+    orgOpenRoundFor = null;
     const ul = document.getElementById('org-draft-list');
     clearNode(ul);
     for (const item of sanOrgDraft) {
@@ -10434,6 +10577,12 @@ function renderSanOrg() {
   }
   const org = db.sanOrg;
   const n = org.participants.length;
+  /* Compilación 37: al aparecer un san nuevo, el acordeón nace con
+     la ronda que está corriendo expandida. */
+  if (orgOpenRoundFor !== orgRoundKey(org)) {
+    orgOpenRoundFor = orgRoundKey(org);
+    orgOpenRound = orgRunningRound(org);
+  }
   document.getElementById('org-title-line').textContent = org.name;
   document.getElementById('org-meta-line').textContent =
     t('san_aporte_line', { amount: fmt(org.aporteCents) }) + ' · ' + t('org_freq_' + org.frequency);
@@ -10486,16 +10635,38 @@ function renderSanOrg() {
   const roundsBox = document.getElementById('org-rounds');
   clearNode(roundsBox);
   org.participants.forEach((receiver, i) => {
-    const card = el('div', 'card');
+    /* Compilación 37: acordeón — la tarjeta retraída conserva el
+       vistazo útil (ronda, fecha, quién recibe y el avance con los
+       pendientes contados, sin nombres ni botones); la expandida
+       trae todo lo de siempre. Tocar la cabecera abre o cierra, y
+       al abrir una se retraen las demás. */
+    const open = orgOpenRound === i;
+    const card = el('div', 'card org-round-card' + (open ? ' org-round-open' : ''));
     const paidCount = orgRoundPaidCount(org, i);
-    card.appendChild(el('h4', null, t('org_round', { x: i + 1, n: n }) + ' · ' + prettyDate(orgRoundDate(org, i))));
+    const head = el('h4', 'org-round-head',
+      t('org_round', { x: i + 1, n: n }) + ' · ' + prettyDate(orgRoundDate(org, i)));
+    head.appendChild(el('span', 'org-round-chevron', open ? '▾' : '▸'));
+    head.setAttribute('role', 'button');
+    head.setAttribute('data-org-round', String(i));
+    head.addEventListener('click', () => {
+      orgOpenRound = orgOpenRound === i ? -1 : i;
+      renderSanOrg();
+    });
+    card.appendChild(head);
     card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
-    const recvZelle = org.zelle && org.zelle[receiver];
-    if (recvZelle) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: recvZelle })));
     card.appendChild(el('p', 'muted', t('san_week_collected', {
       amount: fmt(paidCount * org.aporteCents), target: fmt(n * org.aporteCents)
     })));
     const pending = org.participants.filter((pp) => orgPayStatus(org, i, pp) !== 'confirmed');
+    if (!open) {
+      card.appendChild(el('p', 'muted small', pending.length
+        ? t(pending.length === 1 ? 'org_pending_count_one' : 'org_pending_count_many', { n: pending.length })
+        : t('org_pending_none')));
+      roundsBox.appendChild(card);
+      return;
+    }
+    const recvZelle = org.zelle && org.zelle[receiver];
+    if (recvZelle) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: recvZelle })));
     card.appendChild(el('p', 'muted small', pending.length
       ? t('org_pending_list', { names: pending.join(', ') })
       : t('org_pending_none')));
@@ -10863,8 +11034,35 @@ async function initSanPublic(token) {
     } catch (e) { /* sin red o sin función: se muestra «no disponible» */ }
   }
   sanPublicData = (data && typeof data === 'object' && !Array.isArray(data)) ? data : null;
+  /* Compilación 37: la mini barra de marca pegajosa se vigila con un
+     único oyente de scroll (pasivo) por página; el oyente no hace
+     nada fuera del modo público. */
+  if (!window.__pubTopbarBound) {
+    window.__pubTopbarBound = true;
+    window.addEventListener('scroll', sanPublicTopbarUpdate, { passive: true });
+  }
   renderSanPublic();
   return true;
+}
+/* Compilación 37: mini barra de marca pegajosa del visor público.
+   Se muestra solo cuando el hero de marca ya salió de la vista (la
+   persona bajó por el san): franja fina con el icono, «PETO
+   Finanzas» y el enlace «Probar». La sección compensa su alto con
+   la clase pub-top-on para que la franja nunca tape el contenido.
+   Fuera del modo público, sin datos o con la sección oculta, la
+   barra queda oculta y sin clases: en la app normal no existe. */
+function sanPublicTopbarUpdate() {
+  const top = document.getElementById('san-public-topbar');
+  const pub = document.getElementById('san-public');
+  if (!top || !pub) return;
+  let show = false;
+  if (SAN_PUBLIC_MODE && sanPublicData && !pub.hidden) {
+    const hero = document.querySelector('#san-public-body .pub-hero');
+    const limit = hero ? Math.max(0, hero.offsetTop + hero.offsetHeight - 44) : 96;
+    show = (window.scrollY || 0) > limit;
+  }
+  top.classList.toggle('pub-top-show', show);
+  pub.classList.toggle('pub-top-on', show);
 }
 /* Dibuja el visor desde sanPublicData.
    Compilación 35 (Bloque 2.1): el texto de org_public_title («El
@@ -10908,6 +11106,9 @@ function renderSanPublic() {
   const bar = document.getElementById('san-public-bar');
   const barBtn = document.getElementById('san-public-bar-btn');
   if (barBtn) barBtn.textContent = t('pub_bar_try');
+  const topbar = document.getElementById('san-public-topbar');
+  const topBtn = document.getElementById('san-public-topbar-btn');
+  if (topBtn) topBtn.textContent = t('pub_bar_try');
   /* Cabecera de marca (hero): degradado esmeralda, logo y frase. */
   const hero = el('div', 'pub-hero');
   const logo = el('img', 'pub-hero-logo');
@@ -10922,10 +11123,22 @@ function renderSanPublic() {
   const data = sanPublicData;
   if (!data) {
     if (bar) bar.hidden = true;
+    /* Sin san que mostrar, la barra de marca tampoco: como la barra
+       inferior de la 36, no aparece ni deja clases puestas. */
+    if (topbar) {
+      topbar.hidden = true;
+      topbar.classList.remove('pub-top-show');
+      const pubSec = document.getElementById('san-public');
+      if (pubSec) pubSec.classList.remove('pub-top-on');
+    }
     box.appendChild(el('p', 'muted pub-notfound', t('org_public_notfound')));
     return;
   }
   if (bar) bar.hidden = false;
+  if (topbar) {
+    topbar.hidden = false;
+    sanPublicTopbarUpdate();
+  }
   if (sanPublicFlash) {
     box.appendChild(el('p', 'total-line', sanPublicFlash));
     sanPublicFlash = '';
