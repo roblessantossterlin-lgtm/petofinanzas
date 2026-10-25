@@ -1,22 +1,21 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 35) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 36) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 35: el enlace
-   público del san se vuelve participativo (quien lo abre puede
-   reportar su pago con el botón «Ya pagué» y foto opcional; la
-   función del servidor ya está aplicada), el visor
-   público con el tema oscuro forzado y sin el título duplicado,
-   la fusión anti-pérdida al republicar, el lector de PDF
-   corregido (los Zelle salientes entran como gasto), deslizar
-   para refrescar y el enlace siempre con el token completo
-   (681 claves por idioma, con la línea news_c35 y las claves
-   nuevas del visor en los 12 idiomas). Sobre la base de la
-   Compilación 34 ya sincronizada (el logo nuevo esmeralda). */
+   Sincronizado el 25-oct-2026 con la Compilación 36: nueva sección
+   Podcast (episodios de «Finanzas Personales» desde el feed con
+   reproductor integrado y lista guardada sin conexión; la CSP
+   abre connect-src y media-src a muse.ai, igual que en el
+   teléfono), la bienvenida que avanza sola lámina a lámina y la
+   vista pública del enlace del san renovada como vitrina (hero
+   de marca, avance de pagos y acceso para probar la app), con
+   las claves nuevas sec_podcast y pub_* en los 12 idiomas
+   (703 claves por idioma, con la línea news_c36). Sobre la base
+   de la Compilación 35 ya sincronizada (enlace participativo). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -28,7 +27,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 35'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 36'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -41,7 +40,8 @@ const SECTION_DEFS = [
   { id: 'cuentas',     group: 'accounts', icon: '🏦' },
   { id: 'deudas',      group: 'accounts', icon: '📉' },
   { id: 'remesas',     group: 'accounts', icon: '🌎' },
-  { id: 'san',         group: 'accounts', icon: '🤝' }
+  { id: 'san',         group: 'accounts', icon: '🤝' },
+  { id: 'podcast',     group: 'plan',     icon: '🎙️' }
 ];
 const MAX_ITEMS = 5000;
 const MAX_MONEY_CENTS = 999999900; // $9,999,999.00
@@ -75,7 +75,7 @@ function defaultData() {
       reviewPromptDone: false,
       challengeTargetCents: 2000,
       split: { ahorro: 25, negocio: 10, gastos: 55, familia: 10 },
-      sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true },
+      sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true, podcast: true },
       pinSalt: null,
       pinHash: null
     },
@@ -841,6 +841,28 @@ es: {
   news_c33: 'Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.',
   news_c34: 'Compilación 34: nuevo logo de PETO Finanzas — la «P» blanca con barras y flecha en verde suave sobre fondo esmeralda, ya en el icono, la pantalla de bloqueo y toda la app.',
   news_c35: 'Compilación 35: desde el enlace público del san ya puedes reportar tu pago con «Ya pagué» y adjuntar tu comprobante (el organizador lo confirma), el visor se ve con el tema oscuro, la app se refresca deslizando hacia abajo y el lector de PDF ya no confunde los Zelle que envías con ingresos.',
+  sec_podcast: 'Podcast',
+  key_podcast: 'Finanzas Personales, el podcast',
+  pod_hosts: 'con Lucía y Marco',
+  pod_desc: 'Dinero sin enredos: consejos prácticos para ahorrar, salir de deudas y cuidar tu bolsillo, en episodios cortos.',
+  pod_spotify_btn: 'Escuchar en Spotify',
+  pod_loading: 'Cargando episodios…',
+  pod_offline: 'Sin conexión: mostrando la última lista descargada',
+  pod_error: 'No pudimos cargar los episodios. Revisa tu conexión e inténtalo de nuevo.',
+  pod_empty: 'Todavía no hay episodios publicados.',
+  pod_play_aria: 'Reproducir',
+  pod_pause_aria: 'Pausar',
+  pod_audio_error: 'No se pudo reproducir este episodio.',
+  pub_tagline: 'El san, organizado y transparente',
+  pub_progress: '{x} de {n} pagos confirmados',
+  pub_progress_start: 'Recién empieza: todavía no hay pagos confirmados',
+  pub_cta_title: '¿Quieres organizar tu propio san?',
+  pub_cta_text: 'Con PETO Finanzas llevas el orden, los turnos y los comprobantes en un solo lugar, sin libretas ni enredos.',
+  pub_cta_try: 'Probar PETO Finanzas',
+  pub_cta_more: 'Conocer más',
+  pub_bar_try: 'Probar la app',
+  pub_footer: 'Hecho con PETO Finanzas · petofinanzas.com',
+  news_c36: 'Compilación 36: nueva sección Podcast — escucha «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet — la bienvenida ahora avanza sola, lámina a lámina — y la vista del enlace renovada: el san se presenta con su avance y acceso directo para probar la app.',
   back_exit_hint: 'Pulsa atrás otra vez para salir.'
 },
 en: {
@@ -1278,6 +1300,28 @@ en: {
   news_c33: 'Build 33: creating a san can no longer erase the one in progress — if one is already active, the app says so and protects it (payments, receipts, history and public link) — and the web version is now in sync with the phone.',
   news_c34: 'Build 34: new PETO Finanzas logo — the white “P” with bars and arrow in soft green on an emerald background, now on the icon, the lock screen and across the app.',
   news_c35: 'Build 35: from the public san link you can now report your payment with “I paid” and attach your receipt (the organizer confirms it), the viewer uses the dark theme, the app refreshes by pulling down, and the PDF reader no longer mistakes Zelle payments you send for income.',
+  sec_podcast: 'Podcast',
+  key_podcast: 'Finanzas Personales, the podcast',
+  pod_hosts: 'with Lucía and Marco',
+  pod_desc: 'Money without the mess: practical tips to save, get out of debt and look after your wallet, in short episodes.',
+  pod_spotify_btn: 'Listen on Spotify',
+  pod_loading: 'Loading episodes…',
+  pod_offline: 'No connection: showing the last downloaded list',
+  pod_error: 'We could not load the episodes. Check your connection and try again.',
+  pod_empty: 'No episodes published yet.',
+  pod_play_aria: 'Play',
+  pod_pause_aria: 'Pause',
+  pod_audio_error: 'This episode could not be played.',
+  pub_tagline: 'Your san, organized and transparent',
+  pub_progress: '{x} of {n} payments confirmed',
+  pub_progress_start: 'Just getting started: no payments confirmed yet',
+  pub_cta_title: 'Want to organize your own san?',
+  pub_cta_text: 'With PETO Finanzas you keep the order, the turns and the receipts in one place — no notebooks, no mess.',
+  pub_cta_try: 'Try PETO Finanzas',
+  pub_cta_more: 'Learn more',
+  pub_bar_try: 'Try the app',
+  pub_footer: 'Made with PETO Finanzas · petofinanzas.com',
+  news_c36: 'Build 36: new Podcast section — listen to “Finanzas Personales” without leaving the app, with a built-in player and the list saved for when there is no internet — the welcome now moves on its own, slide by slide — and the link view, renewed: the san is showcased with its progress and a direct way to try the app.',
   back_exit_hint: 'Press back again to exit.'
 },
 it: {
@@ -1958,6 +2002,28 @@ it: {
   news_c33: 'Versione 33: creare un san non può più cancellare quello in corso — se ce n’è già uno attivo, l’app lo dice e lo protegge (pagamenti, ricevute, cronologia e link pubblico) — e la versione web è ora sincronizzata con il telefono.',
   news_c34: 'Versione 34: nuovo logo di PETO Finanzas — la «P» bianca con barre e freccia in verde chiaro su fondo smeraldo, ora nell’icona, nella schermata di blocco e in tutta l’app.',
   news_c35: 'Versione 35: dal link pubblico del san ora puoi segnalare il tuo pagamento con «Ho pagato» e allegare la ricevuta (la conferma è dell’organizzatore), il visualizzatore usa il tema scuro, l’app si aggiorna scorrendo verso il basso e il lettore PDF non confonde più gli Zelle che invii con entrate.',
+  sec_podcast: 'Podcast',
+  key_podcast: 'Finanzas Personales, il podcast',
+  pod_hosts: 'con Lucía e Marco',
+  pod_desc: 'Soldi senza complicazioni: consigli pratici per risparmiare, uscire dai debiti e prenderti cura del tuo portafoglio, in episodi brevi.',
+  pod_spotify_btn: 'Ascolta su Spotify',
+  pod_loading: 'Caricamento episodi…',
+  pod_offline: 'Nessuna connessione: vedi l’ultimo elenco scaricato',
+  pod_error: 'Non siamo riusciti a caricare gli episodi. Controlla la connessione e riprova.',
+  pod_empty: 'Nessun episodio pubblicato ancora.',
+  pod_play_aria: 'Riproduci',
+  pod_pause_aria: 'Pausa',
+  pod_audio_error: 'Impossibile riprodurre questo episodio.',
+  pub_tagline: 'Il tuo san, organizzato e trasparente',
+  pub_progress: '{x} di {n} pagamenti confermati',
+  pub_progress_start: 'È appena iniziato: nessun pagamento confermato ancora',
+  pub_cta_title: 'Vuoi organizzare il tuo san?',
+  pub_cta_text: 'Con PETO Finanzas tieni ordine, turni e ricevute in un unico posto, senza quaderni né confusione.',
+  pub_cta_try: 'Prova PETO Finanzas',
+  pub_cta_more: 'Scopri di più',
+  pub_bar_try: 'Prova l’app',
+  pub_footer: 'Fatto con PETO Finanzas · petofinanzas.com',
+  news_c36: 'Versione 36: nuova sezione Podcast — ascolta «Finanzas Personales» senza uscire dall’app, con lettore integrato e l’elenco salvato per quando non c’è internet — la schermata di benvenuto ora avanza da sola, diapositiva dopo diapositiva — e la vista del link rinnovata: il san si presenta con il suo avanzamento e l’accesso diretto per provare l’app.',
   back_exit_hint: 'Premi di nuovo indietro per uscire.'
 },
 pt: {
@@ -2638,6 +2704,28 @@ pt: {
   news_c33: 'Compilação 33: criar um san já não pode apagar o que está em andamento — se já houver um ativo, o app avisa e o protege (pagamentos, comprovantes, histórico e link público) — e a versão web ficou sincronizada com o telefone.',
   news_c34: 'Compilação 34: novo logo do PETO Finanzas — o “P” branco com barras e seta em verde suave sobre fundo esmeralda, já no ícone, na tela de bloqueio e em todo o app.',
   news_c35: 'Compilação 35: pelo link público do san agora você pode reportar seu pagamento com «Já paguei» e anexar o comprovante (o organizador confirma), o visualizador usa o tema escuro, o app atualiza ao puxar para baixo e o leitor de PDF não confunde mais os Zelle que você envia com receita.',
+  sec_podcast: 'Podcast',
+  key_podcast: 'Finanzas Personales, o podcast',
+  pod_hosts: 'com Lucía e Marco',
+  pod_desc: 'Dinheiro sem complicação: dicas práticas para poupar, sair das dívidas e cuidar do seu bolso, em episódios curtos.',
+  pod_spotify_btn: 'Ouvir no Spotify',
+  pod_loading: 'Carregando episódios…',
+  pod_offline: 'Sem conexão: mostrando a última lista baixada',
+  pod_error: 'Não foi possível carregar os episódios. Verifique sua conexão e tente novamente.',
+  pod_empty: 'Ainda não há episódios publicados.',
+  pod_play_aria: 'Reproduzir',
+  pod_pause_aria: 'Pausar',
+  pod_audio_error: 'Não foi possível reproduzir este episódio.',
+  pub_tagline: 'Seu san, organizado e transparente',
+  pub_progress: '{x} de {n} pagamentos confirmados',
+  pub_progress_start: 'Está só começando: ainda não há pagamentos confirmados',
+  pub_cta_title: 'Quer organizar seu próprio san?',
+  pub_cta_text: 'Com o PETO Finanzas você mantém a ordem, os turnos e os comprovantes em um só lugar, sem cadernos nem confusão.',
+  pub_cta_try: 'Testar o PETO Finanzas',
+  pub_cta_more: 'Saiba mais',
+  pub_bar_try: 'Testar o app',
+  pub_footer: 'Feito com PETO Finanzas · petofinanzas.com',
+  news_c36: 'Compilação 36: nova seção Podcast — ouça «Finanzas Personales» sem sair do app, com reprodutor integrado e a lista salva para quando não há internet — a boas-vindas agora avança sozinha, tela a tela — e a vista do link renovada: o san se apresenta com seu progresso e acesso direto para testar o app.',
   back_exit_hint: 'Toque em voltar outra vez para sair.'
 },
 fr: {
@@ -3318,6 +3406,28 @@ fr: {
   news_c33: 'Version 33 : créer un san ne peut plus effacer celui en cours — s’il y en a déjà un actif, l’appli le dit et le protège (paiements, justificatifs, historique et lien public) — et la version web est maintenant synchronisée avec le téléphone.',
   news_c34: 'Version 34 : nouveau logo de PETO Finanzas — le «P» blanc avec barres et flèche en vert doux sur fond émeraude, désormais sur l’icône, l’écran de verrouillage et dans toute l’appli.',
   news_c35: 'Version 35 : depuis le lien public du san, vous pouvez maintenant signaler votre paiement avec « J’ai payé » et joindre votre reçu (l’organisateur confirme), la vue publique utilise le thème sombre, l’appli se rafraîchit en tirant vers le bas et le lecteur PDF ne confond plus les Zelle que vous envoyez avec des revenus.',
+  sec_podcast: 'Podcast',
+  key_podcast: 'Finanzas Personales, le podcast',
+  pod_hosts: 'avec Lucía et Marco',
+  pod_desc: 'L’argent sans prise de tête : des conseils pratiques pour épargner, sortir des dettes et prendre soin de votre portefeuille, en épisodes courts.',
+  pod_spotify_btn: 'Écouter sur Spotify',
+  pod_loading: 'Chargement des épisodes…',
+  pod_offline: 'Pas de connexion : affichage de la dernière liste téléchargée',
+  pod_error: 'Impossible de charger les épisodes. Vérifiez votre connexion et réessayez.',
+  pod_empty: 'Aucun épisode publié pour le moment.',
+  pod_play_aria: 'Lecture',
+  pod_pause_aria: 'Pause',
+  pod_audio_error: 'Impossible de lire cet épisode.',
+  pub_tagline: 'Votre san, organisé et transparent',
+  pub_progress: '{x} paiements confirmés sur {n}',
+  pub_progress_start: 'Ça vient de commencer : aucun paiement confirmé pour l’instant',
+  pub_cta_title: 'Vous voulez organiser votre propre san ?',
+  pub_cta_text: 'Avec PETO Finanzas, vous gardez l’ordre, les tours et les reçus au même endroit, sans cahiers ni confusion.',
+  pub_cta_try: 'Essayer PETO Finanzas',
+  pub_cta_more: 'En savoir plus',
+  pub_bar_try: 'Essayer l’appli',
+  pub_footer: 'Fait avec PETO Finanzas · petofinanzas.com',
+  news_c36: 'Version 36 : nouvelle section Podcast — écoutez « Finanzas Personales » sans quitter l’appli, avec lecteur intégré et la liste enregistrée pour quand il n’y a pas internet — l’écran d’accueil avance maintenant tout seul, diapositive après diapositive — et la vue du lien renouvelée : le san se présente avec sa progression et un accès direct pour essayer l’appli.',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.'
 },
 de: {
@@ -3998,6 +4108,28 @@ de: {
   news_c33: 'Version 33: Einen San zu erstellen kann den laufenden nicht mehr löschen — ist schon einer aktiv, sagt die App Bescheid und schützt ihn (Zahlungen, Belege, Verlauf und öffentlicher Link) — und die Webversion ist jetzt mit dem Telefon synchron.',
   news_c34: 'Version 34: neues Logo von PETO Finanzas — das weiße „P“ mit Balken und Pfeil in sanftem Grün auf Smaragdgrün, jetzt auf dem Symbol, dem Sperrbildschirm und in der ganzen App.',
   news_c35: 'Version 35: Über den öffentlichen San-Link kannst du jetzt deine Zahlung mit „Bezahlt“ melden und deinen Beleg anhängen (der Organisator bestätigt), die öffentliche Ansicht nutzt das dunkle Design, die App aktualisiert sich durch Herunterziehen und der PDF-Leser verwechselt gesendete Zelle-Zahlungen nicht mehr mit Einnahmen.',
+  sec_podcast: 'Podcast',
+  key_podcast: 'Finanzas Personales, der Podcast',
+  pod_hosts: 'mit Lucía und Marco',
+  pod_desc: 'Geld ohne Stress: praktische Tipps zum Sparen, Schulden abbauen und auf dein Geld achten – in kurzen Episoden.',
+  pod_spotify_btn: 'Auf Spotify hören',
+  pod_loading: 'Episoden werden geladen…',
+  pod_offline: 'Keine Verbindung: die zuletzt geladene Liste wird angezeigt',
+  pod_error: 'Die Episoden konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.',
+  pod_empty: 'Noch keine Episoden veröffentlicht.',
+  pod_play_aria: 'Abspielen',
+  pod_pause_aria: 'Pause',
+  pod_audio_error: 'Diese Episode konnte nicht abgespielt werden.',
+  pub_tagline: 'Dein San, organisiert und transparent',
+  pub_progress: '{x} von {n} Zahlungen bestätigt',
+  pub_progress_start: 'Es geht gerade erst los: noch keine Zahlung bestätigt',
+  pub_cta_title: 'Willst du deinen eigenen San organisieren?',
+  pub_cta_text: 'Mit PETO Finanzas hast du Reihenfolge, Runden und Belege an einem Ort – ohne Notizbücher und ohne Durcheinander.',
+  pub_cta_try: 'PETO Finanzas testen',
+  pub_cta_more: 'Mehr erfahren',
+  pub_bar_try: 'App testen',
+  pub_footer: 'Gemacht mit PETO Finanzas · petofinanzas.com',
+  news_c36: 'Version 36: neuer Bereich Podcast — höre „Finanzas Personales“, ohne die App zu verlassen, mit integriertem Player und gespeicherter Liste für Zeiten ohne Internet — der Willkommensbildschirm wechselt jetzt von selbst, Folie für Folie — und die erneuerte Link-Ansicht: Der San zeigt seinen Fortschritt und einen direkten Zugang, um die App zu testen.',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.'
 },
 zh: {
@@ -4678,6 +4810,28 @@ zh: {
   news_c33: '第 33 版：新建 san 不再会误删正在进行的 san——如果已有一个活跃的 san，应用会明确提示并保护它（付款、凭证、历史和公开链接）——网页版现已与手机同步。',
   news_c34: '第 34 版：PETO Finanzas 全新标志——翠绿底色上白色的“P”配浅绿色柱条与箭头，现已出现在图标、锁屏和整个应用中。',
   news_c35: '第 35 版：通过 san 公开链接，现在可以用"我已付款"报告付款并附上收据（由组织者确认）；公开查看器采用深色主题；下拉即可刷新应用；PDF 读取器不再把你发出的 Zelle 付款误认为收入。',
+  sec_podcast: '播客',
+  key_podcast: 'Finanzas Personales 播客',
+  pod_hosts: '主播：Lucía 与 Marco',
+  pod_desc: '轻松聊钱：简短节目，实用建议，帮你存钱、摆脱债务、管好钱包。',
+  pod_spotify_btn: '在 Spotify 收听',
+  pod_loading: '正在加载节目…',
+  pod_offline: '无连接：显示上次下载的列表',
+  pod_error: '无法加载节目。请检查网络后重试。',
+  pod_empty: '尚未发布任何节目。',
+  pod_play_aria: '播放',
+  pod_pause_aria: '暂停',
+  pod_audio_error: '无法播放这一集。',
+  pub_tagline: '你的 san，井井有条、公开透明',
+  pub_progress: '已确认 {x}/{n} 笔付款',
+  pub_progress_start: '刚刚开始：尚无已确认的付款',
+  pub_cta_title: '想组织你自己的 san 吗？',
+  pub_cta_text: '有了 PETO Finanzas，顺序、轮次和收据都集中在一处——不用笔记本，不混乱。',
+  pub_cta_try: '试用 PETO Finanzas',
+  pub_cta_more: '了解更多',
+  pub_bar_try: '试用应用',
+  pub_footer: '由 PETO Finanzas 制作 · petofinanzas.com',
+  news_c36: '第 36 版：新增播客版块——无需离开应用即可收听《Finanzas Personales》，内置播放器，列表会保存以便离线查看；欢迎页现在会自动逐页切换；链接视图也焕然一新：san 展示进度，并可直接试用应用。',
   back_exit_hint: '再按一次返回即可退出。'
 },
 ja: {
@@ -5358,6 +5512,28 @@ ja: {
   news_c33: 'バージョン33：sanを新規作成しても、進行中のsanが消えることはなくなりました。すでにアクティブなsanがある場合、アプリが知らせて保護します（支払い、領収書、履歴、公開リンク）。ウェブ版もスマートフォンと同期されました。',
   news_c34: 'バージョン34：PETO Finanzasの新しいロゴ——エメラルドの背景に白い「P」と淡い緑のバーと矢印が、アイコン、ロック画面、アプリ全体に登場しました。',
   news_c35: 'バージョン35：sanの公開リンクから「支払いました」で支払いを報告し、領収書を添付できるようになりました（確認は主催者）。公開ビューアはダークテーマになり、下に引っ張るとアプリが更新され、PDFリーダーが送信したZelle支払いを収入と間違えなくなりました。',
+  sec_podcast: 'ポッドキャスト',
+  key_podcast: 'Finanzas Personales ポッドキャスト',
+  pod_hosts: '出演：Lucía と Marco',
+  pod_desc: 'お金の話をシンプルに：短いエピソードで、貯金、借金返済、家計管理のコツをお届けします。',
+  pod_spotify_btn: 'Spotifyで聴く',
+  pod_loading: 'エピソードを読み込み中…',
+  pod_offline: '接続なし：前回ダウンロードしたリストを表示しています',
+  pod_error: 'エピソードを読み込めませんでした。接続を確認して、もう一度お試しください。',
+  pod_empty: 'まだエピソードが公開されていません。',
+  pod_play_aria: '再生',
+  pod_pause_aria: '一時停止',
+  pod_audio_error: 'このエピソードを再生できませんでした。',
+  pub_tagline: 'あなたの san、整理されて透明',
+  pub_progress: '{n}件中{x}件の支払いが確認済み',
+  pub_progress_start: '始まったばかり：確認済みの支払いはまだありません',
+  pub_cta_title: '自分の san を組織したいですか？',
+  pub_cta_text: 'PETO Finanzas なら、順番、ラウンド、領収書を一か所で管理。ノートも混乱も不要です。',
+  pub_cta_try: 'PETO Finanzas を試す',
+  pub_cta_more: '詳しく見る',
+  pub_bar_try: 'アプリを試す',
+  pub_footer: 'PETO Finanzas で作成 · petofinanzas.com',
+  news_c36: 'バージョン36：新しいポッドキャストセクション——アプリを離れずに「Finanzas Personales」を聴けます。プレーヤー内蔵、リストはオフライン用に保存。ようこそ画面は自動で切り替わるようになりました。リンク表示も一新：sanの進み具合と、アプリを試す直接アクセス付き。',
   back_exit_hint: 'もう一度戻るを押すと終了します。'
 },
 ko: {
@@ -6038,6 +6214,28 @@ ko: {
   news_c33: '버전 33: san을 새로 만들어도 진행 중인 san이 지워지지 않습니다. 이미 활성 san이 있으면 앱이 알려주고 보호합니다(결제, 영수증, 기록, 공개 링크). 웹 버전도 이제 휴대전화와 동기화됩니다.',
   news_c34: '버전 34: PETO Finanzas의 새 로고 — 에메랄드 배경에 흰색 "P"와 연한 녹색 막대와 화살표가 이제 아이콘, 잠금 화면, 앱 전체에 적용됩니다.',
   news_c35: '버전 35: san 공개 링크에서 "결제했어요"로 결제를 보고하고 영수증을 첨부할 수 있습니다(주최자가 확인). 공개 뷰어는 다크 테마를 사용하고, 아래로 당기면 앱이 새로고침되며, PDF 리더가 보낸 Zelle 결제를 수입으로 착각하지 않습니다.',
+  sec_podcast: '팟캐스트',
+  key_podcast: 'Finanzas Personales 팟캐스트',
+  pod_hosts: '진행: Lucía와 Marco',
+  pod_desc: '돈 이야기, 쉽게: 짧은 에피소드로 저축, 빚 탈출, 지갑 관리 팁을 전합니다.',
+  pod_spotify_btn: 'Spotify에서 듣기',
+  pod_loading: '에피소드를 불러오는 중…',
+  pod_offline: '연결 없음: 마지막으로 받은 목록을 표시합니다',
+  pod_error: '에피소드를 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.',
+  pod_empty: '아직 공개된 에피소드가 없습니다.',
+  pod_play_aria: '재생',
+  pod_pause_aria: '일시정지',
+  pod_audio_error: '이 에피소드를 재생할 수 없습니다.',
+  pub_tagline: '당신의 san, 체계적이고 투명하게',
+  pub_progress: '{n}개 중 {x}개 결제 확인됨',
+  pub_progress_start: '이제 시작 단계: 아직 확인된 결제가 없습니다',
+  pub_cta_title: '나만의 san을 조직하고 싶나요?',
+  pub_cta_text: 'PETO Finanzas와 함께라면 순서, 차례, 영수증을 한곳에서 관리할 수 있습니다. 공책도, 혼란도 없이요.',
+  pub_cta_try: 'PETO Finanzas 사용해 보기',
+  pub_cta_more: '자세히 보기',
+  pub_bar_try: '앱 사용해 보기',
+  pub_footer: 'PETO Finanzas로 제작 · petofinanzas.com',
+  news_c36: '버전 36: 새로운 팟캐스트 섹션 — 앱을 떠나지 않고 "Finanzas Personales"를 들을 수 있고, 내장 플레이어와 오프라인용 저장 목록을 제공합니다. 시작 화면이 이제 슬라이드마다 자동으로 넘어갑니다. 링크 화면도 새로워졌습니다: san의 진행 상황과 앱을 바로 써볼 수 있는 접근을 보여줍니다.',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.'
 },
 ru: {
@@ -6718,6 +6916,28 @@ ru: {
   news_c33: 'Версия 33: создание san больше не может стереть текущий — если один уже активен, приложение сообщает об этом и защищает его (платежи, чеки, историю и публичную ссылку) — а веб-версия теперь синхронизирована с телефоном.',
   news_c34: 'Версия 34: новый логотип PETO Finanzas — белая «P» с полосками и стрелкой нежно-зелёного цвета на изумрудном фоне, теперь на значке, экране блокировки и во всём приложении.',
   news_c35: 'Версия 35: по публичной ссылке san теперь можно сообщить о платеже кнопкой «Я заплатил» и приложить чек (подтверждает организатор), публичный просмотр в тёмной теме, приложение обновляется свайпом вниз, а PDF-читалка больше не путает отправленные вами платежи Zelle с доходом.',
+  sec_podcast: 'Подкаст',
+  key_podcast: 'Finanzas Personales — подкаст',
+  pod_hosts: 'с ведущими Lucía и Marco',
+  pod_desc: 'Деньги без сложностей: практичные советы, как копить, выходить из долгов и беречь кошелёк, в коротких выпусках.',
+  pod_spotify_btn: 'Слушать в Spotify',
+  pod_loading: 'Загрузка выпусков…',
+  pod_offline: 'Нет соединения: показан последний загруженный список',
+  pod_error: 'Не удалось загрузить выпуски. Проверьте соединение и попробуйте снова.',
+  pod_empty: 'Выпуски пока не опубликованы.',
+  pod_play_aria: 'Слушать',
+  pod_pause_aria: 'Пауза',
+  pod_audio_error: 'Не удалось воспроизвести этот выпуск.',
+  pub_tagline: 'Ваш san — организованно и прозрачно',
+  pub_progress: 'Подтверждено платежей: {x} из {n}',
+  pub_progress_start: 'Всё только начинается: подтверждённых платежей пока нет',
+  pub_cta_title: 'Хотите организовать свой san?',
+  pub_cta_text: 'С PETO Finanzas порядок, очерёдность и чеки хранятся в одном месте — без тетрадей и путаницы.',
+  pub_cta_try: 'Попробовать PETO Finanzas',
+  pub_cta_more: 'Узнать больше',
+  pub_bar_try: 'Попробовать приложение',
+  pub_footer: 'Сделано в PETO Finanzas · petofinanzas.com',
+  news_c36: 'Версия 36: новый раздел «Подкаст» — слушайте «Finanzas Personales», не выходя из приложения, со встроенным плеером и сохранённым списком на случай отсутствия интернета — экран приветствия теперь листается сам, слайд за слайдом — и обновлённый вид ссылки: san показывает свой прогресс и прямой доступ, чтобы попробовать приложение.',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.'
 },
 hi: {
@@ -7398,6 +7618,28 @@ hi: {
   news_c33: 'संस्करण 33: नया san बनाना अब चल रहे san को नहीं मिटा सकता — अगर पहले से एक सक्रिय है, तो ऐप बताता है और उसे सुरक्षित रखता है (भुगतान, रसीदें, इतिहास और सार्वजनिक लिंक) — और वेब संस्करण अब फ़ोन के साथ सिंक हो गया है।',
   news_c34: 'संस्करण 34: PETO Finanzas का नया लोगो — पन्ना हरे रंग की पृष्ठभूमि पर हल्के हरे रंग की पट्टियों और तीर वाला सफ़ेद "P", अब आइकन, लॉक स्क्रीन और पूरे ऐप में।',
   news_c35: 'संस्करण 35: san के सार्वजनिक लिंक से अब आप "मैंने भुगतान किया" से अपने भुगतान की रिपोर्ट कर सकते हैं और रसीद जोड़ सकते हैं (आयोजक पुष्टि करता है), सार्वजनिक व्यूअर डार्क थीम में है, नीचे खींचने से ऐप रीफ़्रेश होता है, और PDF रीडर अब आपके भेजे Zelle भुगतान को आय नहीं समझता।',
+  sec_podcast: 'पॉडकास्ट',
+  key_podcast: 'Finanzas Personales, पॉडकास्ट',
+  pod_hosts: 'Lucía और Marco के साथ',
+  pod_desc: 'पैसे की बात, आसान भाषा में: बचत, कर्ज़ से निकलने और जेब का ख्याल रखने के व्यावहारिक सुझाव, छोटे एपिसोड में।',
+  pod_spotify_btn: 'Spotify पर सुनें',
+  pod_loading: 'एपिसोड लोड हो रहे हैं…',
+  pod_offline: 'कनेक्शन नहीं है: आखिरी डाउनलोड की गई सूची दिखाई जा रही है',
+  pod_error: 'एपिसोड लोड नहीं हो सके। अपना कनेक्शन जांचें और फिर से कोशिश करें।',
+  pod_empty: 'अभी तक कोई एपिसोड प्रकाशित नहीं हुआ है।',
+  pod_play_aria: 'चलाएँ',
+  pod_pause_aria: 'रोकें',
+  pod_audio_error: 'यह एपिसोड नहीं चलाया जा सका।',
+  pub_tagline: 'आपका san, व्यवस्थित और पारदर्शी',
+  pub_progress: '{n} में से {x} भुगतानों की पुष्टि हो गई है',
+  pub_progress_start: 'अभी शुरुआत है: अभी तक किसी भुगतान की पुष्टि नहीं हुई है',
+  pub_cta_title: 'क्या आप अपना खुद का san आयोजित करना चाहते हैं?',
+  pub_cta_text: 'PETO Finanzas के साथ क्रम, बारी और रसीदें एक ही जगह रहती हैं — बिना नोटबुक, बिना उलझन।',
+  pub_cta_try: 'PETO Finanzas आज़माएँ',
+  pub_cta_more: 'और जानें',
+  pub_bar_try: 'ऐप आज़माएँ',
+  pub_footer: 'PETO Finanzas से बनाया गया · petofinanzas.com',
+  news_c36: 'संस्करण 36: नया पॉडकास्ट सेक्शन — ऐप छोड़े बिना "Finanzas Personales" सुनें, इन-बिल्ट प्लेयर और बिना इंटरनेट के लिए सहेजी गई सूची के साथ — स्वागत स्क्रीन अब खुद-ब-खुद स्लाइड-दर-स्लाइड आगे बढ़ती है — और लिंक का नया रूप: san अपनी प्रगति और ऐप आज़माने का सीधा एक्सेस दिखाता है।',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।'
 },
 ar: {
@@ -8078,6 +8320,28 @@ ar: {
   news_c33: 'الإصدار 33: إنشاء سان لم يعد بإمكانه مسح السان الجاري — إذا كان هناك سان نشط، يخبرك التطبيق ويحميه (المدفوعات والإيصالات والسجل والرابط العام) — وأصبحت نسخة الويب متزامنة الآن مع الهاتف.',
   news_c34: 'الإصدار 34: شعار PETO Finanzas الجديد — حرف «P» الأبيض مع أشرطة وسهم باللون الأخضر الفاتح على خلفية زمردية، الآن في الأيقونة وشاشة القفل وفي التطبيق بأكمله.',
   news_c35: 'الإصدار 35: من رابط san العام يمكنك الآن الإبلاغ عن دفعتك بزر «دفعت» وإرفاق الإيصال (يؤكده المنظم)، وأصبح العارض العام بالمظهر الداكن، ويُحدَّث التطبيق بالسحب لأسفل، وقارئ PDF لم يعد يخلط مدفوعات Zelle التي ترسلها بالدخل.',
+  sec_podcast: 'بودكاست',
+  key_podcast: 'Finanzas Personales، البودكاست',
+  pod_hosts: 'مع Lucía و Marco',
+  pod_desc: 'المال بلا تعقيد: نصائح عملية للادخار والخروج من الديون والعناية بمحفظتك، في حلقات قصيرة.',
+  pod_spotify_btn: 'استمع على Spotify',
+  pod_loading: 'جارٍ تحميل الحلقات…',
+  pod_offline: 'لا يوجد اتصال: يتم عرض آخر قائمة تم تنزيلها',
+  pod_error: 'تعذر تحميل الحلقات. تحقق من اتصالك وحاول مرة أخرى.',
+  pod_empty: 'لا توجد حلقات منشورة بعد.',
+  pod_play_aria: 'تشغيل',
+  pod_pause_aria: 'إيقاف مؤقت',
+  pod_audio_error: 'تعذر تشغيل هذه الحلقة.',
+  pub_tagline: 'سانك منظم وشفاف',
+  pub_progress: 'تم تأكيد {x} من {n} دفعة',
+  pub_progress_start: 'البداية فقط: لا توجد دفعات مؤكدة بعد',
+  pub_cta_title: 'هل تريد تنظيم السان الخاص بك؟',
+  pub_cta_text: 'مع PETO Finanzas يبقى الترتيب والأدوار والإيصالات في مكان واحد — بلا دفاتر ولا فوضى.',
+  pub_cta_try: 'جرّب PETO Finanzas',
+  pub_cta_more: 'اعرف المزيد',
+  pub_bar_try: 'جرّب التطبيق',
+  pub_footer: 'صُنع بواسطة PETO Finanzas · petofinanzas.com',
+  news_c36: 'الإصدار 36: قسم بودكاست جديد — استمع إلى «Finanzas Personales» دون مغادرة التطبيق، مع مشغّل مدمج وقائمة محفوظة لأوقات عدم وجود إنترنت — شاشة الترحيب الآن تتقدّم من تلقاء نفسها، شريحة بعد شريحة — ومظهر الرابط متجدد: يعرض san تقدّمه ووصولًا مباشرًا لتجربة التطبيق.',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.'
 }
 };
@@ -8236,9 +8500,12 @@ async function checkPin(pin) {
 function validPinFormat(pin) { return /^[0-9]{4,6}$/.test(pin); }
 
 /* ---------------- Navegación ---------------- */
-const VIEW_IDS = ['home', 'gastos', 'ingresos', 'ahorros', 'buscar', 'resumen', 'presupuesto', 'pagos', 'cuentas', 'deudas', 'remesas', 'san', 'ajustes'];
+const VIEW_IDS = ['home', 'gastos', 'ingresos', 'ahorros', 'buscar', 'resumen', 'presupuesto', 'pagos', 'cuentas', 'deudas', 'remesas', 'san', 'podcast', 'ajustes'];
 let currentView = 'home';
 function showView(name) {
+  /* Compilación 36: al salir de la vista del Podcast, la reproducción
+     se pausa (decisión documentada en el bloque del Podcast). */
+  if (currentView === 'podcast' && name !== 'podcast') podcastPause();
   if (name !== 'home' && name !== 'ajustes' && db.settings.sections[name] === false) name = 'home';
   currentView = name;
   for (const v of VIEW_IDS) {
@@ -8258,6 +8525,7 @@ function showView(name) {
   if (name === 'deudas') renderDebts();
   if (name === 'remesas') renderRemittances();
   if (name === 'san') { renderSan(); renderSanOrg(); }
+  if (name === 'podcast') renderPodcast();
   if (name === 'ajustes') renderSettings();
 }
 
@@ -8461,6 +8729,7 @@ function menuKeyText(id) {
     }
     return t('key_san_none');
   }
+  if (id === 'podcast') return t('key_podcast');
   return '';
 }
 
@@ -10597,22 +10866,66 @@ async function initSanPublic(token) {
   renderSanPublic();
   return true;
 }
-/* Dibuja el visor desde sanPublicData. Encabezado: la marca y el
-   nombre del san. Compilación 35 (Bloque 2.1): el texto de
-   org_public_title («El enlace está listo para compartir.») es el
-   estado del enlace en la pantalla del ORGANIZADOR y aquí no se
-   pinta ninguna vez (antes salía dos: el h2 estático del esqueleto
-   y el que agregaba el arranque). */
+/* Dibuja el visor desde sanPublicData.
+   Compilación 35 (Bloque 2.1): el texto de org_public_title («El
+   enlace está listo para compartir.») es el estado del enlace en la
+   pantalla del ORGANIZADOR y aquí no se pinta ninguna vez.
+   Compilación 36: el visor es la VITRINA de la app (el enlace se
+   comparte por WhatsApp y se abre en teléfonos, mobile-first):
+   cabecera de marca con degradado esmeralda y el logo, tarjeta del
+   san elevada con su avance (pagos confirmados / total, calculado
+   SOLO desde la foto pública), la línea antifraude como sello de
+   confianza, estados con pastillas de color, tarjeta final de
+   llamado a la acción y barra fija inferior en pantallas estrechas
+   (en anchas manda la tarjeta final). Nada de esto expone datos
+   nuevos: todo sale de la misma foto pública de siempre, y el flujo
+   «Ya pagué» de la 35 queda intacto. La barra vive fuera del cuerpo
+   (en el esqueleto) para que clearNode no la borre al redibujar;
+   solo se muestra cuando hay san que mostrar. */
+const PUB_APP_URL = 'https://petofinanzas.com/app/';
+const PUB_SITE_URL = 'https://petofinanzas.com/';
+function sanPublicLinkEl(label, href, className) {
+  const a = el('a', className, label);
+  a.href = href;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  return a;
+}
+function sanPublicPayRow(nm, st) {
+  /* Fila de estado SIN acción (Reportado o Confirmado): el nombre y
+     la pastilla de color con el estado. El nombre lleva el « · » de
+     siempre para que el texto completo se lea «Nombre · Estado». */
+  const row = el('div', 'toggle-row pub-pay-row');
+  row.appendChild(el('span', 'pub-pay-name', nm + ' · '));
+  const key = st === 'reported' ? 'org_pub_reported_note' : ('org_pay_' + st);
+  row.appendChild(el('span', 'pub-pill pub-pill-' + st, t(key)));
+  return row;
+}
 function renderSanPublic() {
   const box = document.getElementById('san-public-body');
   if (!box) return;
   clearNode(box);
-  box.appendChild(el('h2', null, t('app_title')));
+  const bar = document.getElementById('san-public-bar');
+  const barBtn = document.getElementById('san-public-bar-btn');
+  if (barBtn) barBtn.textContent = t('pub_bar_try');
+  /* Cabecera de marca (hero): degradado esmeralda, logo y frase. */
+  const hero = el('div', 'pub-hero');
+  const logo = el('img', 'pub-hero-logo');
+  logo.src = 'icons/icon-512.png';
+  logo.alt = t('app_title');
+  hero.appendChild(logo);
+  const heroText = el('div', 'pub-hero-text');
+  heroText.appendChild(el('h2', 'pub-hero-brand', t('app_title')));
+  heroText.appendChild(el('p', 'pub-tagline', t('pub_tagline')));
+  hero.appendChild(heroText);
+  box.appendChild(hero);
   const data = sanPublicData;
   if (!data) {
-    box.appendChild(el('p', 'muted', t('org_public_notfound')));
+    if (bar) bar.hidden = true;
+    box.appendChild(el('p', 'muted pub-notfound', t('org_public_notfound')));
     return;
   }
+  if (bar) bar.hidden = false;
   if (sanPublicFlash) {
     box.appendChild(el('p', 'total-line', sanPublicFlash));
     sanPublicFlash = '';
@@ -10628,18 +10941,39 @@ function renderSanPublic() {
     frequency: ORG_FREQUENCIES.includes(data.frequency) ? data.frequency : 'semanal',
     participants: names
   };
-  box.appendChild(el('h3', null, String(data.name || '')));
+  const rounds = Array.isArray(data.rounds) ? data.rounds : [];
+  /* Tarjeta principal del san: nombre, datos y avance. El avance se
+     calcula solo desde la foto: confirmados / total de pagos. */
+  const head = el('div', 'pub-head pub-anim');
+  head.appendChild(el('h3', 'pub-san-name', String(data.name || '')));
   const aporte = cleanCents(data.aporteCents, false);
-  box.appendChild(el('p', 'muted', t('san_aporte_line', { amount: fmtMoney(aporte) }) + ' · ' + t('org_freq_' + fakeOrg.frequency)));
+  head.appendChild(el('p', 'muted', t('san_aporte_line', { amount: fmtMoney(aporte) }) + ' · ' + t('org_freq_' + fakeOrg.frequency)));
   if (data.comp && data.comp.mode && data.comp.mode !== 'none') {
-    box.appendChild(el('p', 'muted', t('org_comp_line', { mode: orgCompLabel(data.comp.mode) })));
+    head.appendChild(el('p', 'muted', t('org_comp_line', { mode: orgCompLabel(data.comp.mode) })));
   }
   const penPub = orgPenaltyLine({ penalty: data.penalty });
-  if (penPub) box.appendChild(el('p', 'muted', penPub));
-  box.appendChild(el('p', 'muted small', t('org_antifraud')));
-  const rounds = Array.isArray(data.rounds) ? data.rounds : [];
+  if (penPub) head.appendChild(el('p', 'muted', penPub));
+  let totalPay = 0;
+  let confPay = 0;
+  for (const rd0 of rounds) {
+    totalPay += names.length;
+    const conf0 = (rd0 && Array.isArray(rd0.confirmed)) ? rd0.confirmed : [];
+    confPay += conf0.filter((nm) => names.includes(nm)).length;
+  }
+  if (totalPay > 0) {
+    const track = el('div', 'pub-progress');
+    const fill = el('div', 'pub-progress-fill');
+    fill.style.width = Math.round(confPay / totalPay * 100) + '%';
+    track.appendChild(fill);
+    head.appendChild(track);
+    head.appendChild(el('p', 'pub-progress-text',
+      confPay > 0 ? t('pub_progress', { x: confPay, n: totalPay }) : t('pub_progress_start')));
+  }
+  head.appendChild(el('p', 'pub-seal', t('org_antifraud')));
+  box.appendChild(head);
   names.forEach((receiver, i) => {
-    const card = el('div', 'card');
+    const card = el('div', 'card pub-round pub-anim');
+    card.style.animationDelay = Math.min((i + 1) * 60, 300) + 'ms';
     card.appendChild(el('h4', null, t('org_round', { x: i + 1, n: names.length }) + ' · ' + prettyDate(orgRoundDate(fakeOrg, i))));
     card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
     if (zelleMap[receiver]) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: zelleMap[receiver] })));
@@ -10648,13 +10982,12 @@ function renderSanPublic() {
     const repo = Array.isArray(rd.reported) ? rd.reported : [];
     for (const nm of names) {
       const st = conf.includes(nm) ? 'confirmed' : (repo.includes(nm) ? 'reported' : 'pending');
-      if (st === 'reported') {
-        /* Sin botón: ya reportó y espera la confirmación del organizador. */
-        card.appendChild(el('p', 'muted small', nm + ' · ' + t('org_pub_reported_note')));
-      } else if (st === 'pending') {
+      if (st === 'pending') {
         card.appendChild(sanPublicPendingRow(i, nm));
       } else {
-        card.appendChild(el('p', 'muted small', nm + ' · ' + t('org_pay_' + st)));
+        /* Sin botón: el Reportado espera la confirmación del
+           organizador y el Confirmado es un sello. */
+        card.appendChild(sanPublicPayRow(nm, st));
       }
     }
     box.appendChild(card);
@@ -10668,6 +11001,16 @@ function renderSanPublic() {
     const dstr = String(data.updatedAt).slice(0, 10);
     box.appendChild(el('p', 'muted small', t('org_public_updated', { date: prettyDate(dstr) })));
   }
+  /* Llamado a la acción: la tarjeta que vende la app. */
+  const cta = el('div', 'pub-cta pub-anim');
+  cta.appendChild(el('h4', 'pub-cta-title', t('pub_cta_title')));
+  cta.appendChild(el('p', 'pub-cta-text', t('pub_cta_text')));
+  const ctaActions = el('div', 'form-actions');
+  ctaActions.appendChild(sanPublicLinkEl(t('pub_cta_try'), PUB_APP_URL, 'btn btn-primary'));
+  ctaActions.appendChild(sanPublicLinkEl(t('pub_cta_more'), PUB_SITE_URL, 'btn btn-ghost'));
+  cta.appendChild(ctaActions);
+  box.appendChild(cta);
+  box.appendChild(el('p', 'pub-footer', t('pub_footer')));
 }
 /* Fila de un participante PENDIENTE en el visor: su estado y la acción
    «Ya pagué». Al tocarla se despliega el panel en línea (confirmación
@@ -10732,8 +11075,9 @@ function sanPublicPendingRow(roundIdx, nm) {
   panel.appendChild(sendBtn);
   panel.appendChild(cancelBtn);
   panel.appendChild(errLine);
-  const row = el('div', 'toggle-row');
-  row.appendChild(el('span', null, nm + ' · ' + t('org_pay_pending')));
+  const row = el('div', 'toggle-row pub-pay-row');
+  row.appendChild(el('span', 'pub-pay-name', nm + ' · '));
+  row.appendChild(el('span', 'pub-pill pub-pill-pending', t('org_pay_pending')));
   const payBtn = actionButton(t('org_pub_pay_btn'), 'btn-primary', () => {
     panel.hidden = false;
     payBtn.disabled = true;
@@ -13980,6 +14324,9 @@ function showLock() {
   setTimeout(() => document.getElementById('lock-pin').focus(), 50);
 }
 function enterApp() {
+  /* Compilación 36: al salir de la bienvenida, el temporizador de
+     rotación del recorrido se detiene y se limpia (sin fugas). */
+  obTourAutoStop();
   document.getElementById('view-lock').hidden = true;
   document.getElementById('view-onboarding').hidden = true;
   document.getElementById('app-shell').hidden = false;
@@ -14032,15 +14379,74 @@ function renderObTour() {
   if (skip) skip.hidden = obTourStep >= 3;
 }
 function obTourSkip() {
+  obTourUserTouch();
   const tour = document.getElementById('ob-tour');
   if (tour) tour.hidden = true;
   const name = document.getElementById('ob-name');
   if (name) name.focus();
 }
 function obTourNext() {
+  obTourUserTouch();
   if (obTourStep >= 3) { obTourSkip(); return; }
   obTourStep++;
   renderObTour();
+}
+
+/* Rotación automática del recorrido (Compilación 36, pedido de
+   Sterlin: «que no haya que darle atrás o adelante»). Las láminas
+   avanzan solas cada ~4 s en bucle (de la 3 vuelve a la 1) usando el
+   mismo renderObTour() de los botones, así los puntos se actualizan
+   igual. Reglas:
+   - Cualquier interacción manual (botones o toque sobre el
+     recorrido) la APAGA por el resto de la sesión de bienvenida:
+     el carrusel nunca le pelea al usuario.
+   - Cada tick se salta si la bienvenida o el recorrido no están
+     visibles (document.hidden o vista oculta) o si la persona está
+     en el formulario (un campo con el foco o texto ya escrito en
+     nombre/PIN): la lámina no se mueve mientras escribe.
+   - Con prefers-reduced-motion NO arranca: queda manual como antes.
+   - Al salir de la bienvenida (enterApp) el temporizador se limpia:
+     nada sigue corriendo dentro de la app. */
+const OB_TOUR_INTERVAL_MS = 4000;
+let obTourTimer = null;
+let obTourAutoOff = false;
+function obTourReducedMotion() {
+  try {
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (e) { return false; }
+}
+function obTourFormBusy() {
+  const form = document.getElementById('onboarding-form');
+  const ae = document.activeElement;
+  if (form && ae && form.contains(ae) &&
+      (ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.tagName === 'TEXTAREA')) return true;
+  for (const id of ['ob-name', 'ob-pin', 'ob-pin2']) {
+    const n = document.getElementById(id);
+    if (n && n.value) return true;
+  }
+  return false;
+}
+function obTourAutoTick() {
+  if (obTourAutoOff || obTourTimer === null) return;
+  const onb = document.getElementById('view-onboarding');
+  const tour = document.getElementById('ob-tour');
+  if (!onb || onb.hidden || !tour || tour.hidden || document.hidden) return;
+  if (obTourFormBusy()) return;
+  obTourStep = obTourStep >= 3 ? 1 : obTourStep + 1;
+  renderObTour();
+}
+function obTourAutoStart() {
+  if (obTourTimer !== null || obTourAutoOff) return;
+  if (obTourReducedMotion()) return;
+  obTourTimer = setInterval(obTourAutoTick, OB_TOUR_INTERVAL_MS);
+}
+function obTourAutoStop() {
+  if (obTourTimer !== null) { clearInterval(obTourTimer); obTourTimer = null; }
+}
+function obTourUserTouch() {
+  obTourAutoOff = true;
+  obTourAutoStop();
 }
 
 async function onOnboardingSubmit(ev) {
@@ -14174,14 +14580,293 @@ function initPullToRefresh() {
   document.addEventListener('touchcancel', endPull);
 }
 
+/* ---------------- Podcast (Compilación 36) ----------------
+   Sección nueva pedida por Sterlin: la ficha del programa oficial
+   «Finanzas Personales» (con Lucía y Marco), la lista de episodios
+   desde su feed RSS público y un reproductor integrado.
+   Decisiones:
+   - Offline-first: la sección SOLO trabaja al abrir su vista (nada
+     en el arranque ni en segundo plano). La última lista buena se
+     cachea en localStorage; sin conexión se muestra el caché con
+     aviso, y sin caché se muestra un mensaje amable.
+   - Todo texto del feed entra por textContent (el parser devuelve
+     datos, la vista los pinta con el()): el feed nunca se inyecta
+     como HTML.
+   - Un solo <audio> para todo. Al salir de la vista la reproducción
+     se PAUSA (lo hace showView): no sigue sonando sobre las demás
+     secciones ni hace falta cazar un botón flotante.
+   - Convivencia: el gesto de atrás (C31) no cambia (salir de la
+     vista vuelve a Inicio y pausa), y el pull-to-refresh (C35)
+     redibuja la vista, lo que aquí significa volver a pedir el feed.
+   - La CSP gana connect-src/media-src SOLO para https://muse.ai
+     (el feed y sus audios); nada más se abre. */
+const PODCAST_FEED_URL = 'https://muse.ai/podcasts/feed/1246339358572522/912278e9-dcd4-40f6-8fd0-ddc078d02c04';
+const PODCAST_CACHE_KEY = 'cgastos.podcast.v1';
+let podcastEpisodes = null;
+let podcastLoadPromise = null;
+let podcastCurrentUrl = '';
+let podcastCurrentTitle = '';
+function podcastAudio() { return document.getElementById('podcast-audio'); }
+function podcastFmtClock(sec) {
+  const total = Math.max(0, Math.floor(Number(sec) || 0));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return (h > 0 ? h + ':' + String(m).padStart(2, '0') : String(m)) + ':' + String(s).padStart(2, '0');
+}
+function podcastDurationLabel(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (/^\d+$/.test(s)) return podcastFmtClock(Number(s));
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(s)) return s;
+  return '';
+}
+function podcastDateLabel(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    try { return d.toLocaleDateString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric' }); }
+    catch (e) { /* sin Intl no pasa nada: se muestra la fecha cruda */ }
+  }
+  return s.slice(0, 32);
+}
+/* Parser PURO del feed RSS (probable sin red): devuelve episodios
+   {title, date, duration, url} en el orden del feed (del más
+   reciente al más viejo). Solo entran ítems con enclosure https. */
+function podcastParseFeed(xmlText) {
+  let doc = null;
+  try { doc = new DOMParser().parseFromString(String(xmlText || ''), 'text/xml'); }
+  catch (e) { return []; }
+  if (!doc || doc.getElementsByTagName('parsererror').length) return [];
+  const out = [];
+  const items = doc.getElementsByTagName('item');
+  for (const item of items) {
+    const childText = (tag) => {
+      const n = item.getElementsByTagName(tag)[0];
+      return n ? String(n.textContent || '').trim() : '';
+    };
+    const enc = item.getElementsByTagName('enclosure')[0];
+    const url = enc ? String(enc.getAttribute('url') || '').trim() : '';
+    if (!/^https:\/\//i.test(url)) continue;
+    const title = childText('title').slice(0, 200);
+    if (!title) continue;
+    const durRaw = childText('itunes:duration') || childText('duration');
+    out.push({ title: title, date: childText('pubDate').slice(0, 64), duration: podcastDurationLabel(durRaw), url: url });
+    if (out.length >= 100) break;
+  }
+  return out;
+}
+function podcastSanitizeEpisodes(list) {
+  if (!Array.isArray(list)) return null;
+  const out = [];
+  for (const e of list) {
+    if (!e || typeof e !== 'object') continue;
+    const url = String(e.url || '');
+    if (!/^https:\/\//i.test(url)) continue;
+    out.push({
+      title: String(e.title || '').slice(0, 200) || '—',
+      date: String(e.date || '').slice(0, 64),
+      duration: String(e.duration || '').slice(0, 16),
+      url: url
+    });
+    if (out.length >= 100) break;
+  }
+  return out;
+}
+function podcastCacheRead() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(PODCAST_CACHE_KEY) || 'null');
+    return raw ? podcastSanitizeEpisodes(raw.episodes) : null;
+  } catch (e) { return null; }
+}
+function podcastCacheWrite(eps) {
+  try {
+    localStorage.setItem(PODCAST_CACHE_KEY, JSON.stringify({ at: Date.now(), episodes: podcastSanitizeEpisodes(eps) || [] }));
+  } catch (e) { /* sin espacio o sin localStorage: la lista vive en memoria */ }
+}
+function renderPodcast() {
+  podcastPaintPlayer();
+  if (podcastEpisodes && podcastEpisodes.length) podcastRenderList(podcastEpisodes);
+  podcastLoad();
+}
+async function podcastLoad() {
+  if (podcastLoadPromise) return podcastLoadPromise;
+  const status = document.getElementById('podcast-status');
+  const list = document.getElementById('podcast-list');
+  if (!status || !list) return false;
+  if (!podcastEpisodes) { status.hidden = false; status.textContent = t('pod_loading'); }
+  podcastLoadPromise = (async () => {
+    let eps = null;
+    try {
+      const res = await fetch(PODCAST_FEED_URL, { cache: 'no-store' });
+      if (res && res.ok) eps = podcastParseFeed(await res.text());
+    } catch (e) { eps = null; }
+    if (eps) {
+      if (eps.length) {
+        podcastEpisodes = eps;
+        podcastCacheWrite(eps);
+        status.hidden = true;
+        podcastRenderList(eps);
+      } else {
+        podcastEpisodes = [];
+        clearNode(list);
+        status.hidden = false;
+        status.textContent = t('pod_empty');
+      }
+      return true;
+    }
+    const cached = podcastCacheRead();
+    if (cached && cached.length) {
+      podcastEpisodes = cached;
+      status.hidden = false;
+      status.textContent = t('pod_offline');
+      podcastRenderList(cached);
+      return true;
+    }
+    status.hidden = false;
+    status.textContent = t('pod_error');
+    return false;
+  })();
+  try { return await podcastLoadPromise; }
+  finally { podcastLoadPromise = null; }
+}
+function podcastRenderList(eps) {
+  const list = document.getElementById('podcast-list');
+  if (!list) return;
+  clearNode(list);
+  for (const ep of eps) {
+    const row = el('button', 'pod-ep');
+    row.type = 'button';
+    row.dataset.url = ep.url;
+    row.appendChild(el('span', 'pod-ep-ico', '▶'));
+    const main = el('span', 'pod-ep-main');
+    main.appendChild(el('span', 'pod-ep-title', ep.title));
+    const meta = [podcastDateLabel(ep.date), ep.duration].filter(Boolean).join(' · ');
+    if (meta) main.appendChild(el('span', 'pod-ep-meta muted small', meta));
+    row.appendChild(main);
+    row.addEventListener('click', () => podcastPlayEpisode(ep));
+    list.appendChild(row);
+  }
+  podcastMarkRow();
+}
+function podcastMarkRow() {
+  const list = document.getElementById('podcast-list');
+  if (!list) return;
+  list.querySelectorAll('.pod-ep').forEach((row) => {
+    const on = !!podcastCurrentUrl && row.dataset.url === podcastCurrentUrl;
+    row.classList.toggle('playing', on);
+    const ico = row.querySelector('.pod-ep-ico');
+    if (ico) ico.textContent = on ? '♪' : '▶';
+  });
+}
+function podcastShowAudioError() {
+  const msg = document.getElementById('podcast-player-msg');
+  if (msg) { msg.textContent = t('pod_audio_error'); msg.hidden = false; }
+  podcastPaintPlayer();
+}
+function podcastHideAudioError() {
+  const msg = document.getElementById('podcast-player-msg');
+  if (msg) msg.hidden = true;
+}
+function podcastPlayEpisode(ep) {
+  const a = podcastAudio();
+  if (!a || !ep || !ep.url) return;
+  podcastHideAudioError();
+  if (podcastCurrentUrl !== ep.url) {
+    podcastCurrentUrl = ep.url;
+    podcastCurrentTitle = ep.title || '';
+    try { a.src = ep.url; } catch (e) { /* URL inválida: lo reporta el evento error */ }
+  }
+  let p = null;
+  try { p = a.play(); } catch (e) { podcastShowAudioError(); }
+  if (p && typeof p.catch === 'function') p.catch(() => podcastShowAudioError());
+  podcastPaintPlayer();
+  podcastMarkRow();
+}
+function podcastPause() {
+  const a = podcastAudio();
+  if (a && !a.paused) { try { a.pause(); } catch (e) { /* sin reproductor no pasa nada */ } }
+  podcastPaintPlayer();
+}
+function podcastToggle() {
+  const a = podcastAudio();
+  if (!a) return;
+  if (!podcastCurrentUrl) {
+    if (podcastEpisodes && podcastEpisodes.length) podcastPlayEpisode(podcastEpisodes[0]);
+    return;
+  }
+  if (a.paused) {
+    const ep = (podcastEpisodes || []).find((e) => e.url === podcastCurrentUrl)
+      || { url: podcastCurrentUrl, title: podcastCurrentTitle };
+    podcastPlayEpisode(ep);
+  } else {
+    podcastPause();
+  }
+}
+function podcastPaintPlayer() {
+  const a = podcastAudio();
+  const btn = document.getElementById('podcast-toggle');
+  if (!btn) return;
+  const playing = !!a && !a.paused && !a.ended;
+  btn.textContent = playing ? '⏸' : '▶';
+  btn.setAttribute('aria-label', t(playing ? 'pod_pause_aria' : 'pod_play_aria'));
+  const now = document.getElementById('podcast-now');
+  if (now) now.textContent = podcastCurrentTitle || '';
+  podcastPaintProgress();
+}
+function podcastPaintProgress() {
+  const a = podcastAudio();
+  if (!a) return;
+  const seek = document.getElementById('podcast-seek');
+  const cur = Number(a.currentTime) || 0;
+  const dur = Number(a.duration) || 0;
+  if (seek) seek.value = dur > 0 ? String(Math.round(cur / dur * 1000)) : '0';
+  const elE = document.getElementById('podcast-elapsed');
+  const elT = document.getElementById('podcast-total');
+  if (elE) elE.textContent = podcastFmtClock(cur);
+  if (elT) elT.textContent = dur > 0 ? podcastFmtClock(dur) : '0:00';
+}
+function podcastWirePlayer() {
+  const btn = document.getElementById('podcast-toggle');
+  const seek = document.getElementById('podcast-seek');
+  const a = podcastAudio();
+  if (btn) btn.addEventListener('click', podcastToggle);
+  if (seek) seek.addEventListener('input', () => {
+    if (!a) return;
+    const dur = Number(a.duration) || 0;
+    if (dur > 0) {
+      try { a.currentTime = (Number(seek.value) / 1000) * dur; } catch (e) { /* sin metadatos aún */ }
+      podcastPaintProgress();
+    }
+  });
+  if (a) {
+    a.addEventListener('timeupdate', podcastPaintProgress);
+    a.addEventListener('loadedmetadata', podcastPaintPlayer);
+    a.addEventListener('durationchange', podcastPaintProgress);
+    a.addEventListener('play', podcastPaintPlayer);
+    a.addEventListener('pause', podcastPaintPlayer);
+    a.addEventListener('ended', podcastPaintPlayer);
+    a.addEventListener('error', () => { if (podcastCurrentUrl) podcastShowAudioError(); });
+  }
+}
+
 function wireEvents() {
   initPullToRefresh();
+  podcastWirePlayer();
   document.getElementById('lock-form').addEventListener('submit', onLockSubmit);
   document.getElementById('onboarding-form').addEventListener('submit', onOnboardingSubmit);
   const obTourNextBtn = document.getElementById('ob-tour-next');
   if (obTourNextBtn) obTourNextBtn.addEventListener('click', obTourNext);
   const obTourSkipBtn = document.getElementById('ob-tour-skip');
   if (obTourSkipBtn) obTourSkipBtn.addEventListener('click', obTourSkip);
+  /* Compilación 36: tocar el recorrido (lámina o puntos) también
+     cuenta como interacción manual: pausa la rotación automática. */
+  const obTourEl = document.getElementById('ob-tour');
+  if (obTourEl) {
+    obTourEl.addEventListener('pointerdown', obTourUserTouch);
+    obTourEl.addEventListener('touchstart', obTourUserTouch, { passive: true });
+  }
   const obLangSel = document.getElementById('ob-lang');
   if (obLangSel) obLangSel.addEventListener('change', (ev) => {
     db.settings.lang = validLangSetting(ev.target.value);
@@ -14454,6 +15139,7 @@ function init() {
     document.getElementById('view-lock').hidden = true;
     document.getElementById('view-onboarding').hidden = false;
     renderObTour();
+    obTourAutoStart();
     const obLangBoot = document.getElementById('ob-lang');
     if (obLangBoot) obLangBoot.value = db.settings.lang || 'auto';
     return;

@@ -4,10 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b6e4f">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#00421C">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11171d">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://muse.ai; media-src 'self' https://muse.ai; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="description" content="PETO Finanzas: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PETO Finanzas">
+<meta property="og:title" content="PETO Finanzas">
+<meta property="og:description" content="Organiza tus gastos, ingresos, presupuesto, cuentas, deudas y tu san — sin cuenta y sin enredos. Tus datos quedan en tu teléfono.">
+<meta property="og:image" content="icons/icon-512.png">
 <title>PETO Finanzas — Web</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -32,7 +37,7 @@
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 35</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 36</p>
   </div>
 </section>
 
@@ -566,6 +571,31 @@
     <section id="rem-totals" class="card" hidden></section>
   </main>
 
+  <!-- ======= PODCAST ======= -->
+  <main id="view-podcast" class="view" hidden>
+    <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
+    <h2 data-i18n="sec_podcast">Podcast</h2>
+    <div class="card podcast-card">
+      <img class="podcast-cover" src="icons/icon-512.png" alt="PETO Finanzas">
+      <h3 class="podcast-title">Finanzas Personales</h3>
+      <p class="muted" data-i18n="pod_hosts">con Lucía y Marco</p>
+      <p data-i18n="pod_desc">Dinero sin enredos: consejos prácticos para ahorrar, salir de deudas y cuidar tu bolsillo, en episodios cortos.</p>
+      <a class="btn btn-secondary" href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener" data-i18n="pod_spotify_btn">Escuchar en Spotify</a>
+    </div>
+    <p id="podcast-status" class="muted" role="status" hidden></p>
+    <div id="podcast-list" class="podcast-list"></div>
+    <div class="podcast-player" id="podcast-player">
+      <button type="button" class="btn btn-primary podcast-toggle" id="podcast-toggle" aria-label="Reproducir">▶</button>
+      <div class="podcast-player-main">
+        <p class="podcast-now" id="podcast-now"></p>
+        <input type="range" id="podcast-seek" min="0" max="1000" value="0" step="1">
+        <p class="muted small podcast-times"><span id="podcast-elapsed">0:00</span> · <span id="podcast-total">0:00</span></p>
+      </div>
+      <audio id="podcast-audio" preload="none"></audio>
+    </div>
+    <p id="podcast-player-msg" class="error" role="alert" hidden></p>
+  </main>
+
   <main id="view-san" class="view" hidden>
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_san">Mi san</h2>
@@ -925,6 +955,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c36">Compilación 36: nueva sección Podcast — escucha «Finanzas Personales» sin salir de la app, con reproductor integrado y la lista guardada para cuando no hay internet — la bienvenida ahora avanza sola, lámina a lámina — y la vista del enlace renovada: el san se presenta con su avance y acceso directo para probar la app.</li>
         <li data-i18n="news_c35">Compilación 35: desde el enlace público del san ya puedes reportar tu pago con «Ya pagué» y adjuntar tu comprobante (el organizador lo confirma), el visor se ve con el tema oscuro, la app se refresca deslizando hacia abajo y el lector de PDF ya no confunde los Zelle que envías con ingresos.</li>
         <li data-i18n="news_c34">Compilación 34: nuevo logo de PETO Finanzas — la «P» blanca con barras y flecha en verde suave sobre fondo esmeralda, ya en el icono, la pantalla de bloqueo y toda la app.</li>
         <li data-i18n="news_c33">Compilación 33: crear un san ya no puede borrar el que está en curso — si ya hay uno activo, la app lo dice y lo protege (pagos, comprobantes, historial y enlace público) — y la versión web quedó sincronizada con el teléfono.</li>
@@ -937,7 +968,7 @@
         <li data-i18n="news_c24">Compilación 24: tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 35</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 36</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
@@ -995,6 +1026,11 @@
 
 <section id="san-public" hidden>
   <div id="san-public-body"></div>
+  <div id="san-public-bar" hidden>
+    <img class="pub-bar-logo" src="icons/icon-192.png" alt="">
+    <span class="pub-bar-brand">PETO Finanzas</span>
+    <a class="btn btn-primary btn-small" id="san-public-bar-btn" href="https://petofinanzas.com/app/" target="_blank" rel="noopener">Probar la app</a>
+  </div>
 </section>
 
 <script src="vendor/supabase.js"></script>
