@@ -464,6 +464,13 @@ html[data-theme="oscuro"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:
   font-size:.9rem;font-weight:600;
 }
 .pub-round h4{margin:.1rem 0 .35rem;font-size:1.08rem}
+/* Compilación 41: buscador de nombre y acordeón del visor público */
+.pub-find-hint{font-weight:600;margin:.2rem 0 .5rem}
+.pub-find{display:flex;gap:.5rem;align-items:center;margin:0 0 1rem}
+.pub-find-input{flex:1;min-width:0}
+.pub-round-head{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.pub-match{outline:2px solid var(--accent);outline-offset:-2px;border-radius:.5rem;background:var(--accent-soft)}
+.pub-find-none{margin:-.4rem 0 1rem}
 .pub-pay-row{justify-content:flex-start;gap:.55rem}
 .pub-pay-row .btn{margin-left:auto}
 .pub-pay-name{font-weight:600}
@@ -512,3 +519,10 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 .goal-extra{margin:.7rem 0}
 .goal-move-amt{max-width:110px}
 #home-insights h3{margin:.2rem 0 .5rem}
+
+/* Compilación 41: tarjeta de siguiente paso (primer día guiado) y
+   «Agregar ahorro» protagonista en Ahorros */
+.next-step-card{border:2px solid var(--accent);background:var(--accent-soft)}
+.next-step-card h3{margin:.1rem 0 .5rem}
+.sav-add-card{border:2px solid var(--accent)}
+.sav-add-card h3{font-size:1.2rem}

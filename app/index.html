@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" data-i18n="lock_note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 40</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 41</p>
   </div>
 </section>
 
@@ -101,7 +101,21 @@
       <p id="ob-error" class="error" role="alert" hidden></p>
       <button type="submit" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </form>
-    <p class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
+    <div id="ob-mode" hidden>
+      <h2 data-i18n="ob_mode_title">¿Cómo quieres ver tu app?</h2>
+      <label class="toggle-row">
+        <span><strong data-i18n="ob_mode_essential">Lo esencial</strong><br>
+        <span class="muted small" data-i18n="ob_mode_essential_help">Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.</span></span>
+        <input type="radio" name="ob-mode" value="esencial" checked>
+      </label>
+      <label class="toggle-row">
+        <span><strong data-i18n="ob_mode_all">Todo</strong><br>
+        <span class="muted small" data-i18n="ob_mode_all_help">Las 13 secciones completas desde el primer día.</span></span>
+        <input type="radio" name="ob-mode" value="todo">
+      </label>
+      <button id="ob-mode-btn" type="button" class="btn btn-primary btn-big" data-i18n="ob_mode_btn">Continuar</button>
+    </div>
+    <p id="ob-note" class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
   </div>
 </section>
 
@@ -138,6 +152,13 @@
   <!-- ======= INICIO ======= -->
   <main id="view-home" class="view">
     <div id="home-banners"></div>
+
+    <section id="next-step-card" class="card next-step-card" hidden>
+      <h3 id="next-step-title">Tu siguiente paso</h3>
+      <div class="form-actions">
+        <button id="next-step-btn" class="btn btn-primary" type="button">Crea tu presupuesto</button>
+      </div>
+    </section>
 
     <section class="summary-strip" aria-label="Resumen del mes">
       <button id="tile-available" class="summary-item" type="button" data-i18n-aria="tile_available_aria" aria-label="Dinero disponible: ir a Mis cuentas">
@@ -210,6 +231,8 @@
       <p id="exp-voice-status" class="muted small" aria-live="polite"></p>
       <label for="exp-category" data-i18n="category_label">Categoría</label>
       <select id="exp-category" required></select>
+      <label for="exp-source" data-i18n="src_exp_label">¿De dónde salió?</label>
+      <select id="exp-source"></select>
       <label for="exp-date" data-i18n="date_label">Fecha</label>
       <input id="exp-date" type="date" required>
       <label class="toggle-row">
@@ -280,6 +303,8 @@
       <label id="inc-savings-label" for="inc-savings">Ahorro ($)</label>
       <input id="inc-savings" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
       <p class="muted small" data-i18n="inc_savings_help">Sugerencia según tu porcentaje de ahorro — cámbialo por lo que realmente ahorraste. Puedes poner $0.</p>
+      <label for="inc-source" data-i18n="src_inc_label">¿A dónde entró?</label>
+      <select id="inc-source"></select>
       <label for="inc-date" data-i18n="date_label">Fecha</label>
       <input id="inc-date" type="date" required>
       <label class="toggle-row">
@@ -312,6 +337,22 @@
     <h2 data-i18n="sec_ahorros">Ahorros</h2>
     <p class="muted"><span data-i18n="sav_intro_1">Aquí ves cada cantidad que ahorraste, una por una. También puedes agregar un ahorro suelto,</span> <strong data-i18n="sav_intro_2">sin que venga de un ingreso</strong><span data-i18n="sav_intro_3">, con el formulario de abajo. Si borras un ahorro, solo se borra esa cantidad:</span> <strong data-i18n="sav_intro_4">el ingreso se queda igual</strong><span data-i18n="sav_intro_5">.</span></p>
 
+    <form id="savings-form" class="card form-card sav-add-card" autocomplete="off">
+      <h3 data-i18n="sav_form_title">Agregar ahorro</h3>
+      <label for="sav-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="sav-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
+      <label for="sav-date" data-i18n="date_label">Fecha</label>
+      <input id="sav-date" type="date" required>
+      <label for="sav-note" data-i18n="note_label">Nota (opcional)</label>
+      <input id="sav-note" type="text" maxlength="120" data-i18n-ph="sav_note_ph" placeholder="¿Para qué es este ahorro?">
+      <label for="sav-goal" data-i18n="sav_goal_label">Asignar a una meta (opcional)</label>
+      <select id="sav-goal"></select>
+      <p id="sav-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-big" data-i18n="sav_save">Guardar ahorro</button>
+      </div>
+    </form>
+
     <div id="goal-card" class="card goal-card"></div>
 
     <form id="goal-form" class="card form-card" autocomplete="off" hidden>
@@ -327,50 +368,30 @@
       </div>
     </form>
 
-    <div id="challenge-card" class="card"></div>
-
-    <form id="challenge-form" class="card form-card" autocomplete="off">
-      <label for="chal-target" data-i18n="chal_target_label">Meta semanal de ahorro ($)</label>
-      <input id="chal-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="20.00">
-      <p id="chal-error" class="error" role="alert" hidden></p>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-secondary" data-i18n="chal_save">Guardar meta semanal</button>
-      </div>
-    </form>
-
     <h3 data-i18n="goals_title">Otras metas</h3>
     <div id="goals-list"></div>
     <p id="goals-empty" class="empty-state" hidden></p>
-    <form id="goal2-form" class="card form-card" autocomplete="off">
-      <label for="goal2-name" data-i18n="goal_name_label">Nombre de la meta</label>
-      <input id="goal2-name" type="text" maxlength="60" data-i18n-ph="goal_name_ph" placeholder="Ej.: Fondo de emergencia">
-      <label for="goal2-target" data-i18n="goal_target_label">Cantidad meta ($)</label>
-      <input id="goal2-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
-      <p id="goal2-error" class="error" role="alert" hidden></p>
-      <div class="form-actions">
-        <button id="goal2-submit" type="submit" class="btn btn-secondary" data-i18n="goal2_create">Crear meta</button>
-        <button id="goal2-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
+
+    <section class="card form-card">
+      <label class="toggle-row">
+        <span data-i18n="chal_ask">¿Quieres un reto semanal?</span>
+        <input type="checkbox" id="chal-more">
+      </label>
+      <div id="chal-more-box" hidden>
+        <div id="challenge-card"></div>
+        <form id="challenge-form" autocomplete="off">
+          <label for="chal-target" data-i18n="chal_target_label">Meta semanal de ahorro ($)</label>
+          <input id="chal-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="20.00">
+          <p id="chal-error" class="error" role="alert" hidden></p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-secondary" data-i18n="chal_save">Guardar meta semanal</button>
+          </div>
+        </form>
       </div>
-    </form>
+    </section>
 
     <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
     <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
-
-    <form id="savings-form" class="card form-card" autocomplete="off">
-      <h3 data-i18n="sav_form_title">Agregar ahorro</h3>
-      <label for="sav-amount" data-i18n="amount_label">Cantidad ($)</label>
-      <input id="sav-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
-      <label for="sav-date" data-i18n="date_label">Fecha</label>
-      <input id="sav-date" type="date" required>
-      <label for="sav-note" data-i18n="note_label">Nota (opcional)</label>
-      <input id="sav-note" type="text" maxlength="120" data-i18n-ph="sav_note_ph" placeholder="¿Para qué es este ahorro?">
-      <label for="sav-goal" data-i18n="sav_goal_label">Asignar a una meta (opcional)</label>
-      <select id="sav-goal"></select>
-      <p id="sav-error" class="error" role="alert" hidden></p>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary" data-i18n="sav_save">Guardar ahorro</button>
-      </div>
-    </form>
 
     <ul id="savings-list" class="item-list"></ul>
     <p id="savings-empty" class="empty-state" hidden data-i18n="sav_empty">Todavía no tienes ahorros anotados. Agrega uno con el formulario de arriba, o anota el ahorro de un ingreso cuando lo registres y aparecerá aquí. 🌱</p>
@@ -636,6 +657,14 @@
         <input id="san-name" type="text" maxlength="60" data-i18n-ph="san_name_ph" placeholder="Ej.: San de la familia">
         <label for="san-amount" data-i18n="san_aporte_label">Aporte por turno ($)</label>
         <input id="san-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+        <label for="san-freq" data-i18n="san_freq_label">Frecuencia</label>
+        <select id="san-freq">
+          <option value="semanal" data-i18n="org_freq_semanal">Semanal</option>
+          <option value="quincenal" data-i18n="org_freq_quincenal">Quincenal (cada 2 semanas)</option>
+          <option value="mensual" data-i18n="org_freq_mensual">Mensual</option>
+        </select>
+        <label for="san-start" data-i18n="san_start_label">Fecha de inicio</label>
+        <input id="san-start" type="date">
         <label data-i18n="san_participants_label">Participantes (en orden de turno)</label>
         <div class="budget-input-row">
           <input id="san-pname" type="text" maxlength="40" data-i18n-ph="san_pname_ph" placeholder="Nombre del participante">
@@ -660,7 +689,7 @@
         <div id="san-current">
           <p id="san-receiver-line" class="total-line"></p>
           <p id="san-week-collected" class="muted"></p>
-          <h3 data-i18n="san_paid_title">¿Quién ya pagó esta semana?</h3>
+          <h3 id="san-paid-title" data-i18n="san_paid_title">¿Quién ya pagó esta semana?</h3>
           <div id="san-paid-list"></div>
           <div class="form-actions">
             <button id="san-advance" type="button" class="btn btn-primary" data-i18n="san_advance">Marcar semana completa</button>
@@ -903,6 +932,10 @@
       </div>
       <div id="sections-body" hidden>
         <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
+        <div class="form-actions">
+          <button id="set-mode-essential" type="button" class="btn btn-secondary" data-i18n="set_mode_essential_btn">Modo Lo esencial</button>
+          <button id="set-mode-all" type="button" class="btn btn-ghost" data-i18n="set_mode_all_btn">Mostrar todo</button>
+        </div>
         <div id="section-toggles"></div>
       </div>
     </section>
@@ -984,6 +1017,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c41">Compilación 41: tus cuentas ya están vivas — al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos — el enlace público del san trae buscador de nombre y rondas plegadas — tu primer día va guiado paso a paso, con el modo «Lo esencial» — el san personal ya puede ser quincenal o mensual — y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.</li>
         <li data-i18n="news_c40">Compilación 40: tu saldo en cuentas ahora se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.</li>
         <li data-i18n="news_c39">Compilación 39: el Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.</li>
         <li data-i18n="news_c38">Compilación 38: el Podcast ya carga y reproduce sus episodios.</li>
@@ -1001,7 +1035,7 @@
         <li data-i18n="news_c24">Compilación 24: tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 40</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 41</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">

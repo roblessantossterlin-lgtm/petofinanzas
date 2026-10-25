@@ -1,22 +1,23 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 40) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 41) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 25-oct-2026 con la Compilación 40: los 4 arreglos
-   rápidos de la auditoría de cliente — con cuentas el rótulo pasa a
-   «Saldo en tus cuentas», al crear el PIN la app avisa que no se
-   puede recuperar y la pantalla de bloqueo trae la salida de
-   emergencia «¿Olvidaste tu PIN?», la tarjeta de gasto diario nace
-   el primer día con «Crear mi presupuesto» y el arranque guiado de
-   Presupuesto (ingreso, reparto, total y «Guardar todo»), y anotar
-   un gasto toma tres toques, con la categoría que recuerda la
-   última usada y «Más detalles» plegado — (727 claves por idioma).
-   Sobre la base de la Compilación 39 ya sincronizada (el Podcast
-   ya reproduce sus episodios). */
+   Sincronizado el 25-oct-2026 con la Compilación 41: la FASE 2 de
+   la auditoría de cliente — las cuentas ya están vivas (al anotar
+   un gasto o un ingreso se elige la fuente «¿De dónde salió?» /
+   «¿A dónde entró?» — Saldo disponible, Ahorros o una de tus
+   cuentas — y los saldos se mueven solos), el visor público del
+   san trae buscador de nombre y las rondas plegadas en acordeón,
+   el primer día va guiado con la tarjeta de «siguiente paso» y el
+   modo «Lo esencial», el san personal gana frecuencia (semanal,
+   quincenal o mensual) y fecha de inicio, y Ahorros queda en una
+   sola pantalla con un solo formulario de meta — (763 claves por
+   idioma). Sobre la base de la Compilación 40 ya sincronizada
+   (los 4 arreglos rápidos de la auditoría). */
 /* ============================================================
    PETO Finanzas · Compilación 31
    - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
@@ -28,7 +29,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 40'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 41'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -79,7 +80,12 @@ function defaultData() {
       sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true, podcast: true },
       pinSalt: null,
       pinHash: null,
-      lastExpCategory: null
+      lastExpCategory: null,
+      /* Compilación 41: memoria de la última fuente usada en los
+         formularios de gasto e ingreso ('' = saldo disponible,
+         'ahorros' o el id de una cuenta). */
+      lastExpSource: null,
+      lastIncSource: null
     },
     lastExportAt: null,
     customCategories: [],
@@ -193,7 +199,14 @@ function cleanSan(raw) {
   let currentWeek = Math.trunc(Number(raw.currentWeek));
   if (!Number.isFinite(currentWeek) || currentWeek < 0) currentWeek = 0;
   if (currentWeek > participants.length) currentWeek = participants.length;
-  return { name: name, aporteCents: aporte, participants: participants, weeks: weeks, currentWeek: currentWeek };
+  /* Compilación 41 (auditoría, hallazgo 12): el san personal también
+     tiene frecuencia y fecha de inicio, como el del organizador. Los
+     sanes viejos no traen los campos: quedan semanales y sin fecha
+     (startDate null = no se muestran fechas), sin perder nada. */
+  const frequency = ORG_FREQUENCIES.includes(raw.frequency) ? raw.frequency : 'semanal';
+  const startDate = (typeof raw.startDate === 'string' && cleanDate(raw.startDate) === raw.startDate)
+    ? raw.startDate : null;
+  return { name: name, aporteCents: aporte, participants: participants, weeks: weeks, currentWeek: currentWeek, frequency: frequency, startDate: startDate };
 }
 /* San ORGANIZADO (Fase 4, función Pro): la tanda de TODO el grupo.
    Estructura hermana del san personal: participantes en orden de
@@ -275,6 +288,8 @@ function validateData(raw) {
   d.settings.pinHash = (typeof s.pinHash === 'string' && /^[0-9a-f]{64}$/.test(s.pinHash)) ? s.pinHash : null;
   if (!d.settings.pinSalt || !d.settings.pinHash) { d.settings.pinSalt = null; d.settings.pinHash = null; }
   d.settings.lastExpCategory = (typeof s.lastExpCategory === 'string' && s.lastExpCategory.length <= 30) ? s.lastExpCategory : null;
+  d.settings.lastExpSource = (typeof s.lastExpSource === 'string' && s.lastExpSource.length <= 40) ? s.lastExpSource : null;
+  d.settings.lastIncSource = (typeof s.lastIncSource === 'string' && s.lastIncSource.length <= 40) ? s.lastIncSource : null;
   d.settings.lang = (s.lang === 'auto' || LANGS.includes(s.lang)) ? s.lang : 'auto';
   d.settings.payday = (typeof s.payday === 'number' && Number.isFinite(s.payday) &&
     Math.trunc(s.payday) >= 0 && Math.trunc(s.payday) <= 6) ? Math.trunc(s.payday) : null;
@@ -311,7 +326,13 @@ function validateData(raw) {
   d.expenses = arr(raw.expenses).filter((x) => x && typeof x === 'object').map((x) => ({
     id: cleanId(x.id), amountCents: cleanCents(x.amountCents, false),
     category: okCat(cleanText(x.category, 30)), date: cleanDate(x.date), note: cleanText(x.note, 120),
-    photo: cleanPhoto(x.photo), biz: x.biz === true
+    photo: cleanPhoto(x.photo), biz: x.biz === true,
+    /* Compilación 41 (cuentas vivas): de dónde salió el dinero. Los
+       movimientos viejos no traen los campos: quedan sin enlazar y
+       NO mueven ningún saldo ni el total de ahorros. La limpieza del
+       accountId contra las cuentas vivas va al final de la función. */
+    accountId: (typeof x.accountId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.accountId)) ? x.accountId : null,
+    fromSavings: x.fromSavings === true
   }));
   d.incomes = arr(raw.incomes).filter((x) => x && typeof x === 'object').map((x) => {
     const amount = cleanCents(x.amountCents, false);
@@ -323,7 +344,10 @@ function validateData(raw) {
       : splitCents(amount, d.settings.split).ahorro;
     return {
       id: cleanId(x.id), amountCents: amount, savingsCents: savings,
-      date: cleanDate(x.date), note: cleanText(x.note, 120), biz: x.biz === true
+      date: cleanDate(x.date), note: cleanText(x.note, 120), biz: x.biz === true,
+      /* Compilación 41 (cuentas vivas): a dónde entró el dinero. */
+      accountId: (typeof x.accountId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.accountId)) ? x.accountId : null,
+      toSavings: x.toSavings === true
     };
   });
   d.savings = arr(raw.savings).filter((x) => x && typeof x === 'object').map((x) => ({
@@ -396,6 +420,12 @@ function validateData(raw) {
      ahorro general: nunca se pierde el dinero, solo la etiqueta. */
   const goalIds = new Set(d.goals.map((g) => g.id));
   for (const s of d.savings) if (s.goalId && !goalIds.has(s.goalId)) s.goalId = null;
+  /* Compilación 41: un movimiento enlazado a una cuenta que ya no
+     existe queda sin enlazar (deja de mover saldos), nunca se pierde
+     el movimiento. */
+  const accountIds = new Set(d.accounts.map((a) => a.id));
+  for (const e of d.expenses) if (e.accountId && !accountIds.has(e.accountId)) e.accountId = null;
+  for (const i of d.incomes) if (i.accountId && !accountIds.has(i.accountId)) i.accountId = null;
   return d;
 }
 
@@ -878,6 +908,7 @@ es: {
   news_c38: 'Compilación 38: el Podcast ya carga y reproduce sus episodios.',
   news_c39: 'Compilación 39: el Podcast ya reproduce sus episodios y los widgets pequeños vuelven a funcionar.',
   news_c40: 'Compilación 40: tu saldo en cuentas ahora se rotula con honestidad, al crear tu PIN la app avisa que no se puede recuperar (y hay salida de emergencia si lo olvidas), tu número de gasto diario nace el primer día con «Crear mi presupuesto» y anotar un gasto ahora toma tres toques.',
+  src_exp_label: '¿De dónde salió?', src_inc_label: '¿A dónde entró?', src_available: 'Saldo disponible', src_savings: 'Ahorros', src_from_savings: 'de Ahorros', src_to_savings: 'a Ahorros', tile_available_help: 'Se actualiza con los gastos e ingresos que anotas en una cuenta; una cuenta sin movimientos conserva el saldo que escribiste.', pub_find_hint: '¿Ya pagaste? Escribe tu nombre, toca tu fila y luego Ya pagué.', pub_find_ph: 'Escribe tu nombre', pub_find_clear: 'Limpiar', pub_find_none: 'No aparece ese nombre. Revisa cómo lo escribió el organizador.', next_title: 'Tu siguiente paso', next_step1_btn: 'Crea tu presupuesto', next_step2_btn: 'Anota tu primer gasto', next_step3_btn: 'Crea tu cuenta de efectivo', ob_mode_title: '¿Cómo quieres ver tu app?', ob_mode_essential: 'Lo esencial', ob_mode_essential_help: 'Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.', ob_mode_all: 'Todo', ob_mode_all_help: 'Las 13 secciones completas desde el primer día.', ob_mode_btn: 'Continuar', set_mode_essential_btn: 'Modo Lo esencial', set_mode_all_btn: 'Mostrar todo', san_freq_label: 'Frecuencia', san_start_label: 'Fecha de inicio', san_period_semanal: 'Semana', san_period_quincenal: 'Quincena', san_period_mensual: 'Mes', san_period_line: '{p} {x} de {n}', san_collected_period: 'Reunido este periodo: {amount} de {target}', san_paid_title_period: '¿Quién ya pagó este periodo?', san_advance_period: 'Marcar periodo completo', san_finished_period: 'Todos los periodos se completaron. Puedes borrar este san y crear uno nuevo.', chal_ask: '¿Quieres un reto semanal?', key_san_period: '{p} {x} de {n} · Le toca a {name}', news_c41: 'Compilación 41: tus cuentas ya están vivas — al anotar un gasto o un ingreso eliges de dónde salió o a dónde entró (saldo disponible, Ahorros o una de tus cuentas) y los saldos se mueven solos — el enlace público del san trae buscador de nombre y rondas plegadas — tu primer día va guiado paso a paso, con el modo «Lo esencial» — el san personal ya puede ser quincenal o mensual — y Ahorros quedó en una sola pantalla ordenada, con un solo formulario de meta.',
   news_c37: 'Compilación 37: widgets renovados — degradado de marca, barra de avance que cambia de color según tu presupuesto y la línea del próximo turno de tu san — y un widget nuevo del tamaño de un icono, con lo que puedes gastar hoy — y la marca siempre visible al bajar por el enlace público del san — y las rondas del organizador ahora se pliegan en acordeón, con solo la de esta semana abierta.',
   widget_today: 'hoy',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -1353,6 +1384,7 @@ en: {
   news_c38: 'Build 38: the Podcast now loads and plays its episodes.',
   news_c39: 'Build 39: the Podcast now plays its episodes, and the small widgets work again.',
   news_c40: 'Build 40: your account balance is now labeled honestly, when you create your PIN the app warns it cannot be recovered (and there is an emergency exit if you forget it), your daily spending number is born on day one with "Create my budget", and logging an expense now takes three taps.',
+  src_exp_label: 'Where did it come from?', src_inc_label: 'Where did it go to?', src_available: 'Available balance', src_savings: 'Savings', src_from_savings: 'from Savings', src_to_savings: 'to Savings', tile_available_help: 'It updates with the expenses and income you link to an account; an account with no linked movements keeps the balance you typed.', pub_find_hint: 'Already paid? Type your name, tap your row, then I paid.', pub_find_ph: 'Type your name', pub_find_clear: 'Clear', pub_find_none: 'That name does not appear. Check how the organizer spelled it.', next_title: 'Your next step', next_step1_btn: 'Create your budget', next_step2_btn: 'Log your first expense', next_step3_btn: 'Create your cash account', ob_mode_title: 'How do you want to see your app?', ob_mode_essential: 'The essentials', ob_mode_essential_help: 'Only Home, Expenses, Income, Savings and My san. Everything else can be turned on later in Settings.', ob_mode_all: 'Everything', ob_mode_all_help: 'All 13 sections from day one.', ob_mode_btn: 'Continue', set_mode_essential_btn: 'Essentials mode', set_mode_all_btn: 'Show everything', san_freq_label: 'Frequency', san_start_label: 'Start date', san_period_semanal: 'Week', san_period_quincenal: 'Fortnight', san_period_mensual: 'Month', san_period_line: '{p} {x} of {n}', san_collected_period: 'Collected this period: {amount} of {target}', san_paid_title_period: 'Who has paid this period?', san_advance_period: 'Mark period complete', san_finished_period: 'All periods are complete. You can delete this san and create a new one.', chal_ask: 'Want a weekly challenge?', key_san_period: '{p} {x} of {n} · Up next: {name}', news_c41: 'Build 41: your accounts are alive now — when you log an expense or income you choose where it came from or went to (available balance, Savings, or one of your accounts) and balances move on their own — the public san link now has a name search and folding rounds — your first day is guided step by step, with an "Essentials" mode — the personal san can now be every two weeks or monthly — and Savings is now one tidy screen with a single goal form.',
   news_c37: 'Build 37: redesigned widgets — brand gradient, a progress bar that changes color with your budget and your san’s next-turn line — plus a brand-new app-icon-sized widget with what you can spend today — and the brand stays in view as you scroll the public san link — and the organizer’s rounds now fold into an accordion, with only this week’s open.',
   widget_today: 'today',
   widget_san_next: 'Next turn: {name} · {date}',
@@ -2071,6 +2103,7 @@ it: {
   news_c38: 'Versione 38: il Podcast ora carica e riproduce i suoi episodi.',
   news_c39: 'Versione 39: il Podcast ora riproduce i suoi episodi e i widget piccoli funzionano di nuovo.',
   news_c40: 'Versione 40: il saldo dei tuoi conti ora è etichettato con onestà, quando crei il PIN l’app avvisa che non si può recuperare (e c’è un’uscita di emergenza se lo dimentichi), il tuo numero di spesa giornaliera nasce il primo giorno con «Crea il mio budget» e registrare una spesa ora richiede tre tocchi.',
+  src_exp_label: 'Da dove è uscito?', src_inc_label: 'Dove è entrato?', src_available: 'Saldo disponibile', src_savings: 'Risparmi', src_from_savings: 'dai Risparmi', src_to_savings: 'ai Risparmi', tile_available_help: 'Si aggiorna con le spese e le entrate che colleghi a un conto; un conto senza movimenti collegati conserva il saldo che hai scritto.', pub_find_hint: 'Hai già pagato? Scrivi il tuo nome, tocca la tua riga e poi Ho pagato.', pub_find_ph: 'Scrivi il tuo nome', pub_find_clear: 'Cancella', pub_find_none: 'Quel nome non compare. Controlla come lo ha scritto l’organizzatore.', next_title: 'Il tuo prossimo passo', next_step1_btn: 'Crea il tuo budget', next_step2_btn: 'Annota la tua prima spesa', next_step3_btn: 'Crea il tuo conto contanti', ob_mode_title: 'Come vuoi vedere la tua app?', ob_mode_essential: 'L’essenziale', ob_mode_essential_help: 'Solo Home, Spese, Entrate, Risparmi e Il mio san. Il resto si attiva quando vuoi in Impostazioni.', ob_mode_all: 'Tutto', ob_mode_all_help: 'Le 13 sezioni complete dal primo giorno.', ob_mode_btn: 'Continua', set_mode_essential_btn: 'Modo Essenziale', set_mode_all_btn: 'Mostra tutto', san_freq_label: 'Frequenza', san_start_label: 'Data di inizio', san_period_semanal: 'Settimana', san_period_quincenal: 'Quindicina', san_period_mensual: 'Mese', san_period_line: '{p} {x} di {n}', san_collected_period: 'Raccolto in questo periodo: {amount} di {target}', san_paid_title_period: 'Chi ha già pagato in questo periodo?', san_advance_period: 'Segna periodo completo', san_finished_period: 'Tutti i periodi sono completi. Puoi eliminare questo san e crearne uno nuovo.', chal_ask: 'Vuoi una sfida settimanale?', key_san_period: '{p} {x} di {n} · Tocca a {name}', news_c41: 'Versione 41: i tuoi conti ora sono vivi — quando annoti una spesa o un’entrata scegli da dove è uscita o dove è entrata (saldo disponibile, Risparmi o uno dei tuoi conti) e i saldi si muovono da soli — il link pubblico del san ora ha la ricerca per nome e i turni che si chiudono — il tuo primo giorno è guidato passo dopo passo, con la modalità «Essenziale» — il san personale ora può essere quindicinale o mensile — e Risparmi è ora una sola schermata ordinata, con un solo modulo per gli obiettivi.',
   news_c37: 'Versione 37: widget ridisegnati — gradiente del marchio, barra di avanzamento che cambia colore in base al budget e la riga del prossimo turno del tuo san — e un widget nuovo grande quanto un’icona, con quanto puoi spendere oggi — e il marchio resta visibile mentre scorri il link pubblico del san — e i turni dell’organizzatore ora si piegano a fisarmonica, con aperto solo quello di questa settimana.',
   widget_today: 'oggi',
   widget_san_next: 'Prossimo turno: {name} · {date}',
@@ -2789,6 +2822,7 @@ pt: {
   news_c38: 'Compilação 38: o Podcast agora carrega e reproduz seus episódios.',
   news_c39: 'Compilação 39: o Podcast agora reproduz seus episódios e os widgets pequenos voltaram a funcionar.',
   news_c40: 'Compilação 40: o saldo das suas contas agora é rotulado com honestidade, ao criar seu PIN o app avisa que ele não pode ser recuperado (e há uma saída de emergência se você esquecê-lo), seu número de gastos diários nasce no primeiro dia com «Criar meu orçamento» e registrar uma despesa agora leva três toques.',
+  src_exp_label: 'De onde saiu?', src_inc_label: 'Para onde entrou?', src_available: 'Saldo disponível', src_savings: 'Poupança', src_from_savings: 'da Poupança', src_to_savings: 'para a Poupança', tile_available_help: 'Atualiza com as despesas e receitas que você vincula a uma conta; uma conta sem movimentos vinculados mantém o saldo que você digitou.', pub_find_hint: 'Já pagou? Escreva seu nome, toque na sua linha e depois em Já paguei.', pub_find_ph: 'Escreva seu nome', pub_find_clear: 'Limpar', pub_find_none: 'Esse nome não aparece. Verifique como o organizador o escreveu.', next_title: 'Seu próximo passo', next_step1_btn: 'Crie seu orçamento', next_step2_btn: 'Anote sua primeira despesa', next_step3_btn: 'Crie sua conta de dinheiro', ob_mode_title: 'Como você quer ver seu app?', ob_mode_essential: 'O essencial', ob_mode_essential_help: 'Apenas Início, Despesas, Receitas, Poupança e Meu san. O resto você ativa quando quiser em Ajustes.', ob_mode_all: 'Tudo', ob_mode_all_help: 'As 13 seções completas desde o primeiro dia.', ob_mode_btn: 'Continuar', set_mode_essential_btn: 'Modo Essencial', set_mode_all_btn: 'Mostrar tudo', san_freq_label: 'Frequência', san_start_label: 'Data de início', san_period_semanal: 'Semana', san_period_quincenal: 'Quinzena', san_period_mensual: 'Mês', san_period_line: '{p} {x} de {n}', san_collected_period: 'Reunido neste período: {amount} de {target}', san_paid_title_period: 'Quem já pagou neste período?', san_advance_period: 'Marcar período completo', san_finished_period: 'Todos os períodos foram concluídos. Você pode apagar este san e criar um novo.', chal_ask: 'Quer um desafio semanal?', key_san_period: '{p} {x} de {n} · É a vez de {name}', news_c41: 'Compilação 41: suas contas agora estão vivas — ao anotar uma despesa ou receita você escolhe de onde saiu ou para onde entrou (saldo disponível, Poupança ou uma das suas contas) e os saldos se movem sozinhos — o link público do san agora tem busca por nome e rodadas dobráveis — seu primeiro dia é guiado passo a passo, com o modo «Essencial» — o san pessoal agora pode ser quinzenal ou mensal — e Poupança virou uma só tela organizada, com um único formulário de meta.',
   news_c37: 'Compilação 37: widgets renovados — degradê da marca, barra de progresso que muda de cor conforme seu orçamento e a linha do próximo turno do seu san — e um widget novo do tamanho de um ícone, com o que você pode gastar hoje — e a marca sempre visível ao rolar o link público do san — e as rodadas do organizador agora dobram em acordeão, com só a desta semana aberta.',
   widget_today: 'hoje',
   widget_san_next: 'Próximo turno: {name} · {date}',
@@ -3507,6 +3541,7 @@ fr: {
   news_c38: 'Version 38 : le Podcast charge et lit désormais ses épisodes.',
   news_c39: 'Version 39 : le Podcast lit désormais ses épisodes, et les petits widgets fonctionnent à nouveau.',
   news_c40: 'Version 40 : le solde de tes comptes est maintenant étiqueté honnêtement, quand tu crées ton code PIN l’appli prévient qu’il ne peut pas être récupéré (et il y a une sortie de secours si tu l’oublies), ton montant de dépense quotidienne naît dès le premier jour avec « Créer mon budget » et enregistrer une dépense ne prend plus que trois touchers.',
+  src_exp_label: 'D’où est-ce sorti ?', src_inc_label: 'Où est-ce entré ?', src_available: 'Solde disponible', src_savings: 'Épargne', src_from_savings: 'de l’Épargne', src_to_savings: 'vers l’Épargne', tile_available_help: 'Il se met à jour avec les dépenses et revenus que tu relies à un compte ; un compte sans mouvements reliés garde le solde que tu as écrit.', pub_find_hint: 'Déjà payé ? Écris ton nom, touche ta ligne puis J’ai payé.', pub_find_ph: 'Écris ton nom', pub_find_clear: 'Effacer', pub_find_none: 'Ce nom n’apparaît pas. Vérifie comment l’organisateur l’a écrit.', next_title: 'Ta prochaine étape', next_step1_btn: 'Crée ton budget', next_step2_btn: 'Note ta première dépense', next_step3_btn: 'Crée ton compte d’espèces', ob_mode_title: 'Comment veux-tu voir ton appli ?', ob_mode_essential: 'L’essentiel', ob_mode_essential_help: 'Seulement Accueil, Dépenses, Revenus, Épargne et Mon san. Le reste s’active quand tu veux dans Réglages.', ob_mode_all: 'Tout', ob_mode_all_help: 'Les 13 sections complètes dès le premier jour.', ob_mode_btn: 'Continuer', set_mode_essential_btn: 'Mode Essentiel', set_mode_all_btn: 'Tout afficher', san_freq_label: 'Fréquence', san_start_label: 'Date de début', san_period_semanal: 'Semaine', san_period_quincenal: 'Quinzaine', san_period_mensual: 'Mois', san_period_line: '{p} {x} sur {n}', san_collected_period: 'Réuni sur cette période : {amount} sur {target}', san_paid_title_period: 'Qui a déjà payé sur cette période ?', san_advance_period: 'Marquer la période comme complète', san_finished_period: 'Toutes les périodes sont terminées. Tu peux supprimer ce san et en créer un nouveau.', chal_ask: 'Tu veux un défi hebdomadaire ?', key_san_period: '{p} {x} sur {n} · Au tour de {name}', news_c41: 'Version 41 : tes comptes sont maintenant vivants — quand tu notes une dépense ou un revenu, tu choisis d’où c’est sorti ou où c’est entré (solde disponible, Épargne ou l’un de tes comptes) et les soldes bougent tout seuls — le lien public du san a maintenant une recherche par nom et des tours pliables — ton premier jour est guidé pas à pas, avec le mode « Essentiel » — le san personnel peut maintenant être tous les quinze jours ou mensuel — et Épargne est maintenant un seul écran bien rangé, avec un seul formulaire d’objectif.',
   news_c37: 'Version 37 : widgets repensés — dégradé de la marque, barre de progression qui change de couleur selon votre budget et la ligne du prochain tour de votre san — et un nouveau widget de la taille d’une icône, avec ce que vous pouvez dépenser aujourd’hui — et la marque reste visible quand on fait défiler le lien public du san — et les tours de l’organisateur se plient en accordéon, avec seul celui de cette semaine ouvert.',
   widget_today: 'aujourd’hui',
   widget_san_next: 'Prochain tour : {name} · {date}',
@@ -4225,6 +4260,7 @@ de: {
   news_c38: 'Version 38: Der Podcast lädt und spielt seine Episoden jetzt ab.',
   news_c39: 'Version 39: Der Podcast spielt seine Episoden jetzt ab, und die kleinen Widgets funktionieren wieder.',
   news_c40: 'Version 40: Dein Kontostand wird jetzt ehrlich bezeichnet, beim Erstellen deiner PIN warnt die App, dass sie nicht wiederhergestellt werden kann (und es gibt einen Notausgang, falls du sie vergisst), deine tägliche Ausgabenzahl entsteht am ersten Tag mit „Mein Budget erstellen“ und eine Ausgabe einzutragen dauert jetzt drei Tipps.',
+  src_exp_label: 'Woher kam es?', src_inc_label: 'Wohin ist es gegangen?', src_available: 'Verfügbarer Saldo', src_savings: 'Ersparnisse', src_from_savings: 'aus Ersparnissen', src_to_savings: 'zu Ersparnissen', tile_available_help: 'Er aktualisiert sich mit den Ausgaben und Einnahmen, die du einem Konto zuordnest; ein Konto ohne zugeordnete Bewegungen behält den Saldo, den du eingetippt hast.', pub_find_hint: 'Schon bezahlt? Schreib deinen Namen, tippe auf deine Zeile und dann auf Bezahlt.', pub_find_ph: 'Schreib deinen Namen', pub_find_clear: 'Leeren', pub_find_none: 'Dieser Name erscheint nicht. Prüfe, wie der Organisator ihn geschrieben hat.', next_title: 'Dein nächster Schritt', next_step1_btn: 'Erstelle dein Budget', next_step2_btn: 'Trage deine erste Ausgabe ein', next_step3_btn: 'Erstelle dein Bargeldkonto', ob_mode_title: 'Wie möchtest du deine App sehen?', ob_mode_essential: 'Das Wesentliche', ob_mode_essential_help: 'Nur Start, Ausgaben, Einnahmen, Ersparnisse und Mein San. Alles andere schaltest du in den Einstellungen ein, wann du willst.', ob_mode_all: 'Alles', ob_mode_all_help: 'Alle 13 Bereiche komplett ab dem ersten Tag.', ob_mode_btn: 'Weiter', set_mode_essential_btn: 'Modus Wesentlich', set_mode_all_btn: 'Alles anzeigen', san_freq_label: 'Häufigkeit', san_start_label: 'Startdatum', san_period_semanal: 'Woche', san_period_quincenal: 'Zwei Wochen', san_period_mensual: 'Monat', san_period_line: '{p} {x} von {n}', san_collected_period: 'In diesem Zeitraum gesammelt: {amount} von {target}', san_paid_title_period: 'Wer hat in diesem Zeitraum schon bezahlt?', san_advance_period: 'Zeitraum als komplett markieren', san_finished_period: 'Alle Zeiträume sind komplett. Du kannst diesen San löschen und einen neuen erstellen.', chal_ask: 'Möchtest du eine wöchentliche Challenge?', key_san_period: '{p} {x} von {n} · An der Reihe: {name}', news_c41: 'Version 41: Deine Konten leben jetzt — wenn du eine Ausgabe oder Einnahme einträgst, wählst du, woher sie kam oder wohin sie ging (verfügbarer Saldo, Ersparnisse oder eines deiner Konten), und die Salden bewegen sich von selbst — der öffentliche San-Link hat jetzt eine Namenssuche und einklappbare Runden — dein erster Tag wird Schritt für Schritt geführt, mit dem Modus „Wesentlich“ — der persönliche San kann jetzt alle zwei Wochen oder monatlich sein — und Ersparnisse ist jetzt ein einziger aufgeräumter Bildschirm mit nur einem Ziel-Formular.',
   news_c37: 'Version 37: Widgets im neuen Look — Marken-Farbverlauf, ein Fortschrittsbalken, der je nach Budget die Farbe wechselt, und die Zeile zum nächsten Zug deines San — plus ein neues Widget in App-Symbol-Größe mit deinem heutigen Budget — und die Marke bleibt beim Scrollen im öffentlichen San-Link sichtbar — und die Runden des Organisators klappen jetzt als Akkordeon, mit nur der dieser Woche offen.',
   widget_today: 'heute',
   widget_san_next: 'Nächster Zug: {name} · {date}',
@@ -4943,6 +4979,7 @@ zh: {
   news_c38: '第 38 版：播客现在可以加载并播放节目了。',
   news_c39: '第 39 版：播客现在可以播放节目了，小部件也重新正常工作。',
   news_c40: '第 40 版：你的账户余额现在会诚实标注；创建 PIN 时应用会提醒它无法找回（如果你忘了，还有紧急出口）；你的每日可花金额在第一天就能通过“创建我的预算”诞生；现在记录一笔支出只需点三下。',
+  src_exp_label: '钱从哪里出的？', src_inc_label: '钱进到哪里了？', src_available: '可用余额', src_savings: '储蓄', src_from_savings: '来自储蓄', src_to_savings: '存入储蓄', tile_available_help: '它会随你关联到某个账户的支出和收入自动更新；没有关联记录的账户会保留你手动输入的余额。', pub_find_hint: '已经付了吗？输入你的名字，点你的那一行，然后点“我已付款”。', pub_find_ph: '输入你的名字', pub_find_clear: '清除', pub_find_none: '没有找到这个名字。请核对组织者写的拼写。', next_title: '你的下一步', next_step1_btn: '创建你的预算', next_step2_btn: '记下你的第一笔支出', next_step3_btn: '创建你的现金账户', ob_mode_title: '你想如何查看你的应用？', ob_mode_essential: '精简模式', ob_mode_essential_help: '只显示首页、支出、收入、储蓄和我的 San。其他功能可随时在设置中开启。', ob_mode_all: '全部', ob_mode_all_help: '从第一天起就有完整的 13 个板块。', ob_mode_btn: '继续', set_mode_essential_btn: '精简模式', set_mode_all_btn: '显示全部', san_freq_label: '频率', san_start_label: '开始日期', san_period_semanal: '周', san_period_quincenal: '双周', san_period_mensual: '月', san_period_line: '{p} {x} / {n}', san_collected_period: '本期已收：{amount} / {target}', san_paid_title_period: '本期谁已经付了？', san_advance_period: '标记本期完成', san_finished_period: '所有期数都已完成。你可以删除这个 San 并创建一个新的。', chal_ask: '想要每周挑战吗？', key_san_period: '{p} {x} / {n} · 轮到 {name}', news_c41: '第 41 版：你的账户现在是活的了——记录支出或收入时，你可以选择钱从哪里出或进到哪里（可用余额、储蓄或你的某个账户），余额会自动变动——San 公开链接现在有姓名搜索和可折叠的轮次——你的第一天有分步引导，还有“精简”模式——个人 San 现在可以每两周或每月一次——储蓄现在是一个整洁的页面，只有一个目标表单。',
   news_c37: '第 37 版：小部件全新设计——品牌渐变、会随预算变色的进度条，以及 san 下一轮的提示行——还有一个全新的、只有一个图标大小的小部件，显示你今天能花多少；在 san 公开链接中下滑时，品牌始终可见；组织者的轮次现在折叠成手风琴，仅展开本周一轮。',
   widget_today: '今日',
   widget_san_next: '下一轮：{name} · {date}',
@@ -5661,6 +5698,7 @@ ja: {
   news_c38: 'バージョン38：ポッドキャストのエピソードが読み込めて再生できるようになりました。',
   news_c39: 'バージョン39：ポッドキャストのエピソードが再生できるようになり、小さいウィジェットも再び使えるようになりました。',
   news_c40: 'バージョン40：口座残高が正直に表示されるようになりました。PINを作成するとき、復旧できないことが警告され（忘れた場合の緊急出口もあります）、毎日の支出額は初日から「予算を作成」で生まれ、支出の記録は3タップで済むようになりました。',
+  src_exp_label: 'どこから出た？', src_inc_label: 'どこに入った？', src_available: '利用可能残高', src_savings: '貯金', src_from_savings: '貯金から', src_to_savings: '貯金へ', tile_available_help: '口座に紐づけた支出と収入で自動更新されます。紐づいた動きのない口座は、入力した残高のままです。', pub_find_hint: 'もう払った？名前を入力して、自分の行をタップし、「払った」を押してください。', pub_find_ph: '名前を入力', pub_find_clear: 'クリア', pub_find_none: 'その名前は見つかりません。主催者の表記を確認してください。', next_title: '次のステップ', next_step1_btn: '予算を作る', next_step2_btn: '最初の支出を記録', next_step3_btn: '現金口座を作る', ob_mode_title: 'アプリをどう表示しますか？', ob_mode_essential: 'シンプル', ob_mode_essential_help: 'ホーム、支出、収入、貯金、マイSanだけ。その他は設定でいつでもオンにできます。', ob_mode_all: 'すべて', ob_mode_all_help: '初日から全13セクションが使えます。', ob_mode_btn: '続ける', set_mode_essential_btn: 'シンプルモード', set_mode_all_btn: 'すべて表示', san_freq_label: '頻度', san_start_label: '開始日', san_period_semanal: '週', san_period_quincenal: '隔週', san_period_mensual: '月', san_period_line: '{p} {x} / {n}', san_collected_period: 'この期間の集金：{amount} / {target}', san_paid_title_period: 'この期間に払ったのは誰？', san_advance_period: 'この期間を完了にする', san_finished_period: 'すべての期間が完了しました。このSanを削除して新しく作れます。', chal_ask: '毎週のチャレンジをしますか？', key_san_period: '{p} {x} / {n} · 次は {name}', news_c41: 'ビルド41：口座が生きてきました——支出や収入を記録するとき、どこから出たか・どこに入ったか（利用可能残高、貯金、またはあなたの口座）を選ぶと、残高が自動で動きます——Sanの公開リンクに名前検索と折りたたみラウンドが追加——初日はステップごとのガイド付きで、「シンプル」モードも選べます——個人のSanは隔週や月ごとにも対応——貯金は1つの目標フォームだけの、すっきりした1画面になりました。',
   news_c37: 'バージョン37：ウィジェットを一新——ブランドのグラデーション、予算に合わせて色が変わる進捗バー、sanの次のターンの行——そして、今日使える金額を表示するアイコンサイズの新しいウィジェット。公開リンクをスクロールしてもブランドが常に表示されます。主催者のラウンドはアコーディオン式になり、今週分だけが開きます。',
   widget_today: '今日',
   widget_san_next: '次のターン：{name} · {date}',
@@ -6379,6 +6417,7 @@ ko: {
   news_c38: '버전 38: 팟캐스트 에피소드를 불러와 재생할 수 있습니다.',
   news_c39: '버전 39: 팟캐스트 에피소드를 재생할 수 있고, 작은 위젯도 다시 작동합니다.',
   news_c40: '버전 40: 계좌 잔고가 이제 정직하게 표시되고, PIN을 만들 때 복구할 수 없다는 안내가 나오며(잊었을 때를 위한 비상 출구도 있습니다), 매일 쓸 수 있는 금액이 첫날부터 "내 예산 만들기"로 생기고, 지출 기록은 이제 세 번의 탭으로 끝납니다.',
+  src_exp_label: '어디서 나갔나요?', src_inc_label: '어디로 들어왔나요?', src_available: '사용 가능 잔액', src_savings: '저축', src_from_savings: '저축에서', src_to_savings: '저축으로', tile_available_help: '계좌에 연결한 지출과 수입으로 자동 업데이트됩니다. 연결된 내역이 없는 계좌는 직접 입력한 잔액을 유지합니다.', pub_find_hint: '이미 냈나요? 이름을 입력하고 내 줄을 누른 뒤 "냈어요"를 누르세요.', pub_find_ph: '이름을 입력하세요', pub_find_clear: '지우기', pub_find_none: '그 이름이 보이지 않습니다. 주최자가 적은 표기를 확인하세요.', next_title: '다음 단계', next_step1_btn: '예산 만들기', next_step2_btn: '첫 지출 기록하기', next_step3_btn: '현금 계좌 만들기', ob_mode_title: '앱을 어떻게 보고 싶나요?', ob_mode_essential: '필수만', ob_mode_essential_help: '홈, 지출, 수입, 저축, 내 San만. 나머지는 설정에서 언제든 켤 수 있습니다.', ob_mode_all: '전부', ob_mode_all_help: '첫날부터 13개 섹션 전부.', ob_mode_btn: '계속', set_mode_essential_btn: '필수 모드', set_mode_all_btn: '전부 표시', san_freq_label: '주기', san_start_label: '시작 날짜', san_period_semanal: '주', san_period_quincenal: '2주', san_period_mensual: '달', san_period_line: '{p} {x} / {n}', san_collected_period: '이번 기간 모인 금액: {amount} / {target}', san_paid_title_period: '이번 기간에 누가 이미 냈나요?', san_advance_period: '기간 완료로 표시', san_finished_period: '모든 기간이 완료되었습니다. 이 San을 삭제하고 새로 만들 수 있습니다.', chal_ask: '주간 챌린지를 해볼까요?', key_san_period: '{p} {x} / {n} · 차례: {name}', news_c41: '빌드 41: 이제 계좌가 살아 움직입니다 — 지출이나 수입을 기록할 때 어디서 나갔는지, 어디로 들어왔는지(사용 가능 잔액, 저축, 또는 내 계좌 중 하나)를 고르면 잔액이 저절로 움직입니다 — San 공개 링크에 이름 검색과 접히는 라운드가 생겼습니다 — 첫날은 단계별 안내와 "필수만" 모드가 있습니다 — 개인 San은 격주나 월간도 가능합니다 — 저축은 목표 양식이 하나뿐인 깔끔한 한 화면이 되었습니다.',
   news_c37: '버전 37: 새로워진 위젯 — 브랜드 그라데이션, 예산에 따라 색이 바뀌는 진행 바, san 다음 차례 줄 — 그리고 오늘 쓸 수 있는 금액을 보여주는 아이콘 크기의 새 위젯. 공개 san 링크를 스크롤해도 브랜드가 계속 보입니다. 주최자 라운드는 아코디언으로 접히고, 이번 주 것만 열립니다.',
   widget_today: '오늘',
   widget_san_next: '다음 차례: {name} · {date}',
@@ -7097,6 +7136,7 @@ ru: {
   news_c38: 'Версия 38: Подкаст теперь загружает и воспроизводит выпуски.',
   news_c39: 'Версия 39: Подкаст теперь воспроизводит выпуски, а маленькие виджеты снова работают.',
   news_c40: 'Версия 40: баланс твоих счетов теперь подписан честно, при создании PIN приложение предупреждает, что его нельзя восстановить (и есть аварийный выход, если забудешь), твоя дневная сумма расходов рождается в первый же день с кнопкой «Создать мой бюджет», а записать расход теперь можно в три касания.',
+  src_exp_label: 'Откуда ушло?', src_inc_label: 'Куда пришло?', src_available: 'Доступный остаток', src_savings: 'Сбережения', src_from_savings: 'из сбережений', src_to_savings: 'в сбережения', tile_available_help: 'Обновляется расходами и доходами, которые вы привязываете к счёту; счёт без привязанных движений сохраняет остаток, который вы ввели.', pub_find_hint: 'Уже заплатили? Напишите своё имя, коснитесь своей строки, а затем «Я заплатил».', pub_find_ph: 'Напишите своё имя', pub_find_clear: 'Очистить', pub_find_none: 'Такого имени нет. Проверьте, как его написал организатор.', next_title: 'Ваш следующий шаг', next_step1_btn: 'Создайте свой бюджет', next_step2_btn: 'Запишите первый расход', next_step3_btn: 'Создайте счёт наличных', ob_mode_title: 'Как вы хотите видеть приложение?', ob_mode_essential: 'Только главное', ob_mode_essential_help: 'Только Главная, Расходы, Доходы, Сбережения и Мой сан. Остальное включается в Настройках, когда захотите.', ob_mode_all: 'Всё', ob_mode_all_help: 'Все 13 разделов полностью с первого дня.', ob_mode_btn: 'Продолжить', set_mode_essential_btn: 'Режим «Главное»', set_mode_all_btn: 'Показать всё', san_freq_label: 'Частота', san_start_label: 'Дата начала', san_period_semanal: 'Неделя', san_period_quincenal: 'Две недели', san_period_mensual: 'Месяц', san_period_line: '{p} {x} из {n}', san_collected_period: 'Собрано за этот период: {amount} из {target}', san_paid_title_period: 'Кто уже заплатил за этот период?', san_advance_period: 'Отметить период завершённым', san_finished_period: 'Все периоды завершены. Можно удалить этот сан и создать новый.', chal_ask: 'Хотите еженедельный челлендж?', key_san_period: '{p} {x} из {n} · Очередь: {name}', news_c41: 'Сборка 41: ваши счета теперь живые — записывая расход или доход, вы выбираете, откуда ушло или куда пришло (доступный остаток, сбережения или один из ваших счетов), и остатки движутся сами — в публичной ссылке сана теперь есть поиск по имени и сворачиваемые раунды — первый день ведётся шаг за шагом, с режимом «Главное» — личный сан теперь может быть раз в две недели или ежемесячным — а Сбережения стали одним аккуратным экраном с единственной формой цели.',
   news_c37: 'Версия 37: обновлённые виджеты — градиент бренда, полоса прогресса, меняющая цвет в зависимости от бюджета, и строка следующего хода вашего san — плюс новый виджет размером со значок с суммой на сегодня. А в публичной ссылке san бренд остаётся на виду при прокрутке. Раунды организатора теперь складываются аккордеоном: открыт только раунд этой недели.',
   widget_today: 'сегодня',
   widget_san_next: 'Следующий ход: {name} · {date}',
@@ -7815,6 +7855,7 @@ hi: {
   news_c38: 'संस्करण 38: पॉडकास्ट अब अपने एपिसोड लोड करके चलाता है।',
   news_c39: 'संस्करण 39: पॉडकास्ट अब अपने एपिसोड चलाता है, और छोटे विजेट फिर से काम करते हैं।',
   news_c40: 'संस्करण 40: तुम्हारे खातों का बैलेंस अब ईमानदारी से लेबल होता है, PIN बनाते समय ऐप चेतावनी देता है कि उसे वापस नहीं पाया जा सकता (और अगर तुम भूल जाओ तो एक आपातकालीन रास्ता भी है), तुम्हारा रोज़ का खर्च नंबर पहले दिन से «मेरा बजट बनाओ» के साथ जन्म लेता है, और खर्च दर्ज करना अब सिर्फ़ तीन टैप में हो जाता है।',
+  src_exp_label: 'पैसा कहाँ से गया?', src_inc_label: 'पैसा कहाँ आया?', src_available: 'उपलब्ध शेष', src_savings: 'बचत', src_from_savings: 'बचत से', src_to_savings: 'बचत में', tile_available_help: 'यह उन खर्चों और आय से अपडेट होता है जिन्हें आप किसी खाते से जोड़ते हैं; जिस खाते से कोई लेन-देन जुड़ा नहीं है, वह आपका लिखा शेष ही रखता है।', pub_find_hint: 'पैसे दे दिए? अपना नाम लिखें, अपनी पंक्ति को छुएँ और फिर "मैंने दिया" दबाएँ।', pub_find_ph: 'अपना नाम लिखें', pub_find_clear: 'साफ़ करें', pub_find_none: 'यह नाम नहीं दिख रहा। आयोजक ने इसे कैसे लिखा है, यह जाँचें।', next_title: 'आपका अगला कदम', next_step1_btn: 'अपना बजट बनाएँ', next_step2_btn: 'अपना पहला खर्च लिखें', next_step3_btn: 'अपना नकद खाता बनाएँ', ob_mode_title: 'आप ऐप को कैसे देखना चाहते हैं?', ob_mode_essential: 'सिर्फ़ ज़रूरी', ob_mode_essential_help: 'सिर्फ़ होम, खर्च, आय, बचत और मेरा सान। बाकी सब सेटिंग्स में जब चाहें चालू कर सकते हैं।', ob_mode_all: 'सब कुछ', ob_mode_all_help: 'पहले दिन से पूरे 13 सेक्शन।', ob_mode_btn: 'आगे बढ़ें', set_mode_essential_btn: 'ज़रूरी मोड', set_mode_all_btn: 'सब दिखाएँ', san_freq_label: 'आवृत्ति', san_start_label: 'शुरू होने की तारीख', san_period_semanal: 'सप्ताह', san_period_quincenal: 'पखवाड़ा', san_period_mensual: 'महीना', san_period_line: '{p} {x} / {n}', san_collected_period: 'इस अवधि में जमा: {amount} / {target}', san_paid_title_period: 'इस अवधि में किसने दे दिया?', san_advance_period: 'अवधि पूरी चिह्नित करें', san_finished_period: 'सभी अवधियाँ पूरी हो गईं। आप इस सान को हटाकर नया बना सकते हैं।', chal_ask: 'साप्ताहिक चुनौती चाहिए?', key_san_period: '{p} {x} / {n} · बारी: {name}', news_c41: 'बिल्ड 41: आपके खाते अब ज़िंदा हैं — खर्च या आय लिखते समय आप चुनते हैं कि पैसा कहाँ से गया या कहाँ आया (उपलब्ध शेष, बचत या आपका कोई खाता) और शेष अपने आप बदलते हैं — सान की सार्वजनिक लिंक में अब नाम खोज और मुड़ने वाले राउंड हैं — आपका पहला दिन कदम-दर-कदम मार्गदर्शन के साथ है, "ज़रूरी" मोड के साथ — निजी सान अब पखवाड़े या मासिक भी हो सकता है — और बचत अब एक ही लक्ष्य फ़ॉर्म वाली एक साफ़ स्क्रीन है।',
   news_c37: 'संस्करण 37: नए रूप में विजेट — ब्रांड ग्रेडिएंट, आपके बजट के अनुसार रंग बदलने वाली प्रगति पट्टी और आपके san की अगली बारी की पंक्ति — साथ ही एक नया आइकन-आकार का विजेट, जिसमें आज आप कितना खर्च कर सकते हैं। और san के सार्वजनिक लिंक में स्क्रॉल करते समय ब्रांड हमेशा दिखता है। आयोजक के राउंड अब अकॉर्डियन में मुड़ते हैं: केवल इस सप्ताह वाला खुला रहता है।',
   widget_today: 'आज',
   widget_san_next: 'अगली बारी: {name} · {date}',
@@ -8533,6 +8574,7 @@ ar: {
   news_c38: 'الإصدار 38: البودكاست الآن يُحمّل حلقاته ويشغّلها.',
   news_c39: 'الإصدار 39: البودكاست الآن يُشغّل حلقاته، والأدوات الصغيرة عادت تعمل من جديد.',
   news_c40: 'الإصدار 40: رصيد حساباتك الآن مُسمّى بصدق، وعند إنشاء الرقم السري يُنبّهك التطبيق إلى أنه لا يمكن استعادته (وهناك مخرج طوارئ إذا نسيته)، ورقم إنفاقك اليومي يولد من اليوم الأول مع «إنشاء ميزانيتي»، وتسجيل مصروف أصبح الآن بثلاث لمسات فقط.',
+  src_exp_label: 'من أين خرج؟', src_inc_label: 'إلى أين دخل؟', src_available: 'الرصيد المتاح', src_savings: 'المدخرات', src_from_savings: 'من المدخرات', src_to_savings: 'إلى المدخرات', tile_available_help: 'يتحدث بالمصروفات والدخل التي تربطها بحساب؛ والحساب بلا حركات مرتبطة يحتفظ بالرصيد الذي كتبته.', pub_find_hint: 'دفعت بالفعل؟ اكتب اسمك، المس صفك، ثم اضغط «دفعت».', pub_find_ph: 'اكتب اسمك', pub_find_clear: 'مسح', pub_find_none: 'هذا الاسم غير ظاهر. تحقق من كيفية كتابة المنظم له.', next_title: 'خطوتك التالية', next_step1_btn: 'أنشئ ميزانيتك', next_step2_btn: 'سجل أول مصروف', next_step3_btn: 'أنشئ حساب النقد', ob_mode_title: 'كيف تريد أن ترى تطبيقك؟', ob_mode_essential: 'الأساسيات', ob_mode_essential_help: 'فقط الرئيسية والمصروفات والدخل والمدخرات وسان الخاص بي. والباقي تشغله متى شئت من الإعدادات.', ob_mode_all: 'الكل', ob_mode_all_help: 'الأقسام الـ13 كاملة من أول يوم.', ob_mode_btn: 'متابعة', set_mode_essential_btn: 'وضع الأساسيات', set_mode_all_btn: 'إظهار الكل', san_freq_label: 'التكرار', san_start_label: 'تاريخ البدء', san_period_semanal: 'أسبوع', san_period_quincenal: 'أسبوعان', san_period_mensual: 'شهر', san_period_line: '{p} {x} من {n}', san_collected_period: 'جُمع في هذه الفترة: {amount} من {target}', san_paid_title_period: 'من دفع في هذه الفترة؟', san_advance_period: 'تعليم الفترة كمكتملة', san_finished_period: 'اكتملت كل الفترات. يمكنك حذف هذا السان وإنشاء جديد.', chal_ask: 'تريد تحديًا أسبوعيًا؟', key_san_period: '{p} {x} من {n} · الدور على {name}', news_c41: 'الإصدار 41: حساباتك صارت حية الآن — عند تسجيل مصروف أو دخل تختار من أين خرج أو إلى أين دخل (الرصيد المتاح أو المدخرات أو أحد حساباتك) وتتحرك الأرصدة وحدها — رابط السان العام صار فيه بحث بالاسم وجولات قابلة للطي — يومك الأول موجه خطوة بخطوة مع وضع «الأساسيات» — السان الشخصي صار يمكن أن يكون كل أسبوعين أو شهريًا — والمدخرات صارت شاشة واحدة مرتبة بنموذج هدف واحد فقط.',
   news_c37: 'الإصدار 37: ويدجت بمظهر جديد — تدرّج العلامة، شريط تقدّم يتغيّر لونه حسب ميزانيتك وسطر الدور التالي في san الخاص بك — وويدجت جديد بحجم أيقونة يعرض ما يمكنك إنفاقه اليوم. وتبقى العلامة ظاهرة أثناء التمرير في رابط san العام. وجولات المنظّم الآن تُطوى كالأكورديون: جولة هذا الأسبوع فقط مفتوحة.',
   widget_today: 'اليوم',
   widget_san_next: 'الدور التالي: {name} · {date}',
@@ -8867,16 +8909,47 @@ function sumCents(list) { return list.reduce((t, x) => t + x.amountCents, 0); }
    anotó en cada ingreso (savingsCents) más los ahorros sueltos que agregó a
    mano en la sección Ahorros (db.savings). El porcentaje solo es sugerencia. */
 function monthSavings(key) {
-  const fromIncomes = monthIncomes(key).reduce((t, i) => t + (i.savingsCents || 0), 0);
+  const fromIncomes = monthIncomes(key).reduce((t, i) => t + effectiveSavingsOfIncome(i), 0);
   const standalone = db.savings.filter((s) => monthKeyOf(s.date) === key)
     .reduce((t, s) => t + s.amountCents, 0);
-  return fromIncomes + standalone;
+  /* Compilación 41: un gasto pagado «de Ahorros» baja el ahorro del mes. */
+  const spent = monthExpenses(key).reduce((t, e) => t + (e.fromSavings ? e.amountCents : 0), 0);
+  return fromIncomes + standalone - spent;
 }
 function pendingDebtsTotal() {
   return db.debts.filter((d) => d.status === 'pendiente').reduce((t, d) => t + d.amountCents, 0);
 }
+/* --- Compilación 41 · CUENTAS VIVAS (auditoría, hallazgo 1) ---
+   Cada gasto e ingreso puede decir de dónde salió / a dónde entró:
+   el saldo disponible (sin efecto extra: el disponible ya es
+   ingresos − gastos), Ahorros (el total de ahorros sube o baja con
+   el movimiento) o una cuenta. El saldo MOSTRADO de una cuenta es
+   derivado, nunca se guarda: base guardada (balanceCents) + la suma
+   de sus movimientos enlazados (ingresos +, gastos −). Editar el
+   saldo a mano redefine la base para que el mostrado sea el
+   tecleado. Como todo es derivado de los movimientos, crear,
+   editar, borrar y DESHACER dejan los saldos siempre exactos. */
+function accountLinkedSum(accountId) {
+  let s = 0;
+  for (const i of db.incomes) if (i.accountId === accountId) s += i.amountCents;
+  for (const e of db.expenses) if (e.accountId === accountId) s -= e.amountCents;
+  return s;
+}
+function accountShownBalance(a) {
+  return a.balanceCents + accountLinkedSum(a.id);
+}
+function accountNameById(id) {
+  const a = db.accounts.find((x) => x.id === id);
+  return a ? a.name : '';
+}
+/* Lo que un ingreso aporta al total de ahorros: si entró «a
+   Ahorros», su cantidad completa; si no, el ahorro que la persona
+   anotó en el ingreso (savingsCents), como siempre. */
+function effectiveSavingsOfIncome(item) {
+  return item.toSavings ? item.amountCents : (item.savingsCents || 0);
+}
 function availableMoney(key) {
-  if (db.accounts.length > 0) return db.accounts.reduce((t, a) => t + a.balanceCents, 0);
+  if (db.accounts.length > 0) return db.accounts.reduce((t, a) => t + accountShownBalance(a), 0);
   return sumCents(monthIncomes(key)) - sumCents(monthExpenses(key));
 }
 
@@ -8911,7 +8984,12 @@ function menuKeyText(id) {
   if (id === 'san') {
     if (db.san) {
       if (db.san.currentWeek >= db.san.participants.length) return t('key_san_done');
-      return t('key_san', { x: db.san.currentWeek + 1, n: db.san.participants.length, name: db.san.participants[db.san.currentWeek] });
+      /* Compilación 41: el subtítulo de Inicio respeta la frecuencia
+         del san personal (semana / quincena / mes). */
+      if (sanFreq(db.san) === 'semanal') {
+        return t('key_san', { x: db.san.currentWeek + 1, n: db.san.participants.length, name: db.san.participants[db.san.currentWeek] });
+      }
+      return t('key_san_period', { p: t('san_period_' + sanFreq(db.san)), x: db.san.currentWeek + 1, n: db.san.participants.length, name: db.san.participants[db.san.currentWeek] });
     }
     /* Compilación 32: si solo hay san del organizador, el subtítulo
        también va vivo: ronda actual, quién recibe y la fecha. */
@@ -9251,26 +9329,75 @@ function homeMenuItem(def) {
   return item;
 }
 
+/* --- Compilación 41 · PRIMER DÍA GUIADO (auditoría, hallazgo 8) ---
+   Tarjeta de «siguiente paso» arriba en Inicio, derivada del estado:
+   aparece solo mientras falte un paso y desaparece al completarse
+   todos. Al usuario con datos (presupuesto o ingresos, al menos un
+   gasto y una cuenta) nunca le aparece. */
+function nextStepState() {
+  const hasBudget = Object.keys(db.budgets || {}).length > 0;
+  if (!hasBudget && db.incomes.length === 0) return 1;
+  if (db.expenses.length === 0) return 2;
+  if (db.accounts.length === 0) return 3;
+  return 0;
+}
+function renderNextStep() {
+  const card = document.getElementById('next-step-card');
+  if (!card) return;
+  const step = nextStepState();
+  card.hidden = step === 0;
+  if (!step) return;
+  document.getElementById('next-step-title').textContent =
+    t('next_title') + ' · ' + step + '/3';
+  document.getElementById('next-step-btn').textContent =
+    step === 1 ? t('next_step1_btn') : step === 2 ? t('next_step2_btn') : t('next_step3_btn');
+}
+function goNextStep() {
+  const step = nextStepState();
+  /* Si la sección destino estaba apagada (p. ej. modo «Lo
+     esencial»), el paso la enciende: la persona lo pidió con su
+     toque y la alternativa sería rebotar a Inicio sin explicación. */
+  const go = (view) => {
+    if (db.settings.sections[view] === false) { db.settings.sections[view] = true; save(); }
+    showView(view);
+  };
+  if (step === 1) go('presupuesto');
+  else if (step === 2) go('gastos');
+  else if (step === 3) go('cuentas');
+}
+/* Modo «Lo esencial»: deja visibles solo Inicio (siempre), Gastos,
+   Ingresos, Ahorros y Mi san, con el MISMO sistema de «Secciones
+   visibles» de Ajustes. «Todo» las enciende las 12. */
+const ESSENTIAL_SECTIONS = ['gastos', 'ingresos', 'ahorros', 'san'];
+function applySectionsMode(mode) {
+  for (const def of SECTION_DEFS) {
+    db.settings.sections[def.id] = mode === 'all' ? true : ESSENTIAL_SECTIONS.includes(def.id);
+  }
+}
 function renderHome() {
   const key = currentMonthKey();
   document.getElementById('sum-available').textContent = fmt(availableMoney(key));
-  /* Compilación 40 (auditoría, hallazgo 1): con cuentas creadas el cálculo es
-     la suma de saldos que la persona mantiene a mano; el rótulo lo dice. Sin
-     cuentas se queda el rótulo de siempre (ingresos − gastos del mes). */
+  /* Compilación 41 (auditoría, hallazgo 1 — regla que REEMPLAZA al
+     rótulo condicional de la 40): el título es siempre «Dinero
+     disponible». Con cuentas, el número es la suma de los saldos
+     MOSTRADOS (base + movimientos enlazados) y la ayuda lo dice con
+     honestidad en una línea: se actualiza con los movimientos
+     enlazados a una cuenta; una cuenta sin movimientos enlazados
+     conserva el saldo que la persona escribió. Sin cuentas, el
+     número es ingresos − gastos del mes y no hace falta ayuda. */
   const availLabel = document.getElementById('tile-available-label');
   const availSub = document.getElementById('sum-available-sub');
   const availTile = document.getElementById('tile-available');
+  availLabel.textContent = t('tile_available');
+  availTile.setAttribute('aria-label', t('tile_available_aria'));
   if ((db.accounts || []).length > 0) {
-    availLabel.textContent = t('tile_accounts');
-    availTile.setAttribute('aria-label', t('tile_accounts_aria'));
-    availSub.textContent = t('tile_accounts_help');
+    availSub.textContent = t('tile_available_help');
     availSub.hidden = false;
   } else {
-    availLabel.textContent = t('tile_available');
-    availTile.setAttribute('aria-label', t('tile_available_aria'));
     availSub.textContent = '';
     availSub.hidden = true;
   }
+  renderNextStep();
   document.getElementById('sum-savings').textContent = fmt(monthSavings(key));
   document.getElementById('sum-debts').textContent = fmt(pendingDebtsTotal());
   document.getElementById('sum-incomes').textContent = fmt(sumCents(monthIncomes(key)));
@@ -9351,6 +9478,55 @@ function renderHome() {
 }
 
 /* ---------------- GASTOS ---------------- */
+/* Compilación 41: selector de fuente del movimiento («¿De dónde
+   salió?» / «¿A dónde entró?»). Opciones: «Saldo disponible» (valor
+   ''), «Ahorros» (valor 'ahorros') y una por cada cuenta. Al abrir
+   el formulario queda preseleccionada la última fuente usada de ese
+   tipo (persistida, como la categoría); si nunca se eligió, «Saldo
+   disponible». */
+function fillSourceSelect(selId, kind) {
+  const sel = document.getElementById(selId);
+  if (!sel) return;
+  const prev = sel.value;
+  clearNode(sel);
+  const avail = el('option', null, t('src_available'));
+  avail.value = '';
+  sel.appendChild(avail);
+  const sav = el('option', null, t('src_savings'));
+  sav.value = 'ahorros';
+  sel.appendChild(sav);
+  for (const a of db.accounts) {
+    const opt = el('option', null, a.name);
+    opt.value = a.id;
+    sel.appendChild(opt);
+  }
+  const valid = (v) => v === '' || v === 'ahorros' || db.accounts.some((a) => a.id === v);
+  const last = kind === 'exp' ? db.settings.lastExpSource : db.settings.lastIncSource;
+  if (valid(prev) && prev !== '') sel.value = prev;
+  else if (typeof last === 'string' && valid(last)) sel.value = last;
+  else sel.value = '';
+}
+function readSource(selId) {
+  const sel = document.getElementById(selId);
+  const v = sel ? sel.value : '';
+  if (v === 'ahorros') return { accountId: null, savings: true, mem: 'ahorros' };
+  if (v && db.accounts.some((a) => a.id === v)) return { accountId: v, savings: false, mem: v };
+  return { accountId: null, savings: false, mem: '' };
+}
+function setSourceSelect(selId, item, isIncome) {
+  fillSourceSelect(selId, isIncome ? 'inc' : 'exp');
+  const sel = document.getElementById(selId);
+  if (!sel) return;
+  const savFlag = isIncome ? item.toSavings : item.fromSavings;
+  sel.value = savFlag ? 'ahorros' : (item.accountId || '');
+}
+/* La fuente del movimiento en letra pequeña (lista de movimientos):
+   «de Ahorros» / «a Ahorros» o el nombre de la cuenta. */
+function movementSourceTag(item, isIncome) {
+  if (isIncome ? item.toSavings : item.fromSavings) return t(isIncome ? 'src_to_savings' : 'src_from_savings');
+  if (item.accountId) return accountNameById(item.accountId);
+  return '';
+}
 function fillCategorySelect() {
   const sel = document.getElementById('exp-category');
   const prev = sel.value;
@@ -9378,6 +9554,7 @@ function resetExpenseForm() {
   showError('exp-error', '');
   setExpensePhoto(null);
   fillCategorySelect();
+  fillSourceSelect('exp-source', 'exp');
   document.getElementById('exp-more').checked = false;
   document.getElementById('exp-more-box').hidden = true;
 }
@@ -9396,6 +9573,8 @@ function renderExpenses() {
     const main = el('div', 'item-main');
     main.appendChild(el('div', 'item-title', catName(item.category) + (item.biz ? ' 💼' : '')));
     main.appendChild(el('div', 'item-sub', prettyDate(item.date) + (item.note ? ' · ' + item.note : '')));
+    const expSrcTag = movementSourceTag(item, false);
+    if (expSrcTag) main.appendChild(el('div', 'item-sub', expSrcTag));
     li.appendChild(main);
     li.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
     if (item.photo) {
@@ -9409,7 +9588,7 @@ function renderExpenses() {
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
       beginUndo();
-      db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null });
+      db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null, accountId: item.accountId || null, fromSavings: item.fromSavings === true });
       save(); renderExpenses(); showUndoToast();
     }));
     acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
@@ -9417,6 +9596,7 @@ function renderExpenses() {
       document.getElementById('exp-amount').value = (item.amountCents / 100).toFixed(2);
       fillCategorySelect();
       document.getElementById('exp-category').value = item.category;
+      setSourceSelect('exp-source', item, false);
       document.getElementById('exp-date').value = item.date;
       document.getElementById('exp-note').value = item.note;
       document.getElementById('exp-biz').checked = item.biz === true;
@@ -9449,13 +9629,18 @@ function onExpenseSubmit(ev) {
   const id = document.getElementById('exp-id').value;
   if (!id && db.expenses.length >= MAX_ITEMS) { showError('exp-error', t('err_limit_expenses')); return; }
   db.settings.lastExpCategory = category;
+  /* Compilación 41: la fuente elegida se guarda en el movimiento y
+     queda como la preseleccionada del próximo gasto. Los saldos y el
+     total de ahorros son derivados: con guardar el enlace basta. */
+  const expSrc = readSource('exp-source');
+  db.settings.lastExpSource = expSrc.mem;
   beginUndo();
   let savedItem = null;
   if (id) {
     const found = db.expenses.find((x) => x.id === id);
-    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; savedItem = found; }
+    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; savedItem = found; }
   } else {
-    savedItem = { id: uid(), amountCents: cents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true };
+    savedItem = { id: uid(), amountCents: cents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings };
     db.expenses.push(savedItem);
   }
   expMonth = monthKeyOf(date);
@@ -9481,7 +9666,7 @@ function suggestedSavings(amountCents) {
 function splitLine(item) {
   const s = splitCents(item.amountCents, db.settings.split);
   return t('inc_split_line', {
-    sav: fmt(item.savingsCents || 0), biz: fmt(s.negocio), exp: fmt(s.gastos), fam: fmt(s.familia)
+    sav: fmt(effectiveSavingsOfIncome(item)), biz: fmt(s.negocio), exp: fmt(s.gastos), fam: fmt(s.familia)
   });
 }
 function resetIncomeForm() {
@@ -9493,6 +9678,7 @@ function resetIncomeForm() {
   document.getElementById('inc-split-preview').textContent = '';
   incSavingsTouched = false;
   document.getElementById('inc-savings-label').textContent = t('inc_savings_label');
+  fillSourceSelect('inc-source', 'inc');
   showError('inc-error', '');
   document.getElementById('inc-more').checked = false;
   document.getElementById('inc-more-box').hidden = true;
@@ -9511,16 +9697,19 @@ function renderIncomes() {
     main.appendChild(el('div', 'item-title', fmt(item.amountCents) + (item.biz ? ' 💼' : '')));
     main.appendChild(el('div', 'item-sub', prettyDate(item.date) + (item.note ? ' · ' + item.note : '')));
     main.appendChild(el('div', 'item-sub', splitLine(item)));
+    const incSrcTag = movementSourceTag(item, true);
+    if (incSrcTag) main.appendChild(el('div', 'item-sub', incSrcTag));
     li.appendChild(main);
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
       beginUndo();
-      db.incomes.push({ id: uid(), amountCents: item.amountCents, savingsCents: item.savingsCents || 0, date: todayStr(), note: item.note });
+      db.incomes.push({ id: uid(), amountCents: item.amountCents, savingsCents: item.savingsCents || 0, date: todayStr(), note: item.note, accountId: item.accountId || null, toSavings: item.toSavings === true });
       save(); renderIncomes(); showUndoToast();
     }));
     acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
       document.getElementById('inc-id').value = item.id;
       document.getElementById('inc-amount').value = (item.amountCents / 100).toFixed(2);
+      setSourceSelect('inc-source', item, true);
       document.getElementById('inc-date').value = item.date;
       document.getElementById('inc-note').value = item.note;
       document.getElementById('inc-biz').checked = item.biz === true;
@@ -9590,12 +9779,16 @@ function onIncomeSubmit(ev) {
   const note = cleanText(document.getElementById('inc-note').value, 120);
   const id = document.getElementById('inc-id').value;
   if (!id && db.incomes.length >= MAX_ITEMS) { showError('inc-error', t('err_limit_incomes')); return; }
+  /* Compilación 41: destino del ingreso (disponible / Ahorros /
+     cuenta), con su memoria de última usada, como en el gasto. */
+  const incSrc = readSource('inc-source');
+  db.settings.lastIncSource = incSrc.mem;
   beginUndo();
   if (id) {
     const found = db.incomes.find((x) => x.id === id);
-    if (found) { found.amountCents = cents; found.savingsCents = savingsCents; found.date = date; found.note = note; found.biz = document.getElementById('inc-biz').checked === true; }
+    if (found) { found.amountCents = cents; found.savingsCents = savingsCents; found.date = date; found.note = note; found.biz = document.getElementById('inc-biz').checked === true; found.accountId = incSrc.accountId; found.toSavings = incSrc.savings; }
   } else {
-    db.incomes.push({ id: uid(), amountCents: cents, savingsCents, date, note, biz: document.getElementById('inc-biz').checked === true });
+    db.incomes.push({ id: uid(), amountCents: cents, savingsCents, date, note, biz: document.getElementById('inc-biz').checked === true, accountId: incSrc.accountId, toSavings: incSrc.savings });
   }
   save(); resetIncomeForm(); renderIncomes(); showUndoToast();
 }
@@ -9608,9 +9801,12 @@ function onIncomeSubmit(ev) {
    savingsCents en 0 (el ingreso queda intacto, con su misma cantidad);
    borrar una fila suelta elimina solo esa entrada de db.savings. */
 function allSavingsTotal() {
-  const fromIncomes = db.incomes.reduce((t, i) => t + (i.savingsCents || 0), 0);
+  const fromIncomes = db.incomes.reduce((t, i) => t + effectiveSavingsOfIncome(i), 0);
   const standalone = db.savings.reduce((t, s) => t + s.amountCents, 0);
-  return fromIncomes + standalone;
+  /* Compilación 41: los gastos pagados «de Ahorros» restan del total
+     (derivado: editar, borrar o deshacer el gasto lo revierte solo). */
+  const spent = db.expenses.reduce((t, e) => t + (e.fromSavings ? e.amountCents : 0), 0);
+  return fromIncomes + standalone - spent;
 }
 /* Selector de meta del formulario de ahorro (Paquete 3): la primera
    opción es «sin meta» (ahorro general, como siempre); el resto son
@@ -9644,9 +9840,14 @@ function renderSavings() {
   fillSavingsGoalSelect();
   const rows = [];
   for (const item of db.incomes) {
-    if ((item.savingsCents || 0) > 0) rows.push({ kind: 'ingreso', date: item.date, item: item });
+    if (effectiveSavingsOfIncome(item) > 0) rows.push({ kind: 'ingreso', date: item.date, item: item });
   }
   for (const item of db.savings) rows.push({ kind: 'manual', date: item.date, item: item });
+  /* Compilación 41: los gastos pagados «de Ahorros» también se ven
+     aquí, como salida del total (se borran desde el propio gasto). */
+  for (const item of db.expenses) {
+    if (item.fromSavings) rows.push({ kind: 'gasto', date: item.date, item: item });
+  }
   rows.sort((a, b) => (a.date < b.date ? 1 : -1));
   document.getElementById('sav-total').textContent = fmt(allSavingsTotal());
   document.getElementById('sav-month-total').textContent = fmt(monthSavings(currentMonthKey()));
@@ -9663,16 +9864,28 @@ function renderSavings() {
       main.appendChild(el('div', 'item-sub',
         t('sav_from_sub', { amount: fmt(item.amountCents) }) + (item.note ? ' · ' + item.note : '')));
       li.appendChild(main);
-      li.appendChild(el('span', 'item-amount', fmt(item.savingsCents)));
+      li.appendChild(el('span', 'item-amount', fmt(effectiveSavingsOfIncome(item))));
       acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
         beginUndo();
-        db.savings.push({ id: uid(), amountCents: item.savingsCents, date: todayStr(), note: item.note, goalId: null });
+        db.savings.push({ id: uid(), amountCents: effectiveSavingsOfIncome(item), date: todayStr(), note: item.note, goalId: null });
         save(); renderSavings(); showUndoToast();
       }));
       acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
-        if (!window.confirm(t('sav_delete_income_confirm', { amount: fmt(item.savingsCents), date: prettyDate(item.date), income: fmt(item.amountCents) }))) return;
+        if (!window.confirm(t('sav_delete_income_confirm', { amount: fmt(effectiveSavingsOfIncome(item)), date: prettyDate(item.date), income: fmt(item.amountCents) }))) return;
         beginUndo();
         item.savingsCents = 0;
+        item.toSavings = false;
+        save(); renderSavings(); showUndoToast();
+      }));
+    } else if (row.kind === 'gasto') {
+      main.appendChild(el('div', 'item-title', catName(item.category) + (item.biz ? ' 💼' : '')));
+      main.appendChild(el('div', 'item-sub', prettyDate(item.date) + ' · ' + t('src_from_savings') + (item.note ? ' · ' + item.note : '')));
+      li.appendChild(main);
+      li.appendChild(el('span', 'item-amount', '-' + fmt(item.amountCents)));
+      acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
+        if (!window.confirm(t('exp_delete_confirm', { amount: fmt(item.amountCents), cat: catName(item.category), date: prettyDate(item.date) }))) return;
+        beginUndo();
+        db.expenses = db.expenses.filter((x) => x.id !== item.id);
         save(); renderSavings(); showUndoToast();
       }));
     } else {
@@ -9718,10 +9931,37 @@ function onSavingsSubmit(ev) {
    TOTAL de todos los tiempos (allSavingsTotal). Borrar la meta nunca
    toca los ahorros: solo se borra la meta. */
 let goalEditing = false;
+/* Compilación 41 (auditoría, hallazgo 7): UN SOLO formulario de
+   meta para todo Ahorros. Sin meta principal, crea la principal;
+   con meta principal, crea una meta más de la lista; y edita la que
+   se esté editando (principal o de la lista, según el estado). El
+   formulario duplicado de «Otras metas» desapareció. */
+let goal2EditingId = null;
 function resetGoalForm() {
   document.getElementById('goal-form').reset();
   goalEditing = false;
+  goal2EditingId = null;
   showError('goal-error', '');
+}
+function updateGoalFormChrome() {
+  const form = document.getElementById('goal-form');
+  const title = document.getElementById('goal-form-title');
+  const submit = document.getElementById('goal-submit');
+  const cancel = document.getElementById('goal-cancel-edit');
+  form.hidden = false;
+  if (goal2EditingId || goalEditing) {
+    title.textContent = t('goal_form_edit');
+    submit.textContent = t('goal_save_btn');
+    cancel.hidden = false;
+  } else if (!db.savingsGoal) {
+    title.textContent = t('goal_form_create');
+    submit.textContent = t('goal_create_btn');
+    cancel.hidden = true;
+  } else {
+    title.textContent = t('goal_form_create');
+    submit.textContent = t('goal2_create');
+    cancel.hidden = true;
+  }
 }
 function renderGoal() {
   const card = document.getElementById('goal-card');
@@ -9732,10 +9972,7 @@ function renderGoal() {
     goalEditing = false;
     card.appendChild(el('h3', null, t('goal_prompt')));
     card.appendChild(el('p', 'muted', t('goal_prompt_sub')));
-    form.hidden = false;
-    document.getElementById('goal-form-title').textContent = t('goal_form_create');
-    document.getElementById('goal-submit').textContent = t('goal_create_btn');
-    document.getElementById('goal-cancel-edit').hidden = true;
+    updateGoalFormChrome();
     return;
   }
   const total = allSavingsTotal();
@@ -9755,13 +9992,11 @@ function renderGoal() {
   const acts = el('div', 'form-actions');
   acts.appendChild(actionButton(t('goal_edit'), 'btn-secondary', () => {
     goalEditing = true;
+    goal2EditingId = null;
     document.getElementById('goal-name').value = goal.name;
     document.getElementById('goal-target').value = (goal.targetCents / 100).toFixed(2);
-    document.getElementById('goal-form-title').textContent = t('goal_form_edit');
-    document.getElementById('goal-submit').textContent = t('goal_save_btn');
-    document.getElementById('goal-cancel-edit').hidden = false;
     showError('goal-error', '');
-    form.hidden = false;
+    updateGoalFormChrome();
   }));
   acts.appendChild(actionButton(t('goal_delete'), 'btn-ghost', () => {
     if (!window.confirm(t('goal_delete_confirm', { name: goal.name }))) return;
@@ -9772,7 +10007,7 @@ function renderGoal() {
     save(); renderSavings(); showUndoToast();
   }));
   card.appendChild(acts);
-  form.hidden = !goalEditing;
+  updateGoalFormChrome();
 }
 function onGoalSubmit(ev) {
   ev.preventDefault();
@@ -9780,12 +10015,33 @@ function onGoalSubmit(ev) {
   if (!name) { showError('goal-error', t('err_goal_name')); return; }
   const cents = parseAmount(document.getElementById('goal-target').value, false);
   if (cents === null) { showError('goal-error', t('err_amount')); return; }
+  /* Compilación 41: el único formulario sirve para los tres casos —
+     editar una meta de la lista, crear/editar la principal y, con la
+     principal ya creada, crear una meta más de la lista. Editar una
+     meta conserva su id y lo acumulado. */
+  if (goal2EditingId) {
+    const g = db.goals.find((x) => x.id === goal2EditingId);
+    if (g) { beginUndo(); g.name = name; g.targetCents = cents; save(); showUndoToast(); }
+    resetGoalForm();
+    renderSavings();
+    return;
+  }
+  if (goalEditing || !db.savingsGoal) {
+    beginUndo();
+    db.savingsGoal = { name: name, targetCents: cents };
+    goalEditing = false;
+    document.getElementById('goal-form').reset();
+    showError('goal-error', '');
+    save(); renderSavings(); showUndoToast();
+    return;
+  }
+  if (db.goals.length >= 20) { showError('goal-error', t('err_limit_goals')); return; }
   beginUndo();
-  db.savingsGoal = { name: name, targetCents: cents };
-  goalEditing = false;
-  document.getElementById('goal-form').reset();
-  showError('goal-error', '');
-  save(); renderSavings(); showUndoToast();
+  db.goals.push({ id: uid(), name: name, targetCents: cents, savedCents: 0 });
+  save();
+  resetGoalForm();
+  renderSavings();
+  showUndoToast();
 }
 
 /* ---------------- RESUMEN (GRÁFICAS) ----------------
@@ -10146,12 +10402,15 @@ function renderAccounts() {
     const main = el('div', 'item-main');
     main.appendChild(el('div', 'item-title', item.name));
     li.appendChild(main);
-    li.appendChild(el('span', 'item-amount', fmt(item.balanceCents)));
+    /* Compilación 41: se muestra el saldo vivo (base + movimientos
+       enlazados); el formulario de edición también abre con ese
+       saldo mostrado, y al guardar redefine la base. */
+    li.appendChild(el('span', 'item-amount', fmt(accountShownBalance(item))));
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
       document.getElementById('acc-id').value = item.id;
       document.getElementById('acc-name').value = item.name;
-      document.getElementById('acc-balance').value = (item.balanceCents / 100).toFixed(2);
+      document.getElementById('acc-balance').value = (accountShownBalance(item) / 100).toFixed(2);
       document.getElementById('account-form-title').textContent = t('acc_edit');
       document.getElementById('acc-cancel-edit').hidden = false;
       window.scrollTo(0, 0);
@@ -10177,7 +10436,10 @@ function onAccountSubmit(ev) {
   beginUndo();
   if (id) {
     const found = db.accounts.find((x) => x.id === id);
-    if (found) { found.name = name; found.balanceCents = cents; }
+    /* Compilación 41: teclear un saldo REDEFINE la base (lo tecleado
+       menos la suma de movimientos enlazados) para que el saldo
+       mostrado sea exactamente el tecleado. */
+    if (found) { found.name = name; found.balanceCents = cents - accountLinkedSum(found.id); }
   } else {
     db.accounts.push({ id: uid(), name, balanceCents: cents });
   }
@@ -10290,8 +10552,27 @@ function sanTotalReunido() {
 function resetSanForm() {
   document.getElementById('san-form').reset();
   document.getElementById('san-pname').value = '';
+  const startEl = document.getElementById('san-start');
+  if (startEl) startEl.value = todayStr();
+  const freqEl = document.getElementById('san-freq');
+  if (freqEl) freqEl.value = 'semanal';
   sanDraft = [];
   showError('san-error', '');
+}
+/* Compilación 41 (auditoría, hallazgo 12): frecuencia y fechas del
+   san personal, con las mismas reglas del organizador (semanal +7,
+   quincenal +14, mensual mismo día con tope de fin de mes). */
+function sanFreq(s) {
+  return ORG_FREQUENCIES.includes(s && s.frequency) ? s.frequency : 'semanal';
+}
+function sanPeriodDate(s, i) {
+  if (!s || !s.startDate) return null;
+  return orgRoundDate({ startDate: s.startDate, frequency: sanFreq(s) }, i);
+}
+function sanProgressText(s) {
+  return t('san_period_line', {
+    p: t('san_period_' + sanFreq(s)), x: s.currentWeek + 1, n: s.participants.length
+  });
 }
 function renderSan() {
   const has = !!db.san;
@@ -10319,12 +10600,25 @@ function renderSan() {
   const s = db.san;
   const n = s.participants.length;
   const finished = sanFinished();
+  /* Compilación 41: los textos de periodo siguen la frecuencia del
+     san (semana / quincena / mes) y el avance muestra la fecha del
+     periodo en curso cuando el san trae fecha de inicio. */
+  const freq = sanFreq(s);
   document.getElementById('san-title').textContent = s.name;
-  document.getElementById('san-progress').textContent =
-    finished ? t('san_finished') : t('san_week', { x: s.currentWeek + 1, n: n });
+  let progress = finished ? t('san_finished') : sanProgressText(s);
+  if (!finished) {
+    const pd = sanPeriodDate(s, s.currentWeek);
+    if (pd) progress += ' · ' + prettyDate(pd);
+  }
+  document.getElementById('san-progress').textContent = progress;
   document.getElementById('san-aporte-line').textContent = t('san_aporte_line', { amount: fmt(s.aporteCents) });
   document.getElementById('san-total-line').textContent = t('san_total_line', { amount: fmt(sanTotalReunido()) });
   document.getElementById('san-finished-note').hidden = !finished;
+  if (freq !== 'semanal') document.getElementById('san-finished-note').textContent = t('san_finished_period');
+  const paidTitle = document.getElementById('san-paid-title');
+  if (paidTitle) paidTitle.textContent = t(freq === 'semanal' ? 'san_paid_title' : 'san_paid_title_period');
+  const advBtn = document.getElementById('san-advance');
+  if (advBtn) advBtn.textContent = t(freq === 'semanal' ? 'san_advance' : 'san_advance_period');
   document.getElementById('san-current').hidden = finished;
   document.getElementById('san-new').hidden = !finished;
   if (!finished) {
@@ -10332,7 +10626,7 @@ function renderSan() {
     const paidCount = s.participants.filter((p) => week.paid[p]).length;
     document.getElementById('san-receiver-line').textContent =
       t('san_receiver_line', { name: s.participants[s.currentWeek] });
-    document.getElementById('san-week-collected').textContent = t('san_week_collected', {
+    document.getElementById('san-week-collected').textContent = t(freq === 'semanal' ? 'san_week_collected' : 'san_collected_period', {
       amount: fmt(paidCount * s.aporteCents), target: fmt(n * s.aporteCents)
     });
     const ul = document.getElementById('san-paid-list');
@@ -10378,11 +10672,19 @@ function onSanCreateSubmit(ev) {
   const cents = parseAmount(document.getElementById('san-amount').value, false);
   if (cents === null) { showError('san-error', t('err_amount')); return; }
   if (sanDraft.length < 2) { showError('san-error', t('san_err_participants')); return; }
+  /* Compilación 41: frecuencia y fecha de inicio también en el san
+     personal (antes solo existían en el Modo Organizador). */
+  const freqEl = document.getElementById('san-freq');
+  const frequency = freqEl && ORG_FREQUENCIES.includes(freqEl.value) ? freqEl.value : 'semanal';
+  const startEl = document.getElementById('san-start');
+  const startDate = startEl ? cleanDate(startEl.value) : todayStr();
   db.san = {
     name: name, aporteCents: cents,
     participants: sanDraft.slice(),
     weeks: sanDraft.map(() => ({ paid: {} })),
-    currentWeek: 0
+    currentWeek: 0,
+    frequency: frequency,
+    startDate: startDate
   };
   resetSanForm();
   save(); renderSan();
@@ -11232,6 +11534,27 @@ let SAN_PUBLIC_MODE = false;
 let sanPublicToken = null;
 let sanPublicData = null;
 let sanPublicFlash = '';
+/* Compilación 41 (auditoría, hallazgo 5): acordeón de rondas del
+   visor (solo una abierta, como el del organizador) y buscador de
+   nombre. El estado vive fuera del dibujo para sobrevivir a los
+   redibujos tras cada «Ya pagué». */
+let sanPublicOpenRound = -1;
+let sanPublicOpenFor = null;
+let sanPublicQuery = '';
+let sanPublicFindFocus = false;
+function sanPublicCurrentRound(names, rounds) {
+  for (let i = 0; i < names.length; i++) {
+    const rd = rounds[i] && typeof rounds[i] === 'object' ? rounds[i] : {};
+    const conf = Array.isArray(rd.confirmed) ? rd.confirmed : [];
+    if (conf.filter((nm) => names.includes(nm)).length < names.length) return i;
+  }
+  return names.length - 1;
+}
+function sanPublicNorm(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+/* (la clase de arriba cubre las marcas combinantes U+0300–U+036F:
+   la búsqueda no distingue acentos ni mayúsculas) */
 async function initSanPublic(token) {
   /* token === undefined → se extrae del hash con la regex estricta
      (compatibilidad); token === null → la URL traía #san= pero el
@@ -11241,6 +11564,13 @@ async function initSanPublic(token) {
     token = m ? m[1] : null;
   }
   SAN_PUBLIC_MODE = true;
+  /* Compilación 41: un enlace distinto empieza con el buscador
+     limpio y el acordeón en su ronda en curso. */
+  if (sanPublicToken !== token) {
+    sanPublicQuery = '';
+    sanPublicOpenFor = null;
+    sanPublicFindFocus = false;
+  }
   sanPublicToken = token;
   /* Compilación 35 (Bloque 2.3): el visor se presenta SIEMPRE con el
      tema oscuro de la app (acento verde), sin depender de los ajustes
@@ -11419,24 +11749,84 @@ function renderSanPublic() {
   }
   head.appendChild(el('p', 'pub-seal', t('org_antifraud')));
   box.appendChild(head);
+  /* Compilación 41 (auditoría, hallazgo 5): el invitado ya no se
+     pierde entre 13×13 filas. Bajo el avance va la instrucción y un
+     buscador de nombre; las rondas son un acordeón como el del
+     organizador (solo la EN CURSO nace abierta; las demás muestran
+     fecha, quién recibe y lo reunido). Buscar abre la ronda de la
+     primera coincidencia, resalta las filas que coinciden y oculta
+     las que no. El flujo «Ya pagué» (RPC san_public_report y la
+     fusión anti-pérdida al publicar) no cambia. */
+  box.appendChild(el('p', 'pub-find-hint', t('pub_find_hint')));
+  const findWrap = el('div', 'pub-find');
+  const findInput = document.createElement('input');
+  findInput.type = 'search';
+  findInput.id = 'pub-find-input';
+  findInput.className = 'pub-find-input';
+  findInput.placeholder = t('pub_find_ph');
+  findInput.setAttribute('aria-label', t('pub_find_ph'));
+  findInput.value = sanPublicQuery;
+  findInput.addEventListener('input', () => {
+    sanPublicQuery = findInput.value;
+    sanPublicFindFocus = true;
+    renderSanPublic();
+  });
+  findInput.addEventListener('focus', () => { sanPublicFindFocus = true; });
+  findWrap.appendChild(findInput);
+  if (sanPublicQuery) {
+    findWrap.appendChild(actionButton(t('pub_find_clear'), 'btn-ghost btn-small', () => {
+      sanPublicQuery = '';
+      sanPublicFindFocus = false;
+      renderSanPublic();
+    }));
+  }
+  box.appendChild(findWrap);
+  const query = sanPublicNorm(sanPublicQuery.trim());
+  const matchesName = (nm) => !query || sanPublicNorm(nm).includes(query);
+  if (query && !names.some(matchesName)) {
+    box.appendChild(el('p', 'muted pub-find-none', t('pub_find_none')));
+  }
+  const openKey = names.join('|') + '|' + (data.startDate || '') + '|' + (data.updatedAt || '');
+  if (sanPublicOpenFor !== openKey) {
+    sanPublicOpenFor = openKey;
+    sanPublicOpenRound = sanPublicCurrentRound(names, rounds);
+  }
   names.forEach((receiver, i) => {
-    const card = el('div', 'card pub-round pub-anim');
-    card.style.animationDelay = Math.min((i + 1) * 60, 300) + 'ms';
-    card.appendChild(el('h4', null, t('org_round', { x: i + 1, n: names.length }) + ' · ' + prettyDate(orgRoundDate(fakeOrg, i))));
-    card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
-    if (zelleMap[receiver]) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: zelleMap[receiver] })));
     const rd = rounds[i] && typeof rounds[i] === 'object' ? rounds[i] : {};
     const conf = Array.isArray(rd.confirmed) ? rd.confirmed : [];
     const repo = Array.isArray(rd.reported) ? rd.reported : [];
+    const confCount = conf.filter((nm) => names.includes(nm)).length;
+    const roundMatches = names.some(matchesName);
+    const open = sanPublicOpenRound === i || (!!query && roundMatches);
+    const card = el('div', 'card pub-round pub-anim' + (open ? ' pub-round-open' : ''));
+    card.style.animationDelay = Math.min((i + 1) * 60, 300) + 'ms';
+    const head4 = el('h4', 'pub-round-head',
+      t('org_round', { x: i + 1, n: names.length }) + ' · ' + prettyDate(orgRoundDate(fakeOrg, i)));
+    head4.appendChild(el('span', 'org-round-chevron', open ? '▾' : '▸'));
+    head4.setAttribute('role', 'button');
+    head4.setAttribute('data-pub-round', String(i));
+    head4.addEventListener('click', () => {
+      sanPublicOpenRound = open ? -1 : i;
+      renderSanPublic();
+    });
+    card.appendChild(head4);
+    card.appendChild(el('p', 'total-line', t('org_receiver_line', { name: receiver })));
+    card.appendChild(el('p', 'muted', t('san_week_collected', {
+      amount: fmtMoney(confCount * aporte), target: fmtMoney(names.length * aporte)
+    })));
+    if (!open) {
+      const pend = names.length - confCount;
+      card.appendChild(el('p', 'muted small', t(pend === 1 ? 'org_pending_count_one' : 'org_pending_count_many', { n: pend })));
+      box.appendChild(card);
+      return;
+    }
+    if (zelleMap[receiver]) card.appendChild(el('p', 'muted small', t('org_zelle_line', { zelle: zelleMap[receiver] })));
     for (const nm of names) {
+      if (!matchesName(nm)) continue;
       const st = conf.includes(nm) ? 'confirmed' : (repo.includes(nm) ? 'reported' : 'pending');
-      if (st === 'pending') {
-        card.appendChild(sanPublicPendingRow(i, nm));
-      } else {
-        /* Sin botón: el Reportado espera la confirmación del
-           organizador y el Confirmado es un sello. */
-        card.appendChild(sanPublicPayRow(nm, st));
-      }
+      const rowEl = st === 'pending' ? sanPublicPendingRow(i, nm) : sanPublicPayRow(nm, st);
+      if (query) rowEl.classList.add('pub-match');
+      card.appendChild(rowEl);
     }
     box.appendChild(card);
   });
@@ -11459,6 +11849,20 @@ function renderSanPublic() {
   cta.appendChild(ctaActions);
   box.appendChild(cta);
   box.appendChild(el('p', 'pub-footer', t('pub_footer')));
+  /* Compilación 41: tras redibujar por la búsqueda, el foco vuelve
+     al buscador (con el cursor al final) y la vista se desplaza a
+     la primera coincidencia resaltada. */
+  if (sanPublicFindFocus) {
+    const inp = document.getElementById('pub-find-input');
+    if (inp) {
+      inp.focus();
+      try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) { /* sin selección */ }
+    }
+  }
+  if (query) {
+    const first = box.querySelector('.pub-match');
+    if (first && typeof first.scrollIntoView === 'function') first.scrollIntoView({ block: 'center' });
+  }
 }
 /* Fila de un participante PENDIENTE en el visor: su estado y la acción
    «Ya pagué». Al tocarla se despliega el panel en línea (confirmación
@@ -13095,17 +13499,6 @@ function goalAccumulated(g) {
   for (const s of db.savings) if (s.goalId === g.id) total += s.amountCents;
   return total;
 }
-let goal2EditingId = null;
-function resetGoal2Form() {
-  const form = document.getElementById('goal2-form');
-  if (form) form.reset();
-  goal2EditingId = null;
-  const submit = document.getElementById('goal2-submit');
-  if (submit) submit.textContent = t('goal2_create');
-  const cancel = document.getElementById('goal2-cancel-edit');
-  if (cancel) cancel.hidden = true;
-  showError('goal2-error', '');
-}
 function renderGoals() {
   const list = document.getElementById('goals-list');
   if (!list) return;
@@ -13132,13 +13525,15 @@ function renderGoals() {
     row.appendChild(actionButton(t('goal_add'), 'btn-secondary', () => moveGoalMoney(g.id, amt, 1)));
     row.appendChild(actionButton(t('goal_take'), 'btn-ghost', () => moveGoalMoney(g.id, amt, -1)));
     row.appendChild(actionButton(t('goal_edit'), 'btn-ghost', () => {
+      /* Compilación 41: editar una meta de la lista usa el ÚNICO
+         formulario de metas (el de arriba), no uno duplicado. */
       goal2EditingId = g.id;
-      document.getElementById('goal2-name').value = g.name;
-      document.getElementById('goal2-target').value = (g.targetCents / 100).toFixed(2);
-      document.getElementById('goal2-submit').textContent = t('goal_save_btn');
-      document.getElementById('goal2-cancel-edit').hidden = false;
-      showError('goal2-error', '');
-      document.getElementById('goal2-name').focus();
+      goalEditing = false;
+      document.getElementById('goal-name').value = g.name;
+      document.getElementById('goal-target').value = (g.targetCents / 100).toFixed(2);
+      showError('goal-error', '');
+      updateGoalFormChrome();
+      document.getElementById('goal-name').focus();
     }));
     row.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
       if (!window.confirm(t('goal_delete_confirm', { name: g.name }))) return;
@@ -13159,27 +13554,9 @@ function moveGoalMoney(id, input, dir) {
   g.savedCents = Math.max(0, g.savedCents + dir * cents);
   save(); renderSavings(); showUndoToast();
 }
-function onGoal2Submit(ev) {
-  ev.preventDefault();
-  const name = cleanText(document.getElementById('goal2-name').value, 60);
-  const target = parseAmount(document.getElementById('goal2-target').value, false);
-  if (!name) { showError('goal2-error', t('err_name')); return; }
-  if (target === null) { showError('goal2-error', t('err_amount')); return; }
-  /* Editar una meta conserva su id y lo acumulado: los ahorros
-     asignados la siguen por id, no por nombre. */
-  if (goal2EditingId) {
-    const g = db.goals.find((x) => x.id === goal2EditingId);
-    if (g) { beginUndo(); g.name = name; g.targetCents = target; save(); showUndoToast(); }
-    resetGoal2Form();
-    renderSavings();
-    return;
-  }
-  if (db.goals.length >= 20) { showError('goal2-error', t('err_limit_goals')); return; }
-  db.goals.push({ id: uid(), name: name, targetCents: target, savedCents: 0 });
-  save();
-  resetGoal2Form();
-  renderSavings();
-}
+/* Compilación 41: onGoal2Submit y su formulario duplicado se
+   eliminaron; crear y editar metas (principal y de la lista) vive
+   en onGoalSubmit, con el único formulario de la sección. */
 
 /* --- Negocio: resumen en la vista Resumen --- */
 function renderBizCard(key) {
@@ -13997,7 +14374,6 @@ function onUndo() {
   applyTheme();
   applyTextSize();
   resetExpenseForm(); resetIncomeForm(); resetSavingsForm(); resetGoalForm();
-  resetGoal2Form();
   resetFixedForm(); resetAccountForm(); resetDebtForm();
   showView(currentView);
 }
@@ -14018,8 +14394,9 @@ function weekStartOf(dateStr) {
 }
 function savingsBetween(fromStr, toStr) {
   let total = 0;
-  for (const i of db.incomes) if (i.date >= fromStr && i.date <= toStr) total += (i.savingsCents || 0);
+  for (const i of db.incomes) if (i.date >= fromStr && i.date <= toStr) total += effectiveSavingsOfIncome(i);
   for (const s of db.savings) if (s.date >= fromStr && s.date <= toStr) total += s.amountCents;
+  for (const e of db.expenses) if (e.fromSavings && e.date >= fromStr && e.date <= toStr) total -= e.amountCents;
   return total;
 }
 function challengeTarget() {
@@ -14959,9 +15336,33 @@ async function onOnboardingSubmit(ev) {
   db.settings.onboarded = true;
   if (pin) await setPin(pin);
   save();
+  /* Compilación 41 (auditoría, hallazgo 8): al terminar la
+     bienvenida, la elección «¿Cómo quieres ver tu app?» — «Lo
+     esencial» viene preseleccionado SOLO para usuarios nuevos (este
+     paso solo existe en este flujo). La app entra al confirmar. */
+  obPendingPin = !!pin;
+  const form = document.getElementById('onboarding-form');
+  if (form) form.hidden = true;
+  const tour = document.getElementById('ob-tour');
+  if (tour) tour.hidden = true;
+  const note = document.getElementById('ob-note');
+  if (note) note.hidden = true;
+  const mode = document.getElementById('ob-mode');
+  if (mode) { mode.hidden = false; return; }
+  enterApp();
+  if (pin) maybeOfferBiometric();
+}
+let obPendingPin = false;
+function onObModeContinue() {
+  const picked = document.querySelector('input[name="ob-mode"]:checked');
+  if (picked && picked.value === 'esencial') applySectionsMode('essential');
+  else applySectionsMode('all');
+  save();
+  const mode = document.getElementById('ob-mode');
+  if (mode) mode.hidden = true;
   enterApp();
   /* Recién creado el PIN: ofrecer la huella en el momento (flujo guiado). */
-  if (pin) maybeOfferBiometric();
+  if (obPendingPin) { obPendingPin = false; maybeOfferBiometric(); }
 }
 
 /* ---------------- Inicio ---------------- */
@@ -15566,8 +15967,21 @@ function wireEvents() {
   });
   document.getElementById('btn-share-org').addEventListener('click', onShareSanOrg);
   document.getElementById('btn-share-org-img').addEventListener('click', shareSanOrgPng);
-  document.getElementById('goal2-form').addEventListener('submit', onGoal2Submit);
-  document.getElementById('goal2-cancel-edit').addEventListener('click', () => { resetGoal2Form(); });
+  /* Compilación 41: la elección de modo al terminar la bienvenida,
+     la tarjeta de siguiente paso de Inicio, los botones de modo de
+     «Secciones visibles» y el pliegue del reto semanal de Ahorros. */
+  const obModeBtn = document.getElementById('ob-mode-btn');
+  if (obModeBtn) obModeBtn.addEventListener('click', onObModeContinue);
+  const nextStepBtn = document.getElementById('next-step-btn');
+  if (nextStepBtn) nextStepBtn.addEventListener('click', goNextStep);
+  const setModeEssential = document.getElementById('set-mode-essential');
+  if (setModeEssential) setModeEssential.addEventListener('click', () => { applySectionsMode('essential'); save(); renderSettings(); });
+  const setModeAll = document.getElementById('set-mode-all');
+  if (setModeAll) setModeAll.addEventListener('click', () => { applySectionsMode('all'); save(); renderSettings(); });
+  const chalMore = document.getElementById('chal-more');
+  if (chalMore) chalMore.addEventListener('change', () => {
+    document.getElementById('chal-more-box').hidden = !chalMore.checked;
+  });
   document.getElementById('btn-menu-close').addEventListener('click', closeMenu);
   document.getElementById('menu-backdrop').addEventListener('click', closeMenu);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
@@ -15583,7 +15997,7 @@ function wireEvents() {
   document.getElementById('exp-next').addEventListener('click', () => { expMonth = shiftMonth(expMonth, 1); renderExpenses(); });
   document.getElementById('exp-cancel-edit').addEventListener('click', resetExpenseForm);
   document.getElementById('inc-cancel-edit').addEventListener('click', resetIncomeForm);
-  document.getElementById('goal-cancel-edit').addEventListener('click', () => { resetGoalForm(); renderGoal(); });
+  document.getElementById('goal-cancel-edit').addEventListener('click', () => { resetGoalForm(); renderSavings(); });
   document.getElementById('res-prev').addEventListener('click', () => { chartMonth = shiftMonth(chartMonth, -1); renderResumen(); });
   document.getElementById('res-next').addEventListener('click', () => { chartMonth = shiftMonth(chartMonth, 1); renderResumen(); });
   document.getElementById('san-add-participant').addEventListener('click', onSanAddParticipant);
