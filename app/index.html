@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 44</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 45</p>
   </div>
 </section>
 
@@ -132,12 +132,21 @@
       <p id="ob-error" class="error" role="alert" hidden></p>
       <button type="submit" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </form>
+    <div class="ob-demo">
+      <button id="ob-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">👀 Ver una demo</button>
+      <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
+    </div>
     <p id="ob-note" class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
   </div>
 </section>
 
 <!-- ============ APP ============ -->
 <div id="app-shell" hidden>
+
+  <div id="demo-banner" class="demo-banner" hidden>
+    <span data-i18n="demo_banner">Estás viendo una demo — tus datos reales están a salvo</span>
+    <button id="demo-exit" type="button" class="btn btn-small btn-primary" data-i18n="demo_exit">Salir de la demo</button>
+  </div>
 
   <div id="ptr-indicator" aria-hidden="true"><span class="ptr-arrow">↻</span></div>
 
@@ -261,7 +270,9 @@
       <input id="exp-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
       <div class="form-actions">
         <button id="exp-voice" type="button" class="btn btn-secondary" data-i18n="voice_btn">🎤 Dictar</button>
+        <button id="exp-ocr" type="button" class="btn btn-secondary" data-i18n="ocr_btn">📷 Foto de recibo</button>
       </div>
+      <p class="muted small" data-i18n="ocr_help">La foto se lee aquí, en tu teléfono: nada se sube a internet. Relleno el monto, la fecha y el comercio; tú lo revisas antes de guardar.</p>
       <p id="exp-voice-status" class="muted small" aria-live="polite"></p>
       <label for="exp-category" data-i18n="category_label">Categoría</label>
       <select id="exp-category" required></select>
@@ -396,6 +407,14 @@
       <input id="goal-name" type="text" maxlength="60" data-i18n-ph="goal_name_ph" placeholder="Ej.: Fondo de emergencia">
       <label for="goal-target" data-i18n="goal_target_label">Cantidad meta ($)</label>
       <input id="goal-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+      <label data-i18n="goal_icon_label">Icono (opcional)</label>
+      <div id="goal-icons" class="goal-icons"></div>
+      <label for="goal-photo" data-i18n="goal_photo_label">Foto (opcional)</label>
+      <input id="goal-photo" type="file" accept="image/*">
+      <img id="goal-photo-preview" class="receipt-preview" alt="" hidden>
+      <div class="form-actions">
+        <button id="goal-photo-remove" type="button" class="btn btn-ghost btn-small" hidden data-i18n="goal_photo_remove">Quitar foto</button>
+      </div>
       <p id="goal-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
         <button id="goal-submit" type="submit" class="btn btn-primary">Crear meta</button>
@@ -459,6 +478,14 @@
     <button id="btn-report-png" type="button" class="btn btn-secondary" data-i18n="rep_download">Descargar imagen</button>
     <button id="btn-report-share-img" type="button" class="btn btn-secondary" data-i18n="rep_share_image">Compartir imagen</button>
     <button id="btn-share-report" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
+    <div id="year-card" class="card report-card">
+      <h3 id="year-title"></h3>
+      <div id="year-body"></div>
+      <div class="form-actions" id="year-actions">
+        <button id="btn-year-share" type="button" class="btn btn-secondary" data-i18n="year_share_btn">Compartir mi año como imagen</button>
+      </div>
+      <p id="year-status" class="muted small" aria-live="polite"></p>
+    </div>
     <div id="review-card" class="card" hidden></div>
     <h3 data-i18n="adv_title">Informe avanzado</h3>
     <p class="muted small" data-i18n="adv_note">Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.</p>
@@ -1080,6 +1107,11 @@
       </div>
       <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
       <hr>
+      <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
+      <div class="form-actions">
+        <button id="set-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">👀 Ver una demo</button>
+      </div>
+      <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
     </section>
     <section class="card form-card" id="settings-privacy">
@@ -1092,6 +1124,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c45">Ahora puedes tomarle una foto a un recibo y el gasto se rellena casi solo, tus presupuestos por categoría te avisan antes de pasarte, puedes explorar una demo con datos de ejemplo que nunca toca los tuyos, y tus metas de ahorro llevan nombre, un emoji o una foto. Y en el Resumen: tu año completo en dinero.</li>
         <li data-i18n="news_c44">Tu página principal estrena gráfica: se actualiza sola con cada movimiento y te muestra en qué se va tu dinero. Tu san volvió a Inicio, y dentro del organizador cada san se pliega para que veas solo lo importante.</li>
         <li data-i18n="news_c43">Tu Dinero disponible ya refleja solo tus cuentas y lo que anotas desde ahora: cada ingreso y gasto nuevo se suma o se resta al momento, según el bolsillo que elijas. Mi san ahora se pliega por bloques, tu página principal muestra solo lo importante y la lupa sobre el botón + busca cualquier movimiento.</li>
         <li data-i18n="news_c42">Tu Dinero disponible ahora se mueve con cada gasto e ingreso que anotas, salga de donde salga. En las remesas puedes escribir cuánto llegó y la tasa se calcula sola. La bienvenida es más corta y el nombre es opcional, «Tengo un negocio» se enciende solo si lo usas, y Novedades ahora se lee en lenguaje de beneficios.</li>
@@ -1113,7 +1146,7 @@
         <li data-i18n="news_c24">Tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 44</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 45</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">

@@ -551,3 +551,22 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 .chart-legend-name{flex:1 1 auto}
 .chart-legend-amt{font-weight:600}
 .chart-legend-pct{color:var(--muted);min-width:2.6em;text-align:right}
+
+/* ---------- Compilación 45 · Bloques M–Q ----------
+   M: el botón de foto de recibo usa los estilos de .btn existentes.
+   O: banda permanente de la demo, fija bajo el encabezado, con el
+   botón de salir siempre visible. P: fila de iconos de la meta, su
+   foto y el selector de meta de la fila de ingreso. */
+.demo-banner{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:.6rem;
+  background:var(--amber-soft);color:var(--amber);border-bottom:2px solid var(--amber);
+  padding:.55rem .9rem;font-weight:600}
+.demo-banner span{flex:1 1 auto}
+.demo-banner[hidden]{display:none}
+.ob-demo{margin-top:1rem;text-align:center}
+.goal-icons{display:flex;flex-wrap:wrap;gap:.4rem;margin:.3rem 0 .6rem}
+.goal-icon-btn{font-size:1.35rem;line-height:1;padding:.45rem .55rem;border:2px solid var(--line);
+  border-radius:.7rem;background:var(--card);cursor:pointer}
+.goal-icon-btn.selected{border-color:var(--accent);background:var(--accent-soft)}
+.goal-photo-thumb{width:64px;height:64px;object-fit:cover;border-radius:.8rem;
+  border:2px solid var(--line);margin-bottom:.4rem}
+.goal-assign-sel{max-width:10.5rem}
