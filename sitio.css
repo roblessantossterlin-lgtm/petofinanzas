@@ -46,3 +46,10 @@ footer.site a{color:#cfe3d8}
 .lang-switch button:hover{border-color:#35c184;color:#35c184}
 .lang-switch button.activo{background:#35c184;border-color:#35c184;color:#06231a}
 .lang-switch button.activo:hover{color:#06231a}
+.pila{display:grid;gap:1rem}
+.ep-fecha{color:#9db4a9;font-size:.9rem;margin:0}
+.precio{font-size:2rem;font-weight:800;color:#35c184;margin:.3rem 0;line-height:1.2}
+.precio small{font-size:.95rem;color:#9db4a9;font-weight:600}
+.card ul{margin:.4rem 0 .8rem;padding-left:1.15rem;color:#c4d8cc}
+.card li{margin:.32rem 0}
+.card.destacado{border-color:#35c184}
