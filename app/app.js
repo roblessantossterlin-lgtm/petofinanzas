@@ -1,12 +1,17 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 46) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 47) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 27-oct-2026 con la Compilación 46: la conexión
+   Sincronizado el 27-oct-2026 con la Compilación 47: la
+   recuperación de contraseña de la cuenta en la nube (enlace
+   «¿Olvidaste tu contraseña?» en Ajustes y pantalla de contraseña
+   nueva al llegar desde el correo; el enlace de recuperación
+   aterriza SIEMPRE en esta web, también si se pidió desde el
+   teléfono; 836 claves por idioma). Y con la Compilación 46: la conexión
    bancaria con Plaid en Sandbox (tarjeta en Ajustes con
    «Conectar banco» y «Sincronizar»; en la web el Link corre
    en la misma pestaña). Y de la 45: la foto de
@@ -24,7 +29,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 46'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 47'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -826,6 +831,15 @@ es: {
   cloud_deleted: 'Tu cuenta fue eliminada.',
   cloud_delete_err_auth: 'Tu sesión ya no es válida. Entra de nuevo e inténtalo otra vez.',
   cloud_unavailable: 'La nube no está disponible en esta versión.',
+  news_c47: '¿Olvidaste la contraseña de tu cuenta en la nube? Ya puedes recuperar tu cuenta: en Ajustes, en «Cuenta en la nube», te enviamos un enlace a tu correo para crear una contraseña nueva.',
+  cloud_forgot: '¿Olvidaste tu contraseña?',
+  cloud_forgot_err_email: 'Escribe tu correo arriba y te enviamos el enlace para recuperar tu cuenta.',
+  cloud_recovery_sent: 'Si ese correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva. Revisa tu correo (y el spam).',
+  cloud_recovery_help: 'Llegaste desde el enlace de tu correo. Escribe una contraseña nueva y quedará guardada para tu cuenta.',
+  cloud_newpass_label: 'Escribe tu contraseña nueva',
+  cloud_newpass_err: 'Escribe una contraseña de al menos 6 caracteres.',
+  cloud_recovery_save: 'Guardar contraseña',
+  cloud_recovery_done: 'Contraseña actualizada. Ya puedes entrar.',
   key_settings: 'Nombre, reparto, texto, secciones, PIN',
   footer: 'PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono',
   tile_available: 'Dinero disponible', tile_available_aria: 'Dinero disponible: ir a Mis cuentas',
@@ -1303,6 +1317,15 @@ en: {
   cloud_deleted: 'Your account was deleted.',
   cloud_delete_err_auth: 'Your session is no longer valid. Sign in again and try again.',
   cloud_unavailable: 'The cloud is not available in this version.',
+  news_c47: 'Forgot your cloud account password? You can now get your account back: in Settings, under “Cloud account”, we email you a link to create a new password.',
+  cloud_forgot: 'Forgot your password?',
+  cloud_forgot_err_email: 'Enter your email above and we’ll send you the link to recover your account.',
+  cloud_recovery_sent: 'If that email has an account, we sent you a link to create a new password. Check your email (and spam).',
+  cloud_recovery_help: 'You arrived from the link in your email. Enter a new password and it will be saved for your account.',
+  cloud_newpass_label: 'Enter your new password',
+  cloud_newpass_err: 'Enter a password of at least 6 characters.',
+  cloud_recovery_save: 'Save password',
+  cloud_recovery_done: 'Password updated. You can now sign in.',
   key_settings: 'Name, split, text, sections, PIN',
   footer: 'PETO Web · With your cloud account, your data syncs with your phone',
   tile_available: 'Available money', tile_available_aria: 'Available money: go to My accounts',
@@ -1849,6 +1872,15 @@ it: {
   cloud_deleted: 'Il tuo account è stato eliminato.',
   cloud_delete_err_auth: 'La tua sessione non è più valida. Accedi di nuovo e riprova.',
   cloud_unavailable: 'Il cloud non è disponibile in questa versione.',
+  news_c47: 'Hai dimenticato la password del tuo account cloud? Ora puoi recuperare il tuo account: in Impostazioni, in «Account cloud», ti inviamo via email un link per creare una nuova password.',
+  cloud_forgot: 'Password dimenticata?',
+  cloud_forgot_err_email: 'Scrivi la tua email qui sopra e ti inviamo il link per recuperare il tuo account.',
+  cloud_recovery_sent: 'Se quell’email ha un account, ti abbiamo inviato un link per creare una nuova password. Controlla la tua email (e lo spam).',
+  cloud_recovery_help: 'Sei arrivato dal link nella tua email. Scrivi una nuova password e verrà salvata per il tuo account.',
+  cloud_newpass_label: 'Scrivi la tua nuova password',
+  cloud_newpass_err: 'Scrivi una password di almeno 6 caratteri.',
+  cloud_recovery_save: 'Salva password',
+  cloud_recovery_done: 'Password aggiornata. Ora puoi accedere.',
   key_settings: 'Nome, ripartizione, testo, sezioni, PIN',
   footer: 'PETO Web · Con il tuo account nel cloud, i tuoi dati si sincronizzano con il tuo telefono',
   tile_available: 'Denaro disponibile',
@@ -2569,6 +2601,15 @@ pt: {
   cloud_deleted: 'Sua conta foi excluída.',
   cloud_delete_err_auth: 'Sua sessão não é mais válida. Entre de novo e tente outra vez.',
   cloud_unavailable: 'A nuvem não está disponível nesta versão.',
+  news_c47: 'Esqueceu a senha da sua conta na nuvem? Agora você pode recuperar sua conta: em Ajustes, em «Conta na nuvem», enviamos um link ao seu e-mail para criar uma nova senha.',
+  cloud_forgot: 'Esqueceu sua senha?',
+  cloud_forgot_err_email: 'Digite seu e-mail acima e enviaremos o link para recuperar sua conta.',
+  cloud_recovery_sent: 'Se esse e-mail tiver uma conta, enviamos um link para criar uma nova senha. Verifique seu e-mail (e o spam).',
+  cloud_recovery_help: 'Você chegou pelo link do seu e-mail. Digite uma nova senha e ela ficará salva na sua conta.',
+  cloud_newpass_label: 'Digite sua nova senha',
+  cloud_newpass_err: 'Digite uma senha de pelo menos 6 caracteres.',
+  cloud_recovery_save: 'Salvar senha',
+  cloud_recovery_done: 'Senha atualizada. Você já pode entrar.',
   key_settings: 'Nome, divisão, texto, seções, PIN',
   footer: 'PETO Finanzas · Funciona sem internet · A nuvem é opcional: seus dados, sua decisão',
   tile_available: 'Dinheiro disponível',
@@ -3289,6 +3330,15 @@ fr: {
   cloud_deleted: 'Ton compte a été supprimé.',
   cloud_delete_err_auth: 'Ta session n’est plus valable. Reconnecte-toi et réessaie.',
   cloud_unavailable: 'Le cloud n’est pas disponible dans cette version.',
+  news_c47: 'Tu as oublié le mot de passe de ton compte cloud ? Tu peux maintenant récupérer ton compte : dans Réglages, dans « Compte cloud », on t’envoie un lien par e-mail pour créer un nouveau mot de passe.',
+  cloud_forgot: 'Mot de passe oublié ?',
+  cloud_forgot_err_email: 'Saisis ton e-mail ci-dessus et on t’envoie le lien pour récupérer ton compte.',
+  cloud_recovery_sent: 'Si cet e-mail a un compte, on t’a envoyé un lien pour créer un nouveau mot de passe. Vérifie ton e-mail (et les spams).',
+  cloud_recovery_help: 'Tu es arrivé depuis le lien de ton e-mail. Saisis un nouveau mot de passe et il sera enregistré pour ton compte.',
+  cloud_newpass_label: 'Saisis ton nouveau mot de passe',
+  cloud_newpass_err: 'Saisis un mot de passe d’au moins 6 caractères.',
+  cloud_recovery_save: 'Enregistrer le mot de passe',
+  cloud_recovery_done: 'Mot de passe mis à jour. Tu peux maintenant te connecter.',
   key_settings: 'Nom, répartition, texte, sections, PIN',
   footer: 'PETO Finanzas · Fonctionne hors ligne · Le cloud est facultatif : tes données, ton choix',
   tile_available: 'Argent disponible',
@@ -4009,6 +4059,15 @@ de: {
   cloud_deleted: 'Dein Konto wurde gelöscht.',
   cloud_delete_err_auth: 'Deine Sitzung ist nicht mehr gültig. Melde dich erneut an und versuche es noch einmal.',
   cloud_unavailable: 'Die Cloud ist in dieser Version nicht verfügbar.',
+  news_c47: 'Passwort für dein Cloud-Konto vergessen? Du kannst dein Konto jetzt zurückholen: In den Einstellungen schicken wir dir unter „Cloud-Konto“ per E-Mail einen Link, um ein neues Passwort zu erstellen.',
+  cloud_forgot: 'Passwort vergessen?',
+  cloud_forgot_err_email: 'Gib oben deine E-Mail ein und wir schicken dir den Link, um dein Konto wiederherzustellen.',
+  cloud_recovery_sent: 'Wenn diese E-Mail ein Konto hat, haben wir dir einen Link geschickt, um ein neues Passwort zu erstellen. Prüfe deine E-Mails (und den Spam-Ordner).',
+  cloud_recovery_help: 'Du bist über den Link in deiner E-Mail hierher gekommen. Gib ein neues Passwort ein und es wird für dein Konto gespeichert.',
+  cloud_newpass_label: 'Gib dein neues Passwort ein',
+  cloud_newpass_err: 'Gib ein Passwort mit mindestens 6 Zeichen ein.',
+  cloud_recovery_save: 'Passwort speichern',
+  cloud_recovery_done: 'Passwort aktualisiert. Du kannst dich jetzt anmelden.',
   key_settings: 'Name, Aufteilung, Text, Abschnitte, PIN',
   footer: 'PETO Finanzas · Funktioniert offline · Die Cloud ist optional: deine Daten, deine Entscheidung',
   tile_available: 'Verfügbares Geld',
@@ -4729,6 +4788,15 @@ zh: {
   cloud_deleted: '你的账户已删除。',
   cloud_delete_err_auth: '你的会话已失效。请重新登录后再试。',
   cloud_unavailable: '此版本中没有云服务。',
+  news_c47: '忘记了云账户密码？现在可以找回账户：在「设置」的「云账户」中，我们会向你的邮箱发送一个链接，让你创建新密码。',
+  cloud_forgot: '忘记密码？',
+  cloud_forgot_err_email: '在上方输入你的邮箱，我们会发送找回账户的链接。',
+  cloud_recovery_sent: '如果该邮箱有账户，我们已发送一个创建新密码的链接。请查看你的邮箱（和垃圾邮件）。',
+  cloud_recovery_help: '你通过邮箱中的链接来到这里。输入新密码，它将保存到你的账户。',
+  cloud_newpass_label: '输入你的新密码',
+  cloud_newpass_err: '请输入至少 6 个字符的密码。',
+  cloud_recovery_save: '保存密码',
+  cloud_recovery_done: '密码已更新。现在可以登录了。',
   key_settings: '姓名、分配、文字、版块、PIN',
   footer: 'PETO Finanzas · 离线可用 · 云端可选：你的数据，你做主',
   tile_available: '可用资金',
@@ -5449,6 +5517,15 @@ ja: {
   cloud_deleted: 'アカウントが削除されました。',
   cloud_delete_err_auth: 'セッションの有効期限が切れました。再度ログインして、もう一度お試しください。',
   cloud_unavailable: 'このバージョンではクラウドは利用できません。',
+  news_c47: 'クラウドアカウントのパスワードを忘れましたか？アカウントを復旧できるようになりました：「設定」の「クラウドアカウント」から、新しいパスワードを作成するリンクをメールで送ります。',
+  cloud_forgot: 'パスワードをお忘れですか？',
+  cloud_forgot_err_email: '上にメールアドレスを入力すると、アカウント復旧用のリンクをお送りします。',
+  cloud_recovery_sent: 'そのメールアドレスにアカウントがある場合、新しいパスワードを作成するリンクをお送りしました。メール（と迷惑メール）を確認してください。',
+  cloud_recovery_help: 'メールのリンクから到着しました。新しいパスワードを入力すると、アカウントに保存されます。',
+  cloud_newpass_label: '新しいパスワードを入力',
+  cloud_newpass_err: '6文字以上のパスワードを入力してください。',
+  cloud_recovery_save: 'パスワードを保存',
+  cloud_recovery_done: 'パスワードを更新しました。ログインできます。',
   key_settings: '名前、配分、文字、セクション、PIN',
   footer: 'PETO Finanzas · オフラインで動作 · クラウドは任意：あなたのデータ、あなたの選択',
   tile_available: '利用可能なお金',
@@ -6169,6 +6246,15 @@ ko: {
   cloud_deleted: '계정이 삭제되었습니다.',
   cloud_delete_err_auth: '세션이 더 이상 유효하지 않습니다. 다시 로그인하고 시도하세요.',
   cloud_unavailable: '이 버전에서는 클라우드를 사용할 수 없습니다.',
+  news_c47: '클라우드 계정 비밀번호를 잊으셨나요? 이제 계정을 복구할 수 있습니다: 설정의 «클라우드 계정»에서 새 비밀번호를 만들 수 있는 링크를 이메일로 보내드립니다.',
+  cloud_forgot: '비밀번호를 잊으셨나요?',
+  cloud_forgot_err_email: '위에 이메일을 입력하면 계정을 복구할 수 있는 링크를 보내드립니다.',
+  cloud_recovery_sent: '해당 이메일로 된 계정이 있으면 새 비밀번호를 만들 수 있는 링크를 보냈습니다. 이메일(스팸함 포함)을 확인하세요.',
+  cloud_recovery_help: '이메일의 링크를 통해 도착했습니다. 새 비밀번호를 입력하면 계정에 저장됩니다.',
+  cloud_newpass_label: '새 비밀번호 입력',
+  cloud_newpass_err: '비밀번호는 6자 이상 입력하세요.',
+  cloud_recovery_save: '비밀번호 저장',
+  cloud_recovery_done: '비밀번호가 업데이트되었습니다. 이제 로그인할 수 있습니다.',
   key_settings: '이름, 분배, 글자, 섹션, PIN',
   footer: 'PETO Finanzas · 오프라인으로 작동 · 클라우드는 선택 사항: 내 데이터, 내 결정',
   tile_available: '사용 가능한 돈',
@@ -6889,6 +6975,15 @@ ru: {
   cloud_deleted: 'Ваш аккаунт был удалён.',
   cloud_delete_err_auth: 'Ваша сессия больше недействительна. Войдите снова и попробуйте ещё раз.',
   cloud_unavailable: 'Облако недоступно в этой версии.',
+  news_c47: 'Забыли пароль от облачного аккаунта? Теперь аккаунт можно восстановить: в «Настройках», в разделе «Облачный аккаунт», мы отправим на вашу почту ссылку для создания нового пароля.',
+  cloud_forgot: 'Забыли пароль?',
+  cloud_forgot_err_email: 'Введите ваш e-mail выше, и мы отправим ссылку для восстановления аккаунта.',
+  cloud_recovery_sent: 'Если на этот e-mail есть аккаунт, мы отправили ссылку для создания нового пароля. Проверьте почту (и папку «Спам»).',
+  cloud_recovery_help: 'Вы пришли по ссылке из письма. Введите новый пароль, и он сохранится для вашего аккаунта.',
+  cloud_newpass_label: 'Введите новый пароль',
+  cloud_newpass_err: 'Введите пароль не короче 6 символов.',
+  cloud_recovery_save: 'Сохранить пароль',
+  cloud_recovery_done: 'Пароль обновлён. Теперь можно войти.',
   key_settings: 'Имя, распределение, текст, разделы, PIN',
   footer: 'PETO Finanzas · Работает офлайн · Облако необязательно: ваши данные — ваш выбор',
   tile_available: 'Доступные деньги',
@@ -7609,6 +7704,15 @@ hi: {
   cloud_deleted: 'आपका खाता हटा दिया गया।',
   cloud_delete_err_auth: 'आपका सत्र अब मान्य नहीं है। फिर से साइन इन करके कोशिश करें।',
   cloud_unavailable: 'इस संस्करण में क्लाउड उपलब्ध नहीं है।',
+  news_c47: 'अपने क्लाउड खाते का पासवर्ड भूल गए? अब आप अपना खाता वापस पा सकते हैं: सेटिंग्स में «क्लाउड खाता» से हम आपके ईमेल पर नया पासवर्ड बनाने का लिंक भेजते हैं।',
+  cloud_forgot: 'पासवर्ड भूल गए?',
+  cloud_forgot_err_email: 'ऊपर अपना ईमेल लिखें और हम आपके खाते को वापस पाने का लिंक भेज देंगे।',
+  cloud_recovery_sent: 'अगर उस ईमेल पर खाता है, तो हमने नया पासवर्ड बनाने का लिंक भेजा है। अपना ईमेल (और स्पैम) देखें।',
+  cloud_recovery_help: 'आप अपने ईमेल के लिंक से यहाँ आए हैं। नया पासवर्ड लिखें और वह आपके खाते में सहेजा जाएगा।',
+  cloud_newpass_label: 'अपना नया पासवर्ड लिखें',
+  cloud_newpass_err: 'कम से कम 6 अक्षरों का पासवर्ड लिखें।',
+  cloud_recovery_save: 'पासवर्ड सहेजें',
+  cloud_recovery_done: 'पासवर्ड अपडेट हो गया। अब आप प्रवेश कर सकते हैं।',
   key_settings: 'नाम, बँटवारा, अक्षर, अनुभाग, PIN',
   footer: 'PETO Finanzas · ऑफ़लाइन काम करता है · क्लाउड वैकल्पिक है: आपका डेटा, आपका फ़ैसला',
   tile_available: 'उपलब्ध पैसे',
@@ -8329,6 +8433,15 @@ ar: {
   cloud_deleted: 'تم حذف حسابك.',
   cloud_delete_err_auth: 'جلستك لم تعد صالحة. سجّل الدخول من جديد وحاول مرة أخرى.',
   cloud_unavailable: 'السحابة غير متاحة في هذا الإصدار.',
+  news_c47: 'نسيت كلمة مرور حسابك السحابي؟ يمكنك الآن استعادة حسابك: من الإعدادات، في «الحساب السحابي»، نرسل إلى بريدك رابطًا لإنشاء كلمة مرور جديدة.',
+  cloud_forgot: 'نسيت كلمة المرور؟',
+  cloud_forgot_err_email: 'اكتب بريدك الإلكتروني أعلاه وسنرسل إليك رابط استعادة حسابك.',
+  cloud_recovery_sent: 'إذا كان لهذا البريد حساب، فقد أرسلنا إليك رابطًا لإنشاء كلمة مرور جديدة. تحقق من بريدك (والبريد المزعج).',
+  cloud_recovery_help: 'وصلت من رابط بريدك الإلكتروني. اكتب كلمة مرور جديدة وستُحفظ في حسابك.',
+  cloud_newpass_label: 'اكتب كلمة المرور الجديدة',
+  cloud_newpass_err: 'اكتب كلمة مرور من 6 أحرف على الأقل.',
+  cloud_recovery_save: 'حفظ كلمة المرور',
+  cloud_recovery_done: 'تم تحديث كلمة المرور. يمكنك الآن تسجيل الدخول.',
   key_settings: 'الاسم، التقسيم، النص، الأقسام، PIN',
   footer: 'PETO Finanzas · يعمل دون إنترنت · السحابة اختيارية: بياناتك، قرارك',
   tile_available: 'الأموال المتاحة',
@@ -14699,6 +14812,11 @@ const PETO_SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 const CLOUD_KEY = 'cgastos.cloud.v1';
 let sbClient = null;
 let cloudUser = null;
+/* Compilación 47: modo «recuperación de contraseña» activo cuando la
+   persona llega desde el enlace de su correo. Mientras dura, la
+   tarjeta de la nube muestra SOLO el formulario de contraseña nueva. */
+let cloudRecovery = false;
+let cloudAuthWatching = false;
 let cloudApplying = false;
 let cloudTimer = null;
 let cloudState = { email: '', lastSyncAt: 0, lastRemoteAt: '', dirty: false };
@@ -14747,11 +14865,21 @@ function renderCloudCard() {
   renderBankCard();
   const out = document.getElementById('cloud-signedout');
   const inn = document.getElementById('cloud-signedin');
+  const rec = document.getElementById('cloud-recovery');
   if (!out || !inn) return;
   if (!supa()) {
     out.hidden = true;
     inn.hidden = true;
+    if (rec) rec.hidden = true;
     cloudStatus(t('cloud_unavailable'));
+    return;
+  }
+  /* Compilación 47: en modo recuperación solo se ve el formulario de
+     contraseña nueva; ni el acceso ni la sesión iniciada. */
+  if (rec) rec.hidden = !cloudRecovery;
+  if (cloudRecovery) {
+    out.hidden = true;
+    inn.hidden = true;
     return;
   }
   out.hidden = !!cloudUser;
@@ -14834,6 +14962,12 @@ async function cloudBoot() {
   loadCloudState();
   const sb = supa();
   if (!sb) { renderCloudCard(); return; }
+  /* Compilación 47: primero se atiende una posible llegada por el
+     enlace de recuperación del correo (evento PASSWORD_RECOVERY o el
+     hash type=recovery); si entra en ese modo NO se reconcilia hasta
+     guardar la contraseña nueva. */
+  cloudWatchAuth(sb);
+  if (await cloudTryRecoveryLink(sb)) { renderCloudCard(); return; }
   try {
     const { data } = await sb.auth.getSession();
     if (data && data.session && data.session.user) {
@@ -14907,6 +15041,7 @@ async function onCloudSignOut() {
   const sb = supa();
   if (sb) { try { await sb.auth.signOut(); } catch (e) { /* la sesión local se limpia igual */ } }
   cloudUser = null;
+  cloudRecovery = false;
   cloudState = { email: '', lastSyncAt: 0, lastRemoteAt: '', dirty: false };
   saveCloudState();
   cloudStatus('');
@@ -14968,6 +15103,139 @@ async function onCloudDeleteAccount() {
   }
   await onCloudSignOut();
   cloudStatus(t('cloud_deleted'));
+}
+
+/* ---------------- Recuperación de contraseña (Compilación 47) -----
+   Pedido de Sterlin: el formulario de «Cuenta en la nube» no tenía
+   cómo recuperar la cuenta. Flujo: «¿Olvidaste tu contraseña?» manda
+   el correo de Supabase Auth (resetPasswordForEmail) con regreso a la
+   WEB (https://petofinanzas.com/app/): el enlace siempre aterriza en
+   la web, también si se pidió desde el teléfono (comportamiento
+   aceptado; sin deep links nativos). El cliente se crea con
+   detectSessionInUrl:false a propósito (el hash #san= es de la app),
+   así que la llegada se detecta por dos vías: el evento
+   PASSWORD_RECOVERY de onAuthStateChange (cuando la librería lo
+   emite) y el parseo propio del hash type=recovery + setSession.
+   El mensaje tras pedir el enlace es SIEMPRE neutro: nunca se revela
+   si el correo tiene cuenta. */
+const PETO_RECOVERY_REDIRECT = 'https://petofinanzas.com/app/';
+async function onCloudForgot() {
+  const sb = supa();
+  if (!sb) return;
+  const emEl = document.getElementById('cloud-email');
+  const email = String((emEl && emEl.value) || '').trim().toLowerCase();
+  if (!email || email.indexOf('@') < 1 || email.lastIndexOf('.') < email.indexOf('@') + 2) {
+    showError('cloud-error', t('cloud_forgot_err_email'));
+    return;
+  }
+  showError('cloud-error', '');
+  cloudStatus(t('cloud_working'));
+  let netFail = false;
+  try {
+    const res = await sb.auth.resetPasswordForEmail(email, { redirectTo: PETO_RECOVERY_REDIRECT });
+    /* Un error de la API (p. ej. «correo sin cuenta») NO se muestra:
+       el mensaje neutro protege qué correos están registrados. Solo
+       el fallo de red (sin respuesta del servidor) se avisa. */
+    if (res && res.error && res.error.name === 'AuthRetryableFetchError') netFail = true;
+  } catch (e) { netFail = true; }
+  if (netFail) {
+    cloudStatus('');
+    showError('cloud-error', t('cloud_err_generic'));
+    return;
+  }
+  cloudStatus(t('cloud_recovery_sent'));
+}
+function cloudWatchAuth(sb) {
+  if (cloudAuthWatching || !sb || !sb.auth || typeof sb.auth.onAuthStateChange !== 'function') return;
+  cloudAuthWatching = true;
+  try {
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') enterCloudRecovery(session);
+    });
+  } catch (e) { /* sin suscripción: queda la vía del hash */ }
+}
+function cloudRecoveryTokens() {
+  const h = String(window.location.hash || '');
+  if (h.indexOf('type=recovery') < 0) return null;
+  let p;
+  try { p = new URLSearchParams(h.charAt(0) === '#' ? h.slice(1) : h); } catch (e) { return null; }
+  const at = p.get('access_token');
+  const rt = p.get('refresh_token');
+  if (!at || !rt) return null;
+  return { access_token: at, refresh_token: rt };
+}
+function cloudClearRecoveryHash() {
+  /* Los tokens no deben quedarse en la URL (historial, capturas). */
+  try {
+    const clean = window.location.pathname + window.location.search;
+    window.history.replaceState(null, '', clean);
+  } catch (e) { /* si no se puede, la app sigue igual */ }
+}
+async function cloudTryRecoveryLink(sb) {
+  const tokens = cloudRecoveryTokens();
+  if (!tokens || !sb) return false;
+  try {
+    const { data, error } = await sb.auth.setSession(tokens);
+    cloudClearRecoveryHash();
+    if (error || !data || !data.session) return false;
+    enterCloudRecovery(data.session);
+    return true;
+  } catch (e) { return false; }
+}
+function enterCloudRecovery(session) {
+  if (cloudRecovery) return;
+  cloudRecovery = true;
+  if (session && session.user) {
+    cloudUser = { id: session.user.id, email: session.user.email || cloudState.email };
+    cloudState.email = cloudUser.email;
+    saveCloudState();
+  }
+  renderCloudCard();
+  const shell = document.getElementById('app-shell');
+  if (shell && !shell.hidden) showView('ajustes');
+}
+async function onCloudRecoverySave() {
+  const sb = supa();
+  if (!sb || !cloudRecovery) return;
+  const input = document.getElementById('cloud-newpass');
+  const pass = String((input && input.value) || '');
+  if (pass.length < 6) { showError('cloud-error', t('cloud_newpass_err')); return; }
+  showError('cloud-error', '');
+  cloudStatus(t('cloud_working'));
+  try {
+    const { data, error } = await sb.auth.updateUser({ password: pass });
+    if (error) {
+      cloudStatus('');
+      showError('cloud-error', t('cloud_err_generic'));
+      return;
+    }
+    cloudRecovery = false;
+    if (data && data.user) {
+      cloudUser = { id: data.user.id, email: data.user.email || cloudState.email };
+      cloudState.email = cloudUser.email;
+      saveCloudState();
+    }
+    if (input) input.value = '';
+    /* La sesión de recuperación ES una sesión válida: se entra al
+       estado normal (reconciliar la nube y el hogar compartido). */
+    await cloudReconcile(false);
+    sharedRefresh();
+    cloudStatus(t('cloud_recovery_done'));
+  } catch (e) {
+    cloudStatus('');
+    showError('cloud-error', t('cloud_err_generic'));
+  }
+  renderCloudCard();
+}
+/* Ojo de la contraseña nueva: mismo patrón que onCloudPassEye. */
+function onCloudNewPassEye() {
+  const input = document.getElementById('cloud-newpass');
+  const btn = document.getElementById('cloud-newpass-eye');
+  if (!input || !btn) return;
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+  btn.setAttribute('aria-label', t(show ? 'pass_hide' : 'pass_show'));
 }
 
 /* ---------------- Conexión bancaria (Plaid · Compilación 46) --------
@@ -17325,6 +17593,8 @@ function wireEvents() {
   document.getElementById('btn-cloud-sync').addEventListener('click', onCloudSyncNow);
   document.getElementById('btn-cloud-wipe').addEventListener('click', onCloudWipe);
   document.getElementById('btn-cloud-delete').addEventListener('click', onCloudDeleteAccount);
+  document.getElementById('btn-cloud-forgot').addEventListener('click', onCloudForgot);
+  document.getElementById('btn-cloud-recovery-save').addEventListener('click', onCloudRecoverySave);
   document.getElementById('btn-bank-connect').addEventListener('click', onBankConnect);
   document.getElementById('btn-bank-sync').addEventListener('click', onBankSync);
   document.getElementById('btn-privacy').addEventListener('click', togglePrivacy);
@@ -17412,6 +17682,8 @@ function wireEvents() {
   });
   const cloudPassEye = document.getElementById('cloud-pass-eye');
   if (cloudPassEye) cloudPassEye.addEventListener('click', onCloudPassEye);
+  const cloudNewPassEye = document.getElementById('cloud-newpass-eye');
+  if (cloudNewPassEye) cloudNewPassEye.addEventListener('click', onCloudNewPassEye);
   const privBtn = document.getElementById('btn-privacy-policy');
   if (privBtn) privBtn.addEventListener('click', () => { window.open(PRIVACY_URL, '_blank'); });
   const expImportBtn = document.getElementById('exp-import-link');

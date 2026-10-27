@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 46</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 47</p>
   </div>
 </section>
 
@@ -984,6 +984,7 @@
           <button id="btn-cloud-signin" type="button" class="btn btn-primary" data-i18n="cloud_signin">Entrar</button>
           <button id="btn-cloud-signup" type="button" class="btn btn-secondary" data-i18n="cloud_signup">Crear cuenta</button>
         </div>
+        <p><button id="btn-cloud-forgot" type="button" class="btn btn-ghost btn-small" data-i18n="cloud_forgot">¿Olvidaste tu contraseña?</button></p>
       </div>
       <div id="cloud-signedin" hidden>
         <p class="total-line" id="cloud-who"></p>
@@ -995,6 +996,15 @@
         </div>
         <div class="form-actions">
           <button id="btn-cloud-delete" type="button" class="btn btn-danger" data-i18n="cloud_delete">Eliminar mi cuenta</button>
+        </div>
+      </div>
+      <div id="cloud-recovery" hidden>
+        <p class="muted small" data-i18n="cloud_recovery_help">Llegaste desde el enlace de tu correo. Escribe una contraseña nueva y quedará guardada para tu cuenta.</p>
+        <label for="cloud-newpass" data-i18n="cloud_newpass_label">Escribe tu contraseña nueva</label>
+        <input id="cloud-newpass" type="password" autocomplete="new-password" maxlength="72">
+        <p class="muted small"><span data-i18n="cloud_pass_hint">Mínimo 6 caracteres</span> <button id="cloud-newpass-eye" type="button" class="btn btn-ghost btn-small" aria-label="Mostrar contraseña">👁</button></p>
+        <div class="form-actions">
+          <button id="btn-cloud-recovery-save" type="button" class="btn btn-primary" data-i18n="cloud_recovery_save">Guardar contraseña</button>
         </div>
       </div>
       <p id="cloud-status" class="muted small" aria-live="polite"></p>
@@ -1142,6 +1152,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c47">¿Olvidaste la contraseña de tu cuenta en la nube? Ya puedes recuperar tu cuenta: en Ajustes, en «Cuenta en la nube», te enviamos un enlace a tu correo para crear una contraseña nueva.</li>
         <li data-i18n="news_c46">Ahora puedes conectar tu banco y tus movimientos llegan solos: se anotan como gastos e ingresos sin que escribas nada. Tú eliges qué banco conectar y PETO Finanzas nunca ve la contraseña de tu banco.</li>
         <li data-i18n="news_c45">Ahora puedes tomarle una foto a un recibo y el gasto se rellena casi solo, tus presupuestos por categoría te avisan antes de pasarte, puedes explorar una demo con datos de ejemplo que nunca toca los tuyos, y tus metas de ahorro llevan nombre, un emoji o una foto. Y en el Resumen: tu año completo en dinero.</li>
         <li data-i18n="news_c44">Tu página principal estrena gráfica: se actualiza sola con cada movimiento y te muestra en qué se va tu dinero. Tu san volvió a Inicio, y dentro del organizador cada san se pliega para que veas solo lo importante.</li>
@@ -1165,7 +1176,7 @@
         <li data-i18n="news_c24">Tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 46</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 47</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
