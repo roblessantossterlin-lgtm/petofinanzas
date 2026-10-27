@@ -570,3 +570,8 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 .goal-photo-thumb{width:64px;height:64px;object-fit:cover;border-radius:.8rem;
   border:2px solid var(--line);margin-bottom:.4rem}
 .goal-assign-sel{max-width:10.5rem}
+
+/* Compilación 46 · Conexión bancaria */
+.bank-conn{padding:.6rem 0;border-top:1px solid var(--line)}
+.bank-conn:first-child{border-top:none;padding-top:0}
+.bank-acct{display:flex;justify-content:space-between;gap:.75rem;margin:.15rem 0}

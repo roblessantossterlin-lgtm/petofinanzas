@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#00421C">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11171d">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://muse.ai; media-src 'self' https://muse.ai https://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.plaid.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://muse.ai https://cdn.plaid.com; frame-src https://cdn.plaid.com; media-src 'self' https://muse.ai https://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="description" content="PETO Finanzas: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PETO Finanzas">
@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 45</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 46</p>
   </div>
 </section>
 
@@ -1115,6 +1115,23 @@
       <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
     </section>
+    <section class="card form-card" id="settings-bank">
+      <h3>🏦 <span data-i18n="bank_title">Conexión bancaria</span></h3>
+      <p class="muted small" data-i18n="bank_help">Conecta tu banco de forma segura con Plaid y tus movimientos se anotan solos en la app. La contraseña de tu banco la escribes solo con tu banco: PETO Finanzas nunca la ve ni la guarda.</p>
+      <p class="muted small" data-i18n="bank_sandbox_note">🧪 Vista previa (Sandbox): por ahora se conecta el banco de prueba de Plaid. La conexión bancaria será del nivel superior; durante la prueba cerrada está abierta sin costo.</p>
+      <div id="bank-needcloud">
+        <p class="muted small" data-i18n="bank_need_cloud">Para conectar tu banco, primero entra a tu cuenta en la nube en la tarjeta de arriba: la conexión va ligada a tu cuenta.</p>
+      </div>
+      <div id="bank-main" hidden>
+        <div id="bank-list"></div>
+        <div class="form-actions">
+          <button id="btn-bank-connect" type="button" class="btn btn-primary" data-i18n="bank_connect_btn">🏦 Conectar banco</button>
+          <button id="btn-bank-sync" type="button" class="btn btn-secondary" data-i18n="bank_sync_btn">🔄 Sincronizar</button>
+        </div>
+      </div>
+      <p id="bank-status" class="muted small" aria-live="polite"></p>
+      <p id="bank-error" class="error" role="alert" hidden></p>
+    </section>
     <section class="card form-card" id="settings-privacy">
       <h3 data-i18n="priv_title">Privacidad: cómo cuidamos tus datos</h3>
       <p class="muted small" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
@@ -1125,6 +1142,7 @@
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
       <ul class="news-list">
+        <li data-i18n="news_c46">Ahora puedes conectar tu banco y tus movimientos llegan solos: se anotan como gastos e ingresos sin que escribas nada. Tú eliges qué banco conectar y PETO Finanzas nunca ve la contraseña de tu banco.</li>
         <li data-i18n="news_c45">Ahora puedes tomarle una foto a un recibo y el gasto se rellena casi solo, tus presupuestos por categoría te avisan antes de pasarte, puedes explorar una demo con datos de ejemplo que nunca toca los tuyos, y tus metas de ahorro llevan nombre, un emoji o una foto. Y en el Resumen: tu año completo en dinero.</li>
         <li data-i18n="news_c44">Tu página principal estrena gráfica: se actualiza sola con cada movimiento y te muestra en qué se va tu dinero. Tu san volvió a Inicio, y dentro del organizador cada san se pliega para que veas solo lo importante.</li>
         <li data-i18n="news_c43">Tu Dinero disponible ya refleja solo tus cuentas y lo que anotas desde ahora: cada ingreso y gasto nuevo se suma o se resta al momento, según el bolsillo que elijas. Mi san ahora se pliega por bloques, tu página principal muestra solo lo importante y la lupa sobre el botón + busca cualquier movimiento.</li>
@@ -1147,7 +1165,7 @@
         <li data-i18n="news_c24">Tutorial de bienvenida, racha de días anotando, metas de ahorro con barra de progreso y gráfico de tendencia.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 45</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 46</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
