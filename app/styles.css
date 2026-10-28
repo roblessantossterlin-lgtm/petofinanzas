@@ -112,6 +112,16 @@ h3{font-size:1.1rem}
   100%{box-shadow:0 0 0 0 transparent}
 }
 
+/* Compilación 50: el banco visible en Inicio — tarjeta «Conecta
+   tu banco» sin conexión y tira compacta con conexión (tocable:
+   lleva a la tarjeta «Conexión bancaria» de Ajustes). */
+#home-bank{margin:0 0 1.1rem}
+#home-bank[hidden]{display:none}
+.home-bank-card h3{margin:.1rem 0 .35rem}
+.home-bank-strip{cursor:pointer;position:relative}
+.home-bank-strip .total-line{margin:.1rem 0}
+.home-bank-strip .banner-chevron{position:absolute;right:.7rem;top:50%;transform:translateY(-50%)}
+
 /* ---------- ¿Cuánto puedes gastar hoy? ---------- */
 .spend-card{text-align:center}
 .spend-value{display:block;font-size:1.55rem;font-weight:700;margin:.15rem 0}

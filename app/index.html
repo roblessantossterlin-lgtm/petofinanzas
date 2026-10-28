@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 49</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 50</p>
   </div>
 </section>
 
@@ -178,6 +178,8 @@
   <!-- ======= INICIO ======= -->
   <main id="view-home" class="view">
     <div id="home-banners"></div>
+
+    <div id="home-bank" hidden></div>
 
     <section id="next-step-card" class="card next-step-card" hidden>
       <h3 id="next-step-title">Tu siguiente paso</h3>
@@ -589,8 +591,17 @@
       </div>
     </form>
 
+    <div class="form-actions">
+      <button id="acc-add-bank" class="btn btn-secondary" type="button" data-i18n="acc_add_bank">🏦 Agregar banco</button>
+    </div>
+
     <ul id="account-list" class="item-list"></ul>
     <p id="account-empty" class="empty-state" hidden data-i18n="acc_empty">No tienes cuentas todavía. Agrega una para ver tu dinero disponible en el resumen.</p>
+
+    <section id="acc-bank-wrap" class="card" hidden>
+      <h3 data-i18n="bank_from_bank">De tu banco</h3>
+      <ul id="acc-bank-list" class="item-list"></ul>
+    </section>
   </main>
 
   <!-- ======= DEUDAS ======= -->
@@ -623,6 +634,11 @@
 
     <ul id="debt-list" class="item-list"></ul>
     <p id="debt-empty" class="empty-state" hidden data-i18n="debt_empty">No tienes deudas registradas. 🎉</p>
+
+    <section id="debt-bank-wrap" class="card" hidden>
+      <h3 data-i18n="bank_from_bank">De tu banco</h3>
+      <ul id="debt-bank-list" class="item-list"></ul>
+    </section>
 
     <section class="card form-card">
       <h3 data-i18n="calc_title">Calculadora de deudas</h3>
@@ -1151,20 +1167,19 @@
     </section>
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
-      <!-- Novedades (Compilación 49): SOLO la(s) línea(s) de la versión
+      <!-- Novedades (Compilación 50): SOLO la(s) línea(s) de la versión
            vigente (las de NEWS_CURRENT en app.js). En cada compilación
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c49">Tu banco ya trabaja solo: al conectarlo, tus gastos e ingresos se anotan automáticamente y cada uno cae en la categoría que le corresponde: la comida en Comida, la gasolina en Gasolina y así con todo. Y al abrir la app, lo nuevo de tu banco se sincroniza solo, sin tocar nada.</li>
+        <li data-i18n="news_c50">Tu banco también mueve tu Dinero disponible y tus Deudas pendientes: al sincronizar, los saldos de tus cuentas se suman a tu disponible y lo que debes en tarjetas y préstamos aparece en tus deudas, sin anotar nada a mano. Y conectar tu banco ahora está a la vista: en Inicio y en Mis cuentas.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 49</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 50</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
-    PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono
-  </footer>
+    PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono</footer>
 
   <button id="fab-search" class="fab fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍</button>
   <button id="fab-add" class="fab" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">+</button>
