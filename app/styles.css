@@ -102,6 +102,15 @@ h3{font-size:1.1rem}
   background:transparent;border:none;font-size:1.05rem;line-height:1;cursor:pointer;
   color:inherit;padding:.15rem .35rem;flex:0 0 auto;
 }
+/* Compilación 49: avisos tocables (llevan a donde se solucionan) y
+   resaltado breve del destino al llegar. */
+.banner-tap{cursor:pointer}
+.banner-chevron{flex:0 0 auto;font-weight:700;font-size:1.2rem;line-height:1.2;opacity:.7;padding:.05rem .1rem}
+.flash-focus{animation:flashFocus 2.6s ease-out}
+@keyframes flashFocus{
+  0%,55%{box-shadow:0 0 0 3px var(--amber);background:var(--amber-soft)}
+  100%{box-shadow:0 0 0 0 transparent}
+}
 
 /* ---------- ¿Cuánto puedes gastar hoy? ---------- */
 .spend-card{text-align:center}
