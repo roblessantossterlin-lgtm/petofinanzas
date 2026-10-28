@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 53</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 54</p>
   </div>
 </section>
 
@@ -234,6 +234,7 @@
       <span id="spend-today" class="spend-value">—</span>
       <div id="spend-today-left" class="muted small"></div>
       <span id="spend-today-note" class="muted small"></span>
+      <div id="spend-projection" class="muted small"></div>
       <button id="spend-create-btn" class="btn btn-primary" type="button" hidden data-i18n="spend_create_btn">Crear mi presupuesto</button>
     </section>
 
@@ -576,6 +577,15 @@
 
     <ul id="fixed-list" class="item-list"></ul>
     <p id="fixed-empty" class="empty-state" hidden data-i18n="fix_empty">No tienes pagos fijos todavía.</p>
+
+    <!-- Cobros que se repiten (Compilación 54): detector de solo
+         lectura sobre los movimientos; la tarjeta solo aparece
+         cuando hay detecciones. -->
+    <section id="recurring-card" class="card" hidden>
+      <h3 data-i18n="rec_title">Cobros que se repiten</h3>
+      <p class="muted small" data-i18n="rec_intro">Detectados en tus movimientos: mismo comercio, monto parecido y periodos regulares. Es solo lectura; nada se crea solo.</p>
+      <ul id="recurring-list" class="item-list"></ul>
+    </section>
   </main>
 
   <!-- ======= CUENTAS ======= -->
@@ -1164,6 +1174,14 @@
           <button id="btn-bank-sync" type="button" class="btn btn-secondary" data-i18n="bank_sync_btn">🔄 Sincronizar</button>
         </div>
       </div>
+      <div id="bank-wipe-wrap" hidden>
+        <hr>
+        <p class="muted small" data-i18n="bank_wipe_help">Borra solo los movimientos que entraron con la sincronización del banco. Tus movimientos anotados a mano no se tocan.</p>
+        <div class="form-actions">
+          <button id="btn-bank-wipe" type="button" class="btn btn-danger" data-i18n="bank_wipe_btn">🗑️ Borrar movimientos importados</button>
+        </div>
+        <p id="bank-wipe-status" class="muted small" aria-live="polite"></p>
+      </div>
       <p id="bank-status" class="muted small" aria-live="polite"></p>
       <p id="bank-error" class="error" role="alert" hidden></p>
     </section>
@@ -1176,16 +1194,16 @@
     </section>
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
-      <!-- Novedades (Compilación 53): SOLO la(s) línea(s) de la versión
+      <!-- Novedades (Compilación 54): SOLO la(s) línea(s) de la versión
            vigente (las de NEWS_CURRENT en app.js). En cada compilación
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c53_autosave">⚙️ Tus ajustes se guardan solos: cambia el reparto de tus ingresos y queda guardado al instante, sin botón. Si los porcentajes no suman 100, te avisamos ahí mismo.</li>
-        <li data-i18n="news_c53_welcome">👋 La bienvenida fluye sola: las láminas avanzan por sí mismas hasta la creación de tu cuenta, y también puedes deslizar el dedo para moverte entre ellas.</li>
+        <li data-i18n="news_c54_budget">🎯 Topes que aprenden de ti: en Presupuesto, PETO Finanzas te sugiere el tope de cada categoría según tu gasto real. Nada cambia sin que toques «Usar».</li>
+        <li data-i18n="news_c54_recurring">🔁 Cobros que se repiten: PETO Finanzas detecta tus suscripciones y pagos regulares, y te dice cuánto te cuestan al año.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 53</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 54</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
