@@ -21,9 +21,10 @@
 >    pagos de tarjeta ya no cuentan como gasto — van a la
 >    casilla «Transferencias» con su marca y quedan fuera de
 >    totales, topes y gráfica (la exclusión es por la marca;
->    BANK_MAP_VERSION = 3: la sincronización completa corre
+>    BANK_MAP_VERSION = 4: la sincronización completa corre
 >    otra vez y re-clasifica lo ya importado, sin tocar lo
->    puesto a mano). Novedades: solo
+>    puesto a mano; la versión 4 suma el autopago genérico
+>    de tarjeta a las transferencias). Novedades: solo
    news_c49 (815 claves por idioma). Y con la Compilación
    48: el blindaje de la ventana de Plaid Link (en el WebView
    de Android salía diminuta y anclada al final de la app:
@@ -15203,7 +15204,7 @@ const BANK_AUTO_SYNC_AFTER_MS = 6 * 60 * 60 * 1000; // ~6 horas
    transferencias y los pagos de tarjeta y los manda a la casilla
    «Transferencias» con su marca — la completa tiene que correr
    otra vez para re-clasificar lo ya importado. */
-const BANK_MAP_VERSION = 3;
+const BANK_MAP_VERSION = 4;
 let bankAutoSyncDone = false; // una vez por apertura de la app
 
 function bankStatus(msg) {
