@@ -1,11 +1,22 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 50) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 51) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
+   Sincronizado el 28-oct-2026 con la Compilación 51: el banco
+   también mueve los Ahorros y el gasto diario (decisión del
+   dueño: «todo saliendo del banco») — los saldos de las
+   cuentas de ahorro del banco (ahorro, money market, CD y
+   HSA) se suman a la tarjeta «Ahorros del mes» y se listan
+   de solo lectura en Ahorros (es presentación: el ahorro
+   manual y los totales de la app no cambian), y «¿Cuánto
+   puedes gastar hoy?» sale del saldo real de depósito menos
+   los pagos fijos que faltan este mes; al terminar cada
+   sincronización, Inicio se repinta entero. Novedades:
+   news_c51_savings y news_c51_spend (830 claves por idioma).
    Sincronizado el 28-oct-2026 con la Compilación 50: el banco
    mueve el Dinero disponible y las Deudas pendientes (cada
    sincronización trae también los saldos de las cuentas:
@@ -65,7 +76,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 50'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 51'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 /* Novedades vigentes (Compilación 48, pedido de Sterlin): la
    sección «Novedades» de Ajustes muestra SOLO lo nuevo de la
    versión vigente; las líneas de versiones viejas se BORRAN de
@@ -74,7 +85,7 @@ const BUILD_LABEL = 'Compilación 50'; // marca visible de diagnóstico (bloqueo
    PASO EN CADA COMPILACIÓN NUEVA: sustituir esta lista por la
    clave news_cNN de la versión, borrar la clave anterior de los
    12 diccionarios y dejar en el HTML únicamente su <li>. */
-const NEWS_CURRENT = ['news_c50'];
+const NEWS_CURRENT = ['news_c51_savings', 'news_c51_spend'];
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -948,7 +959,11 @@ es: {
   cloud_deleted: 'Tu cuenta fue eliminada.',
   cloud_delete_err_auth: 'Tu sesión ya no es válida. Entra de nuevo e inténtalo otra vez.',
   cloud_unavailable: 'La nube no está disponible en esta versión.',
-  news_c50: 'Tu banco también mueve tu Dinero disponible y tus Deudas pendientes: al sincronizar, los saldos de tus cuentas se suman a tu disponible y lo que debes en tarjetas y préstamos aparece en tus deudas, sin anotar nada a mano. Y conectar tu banco ahora está a la vista: en Inicio y en Mis cuentas.',
+  news_c51_savings: 'Tus ahorros ya salen de tu banco: si tienes banco conectado, el saldo de tus cuentas de ahorro (ahorro, money market, CD y HSA) se suma a tus Ahorros del mes y se ve en la sección Ahorros, sin anotar nada a mano.',
+  news_c51_spend: '¿Cuánto puedes gastar hoy? ahora se calcula con tu dinero real: si tienes banco conectado, sale de tu saldo disponible menos los pagos fijos que te faltan este mes, repartido entre los días que quedan.',
+  savings_bank_included: 'Incluye {amount} de tus cuentas de ahorro del banco',
+  spend_note_bank: 'Calculado con el saldo real de tu banco, menos tus pagos fijos que faltan este mes.',
+  spend_bank_over: 'El saldo de tu banco no cubre los pagos fijos que faltan este mes.',
   cloud_forgot: '¿Olvidaste tu contraseña?',
   cloud_forgot_err_email: 'Escribe tu correo arriba y te enviamos el enlace para recuperar tu cuenta.',
   cloud_recovery_sent: 'Si ese correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva. Revisa tu correo (y el spam).',
@@ -1418,7 +1433,11 @@ en: {
   cloud_deleted: 'Your account was deleted.',
   cloud_delete_err_auth: 'Your session is no longer valid. Sign in again and try again.',
   cloud_unavailable: 'The cloud is not available in this version.',
-  news_c50: 'Your bank now also drives your Available money and your Pending debts: when it syncs, your account balances add to your available money and what you owe on cards and loans shows up in your debts, with nothing to type by hand. And connecting your bank is now in plain sight: on Home and in My accounts.',
+  news_c51_savings: 'Your savings now come from your bank too: if your bank is connected, the balances of your savings accounts (savings, money market, CD and HSA) are added to your Savings this month and shown in the Savings section, with nothing to type by hand.',
+  news_c51_spend: 'Safe to spend today is now figured from your real money: if your bank is connected, it comes from your available bank balance minus the fixed payments still due this month, split across the days left.',
+  savings_bank_included: 'Includes {amount} from your bank savings accounts',
+  spend_note_bank: 'Figured from your real bank balance, minus this month\'s remaining fixed payments.',
+  spend_bank_over: 'Your bank balance does not cover this month\'s remaining fixed payments.',
   cloud_forgot: 'Forgot your password?',
   cloud_forgot_err_email: 'Enter your email above and we’ll send you the link to recover your account.',
   cloud_recovery_sent: 'If that email has an account, we sent you a link to create a new password. Check your email (and spam).',
@@ -1957,7 +1976,11 @@ it: {
   cloud_deleted: 'Il tuo account è stato eliminato.',
   cloud_delete_err_auth: 'La tua sessione non è più valida. Accedi di nuovo e riprova.',
   cloud_unavailable: 'Il cloud non è disponibile in questa versione.',
-  news_c50: 'La tua banca ora muove anche il tuo Denaro disponibile e i tuoi Debiti in sospeso: a ogni sincronizzazione, i saldi dei tuoi conti si sommano al tuo denaro disponibile e ciò che devi su carte e prestiti compare tra i tuoi debiti, senza scrivere nulla a mano. E collegare la tua banca ora è in bella vista: nella Home e in I miei conti.',
+  news_c51_savings: 'Ora i tuoi risparmi arrivano anche dalla tua banca: se la banca è collegata, i saldi dei tuoi conti di risparmio (risparmio, money market, CD e HSA) si sommano ai tuoi Risparmi del mese e si vedono nella sezione Risparmi, senza scrivere nulla a mano.',
+  news_c51_spend: 'Quanto puoi spendere oggi ora si calcola con i tuoi soldi veri: se la banca è collegata, viene dal tuo saldo disponibile meno i pagamenti fissi che mancano questo mese, diviso per i giorni rimasti.',
+  savings_bank_included: 'Include {amount} dai tuoi conti di risparmio in banca',
+  spend_note_bank: 'Calcolato con il saldo reale della tua banca, meno i pagamenti fissi che mancano questo mese.',
+  spend_bank_over: 'Il saldo della tua banca non copre i pagamenti fissi che mancano questo mese.',
   cloud_forgot: 'Password dimenticata?',
   cloud_forgot_err_email: 'Scrivi la tua email qui sopra e ti inviamo il link per recuperare il tuo account.',
   cloud_recovery_sent: 'Se quell’email ha un account, ti abbiamo inviato un link per creare una nuova password. Controlla la tua email (e lo spam).',
@@ -2670,7 +2693,11 @@ pt: {
   cloud_deleted: 'Sua conta foi excluída.',
   cloud_delete_err_auth: 'Sua sessão não é mais válida. Entre de novo e tente outra vez.',
   cloud_unavailable: 'A nuvem não está disponível nesta versão.',
-  news_c50: 'Seu banco agora também move seu Dinheiro disponível e suas Dívidas pendentes: ao sincronizar, os saldos das suas contas somam ao seu disponível e o que você deve em cartões e empréstimos aparece nas suas dívidas, sem anotar nada à mão. E conectar seu banco agora está à vista: em Início e em Minhas contas.',
+  news_c51_savings: 'Agora sua poupança também sai do seu banco: com o banco conectado, os saldos das suas contas de poupança (poupança, money market, CD e HSA) somam à sua Poupança do mês e aparecem na seção Poupança, sem anotar nada à mão.',
+  news_c51_spend: 'Quanto você pode gastar hoje agora é calculado com seu dinheiro real: com o banco conectado, sai do seu saldo disponível menos os pagamentos fixos que faltam neste mês, dividido pelos dias restantes.',
+  savings_bank_included: 'Inclui {amount} das suas contas de poupança do banco',
+  spend_note_bank: 'Calculado com o saldo real do seu banco, menos os pagamentos fixos que faltam neste mês.',
+  spend_bank_over: 'O saldo do seu banco não cobre os pagamentos fixos que faltam neste mês.',
   cloud_forgot: 'Esqueceu sua senha?',
   cloud_forgot_err_email: 'Digite seu e-mail acima e enviaremos o link para recuperar sua conta.',
   cloud_recovery_sent: 'Se esse e-mail tiver uma conta, enviamos um link para criar uma nova senha. Verifique seu e-mail (e o spam).',
@@ -3383,7 +3410,11 @@ fr: {
   cloud_deleted: 'Ton compte a été supprimé.',
   cloud_delete_err_auth: 'Ta session n’est plus valable. Reconnecte-toi et réessaie.',
   cloud_unavailable: 'Le cloud n’est pas disponible dans cette version.',
-  news_c50: 'Votre banque fait désormais aussi bouger votre Argent disponible et vos Dettes en attente : à chaque synchronisation, les soldes de vos comptes bancaires s\'ajoutent à votre argent disponible et ce que vous devez sur vos cartes et prêts apparaît dans vos dettes, sans rien saisir à la main. Et connecter votre banque est maintenant bien visible : sur l\'Accueil et dans Mes comptes.',
+  news_c51_savings: 'Votre épargne vient maintenant aussi de votre banque : si votre banque est connectée, les soldes de vos comptes d\'épargne (épargne, money market, CD et HSA) s\'ajoutent à votre Épargne du mois et se voient dans la section Épargne, sans rien saisir à la main.',
+  news_c51_spend: 'Ce que vous pouvez dépenser aujourd\'hui se calcule maintenant avec votre argent réel : si votre banque est connectée, cela vient de votre solde disponible moins les paiements fixes restants ce mois-ci, réparti sur les jours restants.',
+  savings_bank_included: 'Inclut {amount} de vos comptes d\'épargne à la banque',
+  spend_note_bank: 'Calculé avec le solde réel de votre banque, moins les paiements fixes restants ce mois-ci.',
+  spend_bank_over: 'Le solde de votre banque ne couvre pas les paiements fixes restants ce mois-ci.',
   cloud_forgot: 'Mot de passe oublié ?',
   cloud_forgot_err_email: 'Saisis ton e-mail ci-dessus et on t’envoie le lien pour récupérer ton compte.',
   cloud_recovery_sent: 'Si cet e-mail a un compte, on t’a envoyé un lien pour créer un nouveau mot de passe. Vérifie ton e-mail (et les spams).',
@@ -4096,7 +4127,11 @@ de: {
   cloud_deleted: 'Dein Konto wurde gelöscht.',
   cloud_delete_err_auth: 'Deine Sitzung ist nicht mehr gültig. Melde dich erneut an und versuche es noch einmal.',
   cloud_unavailable: 'Die Cloud ist in dieser Version nicht verfügbar.',
-  news_c50: 'Ihre Bank bewegt jetzt auch Ihr verfügbares Geld und Ihre offenen Schulden: Bei jeder Synchronisierung werden die Salden Ihrer Bankkonten zu Ihrem verfügbaren Geld addiert, und was Sie auf Karten und Krediten schulden, erscheint bei Ihren Schulden – ganz ohne manuelles Eintragen. Und Ihre Bank zu verbinden ist jetzt gut sichtbar: auf der Startseite und unter Meine Konten.',
+  news_c51_savings: 'Ihre Ersparnisse kommen jetzt auch von Ihrer Bank: Ist Ihre Bank verbunden, werden die Salden Ihrer Sparkonten (Sparkonto, Geldmarkt, CD und HSA) zu Ihren Ersparnissen des Monats addiert und im Bereich Ersparnisse angezeigt – ganz ohne manuelles Eintragen.',
+  news_c51_spend: 'Wie viel Sie heute ausgeben können, wird jetzt mit Ihrem echten Geld berechnet: Ist Ihre Bank verbunden, ergibt es sich aus Ihrem verfügbaren Guthaben minus den in diesem Monat noch offenen Fixzahlungen, verteilt auf die restlichen Tage.',
+  savings_bank_included: 'Enthält {amount} von Ihren Sparkonten bei der Bank',
+  spend_note_bank: 'Berechnet mit Ihrem echten Bankguthaben, minus den in diesem Monat noch offenen Fixzahlungen.',
+  spend_bank_over: 'Ihr Bankguthaben deckt die in diesem Monat noch offenen Fixzahlungen nicht.',
   cloud_forgot: 'Passwort vergessen?',
   cloud_forgot_err_email: 'Gib oben deine E-Mail ein und wir schicken dir den Link, um dein Konto wiederherzustellen.',
   cloud_recovery_sent: 'Wenn diese E-Mail ein Konto hat, haben wir dir einen Link geschickt, um ein neues Passwort zu erstellen. Prüfe deine E-Mails (und den Spam-Ordner).',
@@ -4809,7 +4844,11 @@ zh: {
   cloud_deleted: '你的账户已删除。',
   cloud_delete_err_auth: '你的会话已失效。请重新登录后再试。',
   cloud_unavailable: '此版本中没有云服务。',
-  news_c50: '你的银行现在也能驱动你的可用资金和待还债务：每次同步时，银行账户余额会加到你的可用资金中，信用卡和贷款的欠款会显示在你的债务中，无需手动记录。连接银行现在也一目了然：就在首页和我的账户中。',
+  news_c51_savings: '你的储蓄现在也来自你的银行：如果已连接银行，你的储蓄账户（储蓄、货币市场、定期存款和 HSA）余额会加到你本月的储蓄中，并显示在储蓄页面，无需手动记录。',
+  news_c51_spend: '今天能花多少现在按你的真实资金计算：如果已连接银行，它来自你的银行可用余额减去本月尚未支付的固定支出，再除以本月剩余天数。',
+  savings_bank_included: '其中包括银行储蓄账户的 {amount}',
+  spend_note_bank: '根据你银行的真实余额计算，已扣除本月尚未支付的固定支出。',
+  spend_bank_over: '你的银行余额不足以支付本月尚未支付的固定支出。',
   cloud_forgot: '忘记密码？',
   cloud_forgot_err_email: '在上方输入你的邮箱，我们会发送找回账户的链接。',
   cloud_recovery_sent: '如果该邮箱有账户，我们已发送一个创建新密码的链接。请查看你的邮箱（和垃圾邮件）。',
@@ -5522,7 +5561,11 @@ ja: {
   cloud_deleted: 'アカウントが削除されました。',
   cloud_delete_err_auth: 'セッションの有効期限が切れました。再度ログインして、もう一度お試しください。',
   cloud_unavailable: 'このバージョンではクラウドは利用できません。',
-  news_c50: '銀行があなたの利用可能額と未払いの債務も動かすようになりました：同期のたびに、銀行口座の残高が利用可能額に加算され、カードやローンの借入額が債務に表示されます。手入力は不要です。銀行の接続も、ホームとマイアカウントで目立つ場所になりました。',
+  news_c51_savings: '貯蓄も銀行から反映されるようになりました：銀行を接続すると、貯蓄口座（普通貯蓄、マネーマーケット、CD、HSA）の残高が今月の貯蓄に加算され、貯蓄画面に表示されます。手入力は不要です。',
+  news_c51_spend: '今日使える金額は、実際の残高から計算されるようになりました：銀行を接続すると、利用可能残高から今月残りの固定支払いを引いて、残りの日数で割ります。',
+  savings_bank_included: '銀行の貯蓄口座の {amount} を含みます',
+  spend_note_bank: '銀行の実際の残高から、今月残りの固定支払いを引いて計算しています。',
+  spend_bank_over: '銀行の残高では、今月残りの固定支払いをまかなえません。',
   cloud_forgot: 'パスワードをお忘れですか？',
   cloud_forgot_err_email: '上にメールアドレスを入力すると、アカウント復旧用のリンクをお送りします。',
   cloud_recovery_sent: 'そのメールアドレスにアカウントがある場合、新しいパスワードを作成するリンクをお送りしました。メール（と迷惑メール）を確認してください。',
@@ -6235,7 +6278,11 @@ ko: {
   cloud_deleted: '계정이 삭제되었습니다.',
   cloud_delete_err_auth: '세션이 더 이상 유효하지 않습니다. 다시 로그인하고 시도하세요.',
   cloud_unavailable: '이 버전에서는 클라우드를 사용할 수 없습니다.',
-  news_c50: '이제 은행이 사용 가능 금액과 미결제 부채도 움직입니다: 동기화할 때마다 은행 계좌 잔액이 사용 가능 금액에 더해지고, 카드와 대출로 진 빚이 부채에 표시됩니다. 손으로 입력할 필요가 없습니다. 그리고 은행 연결이 이제 홈과 내 계정에서 눈에 잘 띄는 곳에 있습니다.',
+  news_c51_savings: '이제 저축도 은행에서 반영됩니다: 은행이 연결되면 저축 계좌(저축, 머니마켓, CD, HSA)의 잔액이 이번 달 저축에 더해지고 저축 화면에 표시됩니다. 손으로 입력할 필요가 없습니다.',
+  news_c51_spend: '오늘 쓸 수 있는 돈이 이제 실제 돈으로 계산됩니다: 은행이 연결되면 사용 가능 잔액에서 이번 달 남은 고정 지출을 빼고 남은 날짜로 나눕니다.',
+  savings_bank_included: '은행 저축 계좌의 {amount} 포함',
+  spend_note_bank: '은행의 실제 잔액에서 이번 달 남은 고정 지출을 빼고 계산했습니다.',
+  spend_bank_over: '은행 잔액으로는 이번 달 남은 고정 지출을 감당할 수 없습니다.',
   cloud_forgot: '비밀번호를 잊으셨나요?',
   cloud_forgot_err_email: '위에 이메일을 입력하면 계정을 복구할 수 있는 링크를 보내드립니다.',
   cloud_recovery_sent: '해당 이메일로 된 계정이 있으면 새 비밀번호를 만들 수 있는 링크를 보냈습니다. 이메일(스팸함 포함)을 확인하세요.',
@@ -6948,7 +6995,11 @@ ru: {
   cloud_deleted: 'Ваш аккаунт был удалён.',
   cloud_delete_err_auth: 'Ваша сессия больше недействительна. Войдите снова и попробуйте ещё раз.',
   cloud_unavailable: 'Облако недоступно в этой версии.',
-  news_c50: 'Ваш банк теперь также управляет вашими доступными деньгами и непогашенными долгами: при каждой синхронизации остатки на ваших банковских счетах прибавляются к доступным деньгам, а то, что вы должны по картам и кредитам, появляется в ваших долгах — ничего не нужно записывать вручную. А подключение банка теперь на виду: на главном экране и в разделе «Мои счета».',
+  news_c51_savings: 'Теперь ваши сбережения приходят и из банка: если банк подключён, остатки на ваших сберегательных счетах (сберегательный, денежный рынок, CD и HSA) прибавляются к вашим сбережениям за месяц и видны в разделе «Сбережения» — ничего не нужно записывать вручную.',
+  news_c51_spend: 'Сколько можно потратить сегодня, теперь считается по вашим настоящим деньгам: если банк подключён, это ваш доступный остаток минус оставшиеся в этом месяце постоянные платежи, делённый на оставшиеся дни.',
+  savings_bank_included: 'Включает {amount} с ваших сберегательных счетов в банке',
+  spend_note_bank: 'Рассчитано по настоящему остатку в вашем банке, минус оставшиеся в этом месяце постоянные платежи.',
+  spend_bank_over: 'Остатка в вашем банке не хватает на оставшиеся в этом месяце постоянные платежи.',
   cloud_forgot: 'Забыли пароль?',
   cloud_forgot_err_email: 'Введите ваш e-mail выше, и мы отправим ссылку для восстановления аккаунта.',
   cloud_recovery_sent: 'Если на этот e-mail есть аккаунт, мы отправили ссылку для создания нового пароля. Проверьте почту (и папку «Спам»).',
@@ -7661,7 +7712,11 @@ hi: {
   cloud_deleted: 'आपका खाता हटा दिया गया।',
   cloud_delete_err_auth: 'आपका सत्र अब मान्य नहीं है। फिर से साइन इन करके कोशिश करें।',
   cloud_unavailable: 'इस संस्करण में क्लाउड उपलब्ध नहीं है।',
-  news_c50: 'अब आपका बैंक आपके उपलब्ध धन और बकाया कर्ज़ को भी चलाता है: हर सिंक पर आपके बैंक खातों की शेष राशि आपके उपलब्ध धन में जुड़ जाती है और कार्ड व लोन पर आपका बकाया आपके कर्ज़ में दिखता है — हाथ से कुछ लिखना नहीं पड़ता। और बैंक जोड़ना अब सामने ही है: होम पर और मेरे खातों में।',
+  news_c51_savings: 'अब आपकी बचत आपके बैंक से भी आती है: अगर बैंक जुड़ा है, तो आपके बचत खातों (बचत, मनी मार्केट, CD और HSA) की शेष राशि इस महीने की आपकी बचत में जुड़ जाती है और बचत सेक्शन में दिखती है — हाथ से कुछ लिखना नहीं पड़ता।',
+  news_c51_spend: 'आज कितना खर्च कर सकते हैं, यह अब आपके असली पैसे से हिसाब होता है: अगर बैंक जुड़ा है, तो यह आपके उपलब्ध बैंक बैलेंस में से इस महीने के बचे हुए तय खर्च घटाकर, बचे दिनों में बाँटकर आता है।',
+  savings_bank_included: 'इसमें आपके बैंक बचत खातों के {amount} शामिल हैं',
+  spend_note_bank: 'आपके बैंक के असली बैलेंस से हिसाब किया गया, इस महीने के बचे हुए तय खर्च घटाकर।',
+  spend_bank_over: 'आपके बैंक का बैलेंस इस महीने के बचे हुए तय खर्चों के लिए काफ़ी नहीं है।',
   cloud_forgot: 'पासवर्ड भूल गए?',
   cloud_forgot_err_email: 'ऊपर अपना ईमेल लिखें और हम आपके खाते को वापस पाने का लिंक भेज देंगे।',
   cloud_recovery_sent: 'अगर उस ईमेल पर खाता है, तो हमने नया पासवर्ड बनाने का लिंक भेजा है। अपना ईमेल (और स्पैम) देखें।',
@@ -8374,7 +8429,11 @@ ar: {
   cloud_deleted: 'تم حذف حسابك.',
   cloud_delete_err_auth: 'جلستك لم تعد صالحة. سجّل الدخول من جديد وحاول مرة أخرى.',
   cloud_unavailable: 'السحابة غير متاحة في هذا الإصدار.',
-  news_c50: 'أصبح بنكك الآن يحرّك أيضًا أموالك المتاحة وديونك المستحقة: عند كل مزامنة، تُضاف أرصدة حساباتك البنكية إلى أموالك المتاحة ويظهر ما تدين به على البطاقات والقروض ضمن ديونك، دون أن تكتب شيئًا يدويًا. وربط بنكك أصبح الآن في مكان ظاهر: في الرئيسية وفي حساباتي.',
+  news_c51_savings: 'أصبحت مدّخراتك تأتي الآن من بنكك أيضًا: إذا كان البنك متصلًا، تُضاف أرصدة حسابات التوفير لديك (التوفير، سوق المال، شهادات الإيداع وHSA) إلى مدّخراتك هذا الشهر وتظهر في قسم المدّخرات، دون أن تكتب شيئًا يدويًا.',
+  news_c51_spend: 'كم يمكنك أن تنفق اليوم يُحسب الآن بأموالك الحقيقية: إذا كان البنك متصلًا، يأتي من رصيدك البنكي المتاح ناقص المدفوعات الثابتة المتبقية هذا الشهر، مقسومًا على الأيام المتبقية.',
+  savings_bank_included: 'يشمل {amount} من حسابات التوفير في بنكك',
+  spend_note_bank: 'محسوب من رصيدك البنكي الحقيقي، ناقص المدفوعات الثابتة المتبقية هذا الشهر.',
+  spend_bank_over: 'رصيدك البنكي لا يغطي المدفوعات الثابتة المتبقية هذا الشهر.',
   cloud_forgot: 'نسيت كلمة المرور؟',
   cloud_forgot_err_email: 'اكتب بريدك الإلكتروني أعلاه وسنرسل إليك رابط استعادة حسابك.',
   cloud_recovery_sent: 'إذا كان لهذا البريد حساب، فقد أرسلنا إليك رابطًا لإنشاء كلمة مرور جديدة. تحقق من بريدك (والبريد المزعج).',
@@ -9290,6 +9349,49 @@ function bankDepositTotalCents() {
 function bankDebtTotalCents() {
   return bankDebtAccounts().reduce((t2, a) => t2 + (a.current || 0), 0);
 }
+/* ---------------- Compilación 51 · El banco también mueve
+   «Ahorros del mes» y «¿Cuánto puedes gastar hoy?» ------------
+   Decisión del dueño probando la 50: «haz la Compilación 51
+   con todo saliendo del banco». Dos cambios, SOLO cuando hay
+   banco conectado con saldos guardados; sin banco, todo se
+   comporta EXACTAMENTE como en la 50:
+   1) AHORROS: los saldos de las cuentas de AHORRO del banco
+      (subtipos savings, money market, cd y hsa — depósito, no
+      corriente ni gestión de efectivo) se suman a la tarjeta
+      «Ahorros del mes» de Inicio y se listan en Ahorros en la
+      sección de solo lectura «De tu banco». Es presentación:
+      monthSavings, allSavingsTotal, las metas y cualquier
+      otro total quedan INTACTOS (el ahorro anotado a mano
+      sigue siendo el que manda en los cálculos de la app).
+      El saldo de estas cuentas es el ACTUAL (current); solo
+      si el banco no lo da se usa el disponible.
+   2) GASTAR HOY: el número diario sale del dinero real del
+      banco: saldo total de depósito (el disponible si viene;
+      si no, el actual — el mismo bankDepositTotalCents de la
+      50) menos los pagos fijos de este mes que aún faltan por
+      pagar, repartido entre los días que quedan del mes. Los
+      gastos del mes NO se restan otra vez: el saldo que da el
+      banco ya los trae descontados. */
+const BANK_SAVINGS_SUBTYPES = ['savings', 'money market', 'cd', 'hsa'];
+function bankSavingsAccounts() {
+  return bankStoredAccounts().filter((a) =>
+    a.type === 'depository' && BANK_SAVINGS_SUBTYPES.includes(a.subtype));
+}
+function bankSavingsBalanceCents(a) {
+  return (a.current !== null && a.current !== undefined) ? a.current : (a.available || 0);
+}
+function bankSavingsCents() {
+  return bankSavingsAccounts().reduce((t2, a) => t2 + bankSavingsBalanceCents(a), 0);
+}
+/* Pagos fijos de este mes que aún no están marcados como
+   pagados (la misma convención paidMonths que usa el aviso
+   de «pagos por vencer» de Inicio, dueSoonFixed): lo que el
+   saldo del banco todavía tiene que cubrir este mes. */
+function bankFixedRemainingCents(key) {
+  return (db.fixed || [])
+    .filter((f) => !(f.paidMonths && f.paidMonths[key]))
+    .reduce((t2, f) => t2 + (f.amountCents || 0), 0);
+}
 function bankTypeLabel(type) {
   const known = ['depository', 'credit', 'loan', 'investment'];
   return t(known.includes(type) ? 'bank_type_' + type : 'bank_type_other');
@@ -9594,9 +9696,27 @@ function daysLeftInMonth(key) {
 /* Número diario de Inicio: (presupuesto total del mes − gastos del mes)
    ÷ días restantes, nunca negativo. Si ya se gastó todo el presupuesto,
    el diario es $0 y la tarjeta avisa. Sin presupuestos ni ingresos
-   devuelve null: la tarjeta muestra la guía y ningún número inventado. */
+   devuelve null: la tarjeta muestra la guía y ningún número inventado.
+
+   Compilación 51: con saldos del banco guardados manda el
+   MODO BANCO — el número sale del dinero real: saldo total
+   de depósito menos los pagos fijos que faltan este mes,
+   repartido entre los días que quedan (bank:true, left =
+   pool). Los gastos del mes NO se vuelven a restar: el
+   saldo del banco ya los trae descontados. Si el pool no
+   alcanza, el diario es $0 y la tarjeta lo dice con su
+   línea propia (spend_bank_over). */
 function dailySpendInfo() {
   const key = currentMonthKey();
+  if (bankBalancesKnown()) {
+    const pool = bankDepositTotalCents() - bankFixedRemainingCents(key);
+    const daysLeft = daysLeftInMonth(key);
+    return {
+      bank: true, total: 0, spent: 0, left: pool, pool: pool,
+      daysLeft: daysLeft, over: pool <= 0,
+      daily: pool > 0 ? Math.floor(pool / daysLeft) : 0
+    };
+  }
   const total = monthlyBudgetTotalCents(key);
   if (total <= 0) return null;
   const spent = sumCents(monthCountedExpenses(key));
@@ -9624,9 +9744,22 @@ function renderSpendToday() {
   }
   if (createBtn) createBtn.hidden = true;
   valueEl.textContent = fmt(info.daily);
-  noteEl.textContent = info.over ? t('spend_over') : t('spend_note');
+  /* Compilación 51: en modo banco la nota y la línea de estado
+     son las del banco; la de «te pasaste por…» del presupuesto
+     NO se muestra (ese sobrepaso es del modo presupuesto). */
+  noteEl.textContent = info.bank
+    ? t('spend_note_bank')
+    : (info.over ? t('spend_over') : t('spend_note'));
   if (leftEl) {
-    if (info.left < 0) {
+    if (info.bank) {
+      if (info.left <= 0) {
+        leftEl.textContent = t('spend_bank_over');
+      } else if (info.daysLeft === 1) {
+        leftEl.textContent = t('spend_left_one', { amount: fmt(info.left) });
+      } else {
+        leftEl.textContent = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
+      }
+    } else if (info.left < 0) {
       leftEl.textContent = t('spend_over_by', { amount: fmt(-info.left) });
     } else if (info.over) {
       leftEl.textContent = '';
@@ -9669,7 +9802,11 @@ function syncWidgetSummary(info) {
       note = t('spend_guide');
     } else {
       amount = fmt(info.daily);
-      note = info.over ? t('spend_over') : t('spend_note');
+      /* Compilación 51: en modo banco el widget dice lo mismo
+         que la tarjeta (nota del banco y su línea de estado). */
+      note = info.bank
+        ? (info.over ? t('spend_bank_over') : t('spend_note_bank'))
+        : (info.over ? t('spend_over') : t('spend_note'));
     }
     let streak = '';
     try {
@@ -9682,7 +9819,15 @@ function syncWidgetSummary(info) {
        punto de color por categoría y montos alineados). */
     let monthLeft = '';
     if (info) {
-      if (info.left < 0) {
+      if (info.bank) {
+        if (info.left <= 0) {
+          monthLeft = t('spend_bank_over');
+        } else if (info.daysLeft === 1) {
+          monthLeft = t('spend_left_one', { amount: fmt(info.left) });
+        } else {
+          monthLeft = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
+        }
+      } else if (info.left < 0) {
         monthLeft = t('spend_over_by', { amount: fmt(-info.left) });
       } else if (!info.over) {
         monthLeft = info.daysLeft === 1
@@ -9710,7 +9855,9 @@ function syncWidgetSummary(info) {
     /* Widgets v3: porcentaje de uso del presupuesto del mes (la
        barra y el punto del lado nativo cambian de color con los
        cortes 80/100 de las alertas). Sin presupuesto: -1. */
-    const progressPct = info ? Math.round(info.spent / info.total * 100) : -1;
+    /* Compilación 51: en modo banco no hay presupuesto contra
+       el que medir la barra: -1 (sin barra), como sin base. */
+    const progressPct = (info && !info.bank) ? Math.round(info.spent / info.total * 100) : -1;
     /* Widgets v3: línea del próximo turno del san, solo si hay un
        san activo sin terminar. El personal no guarda fechas: va sin
        fecha. El del organizador lleva quién recibe y cuándo, con
@@ -9904,7 +10051,20 @@ function renderHome() {
     availSub.hidden = true;
   }
   renderNextStep();
-  document.getElementById('sum-savings').textContent = fmt(monthSavings(key));
+  /* Compilación 51: la tarjeta «Ahorros del mes» suma, SOLO en
+     pantalla, los saldos de las cuentas de ahorro del banco
+     (bankSavingsCents); monthSavings sigue siendo el cálculo
+     manual de siempre y es el que manda en el resto de la app.
+     La línea bajo el valor dice cuánto de ese número viene
+     del banco; sin banco (o sin cuentas de ahorro) se oculta. */
+  const bankSav = bankSavingsCents();
+  document.getElementById('sum-savings').textContent = fmt(monthSavings(key) + bankSav);
+  const savBankLine = document.getElementById('sum-savings-bank');
+  if (savBankLine) {
+    savBankLine.hidden = !(bankSav > 0);
+    savBankLine.textContent = bankSav > 0
+      ? t('savings_bank_included', { amount: fmt(bankSav) }) : '';
+  }
   document.getElementById('sum-debts').textContent = fmt(pendingDebtsTotal());
   document.getElementById('sum-incomes').textContent = fmt(sumCents(monthCountedIncomes(key)));
   document.getElementById('sum-expenses').textContent = fmt(sumCents(monthCountedExpenses(key)));
@@ -10521,6 +10681,10 @@ function renderSavings() {
   renderChallenge();
   renderGoals();
   fillSavingsGoalSelect();
+  /* Compilación 51: las cuentas de ahorro del banco, de solo
+     lectura, con su saldo actual (la sección se oculta sola
+     si no hay ninguna: renderBankIntoList manda el hidden). */
+  renderBankIntoList('sav-bank', bankSavingsAccounts(), false, bankSavingsBalanceCents);
   const rows = [];
   for (const item of db.incomes) {
     if (effectiveSavingsOfIncome(item) > 0) rows.push({ kind: 'ingreso', date: item.date, item: item });
@@ -11281,7 +11445,7 @@ function resetAccountForm() {
    en deudas el importe es el saldo actual (lo que se debe) y
    en cuentas el saldo usable (disponible si viene; si no, el
    actual), el mismo criterio de los totales de Inicio. */
-function renderBankIntoList(prefix, accounts, isDebt) {
+function renderBankIntoList(prefix, accounts, isDebt, balanceFn) {
   const wrap = document.getElementById(prefix + '-wrap');
   const ul = document.getElementById(prefix + '-list');
   if (!wrap || !ul) return;
@@ -11294,8 +11458,11 @@ function renderBankIntoList(prefix, accounts, isDebt) {
     main.appendChild(el('div', 'item-sub',
       bankTypeLabel(a.type) + (a.connName ? ' · ' + a.connName : '')));
     li.appendChild(main);
+    /* Compilación 51: quien llama puede pasar su criterio de
+       saldo (Ahorros usa el actual primero, bankSavingsBalanceCents);
+       sin función, el criterio de la 50 de siempre. */
     li.appendChild(el('span', 'item-amount',
-      fmt(isDebt ? (a.current || 0) : bankAccountBalanceCents(a))));
+      fmt(balanceFn ? balanceFn(a) : (isDebt ? (a.current || 0) : bankAccountBalanceCents(a)))));
     ul.appendChild(li);
   }
 }
@@ -15370,7 +15537,10 @@ const BANK_AUTO_SYNC_AFTER_MS = 6 * 60 * 60 * 1000; // ~6 horas
    Versión 3 (última pieza de la 49): el mapa nuevo detecta las
    transferencias y los pagos de tarjeta y los manda a la casilla
    «Transferencias» con su marca — la completa tiene que correr
-   otra vez para re-clasificar lo ya importado. */
+   otra vez para re-clasificar lo ya importado.
+   Versión 4 (ajuste fino de la 49): el autopago genérico de
+   tarjeta (LOAN_PAYMENTS sin detalle de préstamo real) también
+   cae en «Transferencias» — la completa corre otra vez. */
 const BANK_MAP_VERSION = 4;
 let bankAutoSyncDone = false; // una vez por apertura de la app
 
@@ -15505,6 +15675,8 @@ function refreshBankViews() {
   if (currentView === 'home') renderHome();
   else if (currentView === 'cuentas') renderAccounts();
   else if (currentView === 'deudas') renderDebts();
+  /* Compilación 51: Ahorros también vive de los saldos. */
+  else if (currentView === 'ahorros') renderSavings();
   renderHomeBank();
 }
 /* Ir a la tarjeta «Conexión bancaria» de Ajustes, resaltada:
@@ -15868,6 +16040,12 @@ async function bankRunSync(opts) {
     save();
     refreshBankViews();
   }
+  /* Compilación 51: al terminar CUALQUIER sincronización
+     (manual o automática, traiga o no saldos nuevos), Inicio
+     se repinta entero — tarjetas, «¿Cuánto puedes gastar
+     hoy?» y Ahorros viven de los movimientos y de los saldos
+     que la sync acaba de mover. */
+  refreshBankViews();
   return r;
 }
 

@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 50</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 51</p>
   </div>
 </section>
 
@@ -206,6 +206,7 @@
         <span class="summary-label" data-i18n="tile_savings">Ahorros del mes</span>
         <span id="sum-savings" class="summary-value">$0.00</span>
         <span id="sum-savings-goal" class="summary-sub" hidden></span>
+        <span id="sum-savings-bank" class="summary-sub" hidden></span>
         <span class="summary-go" aria-hidden="true">›</span>
       </button>
       <button id="tile-debts" class="summary-item" type="button" data-i18n-aria="tile_debts_aria" aria-label="Deudas pendientes: ir a Mis deudas">
@@ -448,6 +449,11 @@
 
     <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
     <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
+
+    <section id="sav-bank-wrap" class="card" hidden>
+      <h3 data-i18n="bank_from_bank">De tu banco</h3>
+      <ul id="sav-bank-list" class="item-list"></ul>
+    </section>
 
     <ul id="savings-list" class="item-list"></ul>
     <p id="savings-empty" class="empty-state" hidden data-i18n="sav_empty">Todavía no tienes ahorros anotados. Agrega uno con el formulario de arriba, o anota el ahorro de un ingreso cuando lo registres y aparecerá aquí. 🌱</p>
@@ -1167,15 +1173,16 @@
     </section>
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
-      <!-- Novedades (Compilación 50): SOLO la(s) línea(s) de la versión
+      <!-- Novedades (Compilación 51): SOLO la(s) línea(s) de la versión
            vigente (las de NEWS_CURRENT en app.js). En cada compilación
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c50">Tu banco también mueve tu Dinero disponible y tus Deudas pendientes: al sincronizar, los saldos de tus cuentas se suman a tu disponible y lo que debes en tarjetas y préstamos aparece en tus deudas, sin anotar nada a mano. Y conectar tu banco ahora está a la vista: en Inicio y en Mis cuentas.</li>
+        <li data-i18n="news_c51_savings">Tus ahorros ya salen de tu banco: si tienes banco conectado, el saldo de tus cuentas de ahorro (ahorro, money market, CD y HSA) se suma a tus Ahorros del mes y se ve en la sección Ahorros, sin anotar nada a mano.</li>
+        <li data-i18n="news_c51_spend">¿Cuánto puedes gastar hoy? ahora se calcula con tu dinero real: si tienes banco conectado, sale de tu saldo disponible menos los pagos fijos que te faltan este mes, repartido entre los días que quedan.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 50</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 51</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
