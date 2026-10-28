@@ -108,6 +108,12 @@ function defaultData() {
       pro: false,
       proWaitlist: false,
       reviewPromptDone: false,
+      /* Parche Compilación 49: versión del mapa de categorías del
+         banco ya aplicada a ESTOS datos (settings.bankMapV en
+         bankRunSync). 0 = los movimientos del banco se importaron
+         con un mapa viejo (o nunca): la próxima sincronización se
+         pide completa para re-ordenarlos. */
+      bankMapV: 0,
       challengeTargetCents: 2000,
       split: { ahorro: 25, negocio: 10, gastos: 55, familia: 10 },
       sections: { gastos: true, ingresos: true, ahorros: true, buscar: true, resumen: true, presupuesto: true, pagos: true, cuentas: true, deudas: true, san: true, podcast: true },
@@ -525,6 +531,8 @@ function validateData(raw) {
   d.settings.pro = s.pro === true;
   d.settings.proWaitlist = s.proWaitlist === true;
   d.settings.reviewPromptDone = s.reviewPromptDone === true;
+  d.settings.bankMapV = (typeof s.bankMapV === 'number' && Number.isFinite(s.bankMapV) && s.bankMapV >= 0)
+    ? Math.trunc(s.bankMapV) : 0;
   d.settings.theme = (s.theme === 'claro' || s.theme === 'oscuro' || s.theme === 'auto') ? s.theme : 'auto';
   d.settings.accent = ['verde', 'azul', 'morado', 'naranja'].includes(s.accent) ? s.accent : 'verde';
   const chalTarget = cleanCents(s.challengeTargetCents, false);
@@ -15139,6 +15147,12 @@ let plaidSdkPromise = null;
    interfaz, no muestra avisos y si falla queda en silencio —
    el botón «Sincronizar» sigue ahí para forzarla a mano. */
 const BANK_AUTO_SYNC_AFTER_MS = 6 * 60 * 60 * 1000; // ~6 horas
+/* Parche Compilación 49: versión vigente del mapa de categorías
+   del servidor (plaid-sync). Si la marca guardada en los datos
+   (settings.bankMapV) es menor, la próxima sincronización se pide
+   COMPLETA ({full:true}) para que los movimientos ya importados
+   con el mapa viejo vuelvan a pasar por bankRecategorize. */
+const BANK_MAP_VERSION = 2;
 let bankAutoSyncDone = false; // una vez por apertura de la app
 
 function bankStatus(msg) {
@@ -15425,10 +15439,28 @@ async function bankExchange(publicToken, metadata) {
    de servidor falla: quien llama decide cómo avisar (el botón
    muestra el error; el automático traga en silencio). Con
    silent:true no hay deshacer ni avisos: solo importar, guardar
-   y repintar. Devuelve el conteo de la importación. */
+   y repintar. Devuelve el conteo de la importación.
+
+   Parche de la 49 — re-sincronización completa única: si la
+   marca local (settings.bankMapV) quedó detrás de la versión
+   del mapa del servidor, ESTA sincronización se pide completa
+   ({full:true}): el servidor recorre cada conexión desde el
+   principio y lo ya importado vuelve a pasar por el importador,
+   que re-ordena lo que quedó en «Otros» con el mapa nuevo
+   (bankRecategorize) sin tocar lo puesto a mano. La marca SOLO
+   avanza si el servidor confirma que corrió en modo completo
+   (responde full:true): si aún corre el servidor viejo, que
+   ignora el campo, la marca no se guarda y la completa se
+   vuelve a pedir la próxima vez. Sin conexiones no pasa nada:
+   la completa no trae nada y la marca avanza igual, porque no
+   hay nada viejo que re-ordenar. */
 async function bankRunSync(opts) {
   const silent = !!(opts && opts.silent);
-  const out = await bankFn('plaid-sync', {});
+  const wantFull = !!db && !!db.settings &&
+    (Number(db.settings.bankMapV) || 0) < BANK_MAP_VERSION;
+  const out = await bankFn('plaid-sync', wantFull ? { full: true } : {});
+  const fullDone = wantFull && !!out && out.full === true;
+  if (fullDone) db.settings.bankMapV = BANK_MAP_VERSION;
   if (!silent && out.transactions && out.transactions.length) beginUndo();
   const r = bankImportTransactions(out);
   if (r.added > 0 || r.updated > 0) {
@@ -15439,6 +15471,8 @@ async function bankRunSync(opts) {
       checkBudgetAlerts();
       if (!silent) showUndoToast();
     }
+  } else if (fullDone) {
+    save(); // aunque nada se moviera, la marca tiene que persistir
   }
   bankConnections = null;
   bankLoadedFor = null;
