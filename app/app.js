@@ -1,12 +1,17 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 47) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 48) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 27-oct-2026 con la Compilación 47: la
+   Sincronizado el 27-oct-2026 con la Compilación 48: el
+   blindaje de la ventana de Plaid Link (en el WebView de
+   Android salía diminuta y anclada al final de la app: ahora
+   se fuerza a pantalla completa con CSS !important y un
+   refuerzo por código mientras el Link está abierto; 837
+   claves por idioma). Y con la Compilación 47: la
    recuperación de contraseña de la cuenta en la nube (enlace
    «¿Olvidaste tu contraseña?» en Ajustes y pantalla de contraseña
    nueva al llegar desde el correo; el enlace de recuperación
@@ -29,7 +34,7 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 47'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
+const BUILD_LABEL = 'Compilación 48'; // marca visible de diagnóstico (bloqueo y Ajustes): confirma qué código corre el teléfono
 const DEFAULT_CATEGORIES = ['Renta', 'Comida', 'Comida fuera', 'Gasolina', 'Transporte', 'Salud', 'Ropa', 'Otros'];
 const SECTION_DEFS = [
   { id: 'gastos',      group: 'daily',    icon: '🧾' },
@@ -832,6 +837,7 @@ es: {
   cloud_delete_err_auth: 'Tu sesión ya no es válida. Entra de nuevo e inténtalo otra vez.',
   cloud_unavailable: 'La nube no está disponible en esta versión.',
   news_c47: '¿Olvidaste la contraseña de tu cuenta en la nube? Ya puedes recuperar tu cuenta: en Ajustes, en «Cuenta en la nube», te enviamos un enlace a tu correo para crear una contraseña nueva.',
+  news_c48: 'Al conectar tu banco, la ventana segura de Plaid ahora se abre a pantalla completa en tu teléfono: eliges tu banco y escribes tu clave solo con tu banco, como debe ser.',
   cloud_forgot: '¿Olvidaste tu contraseña?',
   cloud_forgot_err_email: 'Escribe tu correo arriba y te enviamos el enlace para recuperar tu cuenta.',
   cloud_recovery_sent: 'Si ese correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva. Revisa tu correo (y el spam).',
@@ -1318,6 +1324,7 @@ en: {
   cloud_delete_err_auth: 'Your session is no longer valid. Sign in again and try again.',
   cloud_unavailable: 'The cloud is not available in this version.',
   news_c47: 'Forgot your cloud account password? You can now get your account back: in Settings, under “Cloud account”, we email you a link to create a new password.',
+  news_c48: 'When you connect your bank, Plaid’s secure window now opens full-screen on your phone: you pick your bank and enter your password only with your bank, just as it should be.',
   cloud_forgot: 'Forgot your password?',
   cloud_forgot_err_email: 'Enter your email above and we’ll send you the link to recover your account.',
   cloud_recovery_sent: 'If that email has an account, we sent you a link to create a new password. Check your email (and spam).',
@@ -1873,6 +1880,7 @@ it: {
   cloud_delete_err_auth: 'La tua sessione non è più valida. Accedi di nuovo e riprova.',
   cloud_unavailable: 'Il cloud non è disponibile in questa versione.',
   news_c47: 'Hai dimenticato la password del tuo account cloud? Ora puoi recuperare il tuo account: in Impostazioni, in «Account cloud», ti inviamo via email un link per creare una nuova password.',
+  news_c48: 'Quando colleghi la tua banca, la finestra sicura di Plaid ora si apre a schermo intero sul tuo telefono: scegli la tua banca e inserisci la password solo con la tua banca, come deve essere.',
   cloud_forgot: 'Password dimenticata?',
   cloud_forgot_err_email: 'Scrivi la tua email qui sopra e ti inviamo il link per recuperare il tuo account.',
   cloud_recovery_sent: 'Se quell’email ha un account, ti abbiamo inviato un link per creare una nuova password. Controlla la tua email (e lo spam).',
@@ -2602,6 +2610,7 @@ pt: {
   cloud_delete_err_auth: 'Sua sessão não é mais válida. Entre de novo e tente outra vez.',
   cloud_unavailable: 'A nuvem não está disponível nesta versão.',
   news_c47: 'Esqueceu a senha da sua conta na nuvem? Agora você pode recuperar sua conta: em Ajustes, em «Conta na nuvem», enviamos um link ao seu e-mail para criar uma nova senha.',
+  news_c48: 'Ao conectar seu banco, a janela segura do Plaid agora abre em tela cheia no seu telefone: você escolhe seu banco e digita sua senha só com seu banco, como deve ser.',
   cloud_forgot: 'Esqueceu sua senha?',
   cloud_forgot_err_email: 'Digite seu e-mail acima e enviaremos o link para recuperar sua conta.',
   cloud_recovery_sent: 'Se esse e-mail tiver uma conta, enviamos um link para criar uma nova senha. Verifique seu e-mail (e o spam).',
@@ -3331,6 +3340,7 @@ fr: {
   cloud_delete_err_auth: 'Ta session n’est plus valable. Reconnecte-toi et réessaie.',
   cloud_unavailable: 'Le cloud n’est pas disponible dans cette version.',
   news_c47: 'Tu as oublié le mot de passe de ton compte cloud ? Tu peux maintenant récupérer ton compte : dans Réglages, dans « Compte cloud », on t’envoie un lien par e-mail pour créer un nouveau mot de passe.',
+  news_c48: 'Quand tu connectes ta banque, la fenêtre sécurisée de Plaid s’ouvre maintenant en plein écran sur ton téléphone : tu choisis ta banque et tu saisis ton mot de passe uniquement auprès de ta banque, comme il se doit.',
   cloud_forgot: 'Mot de passe oublié ?',
   cloud_forgot_err_email: 'Saisis ton e-mail ci-dessus et on t’envoie le lien pour récupérer ton compte.',
   cloud_recovery_sent: 'Si cet e-mail a un compte, on t’a envoyé un lien pour créer un nouveau mot de passe. Vérifie ton e-mail (et les spams).',
@@ -4060,6 +4070,7 @@ de: {
   cloud_delete_err_auth: 'Deine Sitzung ist nicht mehr gültig. Melde dich erneut an und versuche es noch einmal.',
   cloud_unavailable: 'Die Cloud ist in dieser Version nicht verfügbar.',
   news_c47: 'Passwort für dein Cloud-Konto vergessen? Du kannst dein Konto jetzt zurückholen: In den Einstellungen schicken wir dir unter „Cloud-Konto“ per E-Mail einen Link, um ein neues Passwort zu erstellen.',
+  news_c48: 'Wenn du deine Bank verbindest, öffnet sich das sichere Plaid-Fenster jetzt auf deinem Handy im Vollbild: Du wählst deine Bank und gibst dein Passwort nur bei deiner Bank ein – so, wie es sein soll.',
   cloud_forgot: 'Passwort vergessen?',
   cloud_forgot_err_email: 'Gib oben deine E-Mail ein und wir schicken dir den Link, um dein Konto wiederherzustellen.',
   cloud_recovery_sent: 'Wenn diese E-Mail ein Konto hat, haben wir dir einen Link geschickt, um ein neues Passwort zu erstellen. Prüfe deine E-Mails (und den Spam-Ordner).',
@@ -4789,6 +4800,7 @@ zh: {
   cloud_delete_err_auth: '你的会话已失效。请重新登录后再试。',
   cloud_unavailable: '此版本中没有云服务。',
   news_c47: '忘记了云账户密码？现在可以找回账户：在「设置」的「云账户」中，我们会向你的邮箱发送一个链接，让你创建新密码。',
+  news_c48: '连接银行时，Plaid 的安全窗口现在会在你的手机上全屏打开：你选择自己的银行，并且只在银行那里输入密码，本该如此。',
   cloud_forgot: '忘记密码？',
   cloud_forgot_err_email: '在上方输入你的邮箱，我们会发送找回账户的链接。',
   cloud_recovery_sent: '如果该邮箱有账户，我们已发送一个创建新密码的链接。请查看你的邮箱（和垃圾邮件）。',
@@ -5518,6 +5530,7 @@ ja: {
   cloud_delete_err_auth: 'セッションの有効期限が切れました。再度ログインして、もう一度お試しください。',
   cloud_unavailable: 'このバージョンではクラウドは利用できません。',
   news_c47: 'クラウドアカウントのパスワードを忘れましたか？アカウントを復旧できるようになりました：「設定」の「クラウドアカウント」から、新しいパスワードを作成するリンクをメールで送ります。',
+  news_c48: '銀行を接続するとき、Plaidの安全なウィンドウがスマートフォンで全画面表示されるようになりました：銀行を選び、パスワードは銀行にだけ入力します。これが本来の姿です。',
   cloud_forgot: 'パスワードをお忘れですか？',
   cloud_forgot_err_email: '上にメールアドレスを入力すると、アカウント復旧用のリンクをお送りします。',
   cloud_recovery_sent: 'そのメールアドレスにアカウントがある場合、新しいパスワードを作成するリンクをお送りしました。メール（と迷惑メール）を確認してください。',
@@ -6247,6 +6260,7 @@ ko: {
   cloud_delete_err_auth: '세션이 더 이상 유효하지 않습니다. 다시 로그인하고 시도하세요.',
   cloud_unavailable: '이 버전에서는 클라우드를 사용할 수 없습니다.',
   news_c47: '클라우드 계정 비밀번호를 잊으셨나요? 이제 계정을 복구할 수 있습니다: 설정의 «클라우드 계정»에서 새 비밀번호를 만들 수 있는 링크를 이메일로 보내드립니다.',
+  news_c48: '은행을 연결할 때 Plaid 보안 창이 이제 휴대폰에서 전체 화면으로 열립니다: 은행을 선택하고 비밀번호는 은행에만 입력합니다. 당연히 그래야 합니다.',
   cloud_forgot: '비밀번호를 잊으셨나요?',
   cloud_forgot_err_email: '위에 이메일을 입력하면 계정을 복구할 수 있는 링크를 보내드립니다.',
   cloud_recovery_sent: '해당 이메일로 된 계정이 있으면 새 비밀번호를 만들 수 있는 링크를 보냈습니다. 이메일(스팸함 포함)을 확인하세요.',
@@ -6976,6 +6990,7 @@ ru: {
   cloud_delete_err_auth: 'Ваша сессия больше недействительна. Войдите снова и попробуйте ещё раз.',
   cloud_unavailable: 'Облако недоступно в этой версии.',
   news_c47: 'Забыли пароль от облачного аккаунта? Теперь аккаунт можно восстановить: в «Настройках», в разделе «Облачный аккаунт», мы отправим на вашу почту ссылку для создания нового пароля.',
+  news_c48: 'При подключении банка защищённое окно Plaid теперь открывается на весь экран телефона: вы выбираете свой банк и вводите пароль только в своём банке — так, как и должно быть.',
   cloud_forgot: 'Забыли пароль?',
   cloud_forgot_err_email: 'Введите ваш e-mail выше, и мы отправим ссылку для восстановления аккаунта.',
   cloud_recovery_sent: 'Если на этот e-mail есть аккаунт, мы отправили ссылку для создания нового пароля. Проверьте почту (и папку «Спам»).',
@@ -7705,6 +7720,7 @@ hi: {
   cloud_delete_err_auth: 'आपका सत्र अब मान्य नहीं है। फिर से साइन इन करके कोशिश करें।',
   cloud_unavailable: 'इस संस्करण में क्लाउड उपलब्ध नहीं है।',
   news_c47: 'अपने क्लाउड खाते का पासवर्ड भूल गए? अब आप अपना खाता वापस पा सकते हैं: सेटिंग्स में «क्लाउड खाता» से हम आपके ईमेल पर नया पासवर्ड बनाने का लिंक भेजते हैं।',
+  news_c48: 'जब आप अपना बैंक जोड़ते हैं, तो Plaid की सुरक्षित विंडो अब आपके फ़ोन पर पूरी स्क्रीन में खुलती है: आप अपना बैंक चुनते हैं और पासवर्ड सिर्फ़ अपने बैंक के पास ही डालते हैं — जैसा होना चाहिए।',
   cloud_forgot: 'पासवर्ड भूल गए?',
   cloud_forgot_err_email: 'ऊपर अपना ईमेल लिखें और हम आपके खाते को वापस पाने का लिंक भेज देंगे।',
   cloud_recovery_sent: 'अगर उस ईमेल पर खाता है, तो हमने नया पासवर्ड बनाने का लिंक भेजा है। अपना ईमेल (और स्पैम) देखें।',
@@ -8434,6 +8450,7 @@ ar: {
   cloud_delete_err_auth: 'جلستك لم تعد صالحة. سجّل الدخول من جديد وحاول مرة أخرى.',
   cloud_unavailable: 'السحابة غير متاحة في هذا الإصدار.',
   news_c47: 'نسيت كلمة مرور حسابك السحابي؟ يمكنك الآن استعادة حسابك: من الإعدادات، في «الحساب السحابي»، نرسل إلى بريدك رابطًا لإنشاء كلمة مرور جديدة.',
+  news_c48: 'عند ربط بنكك، أصبحت نافذة Plaid الآمنة تفتح الآن بملء الشاشة على هاتفك: تختار بنكك وتُدخل كلمة المرور لدى بنكك فقط، كما ينبغي أن يكون.',
   cloud_forgot: 'نسيت كلمة المرور؟',
   cloud_forgot_err_email: 'اكتب بريدك الإلكتروني أعلاه وسنرسل إليك رابط استعادة حسابك.',
   cloud_recovery_sent: 'إذا كان لهذا البريد حساب، فقد أرسلنا إليك رابطًا لإنشاء كلمة مرور جديدة. تحقق من بريدك (والبريد المزعج).',
@@ -15394,6 +15411,81 @@ function loadPlaidSdk() {
   return plaidSdkPromise;
 }
 
+/* Compilación 48: blindaje de PRESENTACIÓN de Plaid Link en el
+   WebView de Android. El error (captura de Sterlin, teléfono con la
+   47): el Link SÍ abría, pero su iframe salió diminuto en la
+   esquina inferior izquierda, «escondido hasta el final de la
+   app». Investigación: la app no contribuye en nada al encogido —
+   styles.css no tenía NI UNA regla sobre iframes (la primera es
+   la de esta compilación), ni transform/zoom/filter en html/body
+   o contenedores ancestros, ni JS que toque iframes; el viewport
+   es el estándar. El iframe (src cdn.plaid.com/link/…) lo crea y
+   lo dimensiona el propio SDK: en el navegador de escritorio ese
+   dimensionado funciona (la prueba E2E de la 46 abrió a pantalla
+   completa), pero en este WebView no se impuso y el iframe quedó
+   con su tamaño por defecto, en flujo al final del documento.
+   Blindaje por tres vías redundantes mientras el Link está
+   abierto: (1) la clase «plaid-open» en <html> activa el CSS con
+   !important de styles.css, neutraliza transform/filter de los
+   ancestros y congela el scroll de fondo; (2) scroll a arriba
+   del todo antes de abrir; (3) un refuerzo por código que
+   reaplica la geometría al iframe en cuanto aparece en el DOM
+   (MutationObserver acotado a la sesión de Link: se desconecta
+   al cerrar y caduca solo a los 10 minutos). La clase se quita
+   en onExit, en onSuccess (vía bankExchange) y ante cualquier
+   error del intento de apertura. */
+let plaidShieldObserver = null;
+let plaidShieldTimer = null;
+
+function bankPlaidFrameFix() {
+  const frames = document.querySelectorAll('iframe');
+  for (const f of frames) {
+    const tag = ((f.id || '') + ' ' + (f.name || '') + ' ' + ((f.getAttribute && f.getAttribute('src')) || '')).toLowerCase();
+    if (tag.indexOf('plaid') < 0) continue;
+    /* Si ya lleva la geometría buena no se toca: reescribir el
+       mismo estilo dispararía al propio observador en bucle. */
+    if (f.style && f.style.getPropertyValue('position') === 'fixed' &&
+        f.style.getPropertyValue('width') === '100%') continue;
+    try {
+      const st = f.style;
+      st.setProperty('position', 'fixed', 'important');
+      st.setProperty('inset', '0', 'important');
+      st.setProperty('top', '0', 'important');
+      st.setProperty('left', '0', 'important');
+      st.setProperty('width', '100%', 'important');
+      st.setProperty('height', '100%', 'important');
+      st.setProperty('max-width', 'none', 'important');
+      st.setProperty('max-height', 'none', 'important');
+      st.setProperty('border', '0', 'important');
+      st.setProperty('z-index', '2147483647', 'important');
+    } catch (e) { /* un iframe raro no debe tumbar la conexión */ }
+  }
+}
+
+function bankPlaidOpen(on) {
+  const de = document.documentElement;
+  if (!de) return;
+  if (on) {
+    if (de.classList) de.classList.add('plaid-open');
+    try { window.scrollTo(0, 0); } catch (e) { /* sin scroll no pasa nada */ }
+    de.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+    bankPlaidFrameFix();
+    if (typeof MutationObserver !== 'undefined' && document.body && !plaidShieldObserver) {
+      plaidShieldObserver = new MutationObserver(() => { bankPlaidFrameFix(); });
+      plaidShieldObserver.observe(document.body, {
+        childList: true, subtree: true, attributes: true, attributeFilter: ['src']
+      });
+    }
+    if (plaidShieldTimer) clearTimeout(plaidShieldTimer);
+    plaidShieldTimer = setTimeout(() => { bankPlaidOpen(false); }, 10 * 60 * 1000);
+  } else {
+    if (de.classList) de.classList.remove('plaid-open');
+    if (plaidShieldObserver) { plaidShieldObserver.disconnect(); plaidShieldObserver = null; }
+    if (plaidShieldTimer) { clearTimeout(plaidShieldTimer); plaidShieldTimer = null; }
+  }
+}
+
 async function onBankConnect() {
   if (!PETO_BANK_ENABLED || bankBusy) return;
   if (!supa() || !cloudUser) { renderBankCard(); return; }
@@ -15405,10 +15497,14 @@ async function onBankConnect() {
     await loadPlaidSdk();
     if (!window.Plaid || typeof window.Plaid.create !== 'function') throw new Error('bank_generic');
     bankStatus('');
+    /* Compilación 48: el blindaje se arma ANTES de crear y abrir
+       el Link, para que el iframe nazca ya con la clase puesta. */
+    bankPlaidOpen(true);
     const handler = window.Plaid.create({
       token: out.link_token,
       onSuccess: (publicToken, metadata) => { bankExchange(publicToken, metadata); },
       onExit: (err) => {
+        bankPlaidOpen(false);
         bankBusy = false;
         if (err) bankError(t('bank_err_generic'));
         else bankStatus(t('bank_link_closed'));
@@ -15416,6 +15512,7 @@ async function onBankConnect() {
     });
     handler.open();
   } catch (e) {
+    bankPlaidOpen(false);
     bankBusy = false;
     bankStatus('');
     bankError(bankErrText(e));
@@ -15423,6 +15520,9 @@ async function onBankConnect() {
 }
 
 async function bankExchange(publicToken, metadata) {
+  /* Compilación 48: al llegar aquí el Link ya se cerró (onSuccess):
+     el blindaje se retira antes de seguir con el intercambio. */
+  bankPlaidOpen(false);
   bankStatus(t('bank_connecting'));
   try {
     const inst = (metadata && metadata.institution) || {};

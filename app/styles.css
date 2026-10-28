@@ -575,3 +575,42 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 .bank-conn{padding:.6rem 0;border-top:1px solid var(--line)}
 .bank-conn:first-child{border-top:none;padding-top:0}
 .bank-acct{display:flex;justify-content:space-between;gap:.75rem;margin:.15rem 0}
+
+/* ---------- Compilación 48 · Blindaje de la ventana de Plaid ----------
+   El SDK de Plaid Link pinta su ventana en un iframe propio
+   (src «https://cdn.plaid.com/link/v2/stable/link.html…») que
+   dimensiona por su cuenta al mostrarlo. En el WebView de Android
+   ese dimensionado no se impuso (en el navegador de escritorio sí):
+   el iframe salió diminuto y anclado al final del documento,
+   inutilizable. La app NO tenía ni una regla que lo encogiera
+   (este archivo no mencionaba iframes; verificado en la 48), así
+   que aquí se fuerza la geometría buena con !important, acotada a
+   mientras el Link está abierto (clase «plaid-open» en <html>,
+   que pone y quita app.js): fuera de ese momento las reglas no
+   existen y no pueden tapar nada. NO se fuerza display ni
+   visibilidad a propósito: el SDK esconde su iframe hasta abrirlo
+   y ese escondite se respeta; solo se corrige tamaño y posición.
+   La «i» de los selectores de id/name cubre mayúsculas del SDK. */
+html.plaid-open iframe[src*="cdn.plaid.com"],
+html.plaid-open iframe[src*="plaid.com/link"],
+html.plaid-open iframe[id*="plaid" i],
+html.plaid-open iframe[name*="plaid" i]{
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  border:0 !important;
+  z-index:2147483647 !important;
+}
+/* Con el Link abierto, ningún ancestro del iframe puede crear un
+   contexto que rompa su «fixed» (transform/filter lo romperían) y
+   la página de detrás queda quieta: sin scroll mientras se elige
+   banco. Al cerrarse el Link, app.js quita la clase y todo vuelve. */
+html.plaid-open,
+html.plaid-open body{
+  transform:none !important;
+  filter:none !important;
+  overflow:hidden !important;
+}
