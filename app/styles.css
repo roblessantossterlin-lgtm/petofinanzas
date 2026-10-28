@@ -599,6 +599,24 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 .bank-conn:first-child{border-top:none;padding-top:0}
 .bank-acct{display:flex;justify-content:space-between;gap:.75rem;margin:.15rem 0}
 
+/* Compilación 55: el área de impresión del informe del mes no se
+   ve en pantalla; al imprimir CON la clase printing-report en el
+   body, solo sale ella (el informe), en negro sobre blanco. */
+#print-area{ display:none; }
+@media print{
+  body.printing-report > *:not(#print-area){ display:none !important; }
+  body.printing-report #print-area{
+    display:block !important;
+    color:#000;
+    background:#fff;
+    font-family:Georgia, 'Times New Roman', serif;
+    padding:16px;
+  }
+  body.printing-report #print-area h3{ margin:0 0 12px; }
+  body.printing-report #print-area h4{ margin:16px 0 6px; }
+}
+
+
 /* ---------- Compilación 48 · Blindaje de la ventana de Plaid ----------
    El SDK de Plaid Link pinta su ventana en un iframe propio
    (src «https://cdn.plaid.com/link/v2/stable/link.html…») que

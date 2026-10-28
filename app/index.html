@@ -451,6 +451,9 @@
     <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
     <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
 
+    <!-- Compilación 55: fondo de emergencia con meta editable y barra de avance. -->
+    <section id="efund-card" class="card"></section>
+
     <section id="sav-bank-wrap" class="card" hidden>
       <h3 data-i18n="bank_from_bank">De tu banco</h3>
       <ul id="sav-bank-list" class="item-list"></ul>
@@ -544,6 +547,23 @@
     </section>
     <ul id="budget-list" class="item-list"></ul>
 
+    <!-- Compilación 55: informe del mes imprimible (PDF) y en CSV. -->
+    <section class="card form-card" id="mr-card">
+      <h3 data-i18n="mr_btn">🧾 Informe del mes</h3>
+      <div class="form-actions">
+        <button id="mr-generate" type="button" class="btn btn-secondary" data-i18n="mr_generate">Ver el informe de este mes</button>
+      </div>
+      <div id="mr-output" hidden>
+        <div id="mr-body"></div>
+        <div class="form-actions">
+          <button id="mr-print" type="button" class="btn btn-secondary" data-i18n="mr_print">🖨️ Imprimir / guardar PDF</button>
+          <button id="mr-csv" type="button" class="btn btn-secondary" data-i18n="mr_csv">⬇️ Descargar CSV</button>
+        </div>
+        <div id="mr-actions" class="form-actions"></div>
+        <p id="mr-status" class="muted small" aria-live="polite"></p>
+      </div>
+    </section>
+
     <form id="category-form" class="card form-card" autocomplete="off">
       <h3 data-i18n="cat_form_title">Categoría personalizada</h3>
       <label for="cat-name" data-i18n="cat_name_label">Nombre de la categoría</label>
@@ -636,6 +656,8 @@
       <input id="debt-interest" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="0">
       <label for="debt-minpay" data-i18n="debt_minpay_label">Pago mínimo mensual $ (opcional)</label>
       <input id="debt-minpay" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <label for="debt-planpay" data-i18n="debt_planpay_label">Pago mensual planeado $ (opcional)</label>
+      <input id="debt-planpay" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
       <label for="debt-status" data-i18n="debt_status_label">Estado</label>
       <select id="debt-status">
         <option value="pendiente" data-i18n="debt_status_pending">Pendiente</option>
@@ -650,6 +672,9 @@
 
     <ul id="debt-list" class="item-list"></ul>
     <p id="debt-empty" class="empty-state" hidden data-i18n="debt_empty">No tienes deudas registradas. 🎉</p>
+
+    <!-- Compilación 55: resumen del plan para salir de deudas (solo lectura). -->
+    <section id="debt-plan-card" class="card" hidden></section>
 
     <section id="debt-bank-wrap" class="card" hidden>
       <h3 data-i18n="bank_from_bank">De tu banco</h3>
@@ -677,6 +702,7 @@
     <h2 data-i18n="sec_remesas">Remesas</h2>
     <p class="muted" data-i18n="rem_intro">El dinero que envías a tu gente: cuánto salió en dólares y cuánto llegó en pesos.</p>
     <p id="rem-total" class="total-line"></p>
+    <p id="rem-year-total" class="total-line"></p>
 
     <form id="remittance-form" class="card form-card" autocomplete="off">
       <h3 id="remittance-form-title">Guardar remesa</h3>
@@ -1192,18 +1218,33 @@
         <button id="btn-privacy-policy" type="button" class="btn btn-secondary" data-i18n="priv_btn">Leer la política completa</button>
       </div>
     </section>
+    <!-- Compilación 55: reglas propias de categorización. -->
+    <section class="card form-card" id="settings-rules">
+      <h3 data-i18n="rules_title">🧠 Mis reglas de categorías</h3>
+      <p class="muted small" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
+      <ul id="rules-list" class="item-list"></ul>
+      <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
+      <label for="rule-match" data-i18n="rules_match_label">Texto que contiene la nota o el comercio</label>
+      <input id="rule-match" type="text" maxlength="40" data-i18n-ph="rules_match_ph" placeholder="Contiene… (ej.: Shell)">
+      <label for="rule-category" data-i18n="category_label">Categoría</label>
+      <select id="rule-category"></select>
+      <p id="rules-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="rule-add" type="button" class="btn btn-secondary" data-i18n="rules_add">Añadir regla</button>
+      </div>
+    </section>
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
-      <!-- Novedades (Compilación 54): SOLO la(s) línea(s) de la versión
+      <!-- Novedades (Compilación 55): SOLO la(s) línea(s) de la versión
            vigente (las de NEWS_CURRENT en app.js). En cada compilación
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c54_budget">🎯 Topes que aprenden de ti: en Presupuesto, PETO Finanzas te sugiere el tope de cada categoría según tu gasto real. Nada cambia sin que toques «Usar».</li>
-        <li data-i18n="news_c54_recurring">🔁 Cobros que se repiten: PETO Finanzas detecta tus suscripciones y pagos regulares, y te dice cuánto te cuestan al año.</li>
+        <li data-i18n="news_c55_voice">🎤 Anota con tu voz: en Gastos e Ingresos toca «Dictar», di el monto y en qué fue, y PETO Finanzas rellena el formulario. Tú revisas y guardas: nada se anota solo.</li>
+        <li data-i18n="news_c55_smart">🧾 Tu mes, listo para compartir: informe imprimible o en CSV, plan para salir de deudas, fondo de emergencia con tu avance y tus propias reglas de categorías en Ajustes.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 54</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 55</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
@@ -1273,6 +1314,9 @@
     <a class="btn btn-primary btn-small" id="san-public-bar-btn" href="https://petofinanzas.com/app/" target="_blank" rel="noopener">Probar la app</a>
   </div>
 </section>
+
+<!-- Compilación 55: área de impresión del informe del mes (solo se ve al imprimir). -->
+<div id="print-area" aria-hidden="true"></div>
 
 <script src="vendor/supabase.js"></script>
 <script src="web.js"></script>
