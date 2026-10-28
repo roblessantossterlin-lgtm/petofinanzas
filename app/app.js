@@ -16,7 +16,14 @@
    que quedaron en «Otros», sin tocar lo puesto a mano) y los
    avisos de Inicio tocables, que llevan a donde se
    solucionan (el del tope, a Presupuesto con la categoría
-   resaltada; el del respaldo, a Ajustes). Novedades: solo
+   resaltada; el del respaldo, a Ajustes). Y su última
+>    pieza: las transferencias entre cuentas propias y los
+>    pagos de tarjeta ya no cuentan como gasto — van a la
+>    casilla «Transferencias» con su marca y quedan fuera de
+>    totales, topes y gráfica (la exclusión es por la marca;
+>    BANK_MAP_VERSION = 3: la sincronización completa corre
+>    otra vez y re-clasifica lo ya importado, sin tocar lo
+>    puesto a mano). Novedades: solo
    news_c49 (815 claves por idioma). Y con la Compilación
    48: el blindaje de la ventana de Plaid Link (en el WebView
    de Android salía diminuta y anclada al final de la app:
@@ -546,10 +553,21 @@ function validateData(raw) {
   d.customCategories = Array.from(new Set(d.customCategories)).slice(0, 50);
 
   const okCat = (c) => allCategories(d).includes(c) ? c : 'Otros';
+  /* Compilación 49 (transferencias): la casilla «Transferencias»
+     NO es una categoría de la lista (no está en allCategories ni
+     se puede elegir en los formularios): solo se conserva si el
+     movimiento trae la marca `transfer` del importador del banco.
+     Sin marca, una categoría así se sanea a «Otros» como
+     cualquier otra desconocida. */
+  const okCatMov = (x) => (x.transfer === true && cleanText(x.category, 30) === 'Transferencias')
+    ? 'Transferencias' : okCat(cleanText(x.category, 30));
   d.expenses = arr(raw.expenses).filter((x) => x && typeof x === 'object').map((x) => ({
     id: cleanMovId(x.id), amountCents: cleanCents(x.amountCents, false),
-    category: okCat(cleanText(x.category, 30)), date: cleanDate(x.date), note: cleanText(x.note, 120),
+    category: okCatMov(x), date: cleanDate(x.date), note: cleanText(x.note, 120),
     photo: cleanPhoto(x.photo), biz: x.biz === true,
+    /* La marca de transferencia del importador bancario: con ella
+       el movimiento no cuenta en totales, topes ni gráfica. */
+    transfer: x.transfer === true,
     /* Compilación 41 (cuentas vivas): de dónde salió el dinero. Los
        movimientos viejos no traen los campos: quedan sin enlazar y
        NO mueven ningún saldo ni el total de ahorros. La limpieza del
@@ -574,6 +592,10 @@ function validateData(raw) {
     return {
       id: cleanMovId(x.id), amountCents: amount, savingsCents: savings,
       date: cleanDate(x.date), note: cleanText(x.note, 120), biz: x.biz === true,
+      /* Compilación 49: marca de transferencia (una entrada que es
+         dinero movido entre cuentas propias no cuenta en el total
+         de Ingresos de Inicio). */
+      transfer: x.transfer === true,
       /* Compilación 41 (cuentas vivas): a dónde entró el dinero. */
       accountId: (typeof x.accountId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.accountId)) ? x.accountId : null,
       toSavings: x.toSavings === true,
@@ -865,7 +887,7 @@ es: {
   cloud_deleted: 'Tu cuenta fue eliminada.',
   cloud_delete_err_auth: 'Tu sesión ya no es válida. Entra de nuevo e inténtalo otra vez.',
   cloud_unavailable: 'La nube no está disponible en esta versión.',
-  news_c49: 'Tu banco ya trabaja solo: al conectarlo, tus gastos e ingresos se anotan automáticamente y cada uno cae en la categoría que le corresponde: la comida en Comida, la gasolina en Gasolina y así con todo. Y al abrir la app, lo nuevo de tu banco se sincroniza solo, sin tocar nada.',
+  news_c49: 'Tu banco ya trabaja solo: al conectarlo, tus gastos e ingresos se anotan automáticamente y cada uno cae en la categoría que le corresponde: la comida en Comida, la gasolina en Gasolina y así con todo. Y al abrir la app, lo nuevo de tu banco se sincroniza solo, sin tocar nada. Además, las transferencias entre tus cuentas y los pagos de tu tarjeta ya no cuentan como gasto: van a su propia casilla, «Transferencias», y no inflan tus totales ni tus topes.',
   cloud_forgot: '¿Olvidaste tu contraseña?',
   cloud_forgot_err_email: 'Escribe tu correo arriba y te enviamos el enlace para recuperar tu cuenta.',
   cloud_recovery_sent: 'Si ese correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva. Revisa tu correo (y el spam).',
@@ -1335,7 +1357,7 @@ en: {
   cloud_deleted: 'Your account was deleted.',
   cloud_delete_err_auth: 'Your session is no longer valid. Sign in again and try again.',
   cloud_unavailable: 'The cloud is not available in this version.',
-  news_c49: 'Your bank now works on its own: when you connect it, your expenses and income are recorded automatically, and each one lands in the category it belongs to — food in Food, gas in Gas, and so on. And when you open the app, anything new from your bank syncs by itself, no taps needed.',
+  news_c49: 'Your bank now works on its own: when you connect it, your expenses and income are recorded automatically, and each one lands in the category it belongs to — food in Food, gas in Gas, and so on. And when you open the app, anything new from your bank syncs by itself, no taps needed. Plus, transfers between your accounts and your card payments no longer count as spending: they go to their own box, «Transfers», and they do not inflate your totals or your budget caps.',
   cloud_forgot: 'Forgot your password?',
   cloud_forgot_err_email: 'Enter your email above and we’ll send you the link to recover your account.',
   cloud_recovery_sent: 'If that email has an account, we sent you a link to create a new password. Check your email (and spam).',
@@ -1874,7 +1896,7 @@ it: {
   cloud_deleted: 'Il tuo account è stato eliminato.',
   cloud_delete_err_auth: 'La tua sessione non è più valida. Accedi di nuovo e riprova.',
   cloud_unavailable: 'Il cloud non è disponibile in questa versione.',
-  news_c49: 'La tua banca ora lavora da sola: quando la colleghi, le tue spese e le tue entrate si registrano automaticamente e ciascuna finisce nella categoria giusta — il cibo in Cibo, la benzina in Benzina e così via. E quando apri l’app, le novità della tua banca si sincronizzano da sole, senza toccare nulla.',
+  news_c49: 'La tua banca ora lavora da sola: quando la colleghi, le tue spese e le tue entrate si registrano automaticamente e ciascuna finisce nella categoria giusta — il cibo in Cibo, la benzina in Benzina e così via. E quando apri l’app, le novità della tua banca si sincronizzano da sole, senza toccare nulla. Inoltre, i trasferimenti tra i tuoi conti e i pagamenti della tua carta non contano più come spese: vanno nella loro casella, «Trasferimenti», e non gonfiano i tuoi totali né i tuoi tetti di spesa.',
   cloud_forgot: 'Password dimenticata?',
   cloud_forgot_err_email: 'Scrivi la tua email qui sopra e ti inviamo il link per recuperare il tuo account.',
   cloud_recovery_sent: 'Se quell’email ha un account, ti abbiamo inviato un link per creare una nuova password. Controlla la tua email (e lo spam).',
@@ -2148,7 +2170,7 @@ it: {
   ob_title: 'Benvenuto in PETO Finanzas!',
   ob_intro_1: 'Organizza i tuoi soldi in pochi minuti: spese, entrate, budget, conti e debiti.',
   ob_intro_2: 'Con il tuo account nel cloud.',
-  ob_intro_3: 'I tuoi dati si sincronizzano con il tuo telefono.',
+  ob_intro_3: 'Tutto resta salvato solo sul tuo telefono.',
   ob_name_label: 'Il tuo nome (facoltativo)',
   ob_name_ph: 'Il tuo nome',
   ob_pin_label: 'Crea un PIN di sicurezza (facoltativo)',
@@ -2587,7 +2609,7 @@ pt: {
   cloud_deleted: 'Sua conta foi excluída.',
   cloud_delete_err_auth: 'Sua sessão não é mais válida. Entre de novo e tente outra vez.',
   cloud_unavailable: 'A nuvem não está disponível nesta versão.',
-  news_c49: 'Seu banco agora trabalha sozinho: ao conectá-lo, suas despesas e receitas são registradas automaticamente e cada uma cai na categoria certa — a comida em Comida, a gasolina em Gasolina e assim com tudo. E ao abrir o app, o que houver de novo no seu banco sincroniza sozinho, sem tocar em nada.',
+  news_c49: 'Seu banco agora trabalha sozinho: ao conectá-lo, suas despesas e receitas são registradas automaticamente e cada uma cai na categoria certa — a comida em Comida, a gasolina em Gasolina e assim com tudo. E ao abrir o app, o que houver de novo no seu banco sincroniza sozinho, sem tocar em nada. Além disso, as transferências entre suas contas e os pagamentos do seu cartão já não contam como gasto: vão para a sua própria caixinha, «Transferências», e não inflam seus totais nem seus tetos.',
   cloud_forgot: 'Esqueceu sua senha?',
   cloud_forgot_err_email: 'Digite seu e-mail acima e enviaremos o link para recuperar sua conta.',
   cloud_recovery_sent: 'Se esse e-mail tiver uma conta, enviamos um link para criar uma nova senha. Verifique seu e-mail (e o spam).',
@@ -3300,7 +3322,7 @@ fr: {
   cloud_deleted: 'Ton compte a été supprimé.',
   cloud_delete_err_auth: 'Ta session n’est plus valable. Reconnecte-toi et réessaie.',
   cloud_unavailable: 'Le cloud n’est pas disponible dans cette version.',
-  news_c49: 'Ta banque travaille maintenant toute seule : quand tu la connectes, tes dépenses et tes revenus s’enregistrent automatiquement et chacun tombe dans la catégorie qui lui correspond — la nourriture en Nourriture, l’essence en Essence, et ainsi de suite. Et quand tu ouvres l’appli, les nouveautés de ta banque se synchronisent toutes seules, sans rien toucher.',
+  news_c49: 'Ta banque travaille maintenant toute seule : quand tu la connectes, tes dépenses et tes revenus s’enregistrent automatiquement et chacun tombe dans la catégorie qui lui correspond — la nourriture en Nourriture, l’essence en Essence, et ainsi de suite. Et quand tu ouvres l’appli, les nouveautés de ta banque se synchronisent toutes seules, sans rien toucher. De plus, les virements entre tes comptes et les paiements de ta carte ne comptent plus comme des dépenses : ils vont dans leur propre case, « Virements », et ne gonflent ni tes totaux ni tes plafonds.',
   cloud_forgot: 'Mot de passe oublié ?',
   cloud_forgot_err_email: 'Saisis ton e-mail ci-dessus et on t’envoie le lien pour récupérer ton compte.',
   cloud_recovery_sent: 'Si cet e-mail a un compte, on t’a envoyé un lien pour créer un nouveau mot de passe. Vérifie ton e-mail (et les spams).',
@@ -4013,7 +4035,7 @@ de: {
   cloud_deleted: 'Dein Konto wurde gelöscht.',
   cloud_delete_err_auth: 'Deine Sitzung ist nicht mehr gültig. Melde dich erneut an und versuche es noch einmal.',
   cloud_unavailable: 'Die Cloud ist in dieser Version nicht verfügbar.',
-  news_c49: 'Deine Bank arbeitet jetzt von selbst: Wenn du sie verbindest, werden deine Ausgaben und Einnahmen automatisch eingetragen, und jede landet in der Kategorie, in die sie gehört – Essen bei Essen, Benzin bei Benzin und so weiter. Und wenn du die App öffnest, synchronisiert sich alles Neue deiner Bank von allein, ohne dass du etwas antippen musst.',
+  news_c49: 'Deine Bank arbeitet jetzt von selbst: Wenn du sie verbindest, werden deine Ausgaben und Einnahmen automatisch eingetragen, und jede landet in der Kategorie, in die sie gehört – Essen bei Essen, Benzin bei Benzin und so weiter. Und wenn du die App öffnest, synchronisiert sich alles Neue deiner Bank von allein, ohne dass du etwas antippen musst. Außerdem zählen Überweisungen zwischen deinen Konten und deine Kartenzahlungen nicht mehr als Ausgaben: Sie landen in ihrem eigenen Fach „Überweisungen“ und blähen weder deine Summen noch deine Budgetgrenzen auf.',
   cloud_forgot: 'Passwort vergessen?',
   cloud_forgot_err_email: 'Gib oben deine E-Mail ein und wir schicken dir den Link, um dein Konto wiederherzustellen.',
   cloud_recovery_sent: 'Wenn diese E-Mail ein Konto hat, haben wir dir einen Link geschickt, um ein neues Passwort zu erstellen. Prüfe deine E-Mails (und den Spam-Ordner).',
@@ -4726,7 +4748,7 @@ zh: {
   cloud_deleted: '你的账户已删除。',
   cloud_delete_err_auth: '你的会话已失效。请重新登录后再试。',
   cloud_unavailable: '此版本中没有云服务。',
-  news_c49: '你的银行现在会自己工作了：连接后，你的支出和收入会自动记录，每一笔都会落到它所属的类别里——食物归食物，汽油归汽油，其他也一样。而且打开应用时，银行里的新动态会自动同步，你什么都不用点。',
+  news_c49: '你的银行现在会自己工作了：连接后，你的支出和收入会自动记录，每一笔都会落到它所属的类别里——食物归食物，汽油归汽油，其他也一样。而且打开应用时，银行里的新动态会自动同步，你什么都不用点。此外，你账户之间的转账和信用卡还款不再算作支出：它们会进入自己的专属类别“转账”，不会虚增你的总额或预算上限。',
   cloud_forgot: '忘记密码？',
   cloud_forgot_err_email: '在上方输入你的邮箱，我们会发送找回账户的链接。',
   cloud_recovery_sent: '如果该邮箱有账户，我们已发送一个创建新密码的链接。请查看你的邮箱（和垃圾邮件）。',
@@ -5439,7 +5461,7 @@ ja: {
   cloud_deleted: 'アカウントが削除されました。',
   cloud_delete_err_auth: 'セッションの有効期限が切れました。再度ログインして、もう一度お試しください。',
   cloud_unavailable: 'このバージョンではクラウドは利用できません。',
-  news_c49: 'あなたの銀行が自動で働くようになりました：接続すると、支出と収入が自動的に記録され、それぞれふさわしいカテゴリに入ります——食費は食費に、ガソリンはガソリンに、ほかも同じです。そしてアプリを開くと、銀行の新しい動きが何もしなくても自動で同期されます。',
+  news_c49: 'あなたの銀行が自動で働くようになりました：接続すると、支出と収入が自動的に記録され、それぞれふさわしいカテゴリに入ります——食費は食費に、ガソリンはガソリンに、ほかも同じです。そしてアプリを開くと、銀行の新しい動きが何もしなくても自動で同期されます。さらに、口座間の振替やカードの支払いは支出に数えられなくなりました：専用の「振替」ボックスに入り、合計や予算の上限を膨らませません。',
   cloud_forgot: 'パスワードをお忘れですか？',
   cloud_forgot_err_email: '上にメールアドレスを入力すると、アカウント復旧用のリンクをお送りします。',
   cloud_recovery_sent: 'そのメールアドレスにアカウントがある場合、新しいパスワードを作成するリンクをお送りしました。メール（と迷惑メール）を確認してください。',
@@ -6152,7 +6174,7 @@ ko: {
   cloud_deleted: '계정이 삭제되었습니다.',
   cloud_delete_err_auth: '세션이 더 이상 유효하지 않습니다. 다시 로그인하고 시도하세요.',
   cloud_unavailable: '이 버전에서는 클라우드를 사용할 수 없습니다.',
-  news_c49: '이제 은행이 스스로 일합니다: 연결하면 지출과 수입이 자동으로 기록되고, 각각 알맞은 카테고리에 들어갑니다 — 음식은 음식으로, 주유는 주유로, 나머지도 마찬가지입니다. 그리고 앱을 열면 은행의 새로운 내역이 아무것도 누르지 않아도 스스로 동기화됩니다.',
+  news_c49: '이제 은행이 스스로 일합니다: 연결하면 지출과 수입이 자동으로 기록되고, 각각 알맞은 카테고리에 들어갑니다 — 음식은 음식으로, 주유는 주유로, 나머지도 마찬가지입니다. 그리고 앱을 열면 은행의 새로운 내역이 아무것도 누르지 않아도 스스로 동기화됩니다. 또한 계좌 간 이체와 카드 결제는 더 이상 지출로 계산되지 않습니다: 전용 «이체» 칸으로 들어가 총액이나 예산 한도를 부풀리지 않습니다.',
   cloud_forgot: '비밀번호를 잊으셨나요?',
   cloud_forgot_err_email: '위에 이메일을 입력하면 계정을 복구할 수 있는 링크를 보내드립니다.',
   cloud_recovery_sent: '해당 이메일로 된 계정이 있으면 새 비밀번호를 만들 수 있는 링크를 보냈습니다. 이메일(스팸함 포함)을 확인하세요.',
@@ -6865,7 +6887,7 @@ ru: {
   cloud_deleted: 'Ваш аккаунт был удалён.',
   cloud_delete_err_auth: 'Ваша сессия больше недействительна. Войдите снова и попробуйте ещё раз.',
   cloud_unavailable: 'Облако недоступно в этой версии.',
-  news_c49: 'Теперь ваш банк всё делает сам: при подключении ваши расходы и доходы записываются автоматически, и каждый попадает в свою категорию — еда в «Еду», бензин в «Бензин» и так далее. А когда вы открываете приложение, всё новое из банка синхронизируется само, ничего нажимать не нужно.',
+  news_c49: 'Теперь ваш банк всё делает сам: при подключении ваши расходы и доходы записываются автоматически, и каждый попадает в свою категорию — еда в «Еду», бензин в «Бензин» и так далее. А когда вы открываете приложение, всё новое из банка синхронизируется само, ничего нажимать не нужно. Кроме того, переводы между вашими счетами и платежи по карте больше не считаются расходами: они попадают в отдельную ячейку «Переводы» и не раздувают ваши итоги и лимиты бюджета.',
   cloud_forgot: 'Забыли пароль?',
   cloud_forgot_err_email: 'Введите ваш e-mail выше, и мы отправим ссылку для восстановления аккаунта.',
   cloud_recovery_sent: 'Если на этот e-mail есть аккаунт, мы отправили ссылку для создания нового пароля. Проверьте почту (и папку «Спам»).',
@@ -7578,7 +7600,7 @@ hi: {
   cloud_deleted: 'आपका खाता हटा दिया गया।',
   cloud_delete_err_auth: 'आपका सत्र अब मान्य नहीं है। फिर से साइन इन करके कोशिश करें।',
   cloud_unavailable: 'इस संस्करण में क्लाउड उपलब्ध नहीं है।',
-  news_c49: 'अब आपका बैंक अपने आप काम करता है: उसे जोड़ते ही आपके खर्च और आय अपने आप दर्ज हो जाते हैं, और हर एक अपनी सही श्रेणी में जाता है — खाना खाने में, पेट्रोल पेट्रोल में, और बाकी सब भी ऐसे ही। और जब आप ऐप खोलते हैं, तो बैंक की नई चीज़ें बिना कुछ छुए अपने आप सिंक हो जाती हैं।',
+  news_c49: 'अब आपका बैंक अपने आप काम करता है: उसे जोड़ते ही आपके खर्च और आय अपने आप दर्ज हो जाते हैं, और हर एक अपनी सही श्रेणी में जाता है — खाना खाने में, पेट्रोल पेट्रोल में, और बाकी सब भी ऐसे ही। और जब आप ऐप खोलते हैं, तो बैंक की नई चीज़ें बिना कुछ छुए अपने आप सिंक हो जाती हैं। इसके अलावा, आपके खातों के बीच के ट्रांसफ़र और आपके कार्ड के भुगतान अब खर्च नहीं गिने जाते: वे अपने अलग खाने, «ट्रांसफ़र», में जाते हैं और न आपके कुल को बढ़ाते हैं, न आपकी बजट सीमाओं को।',
   cloud_forgot: 'पासवर्ड भूल गए?',
   cloud_forgot_err_email: 'ऊपर अपना ईमेल लिखें और हम आपके खाते को वापस पाने का लिंक भेज देंगे।',
   cloud_recovery_sent: 'अगर उस ईमेल पर खाता है, तो हमने नया पासवर्ड बनाने का लिंक भेजा है। अपना ईमेल (और स्पैम) देखें।',
@@ -8291,7 +8313,7 @@ ar: {
   cloud_deleted: 'تم حذف حسابك.',
   cloud_delete_err_auth: 'جلستك لم تعد صالحة. سجّل الدخول من جديد وحاول مرة أخرى.',
   cloud_unavailable: 'السحابة غير متاحة في هذا الإصدار.',
-  news_c49: 'أصبح بنكك يعمل من تلقاء نفسه: عند ربطه، تُسجَّل نفقاتك ودخلك تلقائيًا، وكل واحدة تذهب إلى الفئة التي تخصها — الطعام في الطعام، والبنزين في البنزين، وهكذا كل شيء. وعندما تفتح التطبيق، تتم مزامنة كل ما هو جديد في بنكك من تلقاء نفسه، دون أن تلمس شيئًا.',
+  news_c49: 'أصبح بنكك يعمل من تلقاء نفسه: عند ربطه، تُسجَّل نفقاتك ودخلك تلقائيًا، وكل واحدة تذهب إلى الفئة التي تخصها — الطعام في الطعام، والبنزين في البنزين، وهكذا كل شيء. وعندما تفتح التطبيق، تتم مزامنة كل ما هو جديد في بنكك من تلقاء نفسه، دون أن تلمس شيئًا. وبالإضافة إلى ذلك، لم تعد التحويلات بين حساباتك ومدفوعات بطاقتك تُحسب كنفقات: فهي تذهب إلى خانة خاصة بها، «التحويلات»، ولا تضخّم مجاميعك ولا حدود ميزانيتك.',
   cloud_forgot: 'نسيت كلمة المرور؟',
   cloud_forgot_err_email: 'اكتب بريدك الإلكتروني أعلاه وسنرسل إليك رابط استعادة حسابك.',
   cloud_recovery_sent: 'إذا كان لهذا البريد حساب، فقد أرسلنا إليك رابطًا لإنشاء كلمة مرور جديدة. تحقق من بريدك (والبريد المزعج).',
@@ -9141,6 +9163,22 @@ function initHardwareBack() {
 function monthIncomes(key) { return db.incomes.filter((i) => monthKeyOf(i.date) === key); }
 function monthExpenses(key) { return db.expenses.filter((e) => monthKeyOf(e.date) === key); }
 function sumCents(list) { return list.reduce((t, x) => t + x.amountCents, 0); }
+/* Compilación 49 (transferencias): un movimiento con la marca
+   `transfer` (lo pone el importador del banco cuando el servidor
+   detecta una transferencia entre cuentas propias o un pago de
+   tarjeta) NO es gasto ni ingreso nuevo: se ve en las listas con
+   su casilla «Transferencias», pero queda FUERA de los totales
+   de Inicio, del uso y las alertas de presupuesto y de la
+   gráfica de gastos. La exclusión es por la MARCA, nunca por el
+   nombre de la categoría: si la persona mueve el movimiento a
+   una categoría real, la marca se quita y vuelve a contar.
+   monthCountedExpenses/monthCountedIncomes son el criterio
+   único: todo total que deba ignorar transferencias pasa por
+   aquí. Las listas de movimientos usan monthExpenses/
+   monthIncomes a secas: ahí las transferencias SÍ se ven. */
+function isTransferMov(x) { return !!x && x.transfer === true; }
+function monthCountedExpenses(key) { return monthExpenses(key).filter((e) => !isTransferMov(e)); }
+function monthCountedIncomes(key) { return monthIncomes(key).filter((i) => !isTransferMov(i)); }
 /* El ahorro NUNCA se calcula solo: el total del mes suma lo que la persona
    anotó en cada ingreso (savingsCents) más los ahorros sueltos que agregó a
    mano en la sección Ahorros (db.savings). El porcentaje solo es sugerencia. */
@@ -9246,14 +9284,14 @@ function goalPct() {
 }
 function menuKeyText(id) {
   const key = currentMonthKey();
-  if (id === 'gastos') return t('key_spent_month', { amount: fmt(sumCents(monthExpenses(key))) });
-  if (id === 'ingresos') return t('key_income_month', { amount: fmt(sumCents(monthIncomes(key))) });
+  if (id === 'gastos') return t('key_spent_month', { amount: fmt(sumCents(monthCountedExpenses(key))) });
+  if (id === 'ingresos') return t('key_income_month', { amount: fmt(sumCents(monthCountedIncomes(key))) });
   if (id === 'ahorros') {
     let s = t('key_saved_total', { amount: fmt(allSavingsTotal()) });
     if (db.savingsGoal) s += t('key_goal_suffix', { name: db.savingsGoal.name, pct: goalPct() });
     return s;
   }
-  if (id === 'resumen') return t('key_spent_month', { amount: fmt(sumCents(monthExpenses(key))) });
+  if (id === 'resumen') return t('key_spent_month', { amount: fmt(sumCents(monthCountedExpenses(key))) });
   if (id === 'presupuesto') {
     const n = Object.keys(db.budgets).filter((k) => db.budgets[k] > 0).length;
     return t(n === 1 ? 'key_budget_one' : 'key_budget_many', { n: n });
@@ -9420,7 +9458,7 @@ function monthlyBudgetTotalCents(key) {
     if (b > 0) total += b;
   }
   if (total > 0) return total;
-  return sumCents(monthIncomes(key));
+  return sumCents(monthCountedIncomes(key));
 }
 /* Días que quedan del mes en curso, incluido hoy. */
 function daysLeftInMonth(key) {
@@ -9434,7 +9472,7 @@ function dailySpendInfo() {
   const key = currentMonthKey();
   const total = monthlyBudgetTotalCents(key);
   if (total <= 0) return null;
-  const spent = sumCents(monthExpenses(key));
+  const spent = sumCents(monthCountedExpenses(key));
   const left = total - spent;
   return {
     total: total, spent: spent, left: left,
@@ -9735,8 +9773,8 @@ function renderHome() {
   renderNextStep();
   document.getElementById('sum-savings').textContent = fmt(monthSavings(key));
   document.getElementById('sum-debts').textContent = fmt(pendingDebtsTotal());
-  document.getElementById('sum-incomes').textContent = fmt(sumCents(monthIncomes(key)));
-  document.getElementById('sum-expenses').textContent = fmt(sumCents(monthExpenses(key)));
+  document.getElementById('sum-incomes').textContent = fmt(sumCents(monthCountedIncomes(key)));
+  document.getElementById('sum-expenses').textContent = fmt(sumCents(monthCountedExpenses(key)));
   /* Accesos rápidos de Inicio: si una sección está apagada en Ajustes,
      su acceso también se esconde. */
   document.getElementById('tile-available').hidden = db.settings.sections.cuentas === false;
@@ -9842,7 +9880,7 @@ function chartColor(cat) {
 }
 function homeChartSegments(key) {
   const byCat = new Map();
-  for (const e of monthExpenses(key)) {
+  for (const e of monthCountedExpenses(key)) {
     byCat.set(e.category, (byCat.get(e.category) || 0) + e.amountCents);
   }
   const rows = [...byCat.entries()]
@@ -10086,7 +10124,10 @@ function renderExpenses() {
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
       beginUndo();
-      db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null, accountId: item.accountId || null, fromSavings: item.fromSavings === true, src: movementSrc(item, false) });
+      /* La copia conserva la marca de transferencia si la trae:
+         repetir una transferencia crea otra transferencia, con
+         su misma casilla y fuera de los totales. */
+      db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null, accountId: item.accountId || null, fromSavings: item.fromSavings === true, src: movementSrc(item, false), transfer: item.transfer === true });
       save(); renderExpenses(); showUndoToast();
     }));
     acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => openExpenseEdit(item)));
@@ -10120,7 +10161,13 @@ function onExpenseSubmit(ev) {
   let savedItem = null;
   if (id) {
     const found = db.expenses.find((x) => x.id === id);
-    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; savedItem = found; }
+    /* Compilación 49: el formulario solo ofrece categorías reales
+       (la casilla «Transferencias» no es editable), así que
+       guardar una edición SIEMPRE deja una categoría real: si el
+       movimiento era una transferencia del banco, la marca se
+       quita y pasa a contar como gasto normal — manda la
+       decisión de la persona. */
+    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; found.transfer = false; savedItem = found; }
   } else {
     savedItem = { id: uid(), amountCents: cents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings, src: expSrc.src };
     db.expenses.push(savedItem);
@@ -10936,7 +10983,7 @@ function onBudgetSaveAll() {
 function renderBudgets() {
   const key = currentMonthKey();
   const spentByCat = {};
-  for (const e of monthExpenses(key)) spentByCat[e.category] = (spentByCat[e.category] || 0) + e.amountCents;
+  for (const e of monthCountedExpenses(key)) spentByCat[e.category] = (spentByCat[e.category] || 0) + e.amountCents;
   const ul = document.getElementById('budget-list');
   clearNode(ul);
   budgetRowInputs = [];
@@ -14335,7 +14382,7 @@ function renderInsights() {
 function budgetAlerts() {
   const key = currentMonthKey();
   const spent = {};
-  for (const e of monthExpenses(key)) spent[e.category] = (spent[e.category] || 0) + e.amountCents;
+  for (const e of monthCountedExpenses(key)) spent[e.category] = (spent[e.category] || 0) + e.amountCents;
   const out = [];
   for (const cat of Object.keys(db.budgets)) {
     const b = db.budgets[cat];
@@ -15151,8 +15198,12 @@ const BANK_AUTO_SYNC_AFTER_MS = 6 * 60 * 60 * 1000; // ~6 horas
    del servidor (plaid-sync). Si la marca guardada en los datos
    (settings.bankMapV) es menor, la próxima sincronización se pide
    COMPLETA ({full:true}) para que los movimientos ya importados
-   con el mapa viejo vuelvan a pasar por bankRecategorize. */
-const BANK_MAP_VERSION = 2;
+   con el mapa viejo vuelvan a pasar por bankRecategorize.
+   Versión 3 (última pieza de la 49): el mapa nuevo detecta las
+   transferencias y los pagos de tarjeta y los manda a la casilla
+   «Transferencias» con su marca — la completa tiene que correr
+   otra vez para re-clasificar lo ya importado. */
+const BANK_MAP_VERSION = 3;
 let bankAutoSyncDone = false; // una vez por apertura de la app
 
 function bankStatus(msg) {
@@ -15529,19 +15580,49 @@ async function bankAutoSync() {
   } catch (e) { /* silencio: el botón «Sincronizar» sigue disponible */ }
 }
 
-/* Compilación 49: mueve un gasto ya importado desde la categoría
-   comodín a la sugerida por el servidor. Solo actúa si el
-   movimiento sigue en «Otros» (o sin categoría): cualquier otra
-   se entiende elegida por la persona (o ya buena) y se respeta. */
+/* Compilación 49: mueve un movimiento ya importado desde la
+   categoría comodín a la sugerida por el servidor. Solo actúa si
+   el movimiento sigue en «Otros» (o sin categoría): cualquier
+   otra se entiende elegida por la persona (o ya buena) y se
+   respeta.
+
+   Última pieza de la 49 — transferencias: si el servidor ahora
+   marca la transacción como transferencia (tx.transfer), el
+   gasto que sigue en el comodín (o ya en la casilla del sistema)
+   pasa a «Transferencias» CON la marca; el que la persona movió
+   a una categoría real se respeta entero: ni se le cambia la
+   categoría ni se le pone la marca (lo trató como gasto: manda
+   su decisión). A la inversa, si un gasto marcado está en la
+   casilla del sistema y el mapa nuevo ya NO lo ve como
+   transferencia, la sugerencia real manda y la marca se quita.
+   Los ingresos no tienen categoría: su re-clasificación es solo
+   poner o quitar la marca según el mapa vigente. */
 function bankRecategorize(tx) {
-  if (!tx || tx.kind === 'ingreso') return false;
+  if (!tx) return false;
+  if (tx.kind === 'ingreso') {
+    const inc = db.incomes.find((x) => x.id === tx.id);
+    if (!inc) return false;
+    const want = tx.transfer === true;
+    if ((inc.transfer === true) === want) return false;
+    inc.transfer = want;
+    return true;
+  }
+  const e = db.expenses.find((x) => x.id === tx.id);
+  if (!e) return false;
+  const inWildcard = !e.category || e.category === 'Otros' || e.category === 'Transferencias';
+  if (tx.transfer === true) {
+    if (!inWildcard) return false; // categoría real puesta a mano: manda la persona
+    let changed = false;
+    if (e.category !== 'Transferencias') { e.category = 'Transferencias'; changed = true; }
+    if (e.transfer !== true) { e.transfer = true; changed = true; }
+    return changed;
+  }
   const sug = (typeof tx.category_suggested === 'string' && allCategories().includes(tx.category_suggested))
     ? tx.category_suggested : null;
   if (!sug || sug === 'Otros') return false;
-  const e = db.expenses.find((x) => x.id === tx.id);
-  if (!e) return false;
-  if (e.category && e.category !== 'Otros') return false;
+  if (!inWildcard) return false;
   e.category = sug;
+  if (e.transfer === true) e.transfer = false;
   return true;
 }
 
@@ -15575,16 +15656,27 @@ function bankImportTransactions(res) {
     if (cents <= 0) continue;
     const note = cleanText(tx.merchant || tx.note || '', 120);
     const date = cleanDate(tx.date);
+    /* Compilación 49: la marca de transferencia que detectó el
+       servidor viaja al movimiento; con ella queda fuera de
+       totales, topes y gráfica (ver isTransferMov). */
+    const isTr = tx.transfer === true;
     if (tx.kind === 'ingreso') {
       if (db.incomes.length >= MAX_ITEMS) break;
       /* El ahorro de un ingreso importado nace en 0: el ahorro se
          anota a mano, nunca se calcula solo (regla de la app). */
-      db.incomes.push({ id: tx.id, amountCents: cents, savingsCents: 0, date: date, note: note, biz: false });
+      const inc = { id: tx.id, amountCents: cents, savingsCents: 0, date: date, note: note, biz: false };
+      if (isTr) inc.transfer = true;
+      db.incomes.push(inc);
     } else {
       if (db.expenses.length >= MAX_ITEMS) break;
-      const cat = (typeof tx.category_suggested === 'string' && allCategories().includes(tx.category_suggested))
-        ? tx.category_suggested : 'Otros';
-      db.expenses.push({ id: tx.id, amountCents: cents, category: cat, date: date, note: note, photo: null, biz: false });
+      /* Una transferencia no pasa por la lista de categorías: su
+         casilla es la del sistema, sin tope ni selector. */
+      const cat = isTr ? 'Transferencias'
+        : (typeof tx.category_suggested === 'string' && allCategories().includes(tx.category_suggested))
+          ? tx.category_suggested : 'Otros';
+      const mov = { id: tx.id, amountCents: cents, category: cat, date: date, note: note, photo: null, biz: false };
+      if (isTr) mov.transfer = true;
+      db.expenses.push(mov);
     }
     seen.add(tx.id);
     out.added++;
