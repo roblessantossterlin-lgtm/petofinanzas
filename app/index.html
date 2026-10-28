@@ -38,7 +38,7 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 52</p>
+    <p class="muted small build-label" id="lock-build-label">Compilación 53</p>
   </div>
 </section>
 
@@ -1049,7 +1049,10 @@
       <label for="split-familia" data-i18n="split_familia">Familia</label>
       <input id="split-familia" type="number" min="0" max="100" step="1" required>
       <p id="set-error" class="error" role="alert" hidden></p>
-      <button type="submit" class="btn btn-primary" data-i18n="set_save">Guardar ajustes</button>
+      <!-- Compilación 53: ya NO hay botón «Guardar ajustes» — la
+           tarjeta se guarda sola (el reparto en cada tecla y el
+           resto de campos al cambiar). El renglón de arriba es el
+           aviso en vivo de la suma del reparto. -->
     </form>
 
     <section class="card form-card">
@@ -1173,15 +1176,16 @@
     </section>
     <section class="card form-card" id="settings-news">
       <h3 data-i18n="set_news_title">Novedades</h3>
-      <!-- Novedades (Compilación 52): SOLO la(s) línea(s) de la versión
+      <!-- Novedades (Compilación 53): SOLO la(s) línea(s) de la versión
            vigente (las de NEWS_CURRENT en app.js). En cada compilación
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c52_security">Más seguridad para tu banco: ahora puedes desconectar tu banco desde Ajustes y PETO Finanzas pierde el acceso al instante (la conexión y su token se borran del servidor). Además verificamos que ninguna cuenta pueda ver los datos de otra: el aislamiento entre usuarios quedó probado.</li>
+        <li data-i18n="news_c53_autosave">⚙️ Tus ajustes se guardan solos: cambia el reparto de tus ingresos y queda guardado al instante, sin botón. Si los porcentajes no suman 100, te avisamos ahí mismo.</li>
+        <li data-i18n="news_c53_welcome">👋 La bienvenida fluye sola: las láminas avanzan por sí mismas hasta la creación de tu cuenta, y también puedes deslizar el dedo para moverte entre ellas.</li>
       </ul>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 52</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 53</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">

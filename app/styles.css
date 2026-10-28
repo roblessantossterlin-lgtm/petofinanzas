@@ -259,6 +259,10 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 }
 .ob-tour-nav .btn{margin-top:0}
 .ob-dots{letter-spacing:.3em;color:var(--accent-dark);font-size:.8rem}
+/* Compilación 53: deslizar sobre el recorrido — el desplazamiento
+   vertical sigue siendo scroll; el horizontal lo leen los Pointer
+   Events de la app para pasar de lámina. */
+#ob-tour{touch-action:pan-y}
 .pin-input{
   width:100%;min-height:60px;text-align:center;font-size:1.6rem;letter-spacing:.4em;
   border:1px solid var(--line);border-radius:12px;margin:.6rem 0;
