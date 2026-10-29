@@ -963,8 +963,17 @@
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_ajustes">Ajustes y personalización</h2>
 
+    <!-- Compilación 56: TODAS las tarjetas de Ajustes se retraen
+         con el patrón de «Secciones visibles» (cabecera con título,
+         resumen y flecha; el estado se guarda en settings.setAcc y
+         las tarjetas nacen abiertas). -->
     <form id="settings-form" class="card form-card" autocomplete="off">
-      <h3 data-i18n="set_profile">Tu perfil</h3>
+      <div class="sections-head" id="setacc-profile-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-profile-body">
+        <h3 data-i18n="set_profile">Tu perfil</h3>
+        <span class="sections-summary muted small" id="setacc-profile-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-profile-body">
       <label for="set-name" data-i18n="set_name_label">Tu nombre</label>
       <input id="set-name" type="text" maxlength="40">
       <label for="set-textsize" data-i18n="set_textsize_label">Tamaño del texto</label>
@@ -1030,7 +1039,24 @@
         <p class="muted small" data-i18n="summary_email_help">Solo con tu cuenta en la nube activa: el mismo resumen llega también a tu correo.</p>
       </div>
 
-      <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
+      <label class="toggle-row">
+        <span><span data-i18n="set_biz_label">Tengo un negocio</span><br>
+        <span class="muted small" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</span></span>
+        <input type="checkbox" id="set-biz">
+      </label>
+
+      </div>
+    </form>
+
+    <!-- Compilación 56: la cuenta en la nube sale del formulario
+         del perfil y vive en su propia tarjeta retráctil. -->
+    <section class="card form-card" id="settings-cloud">
+      <div class="sections-head" id="setacc-cloud-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-cloud-body">
+        <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
+        <span class="sections-summary muted small" id="setacc-cloud-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-cloud-body">
       <p class="muted small" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
       <div id="cloud-signedout">
         <label for="cloud-email" data-i18n="cloud_email">Correo electrónico</label>
@@ -1067,29 +1093,37 @@
       </div>
       <p id="cloud-status" class="muted small" aria-live="polite"></p>
       <p id="cloud-error" class="error" role="alert" hidden></p>
+      </div>
+    </section>
 
-      <label class="toggle-row">
-        <span><span data-i18n="set_biz_label">Tengo un negocio</span><br>
-        <span class="muted small" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</span></span>
-        <input type="checkbox" id="set-biz">
-      </label>
-
-      <h3 data-i18n="set_split_title">Reparto sugerido de ingresos (%)</h3>
+    <!-- Compilación 56: el reparto de ingresos estrena su PROPIA
+         tarjeta retráctil, fuera del formulario del perfil. El
+         guardado automático de la 53 no cambia: el reparto se
+         sigue guardando en cada tecla y el aviso de la suma vive
+         aquí dentro, junto a los porcentajes. -->
+    <section class="card form-card" id="settings-split">
+      <div class="sections-head" id="setacc-split-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-split-body">
+        <h3 data-i18n="set_split_title">Reparto sugerido de ingresos (%)</h3>
+        <span class="sections-summary muted small" id="setacc-split-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-split-body">
       <p class="muted small" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
       <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
-      <input id="split-ahorro" type="number" min="0" max="100" step="1" required>
+      <input id="split-ahorro" type="number" min="0" max="100" step="1">
       <label for="split-negocio" id="split-negocio-label" data-i18n="split_negocio">Negocio</label>
-      <input id="split-negocio" type="number" min="0" max="100" step="1" required>
+      <input id="split-negocio" type="number" min="0" max="100" step="1">
       <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
-      <input id="split-gastos" type="number" min="0" max="100" step="1" required>
+      <input id="split-gastos" type="number" min="0" max="100" step="1">
       <label for="split-familia" data-i18n="split_familia">Familia</label>
-      <input id="split-familia" type="number" min="0" max="100" step="1" required>
+      <input id="split-familia" type="number" min="0" max="100" step="1">
       <p id="set-error" class="error" role="alert" hidden></p>
       <!-- Compilación 53: ya NO hay botón «Guardar ajustes» — la
            tarjeta se guarda sola (el reparto en cada tecla y el
            resto de campos al cambiar). El renglón de arriba es el
            aviso en vivo de la suma del reparto. -->
-    </form>
+      </div>
+    </section>
 
     <section class="card form-card">
       <div class="sections-head" id="sections-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="sections-body">
@@ -1108,16 +1142,27 @@
     </section>
 
     <section class="card form-card" id="pro-card">
-      <h3>⭐ <span data-i18n="pro_title">PETO Pro</span></h3>
+      <div class="sections-head" id="setacc-pro-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-pro-body">
+        <h3>⭐ <span data-i18n="pro_title">PETO Pro</span></h3>
+        <span class="sections-summary muted small" id="setacc-pro-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-pro-body">
       <p class="muted small" data-i18n="pro_card_text">La nube sin límites, el informe avanzado, el presupuesto compartido y el modo organizador de san.</p>
       <p id="pro-status" class="total-line"></p>
       <div class="form-actions">
         <button id="btn-pro-open" type="button" class="btn btn-secondary" data-i18n="pro_btn_see">Ver PETO Pro</button>
       </div>
+      </div>
     </section>
 
     <section class="card form-card" id="shared-card">
-      <h3 data-i18n="shared_title">Presupuesto compartido</h3>
+      <div class="sections-head" id="setacc-shared-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-shared-body">
+        <h3 data-i18n="shared_title">Presupuesto compartido</h3>
+        <span class="sections-summary muted small" id="setacc-shared-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-shared-body">
       <p class="muted small" id="shared-note" data-i18n="shared_preview_note">🔧 Vista previa del diseño: todavía no se conecta con otras cuentas. Sirve para probar cómo se verá crear un hogar, unirse con un código y ver los miembros.</p>
       <div id="shared-none">
         <label for="shared-name" data-i18n="shared_create_label">Nombre del hogar</label>
@@ -1141,10 +1186,16 @@
         </div>
       </div>
       <p id="shared-error" class="error" role="alert" hidden></p>
+      </div>
     </section>
 
     <section class="card form-card">
-      <h3 data-i18n="set_pin_title">Seguridad (PIN)</h3>
+      <div class="sections-head" id="setacc-security-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-security-body">
+        <h3 data-i18n="set_pin_title">Seguridad (PIN)</h3>
+        <span class="sections-summary muted small" id="setacc-security-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-security-body">
       <p id="pin-status" class="muted small"></p>
       <form id="pin-form" autocomplete="off">
         <label for="pin-current" data-i18n="pin_current_label">PIN actual (si ya tienes uno)</label>
@@ -1160,10 +1211,16 @@
         <input type="checkbox" id="set-biometric">
       </label>
       <p class="muted small" data-i18n="set_bio_help">Entra con tu huella además del PIN (necesitas tener un PIN activo).</p>
+      </div>
     </section>
 
     <section class="card form-card" id="settings-data">
-      <h3 data-i18n="set_data_title">Tus datos</h3>
+      <div class="sections-head" id="setacc-data-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-data-body">
+        <h3 data-i18n="set_data_title">Tus datos</h3>
+        <span class="sections-summary muted small" id="setacc-data-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-data-body">
       <p class="muted small" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
       <div class="form-actions">
         <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Guardar copia de seguridad</button>
@@ -1185,9 +1242,15 @@
       </div>
       <hr>
       <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
+      </div>
     </section>
     <section class="card form-card" id="settings-bank">
-      <h3>🏦 <span data-i18n="bank_title">Conexión bancaria</span></h3>
+      <div class="sections-head" id="setacc-bank-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-bank-body">
+        <h3>🏦 <span data-i18n="bank_title">Conexión bancaria</span></h3>
+        <span class="sections-summary muted small" id="setacc-bank-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-bank-body">
       <p class="muted small" data-i18n="bank_help">Conecta tu banco de forma segura con Plaid y tus movimientos se anotan solos en la app. La contraseña de tu banco la escribes solo con tu banco: PETO Finanzas nunca la ve ni la guarda.</p>
       <p class="muted small" data-i18n="bank_sandbox_note">🧪 Vista previa (Sandbox): por ahora se conecta el banco de prueba de Plaid. La conexión bancaria será del nivel superior; durante la prueba cerrada está abierta sin costo.</p>
       <div id="bank-needcloud">
@@ -1210,17 +1273,29 @@
       </div>
       <p id="bank-status" class="muted small" aria-live="polite"></p>
       <p id="bank-error" class="error" role="alert" hidden></p>
+      </div>
     </section>
     <section class="card form-card" id="settings-privacy">
-      <h3 data-i18n="priv_title">Privacidad: cómo cuidamos tus datos</h3>
+      <div class="sections-head" id="setacc-privacy-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-privacy-body">
+        <h3 data-i18n="priv_title">Privacidad: cómo cuidamos tus datos</h3>
+        <span class="sections-summary muted small" id="setacc-privacy-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-privacy-body">
       <p class="muted small" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
       <div class="form-actions">
         <button id="btn-privacy-policy" type="button" class="btn btn-secondary" data-i18n="priv_btn">Leer la política completa</button>
       </div>
+      </div>
     </section>
     <!-- Compilación 55: reglas propias de categorización. -->
     <section class="card form-card" id="settings-rules">
-      <h3 data-i18n="rules_title">🧠 Mis reglas de categorías</h3>
+      <div class="sections-head" id="setacc-rules-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-rules-body">
+        <h3 data-i18n="rules_title">🧠 Mis reglas de categorías</h3>
+        <span class="sections-summary muted small" id="setacc-rules-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-rules-body">
       <p class="muted small" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
       <ul id="rules-list" class="item-list"></ul>
       <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
@@ -1232,19 +1307,26 @@
       <div class="form-actions">
         <button id="rule-add" type="button" class="btn btn-secondary" data-i18n="rules_add">Añadir regla</button>
       </div>
+      </div>
     </section>
     <section class="card form-card" id="settings-news">
-      <h3 data-i18n="set_news_title">Novedades</h3>
-      <!-- Novedades (Compilación 55): SOLO la(s) línea(s) de la versión
+      <div class="sections-head" id="setacc-news-head" role="button" tabindex="0" aria-expanded="true" aria-controls="setacc-news-body">
+        <h3 data-i18n="set_news_title">Novedades</h3>
+        <span class="sections-summary muted small" id="setacc-news-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▾</span>
+      </div>
+      <div id="setacc-news-body">
+      <!-- Novedades (Compilación 56): SOLO la(s) línea(s) de la versión
            vigente (las de NEWS_CURRENT en app.js). En cada compilación
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c55_voice">🎤 Anota con tu voz: en Gastos e Ingresos toca «Dictar», di el monto y en qué fue, y PETO Finanzas rellena el formulario. Tú revisas y guardas: nada se anota solo.</li>
-        <li data-i18n="news_c55_smart">🧾 Tu mes, listo para compartir: informe imprimible o en CSV, plan para salir de deudas, fondo de emergencia con tu avance y tus propias reglas de categorías en Ajustes.</li>
+        <li data-i18n="news_c56_cards">🧹 Ajustes, tarjeta por tarjeta: toca la cabecera de cualquiera — tu perfil, la nube, el banco, Seguridad, Presupuesto compartido — y se retrae. Queda como la dejes.</li>
+        <li data-i18n="news_c56_split">↔️ El reparto de ingresos estrena tarjeta propia en Ajustes, también retráctil, con tu reparto vigente en la cabecera cuando la cierras.</li>
       </ul>
+      </div>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 55</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 56</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
@@ -1280,8 +1362,8 @@
       <ul id="pro-benefits" class="item-list"></ul>
       <p class="muted" data-i18n="pro_coming_text">La compra dentro de la app llega con el lanzamiento en Google Play. Mientras tanto puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar Pro por $1.99 al mes.</p>
       <button id="pro-waitlist-btn" type="button" class="btn btn-primary btn-big" data-i18n="pro_waitlist_btn">Anotarme en la lista de espera</button>
-      <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
       <a class="btn btn-ghost" href="../precios/">Ver precios y planes de PETO Pro</a>
+      <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
       <button id="pro-close" type="button" class="btn btn-ghost" data-i18n="pro_close">Ahora no</button>
     </div>
   </div>
