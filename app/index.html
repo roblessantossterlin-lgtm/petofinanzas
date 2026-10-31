@@ -50,7 +50,7 @@
     <p><span data-i18n="ob_intro_1">Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.</span>
        <strong data-i18n="ob_intro_2">Con tu cuenta en la nube.</strong>
        <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
-    <div id="ob-lang-top-wrap" hidden>
+    <div id="ob-lang-top-wrap">
       <label for="ob-lang-top" data-i18n="set_lang_label">Idioma / Language</label>
       <select id="ob-lang-top">
         <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
@@ -90,25 +90,16 @@
         <button id="ob-tour-next" type="button" class="btn btn-secondary" data-i18n="ob_tour_next">Siguiente</button>
       </div>
     </div>
-    <form id="onboarding-form" autocomplete="off" hidden>
+    <!-- novalidate (Compilación 57): la validación la hace el JS de la
+         app con mensajes propios (p. ej. el del PIN de 4 a 6 números);
+         sin novalidate, el WebView intercepta el envío con el pattern
+         del campo y muestra su mensaje genérico. -->
+    <form id="onboarding-form" autocomplete="off" hidden novalidate>
       <label for="ob-name" data-i18n="ob_name_label">Tu nombre (opcional)</label>
       <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre">
-      <label for="ob-lang" data-i18n="set_lang_label">Idioma / Language</label>
-      <select id="ob-lang">
-        <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
-        <option value="es">Español</option>
-        <option value="en">English</option>
-        <option value="it">Italiano</option>
-        <option value="pt">Português</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="zh">中文</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-        <option value="ru">Русский</option>
-        <option value="hi">हिन्दी</option>
-        <option value="ar">العربية</option>
-      </select>
+      <!-- Compilación 57: el idioma se elige una sola vez en la
+           bienvenida, en el selector de arriba (#ob-lang-top). El
+           segundo selector que había aquí se eliminó. -->
       <label for="ob-pin" data-i18n="ob_pin_label">Crea un PIN de seguridad (opcional)</label>
       <input id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
              data-i18n-ph="ob_pin_ph" placeholder="4 a 6 números, o déjalo vacío">
@@ -1197,7 +1188,10 @@
       </div>
       <div id="setacc-security-body">
       <p id="pin-status" class="muted small"></p>
-      <form id="pin-form" autocomplete="off">
+      <!-- novalidate (Compilación 57): como en la bienvenida, la
+         validación del PIN la reporta el JS con su mensaje específico
+         (4 a 6 números), no el mensaje genérico del WebView. -->
+    <form id="pin-form" autocomplete="off" novalidate>
         <label for="pin-current" data-i18n="pin_current_label">PIN actual (si ya tienes uno)</label>
         <input id="pin-current" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
         <label for="pin-new" data-i18n="pin_new_label">PIN nuevo (vacío = quitar el PIN)</label>
@@ -1321,12 +1315,12 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c56_cards">🧹 Ajustes, tarjeta por tarjeta: toca la cabecera de cualquiera — tu perfil, la nube, el banco, Seguridad, Presupuesto compartido — y se retrae. Queda como la dejes.</li>
-        <li data-i18n="news_c56_split">↔️ El reparto de ingresos estrena tarjeta propia en Ajustes, también retráctil, con tu reparto vigente en la cabecera cuando la cierras.</li>
+        <li data-i18n="news_c57_fixes">🛠️ Arreglos que pediste: guardar un gasto o ingreso ya no te saca de la app, los botones flotantes + y 🔍 ya no tapan los botones de los formularios, y el reparto por ingreso se reparte entre todas tus categorías.</li>
+        <li data-i18n="news_c57_san">🤝 Avisos más claros: si el ahorro de un ingreso es mayor que el ingreso, la app te avisa antes de guardar; y un periodo del san sin ningún pago ahora pide tu confirmación para cerrarse.</li>
       </ul>
       </div>
     </section>
-    <p class="muted small build-label" id="settings-build-label">Compilación 56</p>
+    <p class="muted small build-label" id="settings-build-label">Compilación 57</p>
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
