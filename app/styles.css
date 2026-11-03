@@ -16,7 +16,10 @@
   --tap:52px;
 }
 *{box-sizing:border-box}
-html{font-size:16px}
+/* Compilación 58: el lienzo tras la barra de estado usa el fondo
+   del tema (antes el html quedaba blanco y, con la ventana edge-to-edge
+   de Android 15, la franja superior se veía blanca en modo oscuro). */
+html{font-size:16px;background:var(--bg)}
 html.text-large{font-size:18.5px}
 .news-list{margin:.4rem 0 0;padding-left:1.1rem}
 .news-list li{margin:.3rem 0}
@@ -215,9 +218,14 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .budget-bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:.45rem 0}
 .budget-fill{height:100%;background:var(--accent)}
 .budget-fill.over{background:var(--danger)}
-.budget-input-row{display:flex;gap:.5rem;align-items:center;margin-top:.4rem}
+/* Compilación 58 (captura de Sterlin, día 6): la fila de
+   participantes del san organizador (Nombre + Zelle + Agregar) se
+   salía de la pantalla — los campos no podían encogerse (min-width
+   automático de flex) y la fila no saltaba de línea. Ahora los
+   campos ceden y el botón baja a su propia línea si no cabe. */
+.budget-input-row{display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap}
 .budget-input-row input{
-  flex:1;min-height:48px;padding:.5rem .6rem;font-size:1rem;
+  flex:1 1 7.5rem;min-width:0;min-height:48px;padding:.5rem .6rem;font-size:1rem;
   border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
 }
 

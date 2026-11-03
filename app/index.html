@@ -396,7 +396,7 @@
 
     <div id="goal-card" class="card goal-card"></div>
 
-    <form id="goal-form" class="card form-card" autocomplete="off" hidden>
+    <form id="goal-form" class="card form-card" autocomplete="off" hidden novalidate>
       <h3 id="goal-form-title">Crear meta</h3>
       <label for="goal-name" data-i18n="goal_name_label">Nombre de la meta</label>
       <input id="goal-name" type="text" maxlength="60" data-i18n-ph="goal_name_ph" placeholder="Ej.: Fondo de emergencia">
@@ -843,7 +843,7 @@
       </div>
       <div id="org-main" hidden>
         <div id="org-create-wrap">
-          <form id="org-form" autocomplete="off">
+          <form id="org-form" class="form-card" autocomplete="off">
             <h4 data-i18n="org_form_title">Crear san del grupo</h4>
             <label for="org-name" data-i18n="san_name_label">Nombre del san</label>
             <input id="org-name" type="text" maxlength="60" data-i18n-ph="san_name_ph" placeholder="Ej.: San de la familia">
@@ -1315,8 +1315,8 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c57_fixes">🛠️ Arreglos que pediste: guardar un gasto o ingreso ya no te saca de la app, los botones flotantes + y 🔍 ya no tapan los botones de los formularios, y el reparto por ingreso se reparte entre todas tus categorías.</li>
-        <li data-i18n="news_c57_san">🤝 Avisos más claros: si el ahorro de un ingreso es mayor que el ingreso, la app te avisa antes de guardar; y un periodo del san sin ningún pago ahora pide tu confirmación para cerrarse.</li>
+        <li data-i18n="news_c58_fixes">🛠️ Más arreglos del informe de testers: la barra de estado ya sigue el modo oscuro, el pie de la app se lee en tu idioma y el botón + ya no tapa el botón Agregar del san.</li>
+        <li data-i18n="news_c58_san">🤝 En el san, el estado dice la verdad: nadie aparece como «ya pagó» si todavía no ha pagado, y una meta en 0 ahora muestra un aviso claro en vez de quedarse callada.</li>
       </ul>
       </div>
     </section>
