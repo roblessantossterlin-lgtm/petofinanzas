@@ -218,6 +218,28 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .budget-bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:.45rem 0}
 .budget-fill{height:100%;background:var(--accent)}
 .budget-fill.over{background:var(--danger)}
+/* Compilación 60 · Panel visual: barras comparativas (Este mes vs.
+   el pasado, flujo de caja), top de categorías y tarjetas de topes.
+   Reutiliza .budget-bar para las barras de avance; estas clases son
+   solo para las barras pareadas con monto a la derecha. */
+.vs-legend{display:flex;gap:1rem;flex-wrap:wrap;margin:.3rem 0 .1rem}
+.vs-legend-item{display:inline-flex;align-items:center;gap:.35rem}
+.vs-dot{width:.7rem;height:.7rem;border-radius:50%;background:var(--accent);display:inline-block;flex:none}
+.vs-dot.cur{background:var(--accent)}
+.vs-dot.prev{background:var(--muted)}
+.vs-dot.out{background:#c2570b}
+.vs-week{margin:.55rem 0}
+.vs-week-label{font-weight:600;font-size:.92rem;margin-bottom:.15rem}
+.vs-line{display:flex;align-items:center;gap:.5rem;margin:.22rem 0}
+.vs-track{flex:1 1 auto;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.vs-fill{height:100%;background:var(--accent)}
+.vs-fill.prev{background:var(--muted)}
+.vs-fill.out{background:#c2570b}
+.vs-name{flex:1 1 auto}
+.vs-amt{font-weight:600;text-align:right;white-space:nowrap}
+.flow-net-neg{color:var(--danger)}
+.bc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem}
+.bc-card{border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem}
 /* Compilación 58 (captura de Sterlin, día 6): la fila de
    participantes del san organizador (Nombre + Zelle + Agregar) se
    salía de la pantalla — los campos no podían encogerse (min-width
