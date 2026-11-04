@@ -97,6 +97,10 @@
     <form id="onboarding-form" autocomplete="off" hidden novalidate>
       <label for="ob-name" data-i18n="ob_name_label">Tu nombre (opcional)</label>
       <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre">
+      <label for="ob-country" data-i18n="set_country_label">País</label>
+      <select id="ob-country"></select>
+      <label for="ob-currency" data-i18n="set_currency_label">Moneda</label>
+      <select id="ob-currency"></select>
       <!-- Compilación 57: el idioma se elige una sola vez en la
            bienvenida, en el selector de arriba (#ob-lang-top). El
            segundo selector que había aquí se eliminó. -->
@@ -226,8 +230,12 @@
       <div id="spend-today-left" class="muted small"></div>
       <span id="spend-today-note" class="muted small"></span>
       <div id="spend-projection" class="muted small"></div>
+      <button id="spend-how-btn" class="btn btn-ghost" type="button" hidden data-i18n="spend_how_btn">¿Cómo sale este número?</button>
+      <div id="spend-explain" hidden></div>
       <button id="spend-create-btn" class="btn btn-primary" type="button" hidden data-i18n="spend_create_btn">Crear mi presupuesto</button>
     </section>
+
+    <section id="home-today" class="card"></section>
 
     <div id="home-streak" class="streak-pill" hidden></div>
 
@@ -618,6 +626,22 @@
       </div>
     </form>
 
+    <form id="cash-form" class="card form-card" autocomplete="off" hidden>
+      <h3 data-i18n="cash_title">💵 Sacar efectivo</h3>
+      <p class="muted small" data-i18n="cash_help">Mueve dinero de una cuenta a otra (por ejemplo, a tu Efectivo). Es una transferencia: no cuenta como gasto ni ingreso en tus totales.</p>
+      <label for="cash-from" data-i18n="cash_from_label">Desde</label>
+      <select id="cash-from"></select>
+      <label for="cash-to" data-i18n="cash_to_label">Hacia</label>
+      <select id="cash-to"></select>
+      <label for="cash-amount" data-i18n="amount_label">Cantidad ($)</label>
+      <input id="cash-amount" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <p id="cash-error" class="error" role="alert" hidden></p>
+      <p id="cash-done" class="muted small" aria-live="polite"></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="cash_btn">Sacar efectivo</button>
+      </div>
+    </form>
+
     <div class="form-actions">
       <button id="acc-add-bank" class="btn btn-secondary" type="button" data-i18n="acc_add_bank">🏦 Agregar banco</button>
     </div>
@@ -988,6 +1012,10 @@
         <option value="hi">हिन्दी</option>
         <option value="ar">العربية</option>
       </select>
+      <label for="set-country" data-i18n="set_country_label">País</label>
+      <select id="set-country"></select>
+      <label for="set-currency" data-i18n="set_currency_label">Moneda</label>
+      <select id="set-currency"></select>
       <label for="set-theme" data-i18n="set_theme_label">Tema</label>
       <select id="set-theme">
         <option value="claro" data-i18n="theme_light">Claro</option>
@@ -1228,6 +1256,10 @@
       <div class="form-actions">
         <button id="btn-export-enc" type="button" class="btn btn-secondary" data-i18n="data_export_enc">Guardar copia con contraseña</button>
       </div>
+      <div class="form-actions">
+        <button id="btn-export-csv" type="button" class="btn btn-secondary" data-i18n="data_export_csv">📄 Exportar movimientos (CSV)</button>
+      </div>
+      <p id="csv-export-status" class="muted small" aria-live="polite"></p>
       <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
       <hr>
       <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
@@ -1245,8 +1277,9 @@
         <span class="sections-chevron" aria-hidden="true">▾</span>
       </div>
       <div id="setacc-bank-body">
-      <p class="muted small" data-i18n="bank_help">Conecta tu banco de forma segura con Plaid y tus movimientos se anotan solos en la app. La contraseña de tu banco la escribes solo con tu banco: PETO Finanzas nunca la ve ni la guarda.</p>
-      <p class="muted small" data-i18n="bank_sandbox_note">🧪 Vista previa (Sandbox): por ahora se conecta el banco de prueba de Plaid. La conexión bancaria será del nivel superior; durante la prueba cerrada está abierta sin costo.</p>
+      <p class="muted small" id="bank-help-p" data-i18n="bank_help">Conecta tu banco de forma segura con Plaid y tus movimientos se anotan solos en la app. La contraseña de tu banco la escribes solo con tu banco: PETO Finanzas nunca la ve ni la guarda.</p>
+      <p class="muted small" id="bank-sandbox-p" data-i18n="bank_sandbox_note">🧪 Vista previa (Sandbox): por ahora se conecta el banco de prueba de Plaid. La conexión bancaria será del nivel superior; durante la prueba cerrada está abierta sin costo.</p>
+      <div id="bank-soon" hidden></div>
       <div id="bank-needcloud">
         <p class="muted small" data-i18n="bank_need_cloud">Para conectar tu banco, primero entra a tu cuenta en la nube en la tarjeta de arriba: la conexión va ligada a tu cuenta.</p>
       </div>
@@ -1315,8 +1348,8 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c58_fixes">🛠️ Más arreglos del informe de testers: la barra de estado ya sigue el modo oscuro, el pie de la app se lee en tu idioma y el botón + ya no tapa el botón Agregar del san.</li>
-        <li data-i18n="news_c58_san">🤝 En el san, el estado dice la verdad: nadie aparece como «ya pagó» si todavía no ha pagado, y una meta en 0 ahora muestra un aviso claro en vez de quedarse callada.</li>
+        <li data-i18n="news_c59_features">🆕 Lo nuevo: exporta todos tus movimientos en CSV, toca tu número del día y mira cómo sale, avisa por WhatsApp en tu san, saca efectivo entre cuentas en un toque y ve tu resumen «Hoy» en Inicio.</li>
+        <li data-i18n="news_c59_country">🌎 Capa de país: elige tu país y la conexión con bancos se muestra según donde vivas (automática en EE. UU.; en el resto, tarjeta de «llega pronto» con aviso), tu moneda sale de tu país y el san usa su nombre local: tanda en México y cundina en Puerto Rico.</li>
       </ul>
       </div>
     </section>
