@@ -1,11 +1,19 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 60) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 61) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
+   Sincronizado el 4-nov-2026 con la Compilación 61: el aviso
+   de respaldo llega una vez por semana y se quita solo a los
+   10 segundos, y la tarjeta «Tu siguiente paso» desaparece al
+   completar los pasos (un banco conectado ya cuenta como
+   cuenta). Novedades: news_c61_backup y news_c61_nextstep
+   sustituyen a news_c60_panel y news_c60_settings — 952
+   claves por idioma; la caché del service worker sube a
+   peto-web-v35.
    Sincronizado el 3-nov-2026 con la Compilación 60: panel
    visual en Inicio (este mes vs. el pasado, fondo de
    emergencia, top de categorías y flujo de caja de 6 meses),
@@ -148,9 +156,12 @@
 'use strict';
 
 /* ---------------- Constantes ---------------- */
+'use strict';
+
+/* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 60';
-const BUILD_NUM = 60;
+const BUILD_LABEL = 'Compilación 61';
+const BUILD_NUM = 61;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -166,7 +177,7 @@ function buildLabelText() {
    PASO EN CADA COMPILACIÓN NUEVA: sustituir esta lista por la
    clave news_cNN de la versión, borrar la clave anterior de los
    12 diccionarios y dejar en el HTML únicamente su <li>. */
-const NEWS_CURRENT = ['news_c60_panel', 'news_c60_settings'];
+const NEWS_CURRENT = ['news_c61_backup', 'news_c61_nextstep'];
 
 /* ---------------- Compilación 59: capa de país -------------------
    El país se elige una vez en la bienvenida (usuarios nuevos) y se
@@ -1575,7 +1586,7 @@ es: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Pulsa atrás otra vez para salir.',
-  news_c60_panel: '🆕 Panel visual: Inicio estrena «Este mes vs. el mes pasado», tu fondo de emergencia, tus categorías con más gasto y tu flujo de caja; y Presupuesto muestra tarjetas por categoría con lo que queda de cada tope.', news_c60_settings: '⚙️ Ajustes más claro: la conexión bancaria sube a la parte alta y todas las tarjetas nacen cerradas — toca una cabecera para abrirla.', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
+  news_c61_backup: '🔔 Aviso de respaldo más amable: ahora llega una vez por semana y se quita solo a los 10 segundos.', news_c61_nextstep: '✅ «Tu siguiente paso» ya no se queda pegado: al completar tus pasos la tarjeta desaparece, y tu banco conectado cuenta como tu cuenta.', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
   org_err_san_name: 'Enter the name of the san.', rep_promo_footer: 'Take control of your spending with PETO Finanzas · petofinanzas.com', rep_saved: 'Image saved.', set_sections_summary: '{visible} of {total} visible',
@@ -2053,7 +2064,7 @@ en: {
   widget_san_next: 'Next turn: {name} · {date}',
   widget_san_next_nodate: 'Next turn: {name}',
   back_exit_hint: 'Press back again to exit.',
-  news_c60_panel: '🆕 Visual panel: Home now shows “This month vs. last month”, your emergency fund, your top spending categories and your cash flow; and Budget shows per-category cards with what is left of each limit.', news_c60_settings: '⚙️ Clearer Settings: bank connection moves to the top and every card starts closed — tap a header to open it.', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
+  news_c61_backup: '🔔 Friendlier backup reminder: it now shows once a week and hides itself after 10 seconds.', news_c61_nextstep: '✅ “Your next step” no longer sticks around: once you finish your steps the card disappears, and your connected bank counts as your account.', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
   org_err_san_name: 'Scrivi il nome del san.', rep_promo_footer: 'Controlla le tue spese con PETO Finanzas · petofinanzas.com', rep_saved: 'Immagine salvata.', set_sections_summary: '{visible} di {total} visibili',
@@ -2774,7 +2785,7 @@ it: {
   widget_san_next: 'Prossimo turno: {name} · {date}',
   widget_san_next_nodate: 'Prossimo turno: {name}',
   back_exit_hint: 'Premi di nuovo indietro per uscire.',
-  news_c60_panel: '🆕 Pannello visivo: la Home mostra «Questo mese vs. il mese scorso», il tuo fondo di emergenza, le categorie con più spese e il tuo flusso di cassa; e Budget mostra schede per categoria con quanto resta di ogni tetto.', news_c60_settings: '⚙️ Impostazioni più chiare: la connessione bancaria sale in alto e tutte le schede nascono chiuse — tocca un’intestazione per aprirla.', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
+  news_c61_backup: '🔔 Promemoria di backup più gentile: ora arriva una volta a settimana e si nasconde da solo dopo 10 secondi.', news_c61_nextstep: '✅ «Il tuo prossimo passo» non resta più bloccato: completati i passi la scheda sparisce, e la banca collegata vale come il tuo conto.', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
   org_err_san_name: 'Digite o nome do san.', rep_promo_footer: 'Controle seus gastos com o PETO Finanzas · petofinanzas.com', rep_saved: 'Imagem salva.', set_sections_summary: '{visible} de {total} visíveis',
@@ -3495,7 +3506,7 @@ pt: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Toque em voltar outra vez para sair.',
-  news_c60_panel: '🆕 Painel visual: o Início agora mostra «Este mês vs. o mês passado», seu fundo de emergência, suas categorias com mais gastos e seu fluxo de caixa; e o Orçamento mostra cartões por categoria com o que resta de cada limite.', news_c60_settings: '⚙️ Ajustes mais claros: a conexão bancária sobe para o topo e todos os cartões nascem fechados — toque em um cabeçalho para abrir.', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
+  news_c61_backup: '🔔 Lembrete de backup mais amável: agora chega uma vez por semana e some sozinho após 10 segundos.', news_c61_nextstep: '✅ “Seu próximo passo” não fica mais travado: ao concluir seus passos o cartão some, e seu banco conectado conta como sua conta.', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
   org_err_san_name: 'Saisis le nom du san.', rep_promo_footer: 'Contrôle tes dépenses avec PETO Finanzas · petofinanzas.com', rep_saved: 'Image enregistrée.', set_sections_summary: '{visible} sur {total} visibles',
@@ -4216,7 +4227,7 @@ fr: {
   widget_san_next: 'Prochain tour : {name} · {date}',
   widget_san_next_nodate: 'Prochain tour : {name}',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.',
-  news_c60_panel: '🆕 Panneau visuel : l’accueil affiche désormais « Ce mois-ci vs le mois dernier », votre fonds d’urgence, vos catégories les plus dépensières et votre flux de trésorerie ; et Budget montre des cartes par catégorie avec ce qui reste de chaque plafond.', news_c60_settings: '⚙️ Réglages plus clairs : la connexion bancaire monte en haut et toutes les cartes naissent fermées — touchez un en-tête pour l’ouvrir.', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
+  news_c61_backup: '🔔 Rappel de sauvegarde plus doux : il s’affiche une fois par semaine et se masque tout seul après 10 secondes.', news_c61_nextstep: '✅ « Votre prochaine étape » ne reste plus affichée : une fois vos étapes terminées, la carte disparaît, et votre banque connectée compte comme votre compte.', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
   org_err_san_name: 'Gib den Namen des Sans ein.', rep_promo_footer: 'Kontrolliere deine Ausgaben mit PETO Finanzas · petofinanzas.com', rep_saved: 'Bild gespeichert.', set_sections_summary: '{visible} von {total} sichtbar',
@@ -4937,7 +4948,7 @@ de: {
   widget_san_next: 'Nächster Zug: {name} · {date}',
   widget_san_next_nodate: 'Nächster Zug: {name}',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.',
-  news_c60_panel: '🆕 Visuelles Panel: Die Startseite zeigt jetzt „Dieser Monat vs. letzter Monat“, deinen Notfallfonds, deine Kategorien mit den höchsten Ausgaben und deinen Cashflow; und das Budget zeigt Karten pro Kategorie mit dem Rest jedes Limits.', news_c60_settings: '⚙️ Klarere Einstellungen: Die Bankverbindung rückt nach oben und alle Karten starten geschlossen — tippe auf eine Kopfzeile, um sie zu öffnen.', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
+  news_c61_backup: '🔔 Freundlichere Backup-Erinnerung: Sie erscheint jetzt einmal pro Woche und blendet sich nach 10 Sekunden selbst aus.', news_c61_nextstep: '✅ „Dein nächster Schritt“ bleibt nicht mehr hängen: Sind deine Schritte erledigt, verschwindet die Karte, und deine verbundene Bank zählt als dein Konto.', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
   org_err_san_name: '请输入 san 的名称。', rep_promo_footer: '用 PETO Finanzas 控制你的支出 · petofinanzas.com', rep_saved: '图片已保存。', set_sections_summary: '共 {total} 个，已显示 {visible} 个',
@@ -5658,7 +5669,7 @@ zh: {
   widget_san_next: '下一轮：{name} · {date}',
   widget_san_next_nodate: '下一轮：{name}',
   back_exit_hint: '再按一次返回即可退出。',
-  news_c60_panel: '🆕 可视化面板：首页现在显示«本月 vs 上月»、您的应急基金、支出最多的类别和现金流；预算则按类别显示卡片，标明每个上限还剩多少。', news_c60_settings: '⚙️ 设置更清晰：银行连接移到顶部，所有卡片默认折叠——点击标题即可展开。', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
+  news_c61_backup: '🔔 备份提醒更贴心：现在每周显示一次，10 秒后自动隐藏。', news_c61_nextstep: '✅ «下一步»不再卡住：完成所有步后卡片自动消失，已连接的银行也算作您的账户。', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
   org_err_san_name: 'sanの名前を入力してください。', rep_promo_footer: 'PETO Finanzasで支出を管理しよう · petofinanzas.com', rep_saved: '画像を保存しました。', set_sections_summary: '{total}件中{visible}件を表示',
@@ -6379,7 +6390,7 @@ ja: {
   widget_san_next: '次のターン：{name} · {date}',
   widget_san_next_nodate: '次のターン：{name}',
   back_exit_hint: 'もう一度戻るを押すと終了します。',
-  news_c60_panel: '🆕 ビジュアルパネル：ホームに「今月 vs 先月」、緊急用資金、支出の多いカテゴリ、キャッシュフローを表示。予算ではカテゴリごとのカードで各上限の残りが分かります。', news_c60_settings: '⚙️ 設定がすっきり：銀行連携が上に移動し、すべてのカードは閉じた状態で始まります——見出しをタップすると開きます。', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
+  news_c61_backup: '🔔 バックアップのお知らせが改善：週に1回だけ表示され、10秒で自動的に消えます。', news_c61_nextstep: '✅ 「次のステップ」が残らなくなりました：ステップを終えるとカードは消え、接続した銀行があなたのアカウントとして数えられます。', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
   org_err_san_name: 'san 이름을 입력하세요.', rep_promo_footer: 'PETO Finanzas로 지출을 관리하세요 · petofinanzas.com', rep_saved: '이미지가 저장되었습니다.', set_sections_summary: '{total}개 중 {visible}개 표시',
@@ -7100,7 +7111,7 @@ ko: {
   widget_san_next: '다음 차례: {name} · {date}',
   widget_san_next_nodate: '다음 차례: {name}',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.',
-  news_c60_panel: '🆕 비주얼 패널: 홈에 «이번 달 vs 지난 달», 비상금, 지출이 많은 카테고리, 현금 흐름이 표시됩니다. 예산에서는 카테고리별 카드로 각 한도에 남은 금액을 볼 수 있습니다.', news_c60_settings: '⚙️ 더 깔끔한 설정: 은행 연결이 위로 이동하고 모든 카드가 닫힌 상태로 시작합니다 — 제목을 누르면 열립니다.', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
+  news_c61_backup: '🔔 백업 알림 개선: 이제 주 1회만 표시되고 10초 후 자동으로 사라집니다.', news_c61_nextstep: '✅ «다음 단계»가 더 이상 남아 있지 않습니다: 단계를 마치면 카드가 사라지고, 연결한 은행이 내 계정으로 인정됩니다.', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
   org_err_san_name: 'Введите название сана.', rep_promo_footer: 'Контролируйте свои расходы с PETO Finanzas · petofinanzas.com', rep_saved: 'Изображение сохранено.', set_sections_summary: 'Видимо {visible} из {total}',
@@ -7821,7 +7832,7 @@ ru: {
   widget_san_next: 'Следующий ход: {name} · {date}',
   widget_san_next_nodate: 'Следующий ход: {name}',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.',
-  news_c60_panel: '🆕 Визуальная панель: на главном экране теперь «Этот месяц против прошлого», ваш резервный фонд, категории с самыми большими тратами и денежный поток; а в Бюджете — карточки по категориям с остатком каждого лимита.', news_c60_settings: '⚙️ Настройки понятнее: подключение банка переезжает наверх, а все карточки начинают свёрнутыми — нажмите заголовок, чтобы открыть.', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
+  news_c61_backup: '🔔 Напоминание о резервной копии стало удобнее: теперь показывается раз в неделю и само скрывается через 10 секунд.', news_c61_nextstep: '✅ «Ваш следующий шаг» больше не зависает: когда все шаги выполнены, карточка исчезает, а подключённый банк засчитывается как ваш счёт.', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
   org_err_san_name: 'San का नाम लिखें।', rep_promo_footer: 'PETO Finanzas के साथ अपने खर्चों पर नियंत्रण रखें · petofinanzas.com', rep_saved: 'छवि सहेजी गई।', set_sections_summary: '{total} में से {visible} दिख रहे हैं',
@@ -8542,7 +8553,7 @@ hi: {
   widget_san_next: 'अगली बारी: {name} · {date}',
   widget_san_next_nodate: 'अगली बारी: {name}',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।',
-  news_c60_panel: '🆕 विज़ुअल पैनल: होम पर अब «इस महीना बनाम पिछला महीना», आपका आपातकालीन फ़ंड, सबसे ज़्यादा खर्च वाली श्रेणियाँ और आपका कैश फ़्लो दिखता है; और बजट में हर श्रेणी के कार्ड में हर सीमा की बची राशि दिखती है।', news_c60_settings: '⚙️ सेटिंग्स और साफ़: बैंक कनेक्शन ऊपर आ गया है और सभी कार्ड बंद अवस्था में शुरू होते हैं — खोलने के लिए शीर्षक पर टैप करें।', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
+  news_c61_backup: '🔔 बैकअप रिमाइंडर अब बेहतर: हफ़्ते में एक बार आता है और 10 सेकंड में खुद छिप जाता है।', news_c61_nextstep: '✅ “आपका अगला कदम” अब अटका नहीं रहता: कदम पूरे करते ही कार्ड गायब हो जाता है, और आपका जुड़ा बैंक आपके खाते के रूप में गिना जाता है।', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
   org_err_san_name: 'اكتب اسم الـ san.', rep_promo_footer: 'تحكّم في مصاريفك مع PETO Finanzas · petofinanzas.com', rep_saved: 'تم حفظ الصورة.', set_sections_summary: '{visible} من {total} ظاهرة',
@@ -9263,7 +9274,7 @@ ar: {
   widget_san_next: 'الدور التالي: {name} · {date}',
   widget_san_next_nodate: 'الدور التالي: {name}',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.',
-  news_c60_panel: '🆕 لوحة مرئية: تعرض الشاشة الرئيسية الآن «هذا الشهر مقابل الشهر الماضي» وصندوق الطوارئ والفئات الأكثر إنفاقًا والتدفق النقدي؛ وفي الميزانية بطاقات لكل فئة بما تبقى من كل حد.', news_c60_settings: '⚙️ إعدادات أوضح: ينتقل ربط البنك إلى الأعلى وتبدأ كل البطاقات مغلقة — المس عنوانًا لفتحها.', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
+  news_c61_backup: '🔔 تنبيه النسخ الاحتياطي أصبح ألطف: يظهر مرة واحدة في الأسبوع ويختفي تلقائيًا بعد 10 ثوانٍ.', news_c61_nextstep: '✅ «خطوتك التالية» لم تعد عالقة: عند إكمال خطواتك تختفي البطاقة، ويُحتسب بنكك المتصل كحسابك.', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
 }
 };
 /* Resuelve el idioma automático: coincidencia exacta con un idioma
@@ -9974,6 +9985,17 @@ function dismissBackupBanner() {
   try { localStorage.setItem(BACKUP_BANNER_KEY, weekStartOf(todayStr())); } catch (e) { /* sin espacio: se ignora */ }
   renderHome();
 }
+/* Compilación 61 (pedido de Sterlin): el aviso de respaldo llega una
+   vez por semana y se quita SOLO a los 10 segundos, sin esperar a
+   que la persona lo cierre. El temporizador se arma una vez por
+   sesión; al disparar hace lo mismo que el botón de cerrar (marca la
+   semana como vista), así no reaparece hasta la semana siguiente. */
+let backupBannerTimerArmed = false;
+function scheduleBackupBannerAutoHide() {
+  if (backupBannerTimerArmed) return;
+  backupBannerTimerArmed = true;
+  setTimeout(() => { backupBannerTimerArmed = false; dismissBackupBanner(); }, 10000);
+}
 function renderBanners() {
   const wrap = document.getElementById('home-banners');
   clearNode(wrap);
@@ -10000,6 +10022,7 @@ function renderBanners() {
   }
   if (backupStale() && !backupBannerDismissed()) {
     wrap.appendChild(makeBanner(t('banner_backup'), dismissBackupBanner, goBackupSettings));
+    scheduleBackupBannerAutoHide();
   }
 }
 
@@ -10362,7 +10385,13 @@ function nextStepState() {
   const hasBudget = Object.keys(db.budgets || {}).length > 0;
   if (!hasBudget && db.incomes.length === 0) return 1;
   if (db.expenses.length === 0) return 2;
-  if (db.accounts.length === 0) return 3;
+  /* Compilación 61 (pedido de Sterlin): un banco conectado YA da
+     cuentas; sin esto, la tarjeta se quedaba en 3/3 pidiendo «crea tu
+     cuenta de efectivo» aunque la persona ya tuviera su banco en la
+     app (le pasó a Sterlin al conectar SoFi). Completados los tres
+     pasos, la tarjeta desaparece (renderNextStep ya la oculta en 0). */
+  const hasBank = !!(db.settings && Array.isArray(db.settings.bankConns) && db.settings.bankConns.length);
+  if (db.accounts.length === 0 && !hasBank) return 3;
   return 0;
 }
 function renderNextStep() {
