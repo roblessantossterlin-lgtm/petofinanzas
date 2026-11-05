@@ -1,11 +1,19 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 61) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 62) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
+   Sincronizado el 4-nov-2026 con la Compilación 62: la
+   bienvenida trae «Ya tengo cuenta · Iniciar sesión» para
+   quien ya es cliente: entra con su cuenta en la nube y
+   sus datos bajan solos, sin pasar por el alta ni por
+   Ajustes. Novedades: news_c62_signin sustituye a
+   news_c61_backup y news_c61_nextstep — 954 claves por
+   idioma; la caché del service worker sube a
+   peto-web-v36.
    Sincronizado el 4-nov-2026 con la Compilación 61: el aviso
    de respaldo llega una vez por semana y se quita solo a los
    10 segundos, y la tarjeta «Tu siguiente paso» desaparece al
@@ -156,12 +164,9 @@
 'use strict';
 
 /* ---------------- Constantes ---------------- */
-'use strict';
-
-/* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 61';
-const BUILD_NUM = 61;
+const BUILD_LABEL = 'Compilación 62';
+const BUILD_NUM = 62;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -177,7 +182,7 @@ function buildLabelText() {
    PASO EN CADA COMPILACIÓN NUEVA: sustituir esta lista por la
    clave news_cNN de la versión, borrar la clave anterior de los
    12 diccionarios y dejar en el HTML únicamente su <li>. */
-const NEWS_CURRENT = ['news_c61_backup', 'news_c61_nextstep'];
+const NEWS_CURRENT = ['news_c62_signin'];
 
 /* ---------------- Compilación 59: capa de país -------------------
    El país se elige una vez en la bienvenida (usuarios nuevos) y se
@@ -1586,7 +1591,7 @@ es: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Pulsa atrás otra vez para salir.',
-  news_c61_backup: '🔔 Aviso de respaldo más amable: ahora llega una vez por semana y se quita solo a los 10 segundos.', news_c61_nextstep: '✅ «Tu siguiente paso» ya no se queda pegado: al completar tus pasos la tarjeta desaparece, y tu banco conectado cuenta como tu cuenta.', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
+  news_c62_signin: '👤 ¿Ya tienes cuenta? Ahora puedes iniciar sesión desde la pantalla de bienvenida y bajar tus datos sin pasar por Ajustes.', ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
   org_err_san_name: 'Enter the name of the san.', rep_promo_footer: 'Take control of your spending with PETO Finanzas · petofinanzas.com', rep_saved: 'Image saved.', set_sections_summary: '{visible} of {total} visible',
@@ -2064,7 +2069,7 @@ en: {
   widget_san_next: 'Next turn: {name} · {date}',
   widget_san_next_nodate: 'Next turn: {name}',
   back_exit_hint: 'Press back again to exit.',
-  news_c61_backup: '🔔 Friendlier backup reminder: it now shows once a week and hides itself after 10 seconds.', news_c61_nextstep: '✅ “Your next step” no longer sticks around: once you finish your steps the card disappears, and your connected bank counts as your account.', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
+  news_c62_signin: '👤 Already have an account? You can now sign in right from the welcome screen and pull your data down without going through Settings.', ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
   org_err_san_name: 'Scrivi il nome del san.', rep_promo_footer: 'Controlla le tue spese con PETO Finanzas · petofinanzas.com', rep_saved: 'Immagine salvata.', set_sections_summary: '{visible} di {total} visibili',
@@ -2785,7 +2790,7 @@ it: {
   widget_san_next: 'Prossimo turno: {name} · {date}',
   widget_san_next_nodate: 'Prossimo turno: {name}',
   back_exit_hint: 'Premi di nuovo indietro per uscire.',
-  news_c61_backup: '🔔 Promemoria di backup più gentile: ora arriva una volta a settimana e si nasconde da solo dopo 10 secondi.', news_c61_nextstep: '✅ «Il tuo prossimo passo» non resta più bloccato: completati i passi la scheda sparisce, e la banca collegata vale come il tuo conto.', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
+  news_c62_signin: '👤 Hai già un account? Ora puoi accedere dalla schermata di benvenuto e scaricare i tuoi dati senza passare dalle Impostazioni.', ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
   org_err_san_name: 'Digite o nome do san.', rep_promo_footer: 'Controle seus gastos com o PETO Finanzas · petofinanzas.com', rep_saved: 'Imagem salva.', set_sections_summary: '{visible} de {total} visíveis',
@@ -3506,7 +3511,7 @@ pt: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Toque em voltar outra vez para sair.',
-  news_c61_backup: '🔔 Lembrete de backup mais amável: agora chega uma vez por semana e some sozinho após 10 segundos.', news_c61_nextstep: '✅ “Seu próximo passo” não fica mais travado: ao concluir seus passos o cartão some, e seu banco conectado conta como sua conta.', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
+  news_c62_signin: '👤 Já tem conta? Agora você pode entrar direto da tela de boas-vindas e baixar seus dados sem passar pelas Configurações.', ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
   org_err_san_name: 'Saisis le nom du san.', rep_promo_footer: 'Contrôle tes dépenses avec PETO Finanzas · petofinanzas.com', rep_saved: 'Image enregistrée.', set_sections_summary: '{visible} sur {total} visibles',
@@ -4227,7 +4232,7 @@ fr: {
   widget_san_next: 'Prochain tour : {name} · {date}',
   widget_san_next_nodate: 'Prochain tour : {name}',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.',
-  news_c61_backup: '🔔 Rappel de sauvegarde plus doux : il s’affiche une fois par semaine et se masque tout seul après 10 secondes.', news_c61_nextstep: '✅ « Votre prochaine étape » ne reste plus affichée : une fois vos étapes terminées, la carte disparaît, et votre banque connectée compte comme votre compte.', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
+  news_c62_signin: '👤 Vous avez déjà un compte ? Vous pouvez maintenant vous connecter dès l’écran d’accueil et récupérer vos données sans passer par les Réglages.', ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
   org_err_san_name: 'Gib den Namen des Sans ein.', rep_promo_footer: 'Kontrolliere deine Ausgaben mit PETO Finanzas · petofinanzas.com', rep_saved: 'Bild gespeichert.', set_sections_summary: '{visible} von {total} sichtbar',
@@ -4948,7 +4953,7 @@ de: {
   widget_san_next: 'Nächster Zug: {name} · {date}',
   widget_san_next_nodate: 'Nächster Zug: {name}',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.',
-  news_c61_backup: '🔔 Freundlichere Backup-Erinnerung: Sie erscheint jetzt einmal pro Woche und blendet sich nach 10 Sekunden selbst aus.', news_c61_nextstep: '✅ „Dein nächster Schritt“ bleibt nicht mehr hängen: Sind deine Schritte erledigt, verschwindet die Karte, und deine verbundene Bank zählt als dein Konto.', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
+  news_c62_signin: '👤 Du hast schon ein Konto? Jetzt kannst du dich direkt auf dem Willkommensbildschirm anmelden und deine Daten herunterladen, ohne über die Einstellungen zu gehen.', ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
   org_err_san_name: '请输入 san 的名称。', rep_promo_footer: '用 PETO Finanzas 控制你的支出 · petofinanzas.com', rep_saved: '图片已保存。', set_sections_summary: '共 {total} 个，已显示 {visible} 个',
@@ -5669,7 +5674,7 @@ zh: {
   widget_san_next: '下一轮：{name} · {date}',
   widget_san_next_nodate: '下一轮：{name}',
   back_exit_hint: '再按一次返回即可退出。',
-  news_c61_backup: '🔔 备份提醒更贴心：现在每周显示一次，10 秒后自动隐藏。', news_c61_nextstep: '✅ «下一步»不再卡住：完成所有步后卡片自动消失，已连接的银行也算作您的账户。', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
+  news_c62_signin: '👤 已有账户？现在可以在欢迎界面直接登录，无需进入设置即可下载您的数据。', ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
   org_err_san_name: 'sanの名前を入力してください。', rep_promo_footer: 'PETO Finanzasで支出を管理しよう · petofinanzas.com', rep_saved: '画像を保存しました。', set_sections_summary: '{total}件中{visible}件を表示',
@@ -6390,7 +6395,7 @@ ja: {
   widget_san_next: '次のターン：{name} · {date}',
   widget_san_next_nodate: '次のターン：{name}',
   back_exit_hint: 'もう一度戻るを押すと終了します。',
-  news_c61_backup: '🔔 バックアップのお知らせが改善：週に1回だけ表示され、10秒で自動的に消えます。', news_c61_nextstep: '✅ 「次のステップ」が残らなくなりました：ステップを終えるとカードは消え、接続した銀行があなたのアカウントとして数えられます。', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
+  news_c62_signin: '👤 すでにアカウントをお持ちですか？ようこそ画面からそのままログインし、設定を開かずにデータをダウンロードできるようになりました。', ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
   org_err_san_name: 'san 이름을 입력하세요.', rep_promo_footer: 'PETO Finanzas로 지출을 관리하세요 · petofinanzas.com', rep_saved: '이미지가 저장되었습니다.', set_sections_summary: '{total}개 중 {visible}개 표시',
@@ -7111,7 +7116,7 @@ ko: {
   widget_san_next: '다음 차례: {name} · {date}',
   widget_san_next_nodate: '다음 차례: {name}',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.',
-  news_c61_backup: '🔔 백업 알림 개선: 이제 주 1회만 표시되고 10초 후 자동으로 사라집니다.', news_c61_nextstep: '✅ «다음 단계»가 더 이상 남아 있지 않습니다: 단계를 마치면 카드가 사라지고, 연결한 은행이 내 계정으로 인정됩니다.', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
+  news_c62_signin: '👤 이미 계정이 있나요? 이제 시작 화면에서 바로 로그인해 설정을 거치지 않고 데이터를 내려받을 수 있습니다.', ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
   org_err_san_name: 'Введите название сана.', rep_promo_footer: 'Контролируйте свои расходы с PETO Finanzas · petofinanzas.com', rep_saved: 'Изображение сохранено.', set_sections_summary: 'Видимо {visible} из {total}',
@@ -7832,7 +7837,7 @@ ru: {
   widget_san_next: 'Следующий ход: {name} · {date}',
   widget_san_next_nodate: 'Следующий ход: {name}',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.',
-  news_c61_backup: '🔔 Напоминание о резервной копии стало удобнее: теперь показывается раз в неделю и само скрывается через 10 секунд.', news_c61_nextstep: '✅ «Ваш следующий шаг» больше не зависает: когда все шаги выполнены, карточка исчезает, а подключённый банк засчитывается как ваш счёт.', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
+  news_c62_signin: '👤 Уже есть аккаунт? Теперь можно войти прямо с экрана приветствия и загрузить свои данные, не заходя в настройки.', ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
   org_err_san_name: 'San का नाम लिखें।', rep_promo_footer: 'PETO Finanzas के साथ अपने खर्चों पर नियंत्रण रखें · petofinanzas.com', rep_saved: 'छवि सहेजी गई।', set_sections_summary: '{total} में से {visible} दिख रहे हैं',
@@ -8553,7 +8558,7 @@ hi: {
   widget_san_next: 'अगली बारी: {name} · {date}',
   widget_san_next_nodate: 'अगली बारी: {name}',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।',
-  news_c61_backup: '🔔 बैकअप रिमाइंडर अब बेहतर: हफ़्ते में एक बार आता है और 10 सेकंड में खुद छिप जाता है।', news_c61_nextstep: '✅ “आपका अगला कदम” अब अटका नहीं रहता: कदम पूरे करते ही कार्ड गायब हो जाता है, और आपका जुड़ा बैंक आपके खाते के रूप में गिना जाता है।', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
+  news_c62_signin: '👤 पहले से खाता है? अब आप स्वागत स्क्रीन से ही साइन इन करके सेटिंग्स में जाए बिना अपना डेटा डाउनलोड कर सकते हैं।', ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
   org_err_san_name: 'اكتب اسم الـ san.', rep_promo_footer: 'تحكّم في مصاريفك مع PETO Finanzas · petofinanzas.com', rep_saved: 'تم حفظ الصورة.', set_sections_summary: '{visible} من {total} ظاهرة',
@@ -9274,7 +9279,7 @@ ar: {
   widget_san_next: 'الدور التالي: {name} · {date}',
   widget_san_next_nodate: 'الدور التالي: {name}',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.',
-  news_c61_backup: '🔔 تنبيه النسخ الاحتياطي أصبح ألطف: يظهر مرة واحدة في الأسبوع ويختفي تلقائيًا بعد 10 ثوانٍ.', news_c61_nextstep: '✅ «خطوتك التالية» لم تعد عالقة: عند إكمال خطواتك تختفي البطاقة، ويُحتسب بنكك المتصل كحسابك.', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
+  news_c62_signin: '👤 لديك حساب بالفعل؟ يمكنك الآن تسجيل الدخول من شاشة الترحيب مباشرة وتنزيل بياناتك دون المرور بالإعدادات.', ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
 }
 };
 /* Resuelve el idioma automático: coincidencia exacta con un idioma
@@ -17008,6 +17013,98 @@ async function onCloudForgot() {
   }
   cloudStatus(t('cloud_recovery_sent'));
 }
+/* ------------- Inicio de sesión desde la bienvenida (Compilación 62) --
+   Pedido de Sterlin: quien YA es cliente (cambió de teléfono,
+   reinstaló o viene de la web) no tenía forma de entrar desde la
+   bienvenida: el inicio de sesión solo vivía en Ajustes, después de
+   pasar el alta como si fuera nuevo. La bienvenida muestra ahora
+   «Ya tengo cuenta · Iniciar sesión», que abre un panel propio con
+   el mismo correo y contraseña de la nube. Al entrar se reconcilia
+   igual que en Ajustes (cloudReconcile): si este teléfono no tiene
+   datos, bajan los de la nube; después se salta el alta y se entra
+   directo. El alta normal no cambia: sin cuenta, en minutos. */
+function obSignInStatus(msg) {
+  const el = document.getElementById('ob-signin-status');
+  if (el) el.textContent = msg || '';
+}
+function openObSignIn() {
+  obTourUserTouch();
+  const tour = document.getElementById('ob-tour');
+  if (tour) tour.hidden = true;
+  const form = document.getElementById('onboarding-form');
+  if (form) form.hidden = true;
+  const demo = document.querySelector('.ob-demo');
+  if (demo) demo.hidden = true;
+  const block = document.getElementById('ob-signin');
+  if (block) block.hidden = true;
+  const note = document.getElementById('ob-note');
+  if (note) note.hidden = true;
+  showError('ob-signin-error', '');
+  obSignInStatus('');
+  const panel = document.getElementById('ob-signin-panel');
+  if (panel) panel.hidden = false;
+  const email = document.getElementById('ob-signin-email');
+  if (email) email.focus();
+}
+function closeObSignIn() {
+  showOnboarding();
+}
+async function onObSignIn(ev) {
+  if (ev) ev.preventDefault();
+  const emailEl = document.getElementById('ob-signin-email');
+  const passEl = document.getElementById('ob-signin-pass');
+  const email = String((emailEl && emailEl.value) || '').trim().toLowerCase();
+  const pass = String((passEl && passEl.value) || '');
+  if (!email || email.indexOf('@') < 1 || pass.length < 6) { showError('ob-signin-error', t('cloud_err_fields')); return; }
+  const sb = supa();
+  if (!sb) { showError('ob-signin-error', t('cloud_err_generic')); return; }
+  showError('ob-signin-error', '');
+  obSignInStatus(t('cloud_working'));
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email: email, password: pass });
+    if (error || !data || !data.user) {
+      obSignInStatus('');
+      showError('ob-signin-error', t('cloud_err_login'));
+      return;
+    }
+    cloudUser = { id: data.user.id, email: data.user.email || email };
+    cloudState.email = cloudUser.email;
+    saveCloudState();
+    await cloudReconcile(true);
+    sharedRefresh();
+    renderCloudCard();
+    /* Si la nube no traía datos (cuenta sin sincronizar), el alta
+       queda marcada igual: la persona ya es cliente y entra. */
+    if (!db.settings.onboarded) { db.settings.onboarded = true; save(); }
+    obSignInStatus('');
+    enterApp();
+  } catch (e) { obSignInStatus(''); showError('ob-signin-error', t('cloud_err_generic')); }
+}
+/* «¿Olvidaste tu contraseña?» del panel de la bienvenida: el mismo
+   envío neutro de onCloudForgot, con los avisos en el panel. */
+async function onObForgot() {
+  const sb = supa();
+  if (!sb) return;
+  const emEl = document.getElementById('ob-signin-email');
+  const email = String((emEl && emEl.value) || '').trim().toLowerCase();
+  if (!email || email.indexOf('@') < 1 || email.lastIndexOf('.') < email.indexOf('@') + 2) {
+    showError('ob-signin-error', t('cloud_forgot_err_email'));
+    return;
+  }
+  showError('ob-signin-error', '');
+  obSignInStatus(t('cloud_working'));
+  let netFail = false;
+  try {
+    const res = await sb.auth.resetPasswordForEmail(email, { redirectTo: PETO_RECOVERY_REDIRECT });
+    if (res && res.error && res.error.name === 'AuthRetryableFetchError') netFail = true;
+  } catch (e) { netFail = true; }
+  if (netFail) {
+    obSignInStatus('');
+    showError('ob-signin-error', t('cloud_err_generic'));
+    return;
+  }
+  obSignInStatus(t('cloud_recovery_sent'));
+}
 function cloudWatchAuth(sb) {
   if (cloudAuthWatching || !sb || !sb.auth || typeof sb.auth.onAuthStateChange !== 'function') return;
   cloudAuthWatching = true;
@@ -19485,6 +19582,15 @@ function showOnboarding() {
   if (mode) mode.hidden = false;
   const note = document.getElementById('ob-note');
   if (note) note.hidden = false;
+  /* Compilación 62: al (re)presentar la bienvenida — también al
+     «Volver» del panel de inicio de sesión — el panel queda cerrado
+     y el bloque «Ya tengo cuenta» y la demo vuelven a verse. */
+  const obSigninPanel = document.getElementById('ob-signin-panel');
+  if (obSigninPanel) obSigninPanel.hidden = true;
+  const obSigninBlock = document.getElementById('ob-signin');
+  if (obSigninBlock) obSigninBlock.hidden = false;
+  const obDemoBlock = document.querySelector('.ob-demo');
+  if (obDemoBlock) obDemoBlock.hidden = false;
   /* Compilación 57 (informe de testers, día 4): el idioma se elige
      UNA sola vez en la bienvenida — el selector de arriba, visible
      siempre. Antes solo salía cuando el teléfono no estaba en español
@@ -20276,6 +20382,10 @@ function wireEvents() {
   /* Modo demo (Compilación 45, Bloque O): entrar desde la bienvenida
      o desde Ajustes; salir desde la banda permanente. */
   document.getElementById('ob-demo-btn').addEventListener('click', enterDemo);
+  document.getElementById('ob-signin-open').addEventListener('click', openObSignIn);
+  document.getElementById('ob-signin-panel').addEventListener('submit', onObSignIn);
+  document.getElementById('ob-signin-back').addEventListener('click', closeObSignIn);
+  document.getElementById('ob-signin-forgot').addEventListener('click', onObForgot);
   document.getElementById('set-demo-btn').addEventListener('click', enterDemo);
   document.getElementById('demo-exit').addEventListener('click', exitDemo);
 

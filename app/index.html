@@ -131,6 +131,27 @@
       <button id="ob-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">👀 Ver una demo</button>
       <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
     </div>
+    <!-- Compilación 62: iniciar sesión desde la bienvenida, para
+         quien ya es cliente (cambió de teléfono, reinstaló o viene
+         de la web): entra con su cuenta en la nube y sus datos
+         bajan solos, sin pasar por el alta ni por Ajustes. -->
+    <div class="ob-signin" id="ob-signin">
+      <button id="ob-signin-open" type="button" class="btn btn-ghost" data-i18n="ob_signin_btn">Ya tengo cuenta · Iniciar sesión</button>
+      <p class="muted small" data-i18n="ob_signin_help">Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.</p>
+    </div>
+    <form id="ob-signin-panel" autocomplete="off" hidden novalidate>
+      <label for="ob-signin-email" data-i18n="cloud_email">Correo electrónico</label>
+      <input id="ob-signin-email" type="email" autocomplete="email" maxlength="120">
+      <label for="ob-signin-pass" data-i18n="cloud_pass">Contraseña</label>
+      <input id="ob-signin-pass" type="password" autocomplete="current-password" maxlength="72">
+      <p id="ob-signin-status" class="muted small" aria-live="polite"></p>
+      <p id="ob-signin-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="ob-signin-go" type="submit" class="btn btn-primary" data-i18n="cloud_signin">Entrar</button>
+        <button id="ob-signin-back" type="button" class="btn btn-ghost" data-i18n="ob_signin_back">Volver</button>
+      </div>
+      <p><button id="ob-signin-forgot" type="button" class="btn btn-ghost btn-small" data-i18n="cloud_forgot">¿Olvidaste tu contraseña?</button></p>
+    </form>
     <p id="ob-note" class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
   </div>
 </section>
@@ -1356,8 +1377,7 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c61_backup">🔔 Aviso de respaldo más amable: ahora llega una vez por semana y se quita solo a los 10 segundos.</li>
-        <li data-i18n="news_c61_nextstep">✅ «Tu siguiente paso» ya no se queda pegado: al completar tus pasos la tarjeta desaparece, y tu banco conectado cuenta como tu cuenta.</li>
+        <li data-i18n="news_c62_signin">👤 ¿Ya tienes cuenta? Ahora puedes iniciar sesión desde la pantalla de bienvenida y bajar tus datos sin pasar por Ajustes.</li>
       </ul>
       </div>
     </section>
