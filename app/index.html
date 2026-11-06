@@ -1463,7 +1463,7 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c64_design">🎨 Nuevo diseño: PETO Finanzas se ve más profesional y moderno en toda la app — tarjetas, botones, navegación y una bienvenida renovada.</li>
+        <li data-i18n="news_c65_nav">🧭 Nueva barra inferior: navega por PETO Finanzas desde la cápsula flotante de abajo — Inicio y tus secciones principales a un toque.</li>
       </ul>
       </div>
     </section>
@@ -1472,6 +1472,13 @@
 
   <footer class="app-footer muted small" data-i18n="footer">
     PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono</footer>
+
+  <!-- Compilación 65: barra inferior flotante de navegación (cápsula).
+       Los botones los genera app.js (BOTTOM_NAV) con los iconos del
+       menú lateral y etiquetas i18n; vive dentro de #app-shell, así
+       que en bloqueo y bienvenida queda oculta con el shell, y
+       updateBottomNav la apaga en modo demo. -->
+  <nav id="bottom-nav" class="bottom-nav" hidden aria-label="Navegación principal"></nav>
 
   <button id="fab-search" class="fab fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍</button>
   <button id="fab-add" class="fab" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">+</button>
