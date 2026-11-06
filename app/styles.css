@@ -667,6 +667,305 @@ html[data-theme="oscuro"] .pub-pill-reported{background:#1d3352;color:#a9c8f5;bo
 }
 
 
+/* ================================================================
+   Compilación 64 · Sistema de diseño profesional (estilo fintech)
+   Rediseño SOLO visual: fondo oscuro rico con resplandores, tarjetas
+   elevadas, botones con degradado, héroe de Inicio, navegación
+   pulida y una bienvenida renovada. Todo son reglas NUEVAS o
+   sobreescrituras al final del archivo (ganan por orden a igual
+   especificidad): ninguna clase ni id existente se renombra ni se
+   quita, y el motor no se toca. Los colores salen de las variables
+   del tema (claro/oscuro/auto y acentos) como el resto de la app.
+   ================================================================ */
+:root{
+  --radius:18px;
+  --shadow-card:0 8px 22px rgba(8,25,17,.10);
+  --shadow-pop:0 14px 32px rgba(8,25,17,.18);
+}
+html[data-theme="oscuro"]{
+  --shadow-card:0 10px 24px rgba(0,0,0,.32);
+  --shadow-pop:0 16px 36px rgba(0,0,0,.45);
+}
+@media (prefers-color-scheme: dark){
+  html[data-theme="auto"]{
+    --shadow-card:0 10px 24px rgba(0,0,0,.32);
+    --shadow-pop:0 16px 36px rgba(0,0,0,.45);
+  }
+}
+
+/* Fondo general: lienzo oscuro rico con dos resplandores verdes
+   muy suaves en las esquinas superiores (en claro apenas se notan). */
+body{
+  background:
+    radial-gradient(640px 320px at 88% -4%, rgba(47,174,127,.16), rgba(47,174,127,0) 62%),
+    radial-gradient(760px 420px at -12% 0%, rgba(11,110,79,.13), rgba(11,110,79,0) 58%),
+    var(--bg);
+  background-attachment:fixed;
+}
+
+/* Jerarquía tipográfica más fuerte. */
+h2{font-weight:750;letter-spacing:-.01em}
+h3{font-weight:700}
+.app-title{font-size:1.65rem;font-weight:800;letter-spacing:-.015em}
+.greeting{font-weight:500}
+
+/* ---------- Tarjetas elevadas ---------- */
+.card,.summary-item,.menu-item,.item,.bc-card,.chooser-card,.pod-ep{
+  border-radius:var(--radius);
+  box-shadow:var(--shadow-card);
+}
+.card{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0) 42%),
+    var(--card);
+  border-color:rgba(140,170,155,.35);
+}
+.item,.summary-item,.menu-item{background:var(--card)}
+
+/* ---------- Héroe de Inicio: «¿Cuánto puedes gastar hoy?» ---------- */
+.spend-card{
+  background:linear-gradient(135deg,#04291d 0%,#07503a 52%,#0d7a55 100%);
+  border:1px solid rgba(127,212,182,.40);
+  border-radius:22px;
+  color:#fff;
+  padding:1.45rem 1.15rem 1.25rem;
+  box-shadow:0 16px 34px rgba(3,40,26,.38);
+}
+.spend-card .summary-label{color:#bfe9d8;font-size:.92rem;font-weight:600;letter-spacing:.02em}
+.spend-card .spend-value{font-size:2.7rem;font-weight:800;letter-spacing:-.02em;color:#fff;margin:.25rem 0}
+.spend-card .muted{color:#a9dcc6}
+.spend-card .btn-ghost{background:rgba(255,255,255,.10);color:#eafff5;border-color:rgba(255,255,255,.45)}
+.spend-card .btn-primary{background:#fff;color:#07503a;box-shadow:0 8px 18px rgba(0,0,0,.25)}
+
+/* ---------- Botones ---------- */
+.btn{border-radius:13px;transition:transform .08s ease, box-shadow .15s ease, background .15s ease}
+.btn:active{transform:scale(.975)}
+.btn-primary{
+  background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 150%);
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 7px 16px rgba(6,60,40,.32);
+}
+.btn-secondary{
+  background:var(--accent-soft);
+  border:1px solid var(--accent);
+  color:var(--accent-dark);
+  box-shadow:0 3px 10px rgba(8,25,17,.08);
+}
+.btn-ghost{background:rgba(140,170,155,.07)}
+.fab{
+  background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 150%);
+  box-shadow:0 10px 22px rgba(6,60,40,.42);
+}
+.streak-pill{box-shadow:var(--shadow-card)}
+.banner{border-radius:var(--radius);box-shadow:var(--shadow-card)}
+
+/* ---------- Campos de formulario ---------- */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+select:not([multiple]), textarea{
+  border-radius:12px;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+select:focus, textarea:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(23,150,105,.28);
+}
+
+/* ---------- Navegación (menú lateral y accesos) ---------- */
+.menu-drawer{box-shadow:14px 0 34px rgba(0,0,0,.30)}
+.drawer-head{
+  background:linear-gradient(135deg,#04291d 0%,#07503a 60%,#0b6e4f 100%);
+  color:#fff;
+  border-bottom:none;
+}
+.drawer-head .drawer-brand{color:#fff}
+.drawer-head .muted{color:#cdeeda}
+.drawer-head .btn-ghost{background:rgba(255,255,255,.10);color:#fff;border-color:rgba(255,255,255,.4)}
+.menu-item{transition:border-color .15s ease, background .15s ease, transform .08s ease}
+.menu-item:active{transform:scale(.985)}
+.menu-item.active{
+  background:linear-gradient(135deg, var(--accent-soft) 0%, rgba(140,170,155,.05) 130%);
+  border-color:var(--accent);
+}
+.menu-icon{
+  border-radius:14px;
+  background:linear-gradient(135deg, var(--accent-soft) 0%, rgba(140,170,155,.10) 140%);
+}
+.summary-item{transition:border-color .15s ease, transform .08s ease}
+.btn-menu{border-radius:14px;box-shadow:var(--shadow-card)}
+
+/* ---------- Barras de progreso y chips ---------- */
+.budget-bar,.pub-progress,.vs-track{box-shadow:inset 0 1px 3px rgba(8,25,17,.18)}
+.budget-fill,.pub-progress-fill{
+  background:linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 160%);
+  border-radius:999px;
+}
+.chip{padding:.16rem .62rem;letter-spacing:.01em}
+
+/* ---------- Bienvenida renovada ---------- */
+.onboarding-card,.lock-card{
+  border-radius:24px;
+  background:
+    linear-gradient(180deg, rgba(47,174,127,.08), rgba(47,174,127,0) 34%),
+    var(--card);
+  box-shadow:var(--shadow-pop);
+  padding:1.8rem 1.3rem;
+}
+.onboarding-card h1{font-size:1.68rem;font-weight:800;letter-spacing:-.015em}
+.onboarding-card .app-logo-img,.lock-card .app-logo-img{
+  border-radius:22px;
+  box-shadow:0 0 0 4px var(--accent-soft), 0 12px 26px rgba(6,60,40,.35);
+}
+.ob-progress{
+  height:8px;border-radius:999px;overflow:hidden;
+  background:var(--line);
+  margin:.35rem 0 1.05rem;
+  box-shadow:inset 0 1px 3px rgba(8,25,17,.20);
+}
+#ob-progress-fill{
+  height:100%;width:11.1111%;
+  background:linear-gradient(90deg, var(--accent) 0%, #35c48d 100%);
+  border-radius:999px;
+  transition:width .32s ease;
+}
+.ob-step-icon{
+  width:92px;height:92px;
+  margin:.15rem auto .65rem;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.55rem;line-height:1;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,.28), rgba(255,255,255,0) 55%),
+    radial-gradient(circle, var(--accent-soft) 0%, var(--accent) 135%);
+  border:1px solid var(--accent);
+  box-shadow:0 12px 24px rgba(6,60,40,.30), inset 0 0 0 5px rgba(255,255,255,.07);
+}
+.ob-step h2{font-size:1.48rem;font-weight:800;letter-spacing:-.01em}
+.ob-step>p:not(.ob-step-icon){font-size:1.02rem}
+@keyframes obIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.ob-step.ob-in{animation:obIn .3s ease both}
+@media (prefers-reduced-motion: reduce){
+  .ob-step.ob-in{animation:none}
+  #ob-progress-fill{transition:none}
+  .btn,.menu-item,.summary-item{transition:none}
+}
+/* Mini-formularios del tour: panel interior elevado. */
+.ob-mini-form{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:.95rem;
+  box-shadow:inset 0 1px 4px rgba(8,25,17,.06);
+}
+.ob-added-list{display:flex;flex-direction:column;gap:.4rem}
+.ob-added-list .item{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:.42rem .85rem;
+  font-size:.92rem;font-weight:600;
+  box-shadow:none;
+}
+/* Confirmaciones del tour como pastillas verdes (antes texto chico
+   que pasaba desapercibido). */
+#ob-tour [id^="ob-"][id$="-status"]:not([hidden]){
+  display:inline-block;
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  border:1px solid var(--accent);
+  border-radius:999px;
+  padding:.42rem .9rem;
+  font-weight:700;font-size:.92rem;
+  margin:.45rem auto 0;
+}
+.ob-mini-form [id^="ob-"][id$="-status"]:not([hidden]){align-self:center}
+/* Botón «al terminar» elegido: marcado en verde sólido, imposible
+   de confundir con «no pasó nada». */
+.btn.ob-marked{
+  background:linear-gradient(135deg,#0e7a55 0%,#0b6e4f 100%);
+  color:#fff;
+  border-color:#0b6e4f;
+  box-shadow:0 9px 20px rgba(6,60,40,.38);
+}
+/* Formulario final: filas (huella, modo) como tarjetas suaves. */
+.onboarding-card .toggle-row{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:.7rem .85rem;
+  margin-top:.65rem;
+}
+.onboarding-card .toggle-row:last-child{border-bottom:1px solid var(--line)}
+
+/* ---------- Compilación 64 · Ajuste a la referencia visual ----------
+   Dirección aprobada por Sterlin (conceptos de Inicio y Bienvenida):
+   héroe verde intenso con resplandor, número enorme, pastilla de
+   variación, barras de colores y botones del tour protagonistas. */
+/* Héroe: resplandor esmeralda arriba a la derecha sobre verde
+   profundo, como la referencia (antes: degradado lineal oscuro). */
+.spend-card{
+  background:
+    radial-gradient(130% 95% at 88% -10%, rgba(64,224,150,.85) 0%, rgba(64,224,150,0) 52%),
+    linear-gradient(155deg, #0a7a4b 0%, #055736 58%, #033826 100%);
+}
+.spend-card .spend-value{font-size:3rem}
+/* Panel «Este mes vs. el mes pasado»: título en verde de acento y
+   la línea de variación como pastilla (es el último <p class=muted>
+   de la tarjeta; sin datos, la misma regla viste el aviso vacío). */
+#home-panel-vs h3{color:var(--accent)}
+#home-panel-vs>p.muted:last-of-type{
+  display:inline-block;
+  background:var(--accent-soft);color:var(--accent-dark);
+  border:1px solid var(--accent);border-radius:999px;
+  padding:.35rem .85rem;font-weight:700;
+}
+/* Tarjetas de topes (Presupuesto): barra con color propio por
+   tarjeta, como las categorías de la referencia (naranja, azul,
+   verde, morado, celeste); el «over» conserva su rojo de aviso. */
+.bc-grid .bc-card:nth-child(5n+1) .budget-fill:not(.over){background:#f59e0b}
+.bc-grid .bc-card:nth-child(5n+2) .budget-fill:not(.over){background:#4d94dd}
+.bc-grid .bc-card:nth-child(5n+3) .budget-fill:not(.over){background:#2fb457}
+.bc-grid .bc-card:nth-child(5n+4) .budget-fill:not(.over){background:#9a78e0}
+.bc-grid .bc-card:nth-child(5n+5) .budget-fill:not(.over){background:#38b6c9}
+
+/* Bienvenida según la referencia: progreso fino y brillante, logo
+   con resplandor e icono de lámina grande con centro luminoso. */
+.ob-progress{height:6px}
+#ob-progress-fill{background:linear-gradient(90deg,#17b978 0%,#3fe0a0 100%)}
+.onboarding-card .app-logo-img,.lock-card .app-logo-img{
+  box-shadow:0 0 0 4px var(--accent-soft), 0 0 36px rgba(47,200,130,.50), 0 12px 26px rgba(6,60,40,.35);
+}
+.ob-step-icon{
+  width:104px;height:104px;font-size:2.9rem;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(255,255,255,.40), rgba(255,255,255,0) 52%),
+    radial-gradient(circle, #63e6ae 0%, #14a36c 58%, #0a5c40 100%);
+  border:1px solid rgba(127,230,182,.65);
+  box-shadow:0 0 0 5px rgba(20,163,108,.18), 0 14px 28px rgba(6,60,40,.35);
+}
+/* El botón de acción de cada lámina: ancho completo y verde
+   degradado brillante, como el «Quiero conectar mi banco» de la
+   referencia; la navegación: «Siguiente» sólido y «Saltar» fantasma
+   con borde. */
+.ob-step .btn-secondary,.ob-tour-nav #ob-tour-next{
+  width:100%;
+  background:linear-gradient(135deg,#1ec773 0%,#0a9e5f 100%);
+  color:#fff;border-color:transparent;
+  box-shadow:0 10px 22px rgba(6,80,50,.35);
+}
+.ob-step .btn-secondary{margin-top:.9rem}
+.ob-mini-form .btn-secondary{margin-top:.2rem}
+.ob-tour-nav #ob-tour-next{width:auto}
+.ob-tour-nav .btn-ghost{border:1px solid var(--line);background:transparent}
+/* Y el elegido «al terminar» se distingue del resto con anillo
+   brillante (además del texto «✓ Se abre al terminar»). */
+.btn.ob-marked{
+  background:linear-gradient(135deg,#0e7a55 0%,#0b6e4f 100%);
+  color:#fff;border-color:#35d99a;
+  box-shadow:0 0 0 2px #35d99a, 0 10px 22px rgba(6,60,40,.40);
+}
+
 /* ---------- Compilación 48 · Blindaje de la ventana de Plaid ----------
    El SDK de Plaid Link pinta su ventana en un iframe propio
    (src «https://cdn.plaid.com/link/v2/stable/link.html…») que
