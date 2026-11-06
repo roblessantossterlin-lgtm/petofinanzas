@@ -1,11 +1,20 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 62) con textos adaptados a la
+   Copia de app.js (raíz, Compilación 63) con textos adaptados a la
    web (cuenta en la nube y sincronización en vez de «solo en tu
    teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
    ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
    traducción normal de esas claves). La lógica es la misma; lo
    específico de navegador vive en web.js y web.css. Al actualizar
    la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
+   Sincronizado el 5-nov-2026 con la Compilación 63: el tour
+   de bienvenida pasa de 3 a 9 láminas y ahora CONFIGURA en el
+   camino — primer gasto real, pagos fijos, primera meta de
+   ahorro, destinos «al terminar» (san, banco, podcast y nube),
+   recordatorios y la huella junto al PIN — y el banco se
+   sincroniza en CADA apertura de la app (antes: solo si
+   pasaban ~6 h). Novedades: news_c63_tour sustituye a
+   news_c62_signin — 985 claves por idioma; la caché del
+   service worker sube a peto-web-v37.
    Sincronizado el 4-nov-2026 con la Compilación 62: la
    bienvenida trae «Ya tengo cuenta · Iniciar sesión» para
    quien ya es cliente: entra con su cuenta en la nube y
@@ -165,8 +174,8 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 62';
-const BUILD_NUM = 62;
+const BUILD_LABEL = 'Compilación 63';
+const BUILD_NUM = 63;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -182,7 +191,7 @@ function buildLabelText() {
    PASO EN CADA COMPILACIÓN NUEVA: sustituir esta lista por la
    clave news_cNN de la versión, borrar la clave anterior de los
    12 diccionarios y dejar en el HTML únicamente su <li>. */
-const NEWS_CURRENT = ['news_c62_signin'];
+const NEWS_CURRENT = ['news_c63_tour'];
 
 /* ---------------- Compilación 59: capa de país -------------------
    El país se elige una vez en la bienvenida (usuarios nuevos) y se
@@ -1591,7 +1600,7 @@ es: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Pulsa atrás otra vez para salir.',
-  news_c62_signin: '👤 ¿Ya tienes cuenta? Ahora puedes iniciar sesión desde la pantalla de bienvenida y bajar tus datos sin pasar por Ajustes.', ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
+  ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_bio_label: 'Entrar con huella (si creo un PIN)', news_c63_tour: '👋 Nueva bienvenida: un tour que te muestra todo lo que PETO Finanzas puede hacer y te deja configurar lo básico en el camino — tu primer gasto, tus pagos fijos, tu meta de ahorro, el san, tu banco, el podcast, los recordatorios y tu cuenta en la nube. Y tu banco se sincroniza solo cada vez que abres la app.', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
   org_err_san_name: 'Enter the name of the san.', rep_promo_footer: 'Take control of your spending with PETO Finanzas · petofinanzas.com', rep_saved: 'Image saved.', set_sections_summary: '{visible} of {total} visible',
@@ -2069,7 +2078,7 @@ en: {
   widget_san_next: 'Next turn: {name} · {date}',
   widget_san_next_nodate: 'Next turn: {name}',
   back_exit_hint: 'Press back again to exit.',
-  news_c62_signin: '👤 Already have an account? You can now sign in right from the welcome screen and pull your data down without going through Settings.', ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
+  ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', news_c63_tour: '👋 A new welcome: a tour that shows everything PETO Finanzas can do and lets you set up the basics along the way — your first expense, your fixed payments, your savings goal, the san, your bank, the podcast, reminders and your cloud account. And your bank now syncs on its own every time you open the app.', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
   org_err_san_name: 'Scrivi il nome del san.', rep_promo_footer: 'Controlla le tue spese con PETO Finanzas · petofinanzas.com', rep_saved: 'Immagine salvata.', set_sections_summary: '{visible} di {total} visibili',
@@ -2790,7 +2799,7 @@ it: {
   widget_san_next: 'Prossimo turno: {name} · {date}',
   widget_san_next_nodate: 'Prossimo turno: {name}',
   back_exit_hint: 'Premi di nuovo indietro per uscire.',
-  news_c62_signin: '👤 Hai già un account? Ora puoi accedere dalla schermata di benvenuto e scaricare i tuoi dati senza passare dalle Impostazioni.', ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
+  ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', news_c63_tour: '👋 Nuovo benvenuto: un tour che ti mostra tutto ciò che PETO Finanzas può fare e ti fa impostare le basi lungo il percorso: la prima spesa, i pagamenti fissi, l’obiettivo di risparmio, il san, la banca, il podcast, i promemoria e l’account cloud. E la tua banca si sincronizza da sola ogni volta che apri l’app.', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
   org_err_san_name: 'Digite o nome do san.', rep_promo_footer: 'Controle seus gastos com o PETO Finanzas · petofinanzas.com', rep_saved: 'Imagem salva.', set_sections_summary: '{visible} de {total} visíveis',
@@ -3511,7 +3520,7 @@ pt: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Toque em voltar outra vez para sair.',
-  news_c62_signin: '👤 Já tem conta? Agora você pode entrar direto da tela de boas-vindas e baixar seus dados sem passar pelas Configurações.', ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
+  ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', news_c63_tour: '👋 Novas boas-vindas: um tour que mostra tudo o que o PETO Finanzas pode fazer e deixa você configurar o básico no caminho — sua primeira despesa, seus pagamentos fixos, sua meta de economia, o san, seu banco, o podcast, os lembretes e sua conta na nuvem. E seu banco sincroniza sozinho toda vez que você abre o app.', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
   org_err_san_name: 'Saisis le nom du san.', rep_promo_footer: 'Contrôle tes dépenses avec PETO Finanzas · petofinanzas.com', rep_saved: 'Image enregistrée.', set_sections_summary: '{visible} sur {total} visibles',
@@ -4232,7 +4241,7 @@ fr: {
   widget_san_next: 'Prochain tour : {name} · {date}',
   widget_san_next_nodate: 'Prochain tour : {name}',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.',
-  news_c62_signin: '👤 Vous avez déjà un compte ? Vous pouvez maintenant vous connecter dès l’écran d’accueil et récupérer vos données sans passer par les Réglages.', ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
+  ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', news_c63_tour: '👋 Nouvel accueil : une visite qui vous montre tout ce que PETO Finanzas sait faire et vous laisse configurer l’essentiel en chemin — votre première dépense, vos paiements fixes, votre objectif d’épargne, le san, votre banque, le podcast, les rappels et votre compte cloud. Et votre banque se synchronise toute seule à chaque ouverture de l’app.', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
   org_err_san_name: 'Gib den Namen des Sans ein.', rep_promo_footer: 'Kontrolliere deine Ausgaben mit PETO Finanzas · petofinanzas.com', rep_saved: 'Bild gespeichert.', set_sections_summary: '{visible} von {total} sichtbar',
@@ -4953,7 +4962,7 @@ de: {
   widget_san_next: 'Nächster Zug: {name} · {date}',
   widget_san_next_nodate: 'Nächster Zug: {name}',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.',
-  news_c62_signin: '👤 Du hast schon ein Konto? Jetzt kannst du dich direkt auf dem Willkommensbildschirm anmelden und deine Daten herunterladen, ohne über die Einstellungen zu gehen.', ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
+  ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', news_c63_tour: '👋 Neue Begrüßung: eine Tour, die dir alles zeigt, was PETO Finanzas kann, und dich unterwegs das Wichtigste einrichten lässt — deine erste Ausgabe, deine Fixkosten, dein Sparziel, den San, deine Bank, den Podcast, Erinnerungen und dein Cloud-Konto. Und deine Bank synchronisiert sich jetzt bei jedem Öffnen der App von selbst.', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
   org_err_san_name: '请输入 san 的名称。', rep_promo_footer: '用 PETO Finanzas 控制你的支出 · petofinanzas.com', rep_saved: '图片已保存。', set_sections_summary: '共 {total} 个，已显示 {visible} 个',
@@ -5674,7 +5683,7 @@ zh: {
   widget_san_next: '下一轮：{name} · {date}',
   widget_san_next_nodate: '下一轮：{name}',
   back_exit_hint: '再按一次返回即可退出。',
-  news_c62_signin: '👤 已有账户？现在可以在欢迎界面直接登录，无需进入设置即可下载您的数据。', ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
+  ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_bio_label: '用指纹进入（如果我创建了 PIN）', news_c63_tour: '👋 全新欢迎流程：一次导览，展示 PETO Finanzas 的全部功能，并让你顺路完成基本设置：第一笔支出、固定支出、储蓄目标、san、银行、播客、提醒和云账户。 而且每次打开应用，银行都会自动同步。', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
   org_err_san_name: 'sanの名前を入力してください。', rep_promo_footer: 'PETO Finanzasで支出を管理しよう · petofinanzas.com', rep_saved: '画像を保存しました。', set_sections_summary: '{total}件中{visible}件を表示',
@@ -6395,7 +6404,7 @@ ja: {
   widget_san_next: '次のターン：{name} · {date}',
   widget_san_next_nodate: '次のターン：{name}',
   back_exit_hint: 'もう一度戻るを押すと終了します。',
-  news_c62_signin: '👤 すでにアカウントをお持ちですか？ようこそ画面からそのままログインし、設定を開かずにデータをダウンロードできるようになりました。', ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
+  ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_bio_label: '指紋で入る（PIN を作成した場合）', news_c63_tour: '👋 新しいウェルカム：PETO Finanzas のできることを全部見せて、途中で基本設定まで済ませられるツアーです。最初の支出、固定費、貯蓄目標、san、銀行、ポッドキャスト、リマインダー、クラウドアカウントまで。 そして、アプリを開くたびに銀行が自動で同期します。', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
   org_err_san_name: 'san 이름을 입력하세요.', rep_promo_footer: 'PETO Finanzas로 지출을 관리하세요 · petofinanzas.com', rep_saved: '이미지가 저장되었습니다.', set_sections_summary: '{total}개 중 {visible}개 표시',
@@ -7116,7 +7125,7 @@ ko: {
   widget_san_next: '다음 차례: {name} · {date}',
   widget_san_next_nodate: '다음 차례: {name}',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.',
-  news_c62_signin: '👤 이미 계정이 있나요? 이제 시작 화면에서 바로 로그인해 설정을 거치지 않고 데이터를 내려받을 수 있습니다.', ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
+  ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', news_c63_tour: '👋 새로운 환영 화면: PETO Finanzas가 할 수 있는 모든 것을 보여 주고, 길에서 기본 설정까지 마칠 수 있는 투어입니다 — 첫 지출, 고정 지출, 저축 목표, san, 은행, 팟캐스트, 알림, 클라우드 계정까지. 그리고 앱을 열 때마다 은행이 자동으로 동기화됩니다.', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
   org_err_san_name: 'Введите название сана.', rep_promo_footer: 'Контролируйте свои расходы с PETO Finanzas · petofinanzas.com', rep_saved: 'Изображение сохранено.', set_sections_summary: 'Видимо {visible} из {total}',
@@ -7837,7 +7846,7 @@ ru: {
   widget_san_next: 'Следующий ход: {name} · {date}',
   widget_san_next_nodate: 'Следующий ход: {name}',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.',
-  news_c62_signin: '👤 Уже есть аккаунт? Теперь можно войти прямо с экрана приветствия и загрузить свои данные, не заходя в настройки.', ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
+  ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_bio_label: 'Вход по отпечатку (если создам PIN)', news_c63_tour: '👋 Новое приветствие: экскурсия, которая показывает всё, что умеет PETO Finanzas, и позволяет настроить основное по пути — первый расход, постоянные платежи, цель накоплений, сан, банк, подкаст, напоминания и облачный аккаунт. А ваш банк теперь синхронизируется сам при каждом открытии приложения.', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
   org_err_san_name: 'San का नाम लिखें।', rep_promo_footer: 'PETO Finanzas के साथ अपने खर्चों पर नियंत्रण रखें · petofinanzas.com', rep_saved: 'छवि सहेजी गई।', set_sections_summary: '{total} में से {visible} दिख रहे हैं',
@@ -8558,7 +8567,7 @@ hi: {
   widget_san_next: 'अगली बारी: {name} · {date}',
   widget_san_next_nodate: 'अगली बारी: {name}',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।',
-  news_c62_signin: '👤 पहले से खाता है? अब आप स्वागत स्क्रीन से ही साइन इन करके सेटिंग्स में जाए बिना अपना डेटा डाउनलोड कर सकते हैं।', ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
+  ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', news_c63_tour: '👋 नया स्वागत: एक दौरा जो दिखाता है कि PETO Finanzas क्या-क्या कर सकता है, और रास्ते में बुनियादी सेटअप भी करवा देता है — आपका पहला खर्च, तय भुगतान, बचत लक्ष्य, सन, बैंक, पॉडकास्ट, रिमाइंडर और आपका क्लाउड खाता। और हर बार ऐप खोलने पर आपका बैंक खुद सिंक हो जाता है।', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
   org_err_san_name: 'اكتب اسم الـ san.', rep_promo_footer: 'تحكّم في مصاريفك مع PETO Finanzas · petofinanzas.com', rep_saved: 'تم حفظ الصورة.', set_sections_summary: '{visible} من {total} ظاهرة',
@@ -9279,7 +9288,7 @@ ar: {
   widget_san_next: 'الدور التالي: {name} · {date}',
   widget_san_next_nodate: 'الدور التالي: {name}',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.',
-  news_c62_signin: '👤 لديك حساب بالفعل؟ يمكنك الآن تسجيل الدخول من شاشة الترحيب مباشرة وتنزيل بياناتك دون المرور بالإعدادات.', ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
+  ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', ob_exp_amount_ph: 'المبلغ (مثال 25.00)', ob_exp_add: 'سجّل أول مصروف لي', ob_exp_done: '✓ تم التسجيل! بهذه السهولة يُسجَّل المصروف.', ob_fix_title: 'مدفوعاتك الثابتة وميزانيتك', ob_fix_text: 'أضف المدفوعات التي تتكرر كل شهر (الإيجار، الهاتف، الاشتراكات). بها يبني PETO Finanzas ميزانيتك ويحسب كم يمكنك أن تنفق اليوم. يمكنك إضافة المزيد متى شئت.', ob_fix_name_ph: 'الاسم (مثال: الإيجار)', ob_fix_day_ph: 'اليوم (1-31)', ob_fix_add: '＋ أضف دفعة ثابتة', ob_fix_added: '✓ أُضيفت الدفعة الثابتة. أضف أخرى أو تابع.', ob_goal_title: 'هدف الادخار الخاص بك', ob_goal_text: 'امنح هدفك الأول اسمًا ومبلغًا (على سبيل المثال، صندوق الطوارئ). الادخار نحو هدف واضح أسهل بكثير.', ob_goal_name_ph: 'الاسم (مثال: صندوق الطوارئ)', ob_goal_target_ph: 'مبلغ الهدف (مثال: 1,000)', ob_goal_add: 'أنشئ هدفي', ob_goal_added: '✓ تم إنشاء الهدف! ستجده في المدخرات.', ob_san_title: 'السان: ادّخر مع مجموعة', ob_san_text: 'السان (تاندا، كوندينا، سوسو) هو دائرة الادخار الجماعية الكلاسيكية: الجميع يساهم كل أسبوع وكل شخص يأخذ المبلغ كاملًا في دوره. يدير PETO Finanzas الترتيب والأدوار والإيصالات دون دفاتر.', ob_san_btn: 'أنشئ السان الخاص بي عند الانتهاء', ob_bank_title: 'اربط بنكك', ob_bank_text: 'إن شئت، اربط بنكك لتدخل حركاتك تلقائيًا وتبقى أرصدتك محدثة دائمًا. الأمر اختياري: عند إنهاء الترحيب أو لاحقًا في الإعدادات.', ob_bank_btn: 'أريد ربط بنكي', ob_pod_title: 'تعلّم مع البودكاست', ob_pod_text: '«المالية الشخصية»، بودكاست PETO Finanzas: حلقات بالإسبانية مع لوسيا وماركو، بأمثلة وخطوات عملية لأموالك. استمع إليه داخل التطبيق.', ob_pod_btn: 'شاهد البودكاست عند الانتهاء', ob_bell_title: 'فعّل تذكيراتك', ob_bell_text: 'تلقَّ إشعارًا عندما تقترب دفعة ثابتة من الاستحقاق، إضافة إلى ملخص يومك. هكذا لا يفوتك شيء.', ob_bell_btn: 'تفعيل التذكيرات', ob_bell_done: '✓ تم تفعيل التذكيرات.', ob_cloud_btn: 'أنشئ حسابي عند الانتهاء', ob_pending_ok: '✓ تم! عند إنهاء الترحيب سآخذك إلى هناك مباشرة.', ob_bio_label: 'الدخول بالبصمة (إذا أنشأت رقم PIN)', news_c63_tour: '👋 ترحيب جديد: جولة تعرض لك كل ما يستطيع PETO Finanzas فعله وتتيح لك ضبط الأساسيات في الطريق — أول مصروف، مدفوعاتك الثابتة، هدف ادخارك، السان، بنكك، البودكاست، التذكيرات وحسابك السحابي. ويتزامن بنكك تلقائيًا كلما فتحت التطبيق.', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
 }
 };
 /* Resuelve el idioma automático: coincidencia exacta con un idioma
@@ -17952,18 +17961,30 @@ function bankSyncStale() {
   });
 }
 
+/* Compilación 63 (pedido de Sterlin): la sincronización al entrar
+   ya no espera a que pasen ~6 horas — se sincroniza CADA VEZ que
+   se entra a la app. La puerta es que exista al menos una
+   conexión sincronizable; las marcadas login_required siguen
+   esperando a que la persona vuelva a conectar su banco. */
+function bankSyncDueOnOpen() {
+  if (!Array.isArray(bankConnections)) return false;
+  return bankConnections.some((c) => c && typeof c === 'object' && c.status !== 'login_required');
+}
+
 /* Disparo automático al abrir la app / iniciar sesión en la nube
    (lo invoca renderCloudCard, el punto por el que pasan el
    arranque y los cambios de sesión). Una sola vez por apertura:
-   sin sesión, sin conexiones o sin ninguna vieja, no hace nada;
-   si la sincronización falla, silencio y queda el botón. */
+   sin sesión o sin conexiones sincronizables, no hace nada; si la
+   sincronización falla, silencio y queda el botón.
+   Compilación 63: el disparo corre en CADA apertura (antes pedía
+   ~6 h desde la última sincronización vía bankSyncStale). */
 async function bankAutoSync() {
   if (!PETO_BANK_ENABLED || bankAutoSyncDone || bankBusy || demoMode) return;
   if (!supa() || !cloudUser) return;
   bankAutoSyncDone = true;
   try {
     if (!bankConnections || bankLoadedFor !== cloudUser.id) await bankLoadConnections();
-    if (!bankSyncStale()) return;
+    if (!bankSyncDueOnOpen()) return;
     await bankRunSync({ silent: true });
   } catch (e) { /* silencio: el botón «Sincronizar» sigue disponible */ }
 }
@@ -19525,6 +19546,15 @@ async function onLockSubmit(ev) {
    ya no puede pelear con quien escribe su PIN, porque el formulario
    está en otra pantalla. */
 let obTourStep = 1;
+/* Compilación 63: el recorrido crece de 3 a 9 láminas — una
+   bienvenida que MUESTRA todo lo que la app puede hacer y deja
+   configurar lo básico en el camino: primer gasto real (1), pagos
+   fijos (3) y meta de ahorro (4) se llenan en la propia lámina y se
+   guardan al momento con las mismas rutas de datos de la app; el
+   san (5), el banco (6), el podcast (7) y la nube (9) ofrecen un
+   botón que lleva DIRECTO a su sitio al terminar la bienvenida
+   (obPending); los recordatorios (8) se activan ahí mismo. */
+const OB_TOUR_STEPS = 9;
 function renderObTour() {
   const tour = document.getElementById('ob-tour');
   if (!tour || tour.hidden) return;
@@ -19532,11 +19562,11 @@ function renderObTour() {
     n.hidden = Number(n.getAttribute('data-ob-step')) !== obTourStep;
   });
   const dots = document.getElementById('ob-tour-dots');
-  if (dots) dots.textContent = [1, 2, 3].map((i) => (i === obTourStep ? '●' : '○')).join(' ');
+  if (dots) dots.textContent = Array.from({ length: OB_TOUR_STEPS }, (_, i) => (i + 1 === obTourStep ? '●' : '○')).join(' ');
   const next = document.getElementById('ob-tour-next');
-  if (next) next.textContent = t(obTourStep >= 3 ? 'ob_tour_go' : 'ob_tour_next');
+  if (next) next.textContent = t(obTourStep >= OB_TOUR_STEPS ? 'ob_tour_go' : 'ob_tour_next');
   const skip = document.getElementById('ob-tour-skip');
-  if (skip) skip.hidden = obTourStep >= 3;
+  if (skip) skip.hidden = obTourStep >= OB_TOUR_STEPS;
 }
 /* Paso 2 de la bienvenida: se esconde el recorrido, se detiene la
    rotación y el formulario queda solo en pantalla. */
@@ -19553,7 +19583,7 @@ function obTourSkip() {
   obShowFormStep();
 }
 function obTourNext() {
-  if (obTourStep >= 3) { obShowFormStep(); return; }
+  if (obTourStep >= OB_TOUR_STEPS) { obShowFormStep(); return; }
   obTourStep++;
   renderObTour();
   /* Compilación 53: «Siguiente» ya no apaga la rotación para
@@ -19561,6 +19591,134 @@ function obTourNext() {
      se reanuda sola tras unos segundos sin tocar. */
   obTourPauseResume();
 }
+/* ---------------- Compilación 63: el tour que configura ----------------
+   Estado del recorrido guiado: obPending guarda el destino elegido
+   en una lámina de «al terminar» ('san' | 'bank' | 'podcast' |
+   'cloud'); al enviar el formulario de la bienvenida y entrar a la
+   app, obRunPending() lleva a la persona DIRECTO a ese sitio. Si
+   toca varios botones, manda el ÚLTIMO. obExpTouched marca que la
+   persona ya interactuó con el mini-formulario del primer gasto:
+   desde ahí la rotación automática no la mueve de la lámina 1. */
+let obPending = null;
+let obExpTouched = false;
+function obTourStepManual() {
+  if (obTourStep === 3 || obTourStep === 4) return true;
+  if (obTourStep === 1) return obExpTouched;
+  return false;
+}
+function obStepStatus(id, msg) {
+  const n = document.getElementById(id);
+  if (!n) return;
+  n.textContent = msg || '';
+  n.hidden = !msg;
+}
+/* El selector de categorías del primer gasto: el mismo catálogo
+   real de la app (allCategories), con «Elige categoría» al frente,
+   como el formulario de gastos desde la Compilación 40. */
+function obFillExpCategories() {
+  const sel = document.getElementById('ob-exp-category');
+  if (!sel) return;
+  clearNode(sel);
+  const choose = el('option', null, t('cat_choose'));
+  choose.value = '';
+  sel.appendChild(choose);
+  for (const cat of allCategories(db)) {
+    const opt = el('option', null, catName(cat));
+    opt.value = cat;
+    sel.appendChild(opt);
+  }
+  sel.value = '';
+}
+/* Lámina 1: el primer gasto REAL, guardado con la misma forma que
+   el formulario de gastos (sin foto ni fuente: efectivo/base). */
+function obAddExpense() {
+  obExpTouched = true;
+  const cents = parseAmount(document.getElementById('ob-exp-amount').value, false);
+  if (cents === null) { showError('ob-exp-error', t('err_amount')); return; }
+  const category = document.getElementById('ob-exp-category').value;
+  if (!allCategories(db).includes(category)) { showError('ob-exp-error', t('err_category')); return; }
+  if (db.expenses.length >= MAX_ITEMS) { showError('ob-exp-error', t('err_limit_expenses')); return; }
+  showError('ob-exp-error', '');
+  db.settings.lastExpCategory = category;
+  db.expenses.push({ id: uid(), amountCents: cents, category, date: todayStr(), note: '', photo: null, biz: false, accountId: null, fromSavings: false, src: 'avail' });
+  save();
+  document.getElementById('ob-exp-amount').value = '';
+  obStepStatus('ob-exp-status', t('ob_exp_done'));
+}
+/* Lámina 3: pagos fijos, uno a uno, con la misma validación y la
+   misma forma que el formulario de Pagos fijos. */
+function obAddFixed() {
+  const name = cleanText(document.getElementById('ob-fix-name').value, 60);
+  const cents = parseAmount(document.getElementById('ob-fix-amount').value, false);
+  const day = Math.trunc(Number(document.getElementById('ob-fix-day').value));
+  if (!name) { showError('ob-fix-error', t('err_name')); return; }
+  if (cents === null) { showError('ob-fix-error', t('err_amount')); return; }
+  if (!Number.isFinite(day) || day < 1 || day > 31) { showError('ob-fix-error', t('err_day')); return; }
+  if (db.fixed.length >= MAX_ITEMS) { showError('ob-fix-error', t('err_limit_fixed')); return; }
+  showError('ob-fix-error', '');
+  db.fixed.push({ id: uid(), name, amountCents: cents, day, paidMonths: {} });
+  save();
+  const ul = document.getElementById('ob-fix-list');
+  if (ul) {
+    const li = el('li', 'item');
+    li.textContent = name + ' · ' + fmt(cents) + ' · ' + day;
+    ul.appendChild(li);
+  }
+  document.getElementById('ob-fix-name').value = '';
+  document.getElementById('ob-fix-amount').value = '';
+  document.getElementById('ob-fix-day').value = '';
+  obStepStatus('ob-fix-status', t('ob_fix_added'));
+}
+/* Lámina 4: la primera meta. Si aún no hay meta principal, nace
+   como db.savingsGoal; si ya hay, entra a la lista db.goals, igual
+   que el formulario de Ahorros desde la Compilación 41. */
+function obAddGoal() {
+  const name = cleanText(document.getElementById('ob-goal-name').value, 60);
+  const cents = parseAmount(document.getElementById('ob-goal-target').value, false);
+  if (!name) { showError('ob-goal-error', t('err_name')); return; }
+  if (cents === null) { showError('ob-goal-error', t('err_amount')); return; }
+  showError('ob-goal-error', '');
+  if (!db.savingsGoal) {
+    db.savingsGoal = { name, targetCents: cents, icon: null, photo: null };
+  } else {
+    if (db.goals.length >= 20) { showError('ob-goal-error', t('err_limit_goals')); return; }
+    db.goals.push({ id: uid(), name, targetCents: cents, savedCents: 0, icon: null, photo: null });
+  }
+  save();
+  document.getElementById('ob-goal-name').value = '';
+  document.getElementById('ob-goal-target').value = '';
+  obStepStatus('ob-goal-status', t('ob_goal_added'));
+}
+/* Láminas 5/6/7/9: botones «al terminar» — anotan el destino y dan
+   confirmación en la propia lámina; el viaje ocurre al entrar. */
+function obSetPending(kind, statusId) {
+  obPending = kind;
+  obStepStatus(statusId, t('ob_pending_ok'));
+}
+/* Lámina 8: recordatorios — pide el permiso real y reprograma las
+   notificaciones con las mismas funciones del arranque de la app. */
+async function obEnableReminders() {
+  try { await ensureNotifPermission(); } catch (e) { /* sin permiso: la app sigue */ }
+  try { scheduleNotifications(); } catch (e) { /* WebView sin plugin: nada que programar */ }
+  obStepStatus('ob-bell-status', t('ob_bell_done'));
+}
+/* Al terminar la bienvenida: ejecutar el destino pendiente. */
+function obRunPending() {
+  if (!obPending) return;
+  const p = obPending;
+  obPending = null;
+  if (p === 'san') { showView('san'); return; }
+  if (p === 'podcast') { showView('podcast'); return; }
+  if (p === 'bank' || p === 'cloud') {
+    showView('settings');
+    const targetId = p === 'bank' ? 'settings-bank' : 'settings-cloud';
+    setTimeout(() => {
+      const n = document.getElementById(targetId);
+      if (n && typeof n.scrollIntoView === 'function') n.scrollIntoView();
+    }, 60);
+  }
+}
+
 /* Presenta la bienvenida en su paso 1 (arranque y «empezar de
    cero»): recorrido visible, formulario escondido, y el selector de
    idioma arriba SOLO si el idioma detectado no es español. */
@@ -19601,6 +19759,14 @@ function showOnboarding() {
   if (langTopWrap) langTopWrap.hidden = false;
   const obLangTopBoot = document.getElementById('ob-lang-top');
   if (obLangTopBoot) obLangTopBoot.value = db.settings.lang || 'auto';
+  /* Compilación 63: cada bienvenida nueva arranca el tour limpio:
+     sin destino pendiente, sin toque en el primer gasto, la lista
+     de pagos fijos vacía y el catálogo de categorías cargado. */
+  obPending = null;
+  obExpTouched = false;
+  obFillExpCategories();
+  const obFixList = document.getElementById('ob-fix-list');
+  if (obFixList) clearNode(obFixList);
   renderObTour();
   obTourAutoStart();
 }
@@ -19651,6 +19817,11 @@ function obTourFormBusy() {
     const n = document.getElementById(id);
     if (n && n.value) return true;
   }
+  /* Compilación 63: escribir en cualquier campo del recorrido
+     también cuenta como «ocupado» para la rotación. */
+  const tour = document.getElementById('ob-tour');
+  if (tour && ae && tour.contains(ae) &&
+      (ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.tagName === 'TEXTAREA')) return true;
   return false;
 }
 function obTourAutoTick() {
@@ -19659,10 +19830,15 @@ function obTourAutoTick() {
   const tour = document.getElementById('ob-tour');
   if (!onb || onb.hidden || !tour || tour.hidden || document.hidden) return;
   if (obTourFormBusy()) return;
+  /* Compilación 63: en las láminas que se LLENAN (pagos fijos y
+     metas) la rotación no avanza sola — sería echar a la persona a
+     mitad de escribir. En la del primer gasto tampoco avanza si ya
+     empezó a escribir o ya anotó (obExpTouched). */
+  if (obTourStepManual()) return;
   /* Compilación 53: la rotación ya NO da la vuelta a la primera
      lámina: al terminar la última, el flujo sigue SOLO al paso 2
      (la configuración inicial), sin pulsar nada. */
-  if (obTourStep >= 3) { obShowFormStep(); return; }
+  if (obTourStep >= OB_TOUR_STEPS) { obShowFormStep(); return; }
   obTourStep++;
   renderObTour();
 }
@@ -19716,7 +19892,7 @@ function obTourSwipeEnd(ev) {
   const dx = endX - obSwipeX;
   obSwipeX = null;
   if (dx <= -40) {
-    if (obTourStep >= 3) { obShowFormStep(); return; }
+    if (obTourStep >= OB_TOUR_STEPS) { obShowFormStep(); return; }
     obTourStep++;
     renderObTour();
   } else if (dx >= 40) {
@@ -19751,6 +19927,10 @@ async function onOnboardingSubmit(ev) {
      de arriba de la bienvenida (ob-lang-top); aquí no se vuelve a leer. */
   db.settings.onboarded = true;
   if (pin) await setPin(pin);
+  /* Compilación 63: la huella pedida junto al PIN en la bienvenida
+     se activa aquí mismo (solo tiene sentido con PIN creado). */
+  const obBio = document.getElementById('ob-biometric');
+  if (pin && obBio && obBio.checked) db.settings.biometric = true;
   /* Compilación 42 (hallazgo 17): la elección «¿Cómo quieres ver tu
      app?» vive DENTRO del paso 2 de la bienvenida y se aplica aquí
      mismo, sin pantalla intermedia — «Lo esencial» viene
@@ -19762,6 +19942,9 @@ async function onOnboardingSubmit(ev) {
   enterApp();
   /* Recién creado el PIN: ofrecer la huella en el momento (flujo guiado). */
   if (pin) maybeOfferBiometric();
+  /* Compilación 63: si en el tour tocó un botón «al terminar»
+     (san, banco, podcast o nube), ahora se le lleva directo. */
+  obRunPending();
 }
 
 /* ---------------- Inicio ---------------- */
@@ -20382,6 +20565,19 @@ function wireEvents() {
   /* Modo demo (Compilación 45, Bloque O): entrar desde la bienvenida
      o desde Ajustes; salir desde la banda permanente. */
   document.getElementById('ob-demo-btn').addEventListener('click', enterDemo);
+  /* Compilación 63: botones del tour que configura. */
+  document.getElementById('ob-exp-add').addEventListener('click', obAddExpense);
+  document.getElementById('ob-fix-add').addEventListener('click', obAddFixed);
+  document.getElementById('ob-goal-add').addEventListener('click', obAddGoal);
+  document.getElementById('ob-san-btn').addEventListener('click', () => obSetPending('san', 'ob-san-status'));
+  document.getElementById('ob-bank-btn').addEventListener('click', () => obSetPending('bank', 'ob-bank-status'));
+  document.getElementById('ob-pod-btn').addEventListener('click', () => obSetPending('podcast', 'ob-pod-status'));
+  document.getElementById('ob-cloud-btn').addEventListener('click', () => obSetPending('cloud', 'ob-cloud-status'));
+  document.getElementById('ob-bell-btn').addEventListener('click', obEnableReminders);
+  ['ob-exp-amount', 'ob-exp-category'].forEach((id) => {
+    const n = document.getElementById(id);
+    if (n) n.addEventListener('input', () => { obExpTouched = true; obTourPauseResume(); });
+  });
   document.getElementById('ob-signin-open').addEventListener('click', openObSignIn);
   document.getElementById('ob-signin-panel').addEventListener('submit', onObSignIn);
   document.getElementById('ob-signin-back').addEventListener('click', closeObSignIn);

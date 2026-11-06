@@ -293,6 +293,18 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
    vertical sigue siendo scroll; el horizontal lo leen los Pointer
    Events de la app para pasar de lámina. */
 #ob-tour{touch-action:pan-y}
+/* Compilación 63: mini-formularios dentro de las láminas del tour
+   (primer gasto, pagos fijos, meta). Los inputs ya heredan el
+   estilo de .onboarding-card input; aquí van el select, el ritmo
+   vertical y la lista de pagos fijos ya agregados. */
+.ob-mini-form{display:flex;flex-direction:column;gap:.5rem;margin-top:.7rem;text-align:left}
+.ob-mini-form select{
+  width:100%;min-height:var(--tap);padding:.6rem .75rem;font-size:1rem;
+  border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
+}
+.ob-mini-form .btn{margin-top:.2rem}
+.ob-added-list{list-style:none;margin:.2rem 0 0;padding:0}
+.ob-added-list .item{padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.95rem}
 .pin-input{
   width:100%;min-height:60px;text-align:center;font-size:1.6rem;letter-spacing:.4em;
   border:1px solid var(--line);border-radius:12px;margin:.6rem 0;

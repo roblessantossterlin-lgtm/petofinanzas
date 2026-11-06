@@ -73,6 +73,17 @@
         <p class="ob-step-icon" aria-hidden="true">🧾</p>
         <h2 data-i18n="ob_tour1_title">Anota un gasto en segundos</h2>
         <p data-i18n="ob_tour1_text">Toca el botón +, escribe la cantidad y la categoría. Nada más: tu gasto queda registrado al instante.</p>
+        <!-- Compilación 63: el tour de bienvenida muestra todo lo
+             que la app puede hacer y deja configurar lo básico en el
+             camino. Paso 1 interactivo: el primer gasto real. -->
+        <div class="ob-mini-form">
+          <input id="ob-exp-amount" type="text" inputmode="decimal" autocomplete="off"
+                 data-i18n-ph="ob_exp_amount_ph" placeholder="Cantidad (ej. 25.00)">
+          <select id="ob-exp-category" aria-label="Categoría"></select>
+          <button id="ob-exp-add" type="button" class="btn btn-secondary" data-i18n="ob_exp_add">Anotar mi primer gasto</button>
+          <p id="ob-exp-status" class="muted small" role="status" hidden></p>
+          <p id="ob-exp-error" class="error" role="alert" hidden></p>
+        </div>
       </div>
       <div class="ob-step" data-ob-step="2" hidden>
         <p class="ob-step-icon" aria-hidden="true">💸</p>
@@ -80,13 +91,74 @@
         <p data-i18n="ob_tour2_text">PETO Finanzas reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.</p>
       </div>
       <div class="ob-step" data-ob-step="3" hidden>
+        <p class="ob-step-icon" aria-hidden="true">🗓️</p>
+        <h2 data-i18n="ob_fix_title">Tus pagos fijos y tu presupuesto</h2>
+        <p data-i18n="ob_fix_text">Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy.</p>
+        <div class="ob-mini-form">
+          <input id="ob-fix-name" type="text" maxlength="60" autocomplete="off"
+                 data-i18n-ph="ob_fix_name_ph" placeholder="Nombre (ej. Renta)">
+          <input id="ob-fix-amount" type="text" inputmode="decimal" autocomplete="off"
+                 data-i18n-ph="ob_exp_amount_ph" placeholder="Cantidad (ej. 25.00)">
+          <input id="ob-fix-day" type="number" min="1" max="31" inputmode="numeric" autocomplete="off"
+                 data-i18n-ph="ob_fix_day_ph" placeholder="Día (1-31)">
+          <button id="ob-fix-add" type="button" class="btn btn-secondary" data-i18n="ob_fix_add">＋ Agregar pago fijo</button>
+          <ul id="ob-fix-list" class="ob-added-list"></ul>
+          <p id="ob-fix-status" class="muted small" role="status" hidden></p>
+          <p id="ob-fix-error" class="error" role="alert" hidden></p>
+        </div>
+      </div>
+      <div class="ob-step" data-ob-step="4" hidden>
+        <p class="ob-step-icon" aria-hidden="true">🎯</p>
+        <h2 data-i18n="ob_goal_title">Tu meta de ahorro</h2>
+        <p data-i18n="ob_goal_text">Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.</p>
+        <div class="ob-mini-form">
+          <input id="ob-goal-name" type="text" maxlength="60" autocomplete="off"
+                 data-i18n-ph="ob_goal_name_ph" placeholder="Nombre (ej. Fondo de emergencia)">
+          <input id="ob-goal-target" type="text" inputmode="decimal" autocomplete="off"
+                 data-i18n-ph="ob_goal_target_ph" placeholder="Cantidad meta (ej. 1,000)">
+          <button id="ob-goal-add" type="button" class="btn btn-secondary" data-i18n="ob_goal_add">Crear mi meta</button>
+          <p id="ob-goal-status" class="muted small" role="status" hidden></p>
+          <p id="ob-goal-error" class="error" role="alert" hidden></p>
+        </div>
+      </div>
+      <div class="ob-step" data-ob-step="5" hidden>
+        <p class="ob-step-icon" aria-hidden="true">🔄</p>
+        <h2 data-i18n="ob_san_title">El san: ahorra en grupo</h2>
+        <p data-i18n="ob_san_text">El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.</p>
+        <button id="ob-san-btn" type="button" class="btn btn-secondary" data-i18n="ob_san_btn">Crear mi san al terminar</button>
+        <p id="ob-san-status" class="muted small" role="status" hidden></p>
+      </div>
+      <div class="ob-step" data-ob-step="6" hidden>
+        <p class="ob-step-icon" aria-hidden="true">🏦</p>
+        <h2 data-i18n="ob_bank_title">Conecta tu banco</h2>
+        <p data-i18n="ob_bank_text">Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.</p>
+        <button id="ob-bank-btn" type="button" class="btn btn-secondary" data-i18n="ob_bank_btn">Quiero conectar mi banco</button>
+        <p id="ob-bank-status" class="muted small" role="status" hidden></p>
+      </div>
+      <div class="ob-step" data-ob-step="7" hidden>
+        <p class="ob-step-icon" aria-hidden="true">🎙️</p>
+        <h2 data-i18n="ob_pod_title">Aprende con el podcast</h2>
+        <p data-i18n="ob_pod_text">«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.</p>
+        <button id="ob-pod-btn" type="button" class="btn btn-secondary" data-i18n="ob_pod_btn">Ver el podcast al terminar</button>
+        <p id="ob-pod-status" class="muted small" role="status" hidden></p>
+      </div>
+      <div class="ob-step" data-ob-step="8" hidden>
+        <p class="ob-step-icon" aria-hidden="true">🔔</p>
+        <h2 data-i18n="ob_bell_title">Activa tus recordatorios</h2>
+        <p data-i18n="ob_bell_text">Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.</p>
+        <button id="ob-bell-btn" type="button" class="btn btn-secondary" data-i18n="ob_bell_btn">Activar recordatorios</button>
+        <p id="ob-bell-status" class="muted small" role="status" hidden></p>
+      </div>
+      <div class="ob-step" data-ob-step="9" hidden>
         <p class="ob-step-icon" aria-hidden="true">☁️</p>
         <h2 data-i18n="ob_tour3_title">Tu cuenta en la nube (opcional)</h2>
         <p data-i18n="ob_tour3_text">Si quieres, crea una cuenta gratis para ver tus datos también en la web. Sin cuenta, todo queda solo en tu teléfono.</p>
+        <button id="ob-cloud-btn" type="button" class="btn btn-secondary" data-i18n="ob_cloud_btn">Crear mi cuenta al terminar</button>
+        <p id="ob-cloud-status" class="muted small" role="status" hidden></p>
       </div>
       <div class="ob-tour-nav">
         <button id="ob-tour-skip" type="button" class="btn btn-ghost" data-i18n="ob_tour_skip">Saltar</button>
-        <span id="ob-tour-dots" class="ob-dots" aria-hidden="true">● ○ ○</span>
+        <span id="ob-tour-dots" class="ob-dots" aria-hidden="true">● ○ ○ ○ ○ ○ ○ ○ ○</span>
         <button id="ob-tour-next" type="button" class="btn btn-secondary" data-i18n="ob_tour_next">Siguiente</button>
       </div>
     </div>
@@ -111,6 +183,18 @@
       <input id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
              data-i18n-ph="ob_pin2_ph" placeholder="Repite el PIN">
       <p class="muted small" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
+      <!-- Compilación 63: huella junto al PIN desde la bienvenida;
+           solo se activa si la persona crea un PIN. -->
+      <label class="toggle-row">
+        <span data-i18n="ob_bio_label">Entrar con huella (si creo un PIN)</span>
+        <input type="checkbox" id="ob-biometric">
+      </label>
+      <!-- Compilación 63: huella junto al PIN desde la bienvenida;
+           solo se activa si la persona crea un PIN. -->
+      <label class="toggle-row">
+        <span data-i18n="ob_bio_label">Entrar con huella (si creo un PIN)</span>
+        <input type="checkbox" id="ob-biometric">
+      </label>
       <div id="ob-mode">
         <h2 data-i18n="ob_mode_title">¿Cómo quieres ver tu app?</h2>
         <label class="toggle-row">
@@ -1377,7 +1461,7 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c62_signin">👤 ¿Ya tienes cuenta? Ahora puedes iniciar sesión desde la pantalla de bienvenida y bajar tus datos sin pasar por Ajustes.</li>
+        <li data-i18n="news_c63_tour">👋 Nueva bienvenida: un tour que te muestra todo lo que PETO Finanzas puede hacer y te deja configurar lo básico en el camino — tu primer gasto, tus pagos fijos, tu meta de ahorro, el san, tu banco, el podcast, los recordatorios y tu cuenta en la nube. Y tu banco se sincroniza solo cada vez que abres la app.</li>
       </ul>
       </div>
     </section>
