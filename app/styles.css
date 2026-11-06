@@ -1014,6 +1014,15 @@ body.has-bottomnav .fab{bottom:calc(1.1rem + 92px)}
 body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px)}
 body.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px)}
 
+/* ---------- Compilación 67 · Selector de período por categoría ----------
+   Vive en la fila del tope (junto al campo y a «Guardar»): mismo
+   lenguaje visual que el campo, con ancho propio para que la fila
+   siga saltando de línea en pantallas estrechas sin romperse. */
+.budget-period-select{
+  flex:0 1 auto;min-width:0;min-height:48px;padding:.5rem .45rem;font-size:.95rem;
+  border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
+}
+
 /* ---------- Compilación 48 · Blindaje de la ventana de Plaid ----------
    El SDK de Plaid Link pinta su ventana en un iframe propio
    (src «https://cdn.plaid.com/link/v2/stable/link.html…») que
