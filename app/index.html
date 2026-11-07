@@ -698,8 +698,20 @@
       <input id="fix-name" type="text" maxlength="60" data-i18n-ph="fix_name_ph" placeholder="Ej.: Renta" required>
       <label for="fix-amount" data-i18n="amount_label">Cantidad ($)</label>
       <input id="fix-amount" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" required placeholder="0.00">
-      <label for="fix-day" data-i18n="fix_day_label">Día del mes</label>
-      <input id="fix-day" type="number" min="1" max="31" step="1" required placeholder="1 – 31">
+      <label for="fix-freq" data-i18n="fix_freq_label">Frecuencia</label>
+      <select id="fix-freq">
+        <option value="mensual" data-i18n="fix_freq_mensual">Mensual</option>
+        <option value="quincenal" data-i18n="fix_freq_quincenal">Quincenal</option>
+        <option value="semanal" data-i18n="fix_freq_semanal">Semanal</option>
+      </select>
+      <div id="fix-day-wrap">
+        <label for="fix-day" id="fix-day-label" data-i18n="fix_day_label">Día del mes</label>
+        <input id="fix-day" type="number" min="1" max="31" step="1" required placeholder="1 – 31">
+      </div>
+      <div id="fix-weekday-wrap" hidden>
+        <label for="fix-weekday" data-i18n="fix_weekday_label">Día de la semana</label>
+        <select id="fix-weekday"></select>
+      </div>
       <p id="fix-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" data-i18n="fix_save">Guardar pago fijo</button>
@@ -1463,7 +1475,7 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c67_periodos">🗓️ Presupuesto a tu ritmo: ahora cada categoría puede tener su propio período — semana, quincena o mes — y el gasto de hoy se calcula según el período de cada una.</li>
+        <li data-i18n="news_c68_freq">🗓️ Pagos fijos a tu ritmo: ahora cada pago fijo puede ser semanal, quincenal (dos veces al mes) o mensual — PETO Finanzas lo aplica solo en su fecha.</li>
       </ul>
       </div>
     </section>
