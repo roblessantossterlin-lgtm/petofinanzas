@@ -1013,6 +1013,12 @@ body.has-bottomnav #app-shell{padding-bottom:calc(10.5rem + 92px)}
 body.has-bottomnav .fab{bottom:calc(1.1rem + 92px)}
 body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px)}
 body.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px)}
+/* Compilación 70: con el banner de prueba visible (solo la app,
+   nivel gratis), todo sube lo que ocupa el anuncio (50px + aire). */
+body.has-ads.has-bottomnav #app-shell{padding-bottom:calc(10.5rem + 92px + 60px)}
+body.has-ads.has-bottomnav .fab{bottom:calc(1.1rem + 92px + 60px)}
+body.has-ads.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + 60px)}
+body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px)}
 
 /* ---------- Compilación 67 · Selector de período por categoría ----------
    Vive en la fila del tope (junto al campo y a «Guardar»): mismo
