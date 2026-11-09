@@ -1153,6 +1153,97 @@ body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px)}
   .vs-fill,.budget-fill,.pub-progress-fill{animation:none}
 }
 
+/* ---------- Compilación 73 · Diseño premium (sistema sobrio) ----------
+   Lo que hacen las apps que dan confianza, aplicado a PETO
+   Finanzas: un solo acento (el verde de la marca), color solo
+   con significado (ámbar al 80% del tope, rojo al pasarse),
+   iconos de línea propios en vez de emojis, números tabulares
+   que no bailan, tarjetas con un solo radio y una sola sombra
+   suave. Esta capa neutraliza el neón de la 71/72 sin tocar su
+   estructura: el «2030» pasa a ser verde sobre neutro. */
+body{font-variant-numeric:tabular-nums}
+.card{
+  border-radius:20px;
+  border-color:var(--line);
+  box-shadow:0 1px 2px rgba(4,24,16,.05),0 10px 26px rgba(4,24,16,.06);
+}
+.spend-card{
+  background:linear-gradient(155deg,#0a5c3e 0%,#06402a 100%);
+  border-color:rgba(255,255,255,.10);
+  box-shadow:0 12px 30px rgba(3,40,26,.30);
+}
+.spend-card .spend-value{
+  font-size:2.9rem;
+  background:none;
+  -webkit-background-clip:initial;background-clip:initial;
+  -webkit-text-fill-color:#ffffff;color:#ffffff;
+  filter:none;
+}
+.spend-context{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  color:#dff5ea;font-size:.86rem;margin-top:2px;min-height:1.1em;
+}
+.spend-context svg{width:15px;height:15px;flex:none}
+.spend-context-sep{opacity:.6}
+.budget-bar,.vs-track,.pub-progress{height:10px}
+.vs-fill,.budget-fill,.pub-progress-fill{
+  background:linear-gradient(90deg,var(--accent-dark),var(--accent));
+  background-size:100% 100%;
+  box-shadow:none;
+  animation:c71Grow .85s cubic-bezier(.22,.8,.3,1) both;
+}
+.vs-fill.prev{
+  background:linear-gradient(90deg,var(--muted),var(--muted));
+  box-shadow:none;
+}
+.vs-fill.out{
+  background:linear-gradient(90deg,#b35c12,#e07f2e);
+  box-shadow:none;
+}
+.budget-fill.warn{background:linear-gradient(90deg,#b35c12,#e8a13a)}
+.budget-fill.over{
+  background:linear-gradient(90deg,#a12424,var(--danger));
+  box-shadow:none;
+}
+.chart-donut{filter:none}
+.chart-seg{filter:none}
+.chart-dot{
+  width:30px;height:30px;border-radius:50%;
+  display:inline-grid;place-items:center;
+  color:#ffffff;box-shadow:none;flex:none;
+}
+.chart-dot svg{width:16px;height:16px}
+#trend-canvas{filter:none}
+.bottom-nav{
+  border-color:var(--line);
+  box-shadow:var(--shadow-pop);
+}
+.bnav-icon{display:inline-grid;place-items:center}
+.bnav-icon svg{width:22px;height:22px}
+.menu-icon{
+  width:38px;height:38px;border-radius:50%;flex:none;
+  background:color-mix(in srgb,var(--accent) 13%,transparent);
+  color:var(--accent-dark);
+  display:inline-grid;place-items:center;
+  font-size:1rem;
+}
+.menu-icon svg{width:19px;height:19px}
+.cat-chip{
+  width:34px;height:34px;border-radius:50%;flex:none;
+  background:color-mix(in srgb,var(--accent) 13%,transparent);
+  color:var(--accent-dark);
+  display:inline-grid;place-items:center;
+}
+.cat-chip svg{width:18px;height:18px}
+.bc-head{display:flex;align-items:center;gap:10px}
+.sec-row{display:flex;gap:10px;align-items:flex-start;margin:10px 0}
+.sec-ic{width:19px;height:19px;color:var(--accent-dark);flex:none;margin-top:1px}
+.ob-step-icon svg{width:34px;height:34px;color:var(--accent-dark)}
+.ic{display:inline-grid;place-items:center}
+@media (prefers-reduced-motion: reduce){
+  .vs-fill,.budget-fill,.pub-progress-fill{animation:none}
+}
+
 /* ---------- Compilación 48 · Blindaje de la ventana de Plaid ----------
    El SDK de Plaid Link pinta su ventana en un iframe propio
    (src «https://cdn.plaid.com/link/v2/stable/link.html…») que
