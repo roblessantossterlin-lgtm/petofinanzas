@@ -15,7 +15,7 @@
    la 71/72 queda neutralizada por el sistema sobrio.
    Novedades: news_c73_design sustituye a news_c72_look —
    1011 claves por idioma (7 nuevas); la caché del service
-   worker sube a peto-web-v47.
+   worker sube a peto-web-v48.
    Sincronizado el 9-nov-2026 con la Compilación 72: Look
    2030 reforzado — el héroe pasa a cristal con luz propia
    y número gigante en degradado brillante, las barras
@@ -280,8 +280,8 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 73';
-const BUILD_NUM = 73;
+const BUILD_LABEL = 'Compilación 74';
+const BUILD_NUM = 74;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -9791,17 +9791,17 @@ function updateBottomNav() {
   markBottomNavActive();
   syncAds(vis);
 }
-/* ---------------- Compilación 70 · Anuncios (SOLO PRUEBA) ----------------
-   Banner de AdMob con los códigos DE PRUEBA de Google: no genera
-   dinero ni cuenta como actividad. Se muestra únicamente en el
-   nivel gratis: quien pagó PETO Pro (db.settings.pro) no ve
+/* ---------------- Compilación 74 · Anuncios REALES ----------------
+   Banner de AdMob con los códigos REALES de la cuenta de PETO
+   Finanzas (app id real en el manifiesto y unidad «Banner PETO
+   gratis» en el plugin nativo PetoAdsPlugin), activo desde el
+   lanzamiento público del 11-nov-2026. Se muestra únicamente en
+   el nivel gratis: quien pagó PETO Pro (db.settings.pro) no ve
    anuncios jamás. OJO: durante la prueba cerrada isPro() da true
-   para todos, por eso la visibilidad cuelga del pago real y no de
-   isPro(). El día del lanzamiento público se cambia el código de
-   prueba por el real en el plugin nativo (PetoAdsPlugin) y en el
-   manifiesto, se marca «contiene anuncios» en la ficha de Play y
-   se actualiza la política de privacidad. En la web no hay plugin
-   y no se muestra nada (ni se reserva el hueco). */
+   para todos, por eso la visibilidad cuelga del pago real y no
+   de isPro(). NUNCA tocar los anuncios propios ni pedir a nadie
+   que lo haga (actividad inválida). En la web no hay plugin y
+   no se muestra nada (ni se reserva el hueco). */
 function syncAds(navVisible) {
   const ads = capPlugin('PetoAds');
   if (!ads) { document.body.classList.remove('has-ads'); return; }
