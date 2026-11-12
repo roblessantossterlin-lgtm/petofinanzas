@@ -5,7 +5,7 @@
   --accent-soft:#e6f4ee;
   --ink:#1c2733;
   --muted:#5d6b7a;
-  --bg:#f4f6f8;
+  --bg:#ffffff;
   --card:#ffffff;
   --line:#dde3e8;
   --danger:#b3261e;
@@ -328,7 +328,7 @@ html[data-accent="naranja"]{--accent:#c2570b;--accent-dark:#8a3c05;--accent-soft
 
 /* ---------- Tema oscuro (manual o automático por el sistema) ---------- */
 html[data-theme="oscuro"]{
-  --ink:#e9eef4;--muted:#9dafc0;--bg:#11171d;--card:#1d262f;--line:#35424f;
+  --ink:#e9eef4;--muted:#9dafc0;--bg:#000000;--card:#1d262f;--line:#35424f;
   --danger:#ff9d94;--danger-soft:#402524;--amber:#e8c268;--amber-soft:#3d3317;
 }
 html[data-theme="oscuro"][data-accent="verde"]{--accent:#2fae7f;--accent-dark:#7fd4b6;--accent-soft:#14332a}
@@ -337,7 +337,7 @@ html[data-theme="oscuro"][data-accent="morado"]{--accent:#9a78e0;--accent-dark:#
 html[data-theme="oscuro"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:#f5b478;--accent-soft:#3a2812}
 @media (prefers-color-scheme: dark){
   html[data-theme="auto"]{
-    --ink:#e9eef4;--muted:#9dafc0;--bg:#11171d;--card:#1d262f;--line:#35424f;
+    --ink:#e9eef4;--muted:#9dafc0;--bg:#000000;--card:#1d262f;--line:#35424f;
     --danger:#ff9d94;--danger-soft:#402524;--amber:#e8c268;--amber-soft:#3d3317;
   }
   html[data-theme="auto"][data-accent="verde"]{--accent:#2fae7f;--accent-dark:#7fd4b6;--accent-soft:#14332a}
@@ -1282,3 +1282,30 @@ html.plaid-open body{
   filter:none !important;
   overflow:hidden !important;
 }
+
+/* ================= Compilación 75 =================
+   Cuadrícula de categorías en Presupuesto, editor dentro de la
+   tarjeta, franja de pagos fijos, tarjeta Pro de Inicio, tarjeta
+   del tour contextual y tarjetas anidadas de Ajustes. */
+.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0;list-style:none}
+@media (min-width:720px){.budget-grid{grid-template-columns:1fr 1fr 1fr}}
+.budget-grid .bud-card{margin:0;height:100%}
+.bud-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bud-pct{margin-left:auto;font-weight:700;color:var(--accent-dark,#1d7a5c);font-size:.85em;white-space:nowrap}
+.bud-chev{color:var(--muted);font-size:.8em}
+.bud-editor{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+.bud-fixed-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.bud-fixed-row:last-child{border-bottom:none}
+.bud-fixed-name{font-weight:600}
+.bud-fixed-meta{margin-left:auto;color:var(--muted);font-size:.9em;white-space:nowrap}
+.badge-fixed{background:var(--accent-soft,#e2f2ea);color:var(--accent-dark,#1d7a5c);border-radius:999px;padding:1px 8px;font-size:.75em;font-weight:700;white-space:nowrap}
+.pro-home-card{position:relative;border:1px solid var(--accent,#2fae7f)}
+.pro-home-x{position:absolute;top:6px;right:10px;background:none;border:none;font-size:1.3em;line-height:1;color:var(--muted);cursor:pointer;padding:4px}
+.guide-card{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-h,64px) + 22px);z-index:60;background:var(--card);border:1px solid var(--accent,#2fae7f);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.28);padding:16px}
+.guide-card h3{margin:0 0 6px}
+.guide-card p{margin:0 0 10px}
+.guide-highlight{outline:3px solid var(--accent,#2fae7f) !important;outline-offset:3px;border-radius:12px;position:relative;z-index:55}
+.setacc-nested{box-shadow:none;border:1px dashed var(--line);margin-top:14px}
+.welcome-box{text-align:center}
+.welcome-box .ob-logo{margin:10px auto}
+.welcome-box #ob-start{width:100%}

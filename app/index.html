@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#00421C">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11171d">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.plaid.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://muse.ai https://cdn.plaid.com; frame-src https://cdn.plaid.com; media-src 'self' https://muse.ai https://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="description" content="PETO Finanzas: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
 <meta property="og:type" content="website">
@@ -44,16 +44,11 @@
 
 <!-- ============ BIENVENIDA / PRIMER USO ============ -->
 <section id="view-onboarding" class="view" hidden>
-  <div class="onboarding-card">
-    <img class="app-logo-img" src="icons/icon-192.png" alt="PETO Finanzas">
-    <h1 data-i18n="ob_title">¡Bienvenido a PETO Finanzas!</h1>
-    <p><span data-i18n="ob_intro_1">Organiza tu dinero en minutos: gastos, ingresos, presupuesto, cuentas y deudas.</span>
-       <strong data-i18n="ob_intro_2">Con tu cuenta en la nube.</strong>
-       <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
-    <div id="ob-lang-top-wrap">
-      <label for="ob-lang-top" data-i18n="set_lang_label">Idioma / Language</label>
+  <div class="onboarding-box welcome-box">
+    <div id="ob-lang-top-wrap" class="ob-lang-top">
+      <label for="ob-lang-top" data-i18n="ob_lang_label">🌐 Idioma</label>
       <select id="ob-lang-top">
-        <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
+        <option value="auto" data-i18n="lang_auto">Automático (el de tu teléfono)</option>
         <option value="es">Español</option>
         <option value="en">English</option>
         <option value="it">Italiano</option>
@@ -68,151 +63,14 @@
         <option value="ar">العربية</option>
       </select>
     </div>
-    <div id="ob-tour">
-      <!-- Compilación 64: barra de progreso del recorrido. -->
-      <div class="ob-progress"><div id="ob-progress-fill"></div></div>
-      <div class="ob-step" data-ob-step="1">
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></p>
-        <h2 data-i18n="ob_tour1_title">Anota un gasto en segundos</h2>
-        <p data-i18n="ob_tour1_text">Toca el botón +, escribe la cantidad y la categoría. Nada más: tu gasto queda registrado al instante.</p>
-        <!-- Compilación 63: el tour de bienvenida muestra todo lo
-             que la app puede hacer y deja configurar lo básico en el
-             camino. Paso 1 interactivo: el primer gasto real. -->
-        <div class="ob-mini-form">
-          <input id="ob-exp-amount" type="text" inputmode="decimal" autocomplete="off"
-                 data-i18n-ph="ob_exp_amount_ph" placeholder="Cantidad (ej. 25.00)">
-          <select id="ob-exp-category" aria-label="Categoría"></select>
-          <button id="ob-exp-add" type="button" class="btn btn-secondary" data-i18n="ob_exp_add">Anotar mi primer gasto</button>
-          <p id="ob-exp-status" class="muted small" role="status" hidden></p>
-          <p id="ob-exp-error" class="error" role="alert" hidden></p>
-        </div>
-      </div>
-      <div class="ob-step" data-ob-step="2" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.6h.01M18 14.4h.01"/></svg></p>
-        <h2 data-i18n="ob_tour2_title">¿Cuánto puedes gastar hoy?</h2>
-        <p data-i18n="ob_tour2_text">PETO Finanzas reparte tu presupuesto entre los días que quedan del mes y te dice un solo número: lo que puedes gastar hoy sin pasarte.</p>
-      </div>
-      <div class="ob-step" data-ob-step="3" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></p>
-        <h2 data-i18n="ob_fix_title">Tus pagos fijos y tu presupuesto</h2>
-        <p data-i18n="ob_fix_text">Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy.</p>
-        <div class="ob-mini-form">
-          <input id="ob-fix-name" type="text" maxlength="60" autocomplete="off"
-                 data-i18n-ph="ob_fix_name_ph" placeholder="Nombre (ej. Renta)">
-          <input id="ob-fix-amount" type="text" inputmode="decimal" autocomplete="off"
-                 data-i18n-ph="ob_exp_amount_ph" placeholder="Cantidad (ej. 25.00)">
-          <input id="ob-fix-day" type="number" min="1" max="31" inputmode="numeric" autocomplete="off"
-                 data-i18n-ph="ob_fix_day_ph" placeholder="Día (1-31)">
-          <button id="ob-fix-add" type="button" class="btn btn-secondary" data-i18n="ob_fix_add">＋ Agregar pago fijo</button>
-          <ul id="ob-fix-list" class="ob-added-list"></ul>
-          <p id="ob-fix-status" class="muted small" role="status" hidden></p>
-          <p id="ob-fix-error" class="error" role="alert" hidden></p>
-        </div>
-      </div>
-      <div class="ob-step" data-ob-step="4" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></p>
-        <h2 data-i18n="ob_goal_title">Tu meta de ahorro</h2>
-        <p data-i18n="ob_goal_text">Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.</p>
-        <div class="ob-mini-form">
-          <input id="ob-goal-name" type="text" maxlength="60" autocomplete="off"
-                 data-i18n-ph="ob_goal_name_ph" placeholder="Nombre (ej. Fondo de emergencia)">
-          <input id="ob-goal-target" type="text" inputmode="decimal" autocomplete="off"
-                 data-i18n-ph="ob_goal_target_ph" placeholder="Cantidad meta (ej. 1,000)">
-          <button id="ob-goal-add" type="button" class="btn btn-secondary" data-i18n="ob_goal_add">Crear mi meta</button>
-          <p id="ob-goal-status" class="muted small" role="status" hidden></p>
-          <p id="ob-goal-error" class="error" role="alert" hidden></p>
-        </div>
-      </div>
-      <div class="ob-step" data-ob-step="5" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 3.5V8h-4.5"/></svg></p>
-        <h2 data-i18n="ob_san_title">El san: ahorra en grupo</h2>
-        <p data-i18n="ob_san_text">El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.</p>
-        <button id="ob-san-btn" type="button" class="btn btn-secondary" data-i18n="ob_san_btn">Crear mi san al terminar</button>
-        <p id="ob-san-status" class="muted small" role="status" hidden></p>
-      </div>
-      <div class="ob-step" data-ob-step="6" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 21h17M5 18h14M6.5 18v-6.5M10.2 18v-6.5M13.8 18v-6.5M17.5 18v-6.5M12 3.5 3.5 9h17z"/></svg></p>
-        <h2 data-i18n="ob_bank_title">Conecta tu banco</h2>
-        <p data-i18n="ob_bank_text">Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.</p>
-        <button id="ob-bank-btn" type="button" class="btn btn-secondary" data-i18n="ob_bank_btn">Quiero conectar mi banco</button>
-        <p id="ob-bank-status" class="muted small" role="status" hidden></p>
-      </div>
-      <div class="ob-step" data-ob-step="7" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5"/></svg></p>
-        <h2 data-i18n="ob_pod_title">Aprende con el podcast</h2>
-        <p data-i18n="ob_pod_text">«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.</p>
-        <button id="ob-pod-btn" type="button" class="btn btn-secondary" data-i18n="ob_pod_btn">Ver el podcast al terminar</button>
-        <p id="ob-pod-status" class="muted small" role="status" hidden></p>
-      </div>
-      <div class="ob-step" data-ob-step="8" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.2 16v-5a5.8 5.8 0 0 1 11.6 0v5l1.6 2.6H4.6z"/><path d="M10.2 21a2.1 2.1 0 0 0 3.6 0"/></svg></p>
-        <h2 data-i18n="ob_bell_title">Activa tus recordatorios</h2>
-        <p data-i18n="ob_bell_text">Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.</p>
-        <button id="ob-bell-btn" type="button" class="btn btn-secondary" data-i18n="ob_bell_btn">Activar recordatorios</button>
-        <p id="ob-bell-status" class="muted small" role="status" hidden></p>
-      </div>
-      <div class="ob-step" data-ob-step="9" hidden>
-        <p class="ob-step-icon" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.2 18.5h9.3a4.3 4.3 0 0 0 .8-8.4 6 6 0 0 0-11.5 1 4.8 4.8 0 0 0 1.4 7.4z"/></svg></p>
-        <h2 data-i18n="ob_tour3_title">Tu cuenta en la nube (opcional)</h2>
-        <p data-i18n="ob_tour3_text">Si quieres, crea una cuenta gratis para ver tus datos también en la web. Sin cuenta, todo queda solo en tu teléfono.</p>
-        <button id="ob-cloud-btn" type="button" class="btn btn-secondary" data-i18n="ob_cloud_btn">Crear mi cuenta al terminar</button>
-        <p id="ob-cloud-status" class="muted small" role="status" hidden></p>
-      </div>
-      <div class="ob-tour-nav">
-        <button id="ob-tour-skip" type="button" class="btn btn-ghost" data-i18n="ob_tour_skip">Saltar</button>
-        <span id="ob-tour-dots" class="ob-dots" aria-hidden="true">● ○ ○ ○ ○ ○ ○ ○ ○</span>
-        <button id="ob-tour-next" type="button" class="btn btn-secondary" data-i18n="ob_tour_next">Siguiente</button>
-      </div>
+    <img class="ob-logo" src="icons/icon-192.png" alt="PETO Finanzas" width="96" height="96">
+    <h2 data-i18n="ob_title">Tu dinero, claro y sin estrés</h2>
+    <p class="ob-intro"><span data-i18n="ob_intro_1">Apunta un gasto en segundos.</span><br>
+    <span data-i18n="ob_intro_2">Con tu cuenta en la nube.</span><br>
+    <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
+    <div id="ob-start-wrap">
+      <button id="ob-start" type="button" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </div>
-    <!-- novalidate (Compilación 57): la validación la hace el JS de la
-         app con mensajes propios (p. ej. el del PIN de 4 a 6 números);
-         sin novalidate, el WebView intercepta el envío con el pattern
-         del campo y muestra su mensaje genérico. -->
-    <form id="onboarding-form" autocomplete="off" hidden novalidate>
-      <label for="ob-name" data-i18n="ob_name_label">Tu nombre (opcional)</label>
-      <input id="ob-name" type="text" maxlength="40" data-i18n-ph="ob_name_ph" placeholder="Tu nombre">
-      <label for="ob-country" data-i18n="set_country_label">País</label>
-      <select id="ob-country"></select>
-      <label for="ob-currency" data-i18n="set_currency_label">Moneda</label>
-      <select id="ob-currency"></select>
-      <!-- Compilación 57: el idioma se elige una sola vez en la
-           bienvenida, en el selector de arriba (#ob-lang-top). El
-           segundo selector que había aquí se eliminó. -->
-      <label for="ob-pin" data-i18n="ob_pin_label">Crea un PIN de seguridad (opcional)</label>
-      <input id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
-             data-i18n-ph="ob_pin_ph" placeholder="4 a 6 números, o déjalo vacío">
-      <label for="ob-pin2" data-i18n="ob_pin2_label">Repite el PIN</label>
-      <input id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6"
-             data-i18n-ph="ob_pin2_ph" placeholder="Repite el PIN">
-      <p class="muted small" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
-      <!-- Compilación 63: huella junto al PIN desde la bienvenida;
-           solo se activa si la persona crea un PIN. -->
-      <label class="toggle-row">
-        <span data-i18n="ob_bio_label">Entrar con huella (si creo un PIN)</span>
-        <input type="checkbox" id="ob-biometric">
-      </label>
-      <!-- Compilación 63: huella junto al PIN desde la bienvenida;
-           solo se activa si la persona crea un PIN. -->
-      <label class="toggle-row">
-        <span data-i18n="ob_bio_label">Entrar con huella (si creo un PIN)</span>
-        <input type="checkbox" id="ob-biometric">
-      </label>
-      <div id="ob-mode">
-        <h2 data-i18n="ob_mode_title">¿Cómo quieres ver tu app?</h2>
-        <label class="toggle-row">
-          <span><strong data-i18n="ob_mode_essential">Lo esencial</strong><br>
-          <span class="muted small" data-i18n="ob_mode_essential_help">Solo Inicio, Gastos, Ingresos, Ahorros y Mi san. Lo demás se enciende cuando quieras en Ajustes.</span></span>
-          <input type="radio" name="ob-mode" value="esencial" checked>
-        </label>
-        <label class="toggle-row">
-          <span><strong data-i18n="ob_mode_all">Todo</strong><br>
-          <span class="muted small" data-i18n="ob_mode_all_help">Las 13 secciones completas desde el primer día.</span></span>
-          <input type="radio" name="ob-mode" value="todo">
-        </label>
-      </div>
-      <p id="ob-error" class="error" role="alert" hidden></p>
-      <button type="submit" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
-    </form>
     <div class="ob-demo">
       <button id="ob-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">Ver una demo</button>
       <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
@@ -297,6 +155,17 @@
       </div>
     </section>
 
+    <!-- Compilación 75: invitación a PETO Pro, solo para quien no
+         es Pro; se puede cerrar y reaparece a los 14 días. -->
+    <section id="pro-home-card" class="card pro-home-card" hidden>
+      <button id="pro-home-close" type="button" class="pro-home-x" data-i18n-aria="photo_close" aria-label="Cerrar">×</button>
+      <h3 data-i18n="pro_home_title">Únete a PETO Pro</h3>
+      <p class="muted" data-i18n="pro_home_text">Sin anuncios y con todo desbloqueado: sincronización bancaria, presupuestos compartidos y más.</p>
+      <div class="form-actions">
+        <button id="pro-home-btn" class="btn btn-primary" type="button" data-i18n="pro_btn_see">Ver PETO Pro</button>
+      </div>
+    </section>
+
     <section class="summary-strip" aria-label="Resumen del mes">
       <button id="tile-available" class="summary-item" type="button" data-i18n-aria="tile_available_aria" aria-label="Dinero disponible: ir a Mis cuentas">
         <span class="summary-label" id="tile-available-label" data-i18n="tile_available">Dinero disponible</span>
@@ -331,7 +200,7 @@
       </button>
     </div>
 
-    <section class="card spend-card">
+    <section id="spend-card" class="card spend-card">
       <span class="summary-label" data-i18n="spend_title">¿Cuánto puedes gastar hoy?</span>
       <span id="spend-today" class="spend-value">—</span>
       <div id="spend-today-left" class="muted small"></div>
@@ -585,9 +454,8 @@
       <span id="res-month-label" class="month-label"></span>
       <button id="res-next" class="btn btn-ghost" type="button" data-i18n-aria="month_next_aria" aria-label="Mes siguiente">›</button>
     </div>
-    <h3 data-i18n="res_cats_title">Gastos por categoría</h3>
-    <div id="chart-cats"></div>
-    <p id="chart-cats-empty" class="empty-state" hidden data-i18n="res_cats_empty">No hay gastos en este mes.</p>
+    <!-- Compilación 75: la lista «Gastos por categoría» de Resumen
+         se eliminó — vive unificada en Presupuesto. -->
     <h3 data-i18n="res_summary_title">Ingresos vs Gastos vs Ahorros</h3>
     <div id="chart-summary"></div>
     <p id="chart-summary-empty" class="empty-state" hidden data-i18n="res_summary_empty">Todavía no hay movimientos en este mes.</p>
@@ -657,8 +525,11 @@
         <button id="budget-save-all" type="button" class="btn btn-primary" data-i18n="bud_save_all">Guardar todo</button>
       </div>
     </section>
-    <section id="budget-cards" class="card"></section>
-    <ul id="budget-list" class="item-list"></ul>
+    <!-- Compilación 75: franja de pagos fijos del mes sobre la
+         cuadrícula de categorías (los pagos fijos no tienen
+         categoría fiable en los datos). -->
+    <section id="budget-fixed-strip" class="card" hidden></section>
+    <ul id="budget-list" class="item-list budget-grid"></ul>
 
     <!-- Compilación 55: informe del mes imprimible (PDF) y en CSV. -->
     <section class="card form-card" id="mr-card">
@@ -1104,26 +975,24 @@
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_ajustes">Ajustes y personalización</h2>
 
-    <!-- Compilación 56: TODAS las tarjetas de Ajustes se retraen
-         con el patrón de «Secciones visibles» (cabecera con título,
-         resumen y flecha). Compilación 60: la tarjeta del banco
-         sube a la parte alta (tras la cuenta en la nube) y TODAS
-         las tarjetas nacen CERRADAS: se ven solo el título y el
-         resumen hasta que alguien toca la cabecera. -->
+    <!-- Compilación 75: Ajustes en OCHO tarjetas, por importancia:
+         1 Cuenta (perfil + cuenta en la nube), 2 Conexión bancaria,
+         3 PETO Pro, 4 Presupuesto compartido, 5 Reglas de tu dinero
+         (reparto + mis reglas), 6 Seguridad y privacidad (PIN,
+         seguridad, privacidad y tus datos), 7 Personalización
+         (secciones visibles + tema y apariencia) y 8 Novedades.
+         Las fusionadas viven ANIDADAS dentro de su tarjeta con sus
+         ids y acordeones de siempre (clase «setacc-nested»). -->
     <form id="settings-form" class="card form-card" autocomplete="off">
       <div class="sections-head" id="setacc-profile-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-profile-body">
-        <h3 data-i18n="set_profile">Tu perfil</h3>
+        <h3 data-i18n="set_group_account">Cuenta</h3>
         <span class="sections-summary muted small" id="setacc-profile-summary"></span>
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
       <div id="setacc-profile-body" hidden>
       <label for="set-name" data-i18n="set_name_label">Tu nombre</label>
       <input id="set-name" type="text" maxlength="40">
-      <label for="set-textsize" data-i18n="set_textsize_label">Tamaño del texto</label>
-      <select id="set-textsize">
-        <option value="normal" data-i18n="textsize_normal">Normal</option>
-        <option value="grande" data-i18n="textsize_large">Grande</option>
-      </select>
+      
       <label for="set-lang" data-i18n="set_lang_label">Idioma / Language</label>
       <select id="set-lang">
         <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
@@ -1144,19 +1013,8 @@
       <select id="set-country"></select>
       <label for="set-currency" data-i18n="set_currency_label">Moneda</label>
       <select id="set-currency"></select>
-      <label for="set-theme" data-i18n="set_theme_label">Tema</label>
-      <select id="set-theme">
-        <option value="claro" data-i18n="theme_light">Claro</option>
-        <option value="oscuro" data-i18n="theme_dark">Oscuro</option>
-        <option value="auto" data-i18n="theme_auto">Automático (según el sistema)</option>
-      </select>
-      <label for="set-accent" data-i18n="set_accent_label">Color principal</label>
-      <select id="set-accent">
-        <option value="verde" data-i18n="accent_verde">Verde</option>
-        <option value="azul" data-i18n="accent_azul">Azul</option>
-        <option value="morado" data-i18n="accent_morado">Morado</option>
-        <option value="naranja" data-i18n="accent_naranja">Naranja</option>
-      </select>
+      
+      
 
       <h3 data-i18n="set_reminders_title">Recordatorios</h3>
       <label for="set-payday" data-i18n="set_payday_label">Día de cobro</label>
@@ -1192,56 +1050,55 @@
         <input type="checkbox" id="set-biz">
       </label>
 
+      
+      <section class="card form-card setacc-nested" id="settings-cloud">
+            <div class="sections-head" id="setacc-cloud-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-cloud-body">
+              <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
+              <span class="sections-summary muted small" id="setacc-cloud-summary"></span>
+              <span class="sections-chevron" aria-hidden="true">▸</span>
+            </div>
+            <div id="setacc-cloud-body" hidden>
+            <p class="muted small" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
+            <div id="cloud-signedout">
+              <label for="cloud-email" data-i18n="cloud_email">Correo electrónico</label>
+              <input id="cloud-email" type="email" autocomplete="email" maxlength="120">
+              <label for="cloud-pass" data-i18n="cloud_pass">Contraseña</label>
+              <input id="cloud-pass" type="password" autocomplete="current-password" maxlength="72">
+              <p class="muted small"><span data-i18n="cloud_pass_hint">Mínimo 6 caracteres</span> <button id="cloud-pass-eye" type="button" class="btn btn-ghost btn-small" aria-label="Mostrar contraseña">👁</button></p>
+              <div class="form-actions">
+                <button id="btn-cloud-signin" type="button" class="btn btn-primary" data-i18n="cloud_signin">Entrar</button>
+                <button id="btn-cloud-signup" type="button" class="btn btn-secondary" data-i18n="cloud_signup">Crear cuenta</button>
+              </div>
+              <p><button id="btn-cloud-forgot" type="button" class="btn btn-ghost btn-small" data-i18n="cloud_forgot">¿Olvidaste tu contraseña?</button></p>
+            </div>
+            <div id="cloud-signedin" hidden>
+              <p class="total-line" id="cloud-who"></p>
+              <p class="muted small" id="cloud-sync-status"></p>
+              <div class="form-actions">
+                <button id="btn-cloud-sync" type="button" class="btn btn-secondary" data-i18n="cloud_sync_now">Sincronizar ahora</button>
+                <button id="btn-cloud-signout" type="button" class="btn btn-ghost" data-i18n="cloud_signout">Cerrar sesión</button>
+                <button id="btn-cloud-wipe" type="button" class="btn btn-ghost" data-i18n="cloud_wipe">Borrar mis datos de la nube</button>
+              </div>
+              <div class="form-actions">
+                <button id="btn-cloud-delete" type="button" class="btn btn-danger" data-i18n="cloud_delete">Eliminar mi cuenta</button>
+              </div>
+            </div>
+            <div id="cloud-recovery" hidden>
+              <p class="muted small" data-i18n="cloud_recovery_help">Llegaste desde el enlace de tu correo. Escribe una contraseña nueva y quedará guardada para tu cuenta.</p>
+              <label for="cloud-newpass" data-i18n="cloud_newpass_label">Escribe tu contraseña nueva</label>
+              <input id="cloud-newpass" type="password" autocomplete="new-password" maxlength="72">
+              <p class="muted small"><span data-i18n="cloud_pass_hint">Mínimo 6 caracteres</span> <button id="cloud-newpass-eye" type="button" class="btn btn-ghost btn-small" aria-label="Mostrar contraseña">👁</button></p>
+              <div class="form-actions">
+                <button id="btn-cloud-recovery-save" type="button" class="btn btn-primary" data-i18n="cloud_recovery_save">Guardar contraseña</button>
+              </div>
+            </div>
+            <p id="cloud-status" class="muted small" aria-live="polite"></p>
+            <p id="cloud-error" class="error" role="alert" hidden></p>
+            </div>
+          </section>
+      
       </div>
     </form>
-
-    <!-- Compilación 56: la cuenta en la nube sale del formulario
-         del perfil y vive en su propia tarjeta retráctil. -->
-    <section class="card form-card" id="settings-cloud">
-      <div class="sections-head" id="setacc-cloud-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-cloud-body">
-        <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
-        <span class="sections-summary muted small" id="setacc-cloud-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="setacc-cloud-body" hidden>
-      <p class="muted small" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
-      <div id="cloud-signedout">
-        <label for="cloud-email" data-i18n="cloud_email">Correo electrónico</label>
-        <input id="cloud-email" type="email" autocomplete="email" maxlength="120">
-        <label for="cloud-pass" data-i18n="cloud_pass">Contraseña</label>
-        <input id="cloud-pass" type="password" autocomplete="current-password" maxlength="72">
-        <p class="muted small"><span data-i18n="cloud_pass_hint">Mínimo 6 caracteres</span> <button id="cloud-pass-eye" type="button" class="btn btn-ghost btn-small" aria-label="Mostrar contraseña">👁</button></p>
-        <div class="form-actions">
-          <button id="btn-cloud-signin" type="button" class="btn btn-primary" data-i18n="cloud_signin">Entrar</button>
-          <button id="btn-cloud-signup" type="button" class="btn btn-secondary" data-i18n="cloud_signup">Crear cuenta</button>
-        </div>
-        <p><button id="btn-cloud-forgot" type="button" class="btn btn-ghost btn-small" data-i18n="cloud_forgot">¿Olvidaste tu contraseña?</button></p>
-      </div>
-      <div id="cloud-signedin" hidden>
-        <p class="total-line" id="cloud-who"></p>
-        <p class="muted small" id="cloud-sync-status"></p>
-        <div class="form-actions">
-          <button id="btn-cloud-sync" type="button" class="btn btn-secondary" data-i18n="cloud_sync_now">Sincronizar ahora</button>
-          <button id="btn-cloud-signout" type="button" class="btn btn-ghost" data-i18n="cloud_signout">Cerrar sesión</button>
-          <button id="btn-cloud-wipe" type="button" class="btn btn-ghost" data-i18n="cloud_wipe">Borrar mis datos de la nube</button>
-        </div>
-        <div class="form-actions">
-          <button id="btn-cloud-delete" type="button" class="btn btn-danger" data-i18n="cloud_delete">Eliminar mi cuenta</button>
-        </div>
-      </div>
-      <div id="cloud-recovery" hidden>
-        <p class="muted small" data-i18n="cloud_recovery_help">Llegaste desde el enlace de tu correo. Escribe una contraseña nueva y quedará guardada para tu cuenta.</p>
-        <label for="cloud-newpass" data-i18n="cloud_newpass_label">Escribe tu contraseña nueva</label>
-        <input id="cloud-newpass" type="password" autocomplete="new-password" maxlength="72">
-        <p class="muted small"><span data-i18n="cloud_pass_hint">Mínimo 6 caracteres</span> <button id="cloud-newpass-eye" type="button" class="btn btn-ghost btn-small" aria-label="Mostrar contraseña">👁</button></p>
-        <div class="form-actions">
-          <button id="btn-cloud-recovery-save" type="button" class="btn btn-primary" data-i18n="cloud_recovery_save">Guardar contraseña</button>
-        </div>
-      </div>
-      <p id="cloud-status" class="muted small" aria-live="polite"></p>
-      <p id="cloud-error" class="error" role="alert" hidden></p>
-      </div>
-    </section>
 
     <section class="card form-card" id="settings-bank">
       <div class="sections-head" id="setacc-bank-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-bank-body">
@@ -1273,50 +1130,6 @@
       </div>
       <p id="bank-status" class="muted small" aria-live="polite"></p>
       <p id="bank-error" class="error" role="alert" hidden></p>
-      </div>
-    </section>
-        <!-- Compilación 56: el reparto de ingresos estrena su PROPIA
-         tarjeta retráctil, fuera del formulario del perfil. El
-         guardado automático de la 53 no cambia: el reparto se
-         sigue guardando en cada tecla y el aviso de la suma vive
-         aquí dentro, junto a los porcentajes. -->
-    <section class="card form-card" id="settings-split">
-      <div class="sections-head" id="setacc-split-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-split-body">
-        <h3 data-i18n="set_split_title">Reparto sugerido de ingresos (%)</h3>
-        <span class="sections-summary muted small" id="setacc-split-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="setacc-split-body" hidden>
-      <p class="muted small" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
-      <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
-      <input id="split-ahorro" type="number" min="0" max="100" step="1">
-      <label for="split-negocio" id="split-negocio-label" data-i18n="split_negocio">Negocio</label>
-      <input id="split-negocio" type="number" min="0" max="100" step="1">
-      <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
-      <input id="split-gastos" type="number" min="0" max="100" step="1">
-      <label for="split-familia" data-i18n="split_familia">Familia</label>
-      <input id="split-familia" type="number" min="0" max="100" step="1">
-      <p id="set-error" class="error" role="alert" hidden></p>
-      <!-- Compilación 53: ya NO hay botón «Guardar ajustes» — la
-           tarjeta se guarda sola (el reparto en cada tecla y el
-           resto de campos al cambiar). El renglón de arriba es el
-           aviso en vivo de la suma del reparto. -->
-      </div>
-    </section>
-
-    <section class="card form-card">
-      <div class="sections-head" id="sections-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="sections-body">
-        <h3 data-i18n="set_sections_title">Secciones visibles</h3>
-        <span class="sections-summary muted small" id="sections-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="sections-body" hidden>
-        <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
-        <div class="form-actions">
-          <button id="set-mode-essential" type="button" class="btn btn-secondary" data-i18n="set_mode_essential_btn">Modo Lo esencial</button>
-          <button id="set-mode-all" type="button" class="btn btn-ghost" data-i18n="set_mode_all_btn">Mostrar todo</button>
-        </div>
-        <div id="section-toggles"></div>
       </div>
     </section>
 
@@ -1368,9 +1181,55 @@
       </div>
     </section>
 
+    <section class="card form-card" id="settings-split">
+      <div class="sections-head" id="setacc-split-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-split-body">
+        <h3 data-i18n="set_group_rules">Reglas de tu dinero</h3>
+        <span class="sections-summary muted small" id="setacc-split-summary"></span>
+        <span class="sections-chevron" aria-hidden="true">▸</span>
+      </div>
+      <div id="setacc-split-body" hidden>
+      <p class="muted small" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
+      <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
+      <input id="split-ahorro" type="number" min="0" max="100" step="1">
+      <label for="split-negocio" id="split-negocio-label" data-i18n="split_negocio">Negocio</label>
+      <input id="split-negocio" type="number" min="0" max="100" step="1">
+      <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
+      <input id="split-gastos" type="number" min="0" max="100" step="1">
+      <label for="split-familia" data-i18n="split_familia">Familia</label>
+      <input id="split-familia" type="number" min="0" max="100" step="1">
+      <p id="set-error" class="error" role="alert" hidden></p>
+      <!-- Compilación 53: ya NO hay botón «Guardar ajustes» — la
+           tarjeta se guarda sola (el reparto en cada tecla y el
+           resto de campos al cambiar). El renglón de arriba es el
+           aviso en vivo de la suma del reparto. -->
+      
+      <section class="card form-card setacc-nested" id="settings-rules">
+            <div class="sections-head" id="setacc-rules-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-rules-body">
+              <h3 data-i18n="rules_title">Mis reglas de categorías</h3>
+              <span class="sections-summary muted small" id="setacc-rules-summary"></span>
+              <span class="sections-chevron" aria-hidden="true">▸</span>
+            </div>
+            <div id="setacc-rules-body" hidden>
+            <p class="muted small" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
+            <ul id="rules-list" class="item-list"></ul>
+            <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
+            <label for="rule-match" data-i18n="rules_match_label">Texto que contiene la nota o el comercio</label>
+            <input id="rule-match" type="text" maxlength="40" data-i18n-ph="rules_match_ph" placeholder="Contiene… (ej.: Shell)">
+            <label for="rule-category" data-i18n="category_label">Categoría</label>
+            <select id="rule-category"></select>
+            <p id="rules-error" class="error" role="alert" hidden></p>
+            <div class="form-actions">
+              <button id="rule-add" type="button" class="btn btn-secondary" data-i18n="rules_add">Añadir regla</button>
+            </div>
+            </div>
+          </section>
+      
+      </div>
+    </section>
+
     <section class="card form-card">
       <div class="sections-head" id="setacc-security-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-security-body">
-        <h3 data-i18n="set_pin_title">Seguridad (PIN)</h3>
+        <h3 data-i18n="set_group_security">Seguridad y privacidad</h3>
         <span class="sections-summary muted small" id="setacc-security-summary"></span>
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
@@ -1393,90 +1252,106 @@
         <input type="checkbox" id="set-biometric">
       </label>
       <p class="muted small" data-i18n="set_bio_help">Entra con tu huella además del PIN (necesitas tener un PIN activo).</p>
+      
+      <section class="card form-card setacc-nested" id="settings-trust">
+            <div class="sections-head" id="setacc-trust-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-trust-body">
+              <h3 data-i18n="sec_card_title">Seguridad</h3>
+              <span class="sections-summary muted small" id="setacc-trust-summary"></span>
+              <span class="sections-chevron" aria-hidden="true">▸</span>
+            </div>
+            <div id="setacc-trust-body" hidden>
+            <p class="sec-row"><svg class="ic-svg sec-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 19 5.4v5.4c0 4.6-2.9 7.8-7 9.7-4.1-1.9-7-5.1-7-9.7V5.4z"/><path d="m9 11.6 2.2 2.2 4.2-4.2"/></svg><span data-i18n="sec_card_read">Conexión bancaria de solo lectura: nunca podemos mover tu dinero</span></p>
+            <p class="sec-row"><svg class="ic-svg sec-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15.2v1.8"/></svg><span data-i18n="sec_card_enc">Tus datos viajan y se guardan cifrados</span></p>
+            <p class="sec-row"><svg class="ic-svg sec-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15.5" r="4.5"/><path d="m11.3 12.2 8.2-8.2M17 6l2.5 2.5M14.2 8.8l2.3 2.3"/></svg><span data-i18n="sec_card_lock">Bloqueo con PIN y huella</span></p>
+            </div>
+          </section>
+      <section class="card form-card setacc-nested" id="settings-privacy">
+            <div class="sections-head" id="setacc-privacy-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-privacy-body">
+              <h3 data-i18n="priv_title">Privacidad: cómo cuidamos tus datos</h3>
+              <span class="sections-summary muted small" id="setacc-privacy-summary"></span>
+              <span class="sections-chevron" aria-hidden="true">▸</span>
+            </div>
+            <div id="setacc-privacy-body" hidden>
+            <p class="muted small" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
+            <div class="form-actions">
+              <button id="btn-privacy-policy" type="button" class="btn btn-secondary" data-i18n="priv_btn">Leer la política completa</button>
+            </div>
+            </div>
+          </section>
+      <section class="card form-card setacc-nested" id="settings-data">
+            <div class="sections-head" id="setacc-data-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-data-body">
+              <h3 data-i18n="set_data_title">Tus datos</h3>
+              <span class="sections-summary muted small" id="setacc-data-summary"></span>
+              <span class="sections-chevron" aria-hidden="true">▸</span>
+            </div>
+            <div id="setacc-data-body" hidden>
+            <p class="muted small" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
+            <div class="form-actions">
+              <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Guardar copia de seguridad</button>
+              <label class="btn btn-ghost file-label"><span data-i18n="data_import">Importar copia</span>
+                <input id="file-import" type="file" accept="application/json,.json" hidden>
+              </label>
+            </div>
+            <p id="data-error" class="error" role="alert" hidden></p>
+            <label for="backup-pass" data-i18n="backup_pass_label">Contraseña de la copia cifrada</label>
+            <input id="backup-pass" type="password" autocomplete="off" data-i18n-ph="backup_pass_ph" placeholder="Mínimo 4 caracteres">
+            <div class="form-actions">
+              <button id="btn-export-enc" type="button" class="btn btn-secondary" data-i18n="data_export_enc">Guardar copia con contraseña</button>
+            </div>
+            <div class="form-actions">
+              <button id="btn-export-csv" type="button" class="btn btn-secondary" data-i18n="data_export_csv">Exportar movimientos (CSV)</button>
+            </div>
+            <p id="csv-export-status" class="muted small" aria-live="polite"></p>
+            <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
+            <hr>
+            <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
+            <div class="form-actions">
+              <button id="set-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">Ver una demo</button>
+            </div>
+            <hr>
+            <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
+            </div>
+          </section>
+      
       </div>
     </section>
 
-    <section class="card form-card" id="settings-data">
-      <div class="sections-head" id="setacc-data-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-data-body">
-        <h3 data-i18n="set_data_title">Tus datos</h3>
-        <span class="sections-summary muted small" id="setacc-data-summary"></span>
+    <section class="card form-card">
+      <div class="sections-head" id="sections-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="sections-body">
+        <h3 data-i18n="set_group_personalization">Personalización</h3>
+        <span class="sections-summary muted small" id="sections-summary"></span>
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
-      <div id="setacc-data-body" hidden>
-      <p class="muted small" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
-      <div class="form-actions">
-        <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Guardar copia de seguridad</button>
-        <label class="btn btn-ghost file-label"><span data-i18n="data_import">Importar copia</span>
-          <input id="file-import" type="file" accept="application/json,.json" hidden>
-        </label>
-      </div>
-      <p id="data-error" class="error" role="alert" hidden></p>
-      <label for="backup-pass" data-i18n="backup_pass_label">Contraseña de la copia cifrada</label>
-      <input id="backup-pass" type="password" autocomplete="off" data-i18n-ph="backup_pass_ph" placeholder="Mínimo 4 caracteres">
-      <div class="form-actions">
-        <button id="btn-export-enc" type="button" class="btn btn-secondary" data-i18n="data_export_enc">Guardar copia con contraseña</button>
-      </div>
-      <div class="form-actions">
-        <button id="btn-export-csv" type="button" class="btn btn-secondary" data-i18n="data_export_csv">Exportar movimientos (CSV)</button>
-      </div>
-      <p id="csv-export-status" class="muted small" aria-live="polite"></p>
-      <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
-      <hr>
-      <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
-      <div class="form-actions">
-        <button id="set-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">Ver una demo</button>
-      </div>
-      <hr>
-      <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
-      </div>
-    </section>
-    <section class="card form-card" id="settings-privacy">
-      <div class="sections-head" id="setacc-privacy-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-privacy-body">
-        <h3 data-i18n="priv_title">Privacidad: cómo cuidamos tus datos</h3>
-        <span class="sections-summary muted small" id="setacc-privacy-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="setacc-privacy-body" hidden>
-      <p class="muted small" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
-      <div class="form-actions">
-        <button id="btn-privacy-policy" type="button" class="btn btn-secondary" data-i18n="priv_btn">Leer la política completa</button>
-      </div>
+      <div id="sections-body" hidden>
+        <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
+        <div class="form-actions">
+          <button id="set-mode-essential" type="button" class="btn btn-secondary" data-i18n="set_mode_essential_btn">Modo Lo esencial</button>
+          <button id="set-mode-all" type="button" class="btn btn-ghost" data-i18n="set_mode_all_btn">Mostrar todo</button>
+        </div>
+        <div id="section-toggles"></div>
+      
+      <label for="set-textsize" data-i18n="set_textsize_label">Tamaño del texto</label>
+      <select id="set-textsize">
+        <option value="normal" data-i18n="textsize_normal">Normal</option>
+        <option value="grande" data-i18n="textsize_large">Grande</option>
+      </select>
+      <label for="set-theme" data-i18n="set_theme_label">Tema</label>
+      <select id="set-theme">
+        <option value="claro" data-i18n="theme_light">Claro</option>
+        <option value="oscuro" data-i18n="theme_dark">Oscuro</option>
+        <option value="auto" data-i18n="theme_auto">Automático (según el sistema)</option>
+      </select>
+      <label for="set-accent" data-i18n="set_accent_label">Color principal</label>
+      <select id="set-accent">
+        <option value="verde" data-i18n="accent_verde">Verde</option>
+        <option value="azul" data-i18n="accent_azul">Azul</option>
+        <option value="morado" data-i18n="accent_morado">Morado</option>
+        <option value="naranja" data-i18n="accent_naranja">Naranja</option>
+      </select>
+      
       </div>
     </section>
-    <!-- Compilación 73: tarjeta de confianza — los hechos de seguridad, visibles. -->
-    <section class="card form-card" id="settings-trust">
-      <div class="sections-head" id="setacc-trust-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-trust-body">
-        <h3 data-i18n="sec_card_title">Seguridad</h3>
-        <span class="sections-summary muted small" id="setacc-trust-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="setacc-trust-body" hidden>
-      <p class="sec-row"><svg class="ic-svg sec-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 19 5.4v5.4c0 4.6-2.9 7.8-7 9.7-4.1-1.9-7-5.1-7-9.7V5.4z"/><path d="m9 11.6 2.2 2.2 4.2-4.2"/></svg><span data-i18n="sec_card_read">Conexión bancaria de solo lectura: nunca podemos mover tu dinero</span></p>
-      <p class="sec-row"><svg class="ic-svg sec-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15.2v1.8"/></svg><span data-i18n="sec_card_enc">Tus datos viajan y se guardan cifrados</span></p>
-      <p class="sec-row"><svg class="ic-svg sec-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15.5" r="4.5"/><path d="m11.3 12.2 8.2-8.2M17 6l2.5 2.5M14.2 8.8l2.3 2.3"/></svg><span data-i18n="sec_card_lock">Bloqueo con PIN y huella</span></p>
-      </div>
-    </section>
-    <!-- Compilación 55: reglas propias de categorización. -->
-    <section class="card form-card" id="settings-rules">
-      <div class="sections-head" id="setacc-rules-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-rules-body">
-        <h3 data-i18n="rules_title">Mis reglas de categorías</h3>
-        <span class="sections-summary muted small" id="setacc-rules-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="setacc-rules-body" hidden>
-      <p class="muted small" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
-      <ul id="rules-list" class="item-list"></ul>
-      <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
-      <label for="rule-match" data-i18n="rules_match_label">Texto que contiene la nota o el comercio</label>
-      <input id="rule-match" type="text" maxlength="40" data-i18n-ph="rules_match_ph" placeholder="Contiene… (ej.: Shell)">
-      <label for="rule-category" data-i18n="category_label">Categoría</label>
-      <select id="rule-category"></select>
-      <p id="rules-error" class="error" role="alert" hidden></p>
-      <div class="form-actions">
-        <button id="rule-add" type="button" class="btn btn-secondary" data-i18n="rules_add">Añadir regla</button>
-      </div>
-      </div>
-    </section>
+
     <section class="card form-card" id="settings-news">
       <div class="sections-head" id="setacc-news-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-news-body">
         <h3 data-i18n="set_news_title">Novedades</h3>
@@ -1489,7 +1364,7 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c73_design">✨ Diseño premium: iconos de línea, números más claros, barras con semáforo y tu seguridad a la vista en Ajustes. Tus datos quedan igual que siempre.</li>
+        <li data-i18n="news_c75_direct">✨ Nueva bienvenida: entras directo y PETO Finanzas te guía dentro, paso a paso. Categorías y pagos fijos en una sola vista, gráficas más claras y Ajustes en ocho tarjetas.</li>
       </ul>
       </div>
     </section>
@@ -1505,6 +1380,17 @@
        que en bloqueo y bienvenida queda oculta con el shell, y
        updateBottomNav la apaga en modo demo. -->
   <nav id="bottom-nav" class="bottom-nav" hidden aria-label="Navegación principal"></nav>
+
+  <!-- Compilación 75: tarjeta del tour contextual dentro de la app
+       (se muestra una sola vez, en la primera apertura). -->
+  <div id="guide-card" class="guide-card" hidden>
+    <h3 id="guide-title"></h3>
+    <p id="guide-text" class="muted"></p>
+    <div class="form-actions">
+      <button id="guide-skip" type="button" class="btn btn-ghost" data-i18n="ob_tour_skip">Saltar</button>
+      <button id="guide-next" type="button" class="btn btn-primary" data-i18n="ob_tour_next">Siguiente</button>
+    </div>
+  </div>
 
   <button id="fab-search" class="fab fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍</button>
   <button id="fab-add" class="fab" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">+</button>
