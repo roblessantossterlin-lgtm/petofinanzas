@@ -154,3 +154,22 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(function () { /* sin conexión: se ignora */ });
   });
 })();
+
+/* ---------- 5. Botón «Iniciar sesión» de la portada ----------
+   La portada enlaza a app/?login=1: si la bienvenida está visible,
+   se abre solo el panel «Ya tengo cuenta · Iniciar sesión». Si la
+   app entra directo (ya hay datos locales), no se toca nada. */
+(function () {
+  if (!/[?&]login=1(&|$)/.test(window.location.search)) return;
+  var tries = 0;
+  var iv = setInterval(function () {
+    tries++;
+    var btn = document.getElementById('ob-signin-open');
+    if (btn && btn.offsetParent !== null) {
+      clearInterval(iv);
+      btn.click();
+    } else if (tries > 40) {
+      clearInterval(iv);
+    }
+  }, 300);
+})();
