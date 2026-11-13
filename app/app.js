@@ -280,8 +280,8 @@
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 75';
-const BUILD_NUM = 75;
+const BUILD_LABEL = 'Compilación 76';
+const BUILD_NUM = 76;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -297,7 +297,7 @@ function buildLabelText() {
    PASO EN CADA COMPILACIÓN NUEVA: sustituir esta lista por la
    clave news_cNN de la versión, borrar la clave anterior de los
    12 diccionarios y dejar en el HTML únicamente su <li>. */
-const NEWS_CURRENT = ['news_c75_direct'];
+const NEWS_CURRENT = ['news_c76_direct'];
 
 /* ---------------- Compilación 59: capa de país -------------------
    El país se elige una vez en la bienvenida (usuarios nuevos) y se
@@ -493,6 +493,14 @@ function defaultData() {
       textSize: 'normal',
       lang: 'auto',
       payday: null,
+      /* Compilación 76: el día de cobro gana FRECUENCIA. payFreq:
+         'semanal' | 'quincenal' | 'mensual'. En semanal/quincenal
+         manda payday (día de la semana); en quincenal, payAnchor
+         ('YYYY-MM-DD' de un cobro conocido) fija el ciclo de 14
+         días; en mensual manda payMonthDay (1–31). */
+      payFreq: 'semanal',
+      payMonthDay: null,
+      payAnchor: null,
       reminders: true,
       theme: 'auto',
       accent: 'verde',
@@ -589,7 +597,15 @@ function defaultData() {
     budgetPeriods: {},
     fixed: [],
     accounts: [],
-    debts: []
+    debts: [],
+    /* Compilación 76: datos de tarjeta de las cuentas de crédito
+       del banco (el banco no los entrega): límite y días de corte
+       y de pago, claveados por el id de la cuenta bancaria. Las
+       cuentas manuales guardan los suyos en la propia cuenta. */
+    cardInfo: {},
+    /* Compilación 76: sobres con arrastre opt-in por categoría
+       (clave = categoría, valor true). */
+    envelopes: {}
   };
 }
 
@@ -1032,6 +1048,25 @@ function validateData(raw) {
     ? { country: s.bankWaitlist.country, ts: s.bankWaitlist.ts } : null;
   d.settings.payday = (typeof s.payday === 'number' && Number.isFinite(s.payday) &&
     Math.trunc(s.payday) >= 0 && Math.trunc(s.payday) <= 6) ? Math.trunc(s.payday) : null;
+  /* Compilación 76: frecuencia de cobro y campos asociados. Sin
+     payFreq válido queda 'semanal' (el comportamiento histórico:
+     solo día de la semana). El asistente de primer uso
+     (setupDone), el modo base cero, el tope de gasto hormiga y la
+     foto de deudas para el PETO Score se limpian igual. */
+  d.settings.payFreq = (s.payFreq === 'quincenal' || s.payFreq === 'mensual') ? s.payFreq : 'semanal';
+  d.settings.payMonthDay = (typeof s.payMonthDay === 'number' && Number.isFinite(s.payMonthDay) &&
+    Math.trunc(s.payMonthDay) >= 1 && Math.trunc(s.payMonthDay) <= 31) ? Math.trunc(s.payMonthDay) : null;
+  d.settings.payAnchor = (typeof s.payAnchor === 'string' &&
+    /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(s.payAnchor)) ? s.payAnchor : null;
+  d.settings.setupDone = s.setupDone === true;
+  d.settings.zeroBased = s.zeroBased === true;
+  d.settings.antsMaxCents = (typeof s.antsMaxCents === 'number' && Number.isFinite(s.antsMaxCents))
+    ? Math.max(100, Math.min(10000, Math.trunc(s.antsMaxCents))) : 1500;
+  d.settings.scoreSnap = (s.scoreSnap && typeof s.scoreSnap === 'object' &&
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(String(s.scoreSnap.month || '')) &&
+    Number.isFinite(Number(s.scoreSnap.debtCents)))
+    ? { month: String(s.scoreSnap.month), debtCents: Math.max(0, Math.trunc(Number(s.scoreSnap.debtCents))) }
+    : null;
   d.settings.reminders = s.reminders !== false;
   d.settings.autoFixed = s.autoFixed !== false;
   d.settings.notifications = s.notifications === true;
@@ -1171,6 +1206,32 @@ function validateData(raw) {
       if (allCategories(d).includes(cat) && (p === 'semana' || p === 'quincena')) d.budgetPeriods[cat] = p;
     }
   }
+  /* Compilación 76: datos de tarjeta de las cuentas bancarias de
+     crédito, claveados por id de cuenta. Solo entran límite
+     positivo y días 1–31; una entrada vacía se descarta. */
+  d.cardInfo = {};
+  if (raw.cardInfo && typeof raw.cardInfo === 'object' && !Array.isArray(raw.cardInfo)) {
+    for (const k of Object.keys(raw.cardInfo).slice(0, 60)) {
+      const v = raw.cardInfo[k];
+      if (!v || typeof v !== 'object') continue;
+      const info = {};
+      const lim = Math.trunc(Number(v.limitCents));
+      if (Number.isFinite(lim) && lim > 0) info.limitCents = lim;
+      for (const f of ['cutDay', 'dueDay']) {
+        const dv = Math.trunc(Number(v[f]));
+        if (Number.isFinite(dv) && dv >= 1 && dv <= 31) info[f] = dv;
+      }
+      if (Object.keys(info).length) d.cardInfo[cleanText(k, 90)] = info;
+    }
+  }
+  /* Compilación 76: sobres con arrastre, opt-in por categoría. */
+  d.envelopes = {};
+  if (raw.envelopes && typeof raw.envelopes === 'object' && !Array.isArray(raw.envelopes)) {
+    for (const k of Object.keys(raw.envelopes)) {
+      const cat = cleanText(k, 30);
+      if (raw.envelopes[k] === true && allCategories(d).includes(cat)) d.envelopes[cat] = true;
+    }
+  }
   d.fixed = arr(raw.fixed).filter((x) => x && typeof x === 'object').map((x) => {
     const paid = {};
     if (x.paidMonths && typeof x.paidMonths === 'object') {
@@ -1217,12 +1278,37 @@ function validateData(raw) {
       out68.freq = 'semanal';
       out68.weekday = (Number.isFinite(wd) && wd >= 0 && wd <= 6) ? wd : 1;
     }
+    /* Compilación 76: compra en cuotas. Un pago fijo con instId es
+       la cuota mensual de una compra a plazos: nace en instStart
+       ('YYYY-MM') y deja de ocurrir tras endMonth. Sin instId, la
+       entrada es un pago fijo normal de siempre. */
+    if (typeof x.instId === 'string' && x.instId) {
+      const tot = Math.trunc(Number(x.instTotal));
+      out68.instId = cleanId(x.instId);
+      out68.instTotal = (Number.isFinite(tot) && tot >= 2 && tot <= 60) ? tot : 0;
+      out68.instStart = (typeof x.instStart === 'string' &&
+        /^\d{4}-(0[1-9]|1[0-2])$/.test(x.instStart)) ? x.instStart : '';
+      out68.endMonth = (typeof x.endMonth === 'string' &&
+        /^\d{4}-(0[1-9]|1[0-2])$/.test(x.endMonth)) ? x.endMonth : '';
+      out68.instSumCents = cleanCents(x.instSumCents, false);
+    }
     return out68;
   });
-  d.accounts = arr(raw.accounts).filter((x) => x && typeof x === 'object').map((x) => ({
-    id: cleanId(x.id), name: cleanText(x.name, 60) || 'Cuenta',
-    balanceCents: cleanCents(x.balanceCents, true)
-  }));
+  d.accounts = arr(raw.accounts).filter((x) => x && typeof x === 'object').map((x) => {
+    const acc76 = {
+      id: cleanId(x.id), name: cleanText(x.name, 60) || 'Cuenta',
+      balanceCents: cleanCents(x.balanceCents, true)
+    };
+    /* Compilación 76: una cuenta manual puede ser tarjeta de
+       crédito: límite y días de corte y de pago, opcionales. */
+    const lim = Math.trunc(Number(x.cardLimitCents));
+    if (Number.isFinite(lim) && lim > 0) acc76.cardLimitCents = lim;
+    for (const f of ['cardCutDay', 'cardDueDay']) {
+      const dv = Math.trunc(Number(x[f]));
+      if (Number.isFinite(dv) && dv >= 1 && dv <= 31) acc76[f] = dv;
+    }
+    return acc76;
+  });
   d.debts = arr(raw.debts).filter((x) => x && typeof x === 'object').map((x) => ({
     id: cleanId(x.id), name: cleanText(x.name, 60) || 'Deuda',
     amountCents: cleanCents(x.amountCents, false),
@@ -1351,6 +1437,135 @@ const LANGS = ['es', 'en', 'it', 'pt', 'fr', 'de', 'zh', 'ja', 'ko', 'ru', 'hi',
 const LOCALES = { es: 'es', en: 'en-US', it: 'it-IT', pt: 'pt', fr: 'fr-FR', de: 'de-DE', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ru: 'ru-RU', hi: 'hi-IN', ar: 'ar-EG' };
 const I18N = {
 es: {
+  setup_title: 'Configura tu PETO Finanzas',
+  setup_step_of: 'Paso {n} de 3',
+  setup_step1_t: 'Crea tu cuenta',
+  setup_step1_d: 'Tu cuenta en la nube guarda tu dinero sincronizado y te deja conectar tu banco.',
+  setup_step2_t: 'Crea tu PIN y activa tu huella',
+  setup_step2_d: 'Un PIN de 4 a 6 dígitos protege tu app; con el PIN creado podrás activar la huella.',
+  setup_step3_t: 'Conecta tu banco',
+  setup_step3_d: 'Con tu banco conectado, tus saldos y movimientos se actualizan solos. Puedes hacerlo luego si prefieres.',
+  setup_skip_step: 'Ahora no',
+  setup_skip_all: 'Saltar todo',
+  setup_done: 'Listo',
+  setup_email_ph: 'Tu correo',
+  setup_pass_ph: 'Contraseña (mínimo 6)',
+  setup_pin_ph: 'PIN (4 a 6 dígitos)',
+  setup_pin2_ph: 'Repite el PIN',
+  setup_pin_btn: 'Guardar PIN',
+  setup_bank_btn: 'Conectar banco',
+  setup_account_btn: 'Crear cuenta',
+  home_account_title: 'Crea tu cuenta de PETO Finanzas',
+  home_account_text: 'Guarda tu dinero en la nube, sincroniza entre dispositivos y conecta tu banco.',
+  home_account_btn: 'Crear cuenta',
+  payfreq_label: 'Frecuencia de cobro',
+  payfreq_semanal: 'Semanal',
+  payfreq_quincenal: 'Quincenal',
+  payfreq_mensual: 'Mensual',
+  payday_month_label: 'Día del mes',
+  notif_payday_t: 'Mañana es tu cobro',
+  notif_payday_b: 'Tu próximo cobro llega mañana.',
+  notif_card_t: 'Pago de tarjeta',
+  notif_card_b: '{name}: tu pago vence el {date}.',
+  exit_btn: 'Salir',
+  mr_close: 'Cerrar informe',
+  subs_title: 'Centro de suscripciones',
+  subs_total_month: 'Total al mes',
+  subs_total_year: 'Total al año',
+  subs_hike: 'Subió de precio',
+  subs_hike_d: 'Antes {old}, ahora {new}',
+  subs_dup: 'Posible cargo duplicado',
+  subs_trial: 'Posible prueba recién convertida',
+  subs_in_fixed: 'En pagos fijos',
+  subs_note: 'PETO Finanzas solo detecta y avisa; cancelar una suscripción es decisión tuya en cada servicio.',
+  subs_per_month: 'al mes',
+  ants_title: 'Gastos hormiga',
+  ants_empty: 'Casi no hay compras pequeñas recientes: bien hecho.',
+  ants_month: 'En 30 días',
+  ants_year_line: 'Te cuestan {amount} al año',
+  ants_top_cat: 'Por categoría',
+  ants_top_merch: 'Por comercio',
+  ants_count: '{n} compras',
+  ants_max_label: 'Compras de hasta',
+  card_title: 'Tus tarjetas',
+  card_limit: 'Límite',
+  card_cut: 'Día de corte',
+  card_due: 'Día de pago',
+  card_is: 'Es tarjeta de crédito',
+  card_edit: 'Datos de la tarjeta',
+  card_save: 'Guardar',
+  card_next_cut: 'Corte: {date} (en {n} días)',
+  card_next_due: 'Paga antes del {date} (en {n} días)',
+  card_avail: 'Disponible',
+  card_debt: 'Deuda',
+  card_none: 'Aún no hay tarjetas: marca una cuenta como tarjeta o edita una tarjeta de tu banco.',
+  inst_btn: 'Registrar compra en cuotas',
+  inst_name: 'Nombre de la compra',
+  inst_total: 'Monto total',
+  inst_n: 'Número de cuotas',
+  inst_day: 'Día de pago',
+  inst_card: 'Tarjeta (opcional)',
+  inst_none: 'Sin tarjeta',
+  inst_create: 'Crear cuotas',
+  inst_badge: 'Cuota {a} de {b}',
+  inst_created: 'Cuotas creadas: {n} pagos de {amount}.',
+  inst_err_n: 'Las cuotas deben ser entre 2 y 60.',
+  inst_delete_confirm: '¿Eliminar esta compra en cuotas? Se borran sus pagos futuros.',
+  flow_title: 'Flujo de caja futuro',
+  flow_d30: '30 días',
+  flow_d60: '60 días',
+  flow_d90: '90 días',
+  flow_start: 'Saldo inicial',
+  flow_end: 'Saldo final',
+  flow_min: 'Mínimo: {amount} el {date}',
+  flow_neg: 'Ojo: primer día en negativo el {date}',
+  flow_ok: 'Ningún día en negativo en el periodo',
+  flow_var_note: 'Incluye tu gasto variable promedio de los últimos 30 días como estimación diaria.',
+  flow_income: 'Cobro',
+  flow_no_events: 'Sin movimientos previstos en el periodo.',
+  score_title: 'PETO Score',
+  score_sub: 'Tu salud financiera según los datos de tu app. No es un buró de crédito.',
+  score_f_budget: 'Presupuesto cumplido',
+  score_f_savings: 'Ahorro del mes',
+  score_f_ontime: 'Pagos a tiempo',
+  score_f_debt: 'Deudas a la baja',
+  score_f_efund: 'Fondo de emergencia',
+  score_h_budget: '{n} de {m} categorías dentro del tope',
+  score_h_budget_none: 'Sin topes todavía: se otorga la mitad',
+  score_h_savings: 'Ahorraste el {pct}% de tu ingreso',
+  score_h_savings_abs: 'Ahorro del mes: {amount}',
+  score_h_ontime: '{n} de {m} pagos marcados a tiempo',
+  score_h_ontime_none: 'Sin pagos vencidos este mes',
+  score_h_debt_first: 'Tu primera foto de deudas: el mes que viene ya compara',
+  score_h_debt_zero: 'Sin deudas: así se queda',
+  score_h_debt_down: 'Tus deudas bajaron {amount}',
+  score_h_debt_same: 'Tus deudas quedaron iguales',
+  score_h_debt_up: 'Tus deudas subieron {amount}',
+  score_h_efund: 'Cubre el {pct}% de un mes de pagos',
+  fam_goals: 'Metas compartidas',
+  fam_goal_empty: 'Sin metas compartidas todavía.',
+  fam_goal_name: 'Nombre de la meta',
+  fam_goal_target: 'Meta ($)',
+  fam_goal_add: 'Añadir meta',
+  fam_contrib: 'Aportar',
+  fam_iou: 'Quién debe a quién',
+  fam_iou_empty: 'Nadie debe nada a nadie.',
+  fam_iou_add: 'Anotar deuda',
+  fam_iou_settle: 'Saldado',
+  fam_net_pos: 'le deben {amount}',
+  fam_net_neg: 'debe {amount}',
+  fam_note_ph: 'Nota (opcional)',
+  env_rollover: 'Sobre con arrastre',
+  env_carry_line: 'Arrastre de meses anteriores: {amount}',
+  env_zero: 'Modo base cero',
+  env_zero_help: 'Asigna tus topes (en su equivalente mensual) hasta dejar el ingreso sin asignar en $0.',
+  env_zero_noincome: 'Anota un ingreso este mes para ver lo que falta por asignar.',
+  env_unassigned: 'Sin asignar',
+  env_zero_ok: 'todo asignado',
+  pro_open_adv: 'Abrir el informe avanzado',
+  pro_open_org: 'Abrir el modo organizador de san',
+  pin_err_mismatch: 'Los PIN no coinciden.',
+  news_c76_direct: 'Nuevo en PETO Finanzas: centro de suscripciones, gastos hormiga, flujo de caja a 90 días, PETO Score, compras en cuotas, sobres con arrastre y asistente de inicio en tres pasos.',
   org_err_san_name: 'Escribe el nombre del san.', rep_promo_footer: 'Controla tus gastos con PETO Finanzas · petofinanzas.com', rep_saved: 'Imagen guardada.', set_sections_summary: '{visible} de {total} visibles',
   org_err_active_exists: 'Ya hay un san activo («{name}»). Bórralo primero desde su tarjeta si quieres crear otro.',
   app_title: 'PETO Finanzas', build_word: 'Compilación', back: '← Todas las opciones', greeting: 'Hola', lock_btn: 'Bloquear',
@@ -1826,9 +2041,138 @@ es: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Pulsa atrás otra vez para salir.',
-  ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_pending_btn: '✓ Se abre al terminar', news_c75_direct: '✨ Nueva bienvenida: entras directo y PETO Finanzas te guía dentro, paso a paso. Categorías y pagos fijos en una sola vista, gráficas más claras y Ajustes en ocho tarjetas.', spend_ctx_below: 'Vas {amount} por debajo de tu ritmo del mes pasado', spend_ctx_above: 'Vas {amount} por encima de tu ritmo del mes pasado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Seguridad', sec_card_read: 'Conexión bancaria de solo lectura: nunca podemos mover tu dinero', sec_card_enc: 'Tus datos viajan y se guardan cifrados', sec_card_lock: 'Bloqueo con PIN y huella', bud_per_semana: 'por semana', bud_per_quincena: 'por quincena', bud_per_mes: 'por mes', spend_left_periods: 'Te quedan {amount} entre todos tus períodos.', spend_x_periods: 'Cada categoría se reparte según su propio período:', spend_x_cat: '{cat} ({per}): quedan {left} ÷ {days} días = {daily} hoy', bud_period_aria: 'Período del límite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Presupuesto', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar con huella (si creo un PIN)', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
+  ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_pending_btn: '✓ Se abre al terminar', spend_ctx_below: 'Vas {amount} por debajo de tu ritmo del mes pasado', spend_ctx_above: 'Vas {amount} por encima de tu ritmo del mes pasado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Seguridad', sec_card_read: 'Conexión bancaria de solo lectura: nunca podemos mover tu dinero', sec_card_enc: 'Tus datos viajan y se guardan cifrados', sec_card_lock: 'Bloqueo con PIN y huella', bud_per_semana: 'por semana', bud_per_quincena: 'por quincena', bud_per_mes: 'por mes', spend_left_periods: 'Te quedan {amount} entre todos tus períodos.', spend_x_periods: 'Cada categoría se reparte según su propio período:', spend_x_cat: '{cat} ({per}): quedan {left} ÷ {days} días = {daily} hoy', bud_period_aria: 'Período del límite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Presupuesto', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar con huella (si creo un PIN)', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
+  setup_title: 'Set up your PETO Finanzas',
+  setup_step_of: 'Step {n} of 3',
+  setup_step1_t: 'Create your account',
+  setup_step1_d: 'Your cloud account keeps your money synced and lets you connect your bank.',
+  setup_step2_t: 'Create your PIN and turn on fingerprint',
+  setup_step2_d: 'A 4 to 6 digit PIN protects your app; once it exists you can turn on fingerprint.',
+  setup_step3_t: 'Connect your bank',
+  setup_step3_d: 'With your bank connected, your balances and transactions update on their own. You can do it later if you prefer.',
+  setup_skip_step: 'Not now',
+  setup_skip_all: 'Skip everything',
+  setup_done: 'Done',
+  setup_email_ph: 'Your email',
+  setup_pass_ph: 'Password (at least 6)',
+  setup_pin_ph: 'PIN (4 to 6 digits)',
+  setup_pin2_ph: 'Repeat the PIN',
+  setup_pin_btn: 'Save PIN',
+  setup_bank_btn: 'Connect bank',
+  setup_account_btn: 'Create account',
+  home_account_title: 'Create your PETO Finanzas account',
+  home_account_text: 'Keep your money in the cloud, sync across devices and connect your bank.',
+  home_account_btn: 'Create account',
+  payfreq_label: 'Pay frequency',
+  payfreq_semanal: 'Weekly',
+  payfreq_quincenal: 'Every two weeks',
+  payfreq_mensual: 'Monthly',
+  payday_month_label: 'Day of the month',
+  notif_payday_t: 'Tomorrow is payday',
+  notif_payday_b: 'Your next paycheck arrives tomorrow.',
+  notif_card_t: 'Card payment',
+  notif_card_b: '{name}: your payment is due on {date}.',
+  exit_btn: 'Exit',
+  mr_close: 'Close report',
+  subs_title: 'Subscription center',
+  subs_total_month: 'Total per month',
+  subs_total_year: 'Total per year',
+  subs_hike: 'Price went up',
+  subs_hike_d: 'Was {old}, now {new}',
+  subs_dup: 'Possible duplicate charge',
+  subs_trial: 'Possible trial just converted',
+  subs_in_fixed: 'In fixed payments',
+  subs_note: 'PETO Finanzas only detects and warns; cancelling a subscription is your decision at each service.',
+  subs_per_month: 'per month',
+  ants_title: 'Small everyday spending',
+  ants_empty: 'Hardly any small purchases lately: well done.',
+  ants_month: 'In 30 days',
+  ants_year_line: 'They cost you {amount} a year',
+  ants_top_cat: 'By category',
+  ants_top_merch: 'By store',
+  ants_count: '{n} purchases',
+  ants_max_label: 'Purchases up to',
+  card_title: 'Your cards',
+  card_limit: 'Limit',
+  card_cut: 'Statement day',
+  card_due: 'Payment due day',
+  card_is: 'This is a credit card',
+  card_edit: 'Card details',
+  card_save: 'Save',
+  card_next_cut: 'Statement: {date} (in {n} days)',
+  card_next_due: 'Pay by {date} (in {n} days)',
+  card_avail: 'Available',
+  card_debt: 'Balance owed',
+  card_none: 'No cards yet: mark an account as a card or edit one of your bank cards.',
+  inst_btn: 'Add an installment purchase',
+  inst_name: 'Purchase name',
+  inst_total: 'Total amount',
+  inst_n: 'Number of installments',
+  inst_day: 'Payment day',
+  inst_card: 'Card (optional)',
+  inst_none: 'No card',
+  inst_create: 'Create installments',
+  inst_badge: 'Installment {a} of {b}',
+  inst_created: 'Installments created: {n} payments of {amount}.',
+  inst_err_n: 'Installments must be between 2 and 60.',
+  inst_delete_confirm: 'Delete this installment purchase? Its future payments will be removed.',
+  flow_title: 'Future cash flow',
+  flow_d30: '30 days',
+  flow_d60: '60 days',
+  flow_d90: '90 days',
+  flow_start: 'Starting balance',
+  flow_end: 'Ending balance',
+  flow_min: 'Lowest: {amount} on {date}',
+  flow_neg: 'Careful: first day in the red on {date}',
+  flow_ok: 'No day in the red in this period',
+  flow_var_note: 'Includes your average variable spending of the last 30 days as a daily estimate.',
+  flow_income: 'Paycheck',
+  flow_no_events: 'No expected movements in this period.',
+  score_title: 'PETO Score',
+  score_sub: 'Your financial health from your app data. This is not a credit bureau.',
+  score_f_budget: 'Budget on track',
+  score_f_savings: 'Savings this month',
+  score_f_ontime: 'Payments on time',
+  score_f_debt: 'Debt going down',
+  score_f_efund: 'Emergency fund',
+  score_h_budget: '{n} of {m} categories within their limit',
+  score_h_budget_none: 'No limits yet: half points given',
+  score_h_savings: 'You saved {pct}% of your income',
+  score_h_savings_abs: 'Saved this month: {amount}',
+  score_h_ontime: '{n} of {m} payments marked on time',
+  score_h_ontime_none: 'No payments due yet this month',
+  score_h_debt_first: 'Your first debt snapshot: next month will compare',
+  score_h_debt_zero: 'Debt free: keep it that way',
+  score_h_debt_down: 'Your debt went down by {amount}',
+  score_h_debt_same: 'Your debt stayed the same',
+  score_h_debt_up: 'Your debt went up by {amount}',
+  score_h_efund: 'Covers {pct}% of one month of payments',
+  fam_goals: 'Shared goals',
+  fam_goal_empty: 'No shared goals yet.',
+  fam_goal_name: 'Goal name',
+  fam_goal_target: 'Target ($)',
+  fam_goal_add: 'Add goal',
+  fam_contrib: 'Contribute',
+  fam_iou: 'Who owes whom',
+  fam_iou_empty: 'Nobody owes anything.',
+  fam_iou_add: 'Add a debt',
+  fam_iou_settle: 'Settled',
+  fam_net_pos: 'is owed {amount}',
+  fam_net_neg: 'owes {amount}',
+  fam_note_ph: 'Note (optional)',
+  env_rollover: 'Envelope with rollover',
+  env_carry_line: 'Rollover from earlier months: {amount}',
+  env_zero: 'Zero-based mode',
+  env_zero_help: 'Assign your limits (in monthly terms) until the unassigned income reaches $0.',
+  env_zero_noincome: 'Add income this month to see what is left to assign.',
+  env_unassigned: 'Unassigned',
+  env_zero_ok: 'all assigned',
+  pro_open_adv: 'Open the advanced report',
+  pro_open_org: 'Open the san organizer mode',
+  pin_err_mismatch: 'The PINs do not match.',
+  news_c76_direct: 'New in PETO Finanzas: subscription center, small-spending detector, 90-day cash flow, PETO Score, installment purchases, rollover envelopes and a three-step start assistant.',
   org_err_san_name: 'Enter the name of the san.', rep_promo_footer: 'Take control of your spending with PETO Finanzas · petofinanzas.com', rep_saved: 'Image saved.', set_sections_summary: '{visible} of {total} visible',
   org_err_active_exists: 'There is already an active san (“{name}”). Delete it first from its card if you want to create another one.',
   app_title: 'PETO Finanzas', build_word: 'Build', back: '← All options', greeting: 'Hello', lock_btn: 'Lock',
@@ -2304,9 +2648,138 @@ en: {
   widget_san_next: 'Next turn: {name} · {date}',
   widget_san_next_nodate: 'Next turn: {name}',
   back_exit_hint: 'Press back again to exit.',
-  ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_pending_btn: '✓ Opens when you finish', news_c75_direct: '✨ New welcome: you get in right away and PETO Finanzas guides you inside, step by step. Categories and fixed payments in one view, clearer charts and Settings in eight cards.', spend_ctx_below: 'You are {amount} below last month’s pace', spend_ctx_above: 'You are {amount} above last month’s pace', spend_ctx_bank: 'Bank connected', sec_card_title: 'Security', sec_card_read: 'Read-only bank connection: we can never move your money', sec_card_enc: 'Your data travels and is stored encrypted', sec_card_lock: 'PIN and fingerprint lock', bud_per_semana: 'per week', bud_per_quincena: 'per two weeks', bud_per_mes: 'per month', spend_left_periods: 'You have {amount} left across all your periods.', spend_x_periods: 'Each category is spread over its own period:', spend_x_cat: '{cat} ({per}): {left} left ÷ {days} days = {daily} today', bud_period_aria: 'Limit period for {cat}', nav_gastos: 'Expenses', nav_presupuesto: 'Budget', nav_ajustes: 'Settings', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
+  ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_pending_btn: '✓ Opens when you finish', spend_ctx_below: 'You are {amount} below last month’s pace', spend_ctx_above: 'You are {amount} above last month’s pace', spend_ctx_bank: 'Bank connected', sec_card_title: 'Security', sec_card_read: 'Read-only bank connection: we can never move your money', sec_card_enc: 'Your data travels and is stored encrypted', sec_card_lock: 'PIN and fingerprint lock', bud_per_semana: 'per week', bud_per_quincena: 'per two weeks', bud_per_mes: 'per month', spend_left_periods: 'You have {amount} left across all your periods.', spend_x_periods: 'Each category is spread over its own period:', spend_x_cat: '{cat} ({per}): {left} left ÷ {days} days = {daily} today', bud_period_aria: 'Limit period for {cat}', nav_gastos: 'Expenses', nav_presupuesto: 'Budget', nav_ajustes: 'Settings', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
+  setup_title: 'Configura il tuo PETO Finanzas',
+  setup_step_of: 'Passo {n} di 3',
+  setup_step1_t: 'Crea il tuo account',
+  setup_step1_d: 'Il tuo account cloud mantiene i tuoi soldi sincronizzati e ti permette di collegare la tua banca.',
+  setup_step2_t: 'Crea il tuo PIN e attiva l\'impronta',
+  setup_step2_d: 'Un PIN da 4 a 6 cifre protegge la tua app; una volta creato potrai attivare l\'impronta.',
+  setup_step3_t: 'Collega la tua banca',
+  setup_step3_d: 'Con la banca collegata, saldi e movimenti si aggiornano da soli. Puoi farlo dopo se preferisci.',
+  setup_skip_step: 'Non ora',
+  setup_skip_all: 'Salta tutto',
+  setup_done: 'Fatto',
+  setup_email_ph: 'La tua email',
+  setup_pass_ph: 'Password (almeno 6)',
+  setup_pin_ph: 'PIN (da 4 a 6 cifre)',
+  setup_pin2_ph: 'Ripeti il PIN',
+  setup_pin_btn: 'Salva PIN',
+  setup_bank_btn: 'Collega banca',
+  setup_account_btn: 'Crea account',
+  home_account_title: 'Crea il tuo account PETO Finanzas',
+  home_account_text: 'Conserva i tuoi soldi nel cloud, sincronizza tra dispositivi e collega la tua banca.',
+  home_account_btn: 'Crea account',
+  payfreq_label: 'Frequenza di paga',
+  payfreq_semanal: 'Settimanale',
+  payfreq_quincenal: 'Ogni due settimane',
+  payfreq_mensual: 'Mensile',
+  payday_month_label: 'Giorno del mese',
+  notif_payday_t: 'Domani è giorno di paga',
+  notif_payday_b: 'La tua prossima paga arriva domani.',
+  notif_card_t: 'Pagamento carta',
+  notif_card_b: '{name}: il tuo pagamento scade il {date}.',
+  exit_btn: 'Esci',
+  mr_close: 'Chiudi rapporto',
+  subs_title: 'Centro abbonamenti',
+  subs_total_month: 'Totale al mese',
+  subs_total_year: 'Totale all\'anno',
+  subs_hike: 'Il prezzo è aumentato',
+  subs_hike_d: 'Era {old}, ora {new}',
+  subs_dup: 'Possibile addebito duplicato',
+  subs_trial: 'Possibile prova appena convertita',
+  subs_in_fixed: 'Nei pagamenti fissi',
+  subs_note: 'PETO Finanzas rileva e avvisa soltanto; annullare un abbonamento è una tua decisione presso ciascun servizio.',
+  subs_per_month: 'al mese',
+  ants_title: 'Piccole spese quotidiane',
+  ants_empty: 'Quasi nessuna piccola spesa di recente: ben fatto.',
+  ants_month: 'In 30 giorni',
+  ants_year_line: 'Ti costano {amount} all\'anno',
+  ants_top_cat: 'Per categoria',
+  ants_top_merch: 'Per negozio',
+  ants_count: '{n} acquisti',
+  ants_max_label: 'Acquisti fino a',
+  card_title: 'Le tue carte',
+  card_limit: 'Limite',
+  card_cut: 'Giorno di chiusura estratto',
+  card_due: 'Giorno di scadenza pagamento',
+  card_is: 'È una carta di credito',
+  card_edit: 'Dettagli carta',
+  card_save: 'Salva',
+  card_next_cut: 'Estratto: {date} (tra {n} giorni)',
+  card_next_due: 'Paga entro il {date} (tra {n} giorni)',
+  card_avail: 'Disponibile',
+  card_debt: 'Debito',
+  card_none: 'Ancora nessuna carta: contrassegna un conto come carta o modifica una carta della tua banca.',
+  inst_btn: 'Registra un acquisto a rate',
+  inst_name: 'Nome dell\'acquisto',
+  inst_total: 'Importo totale',
+  inst_n: 'Numero di rate',
+  inst_day: 'Giorno di pagamento',
+  inst_card: 'Carta (facoltativo)',
+  inst_none: 'Nessuna carta',
+  inst_create: 'Crea rate',
+  inst_badge: 'Rata {a} di {b}',
+  inst_created: 'Rate create: {n} pagamenti da {amount}.',
+  inst_err_n: 'Le rate devono essere tra 2 e 60.',
+  inst_delete_confirm: 'Eliminare questo acquisto a rate? I suoi pagamenti futuri verranno rimossi.',
+  flow_title: 'Flusso di cassa futuro',
+  flow_d30: '30 giorni',
+  flow_d60: '60 giorni',
+  flow_d90: '90 giorni',
+  flow_start: 'Saldo iniziale',
+  flow_end: 'Saldo finale',
+  flow_min: 'Minimo: {amount} il {date}',
+  flow_neg: 'Attenzione: primo giorno in negativo il {date}',
+  flow_ok: 'Nessun giorno in negativo in questo periodo',
+  flow_var_note: 'Include la tua spesa variabile media degli ultimi 30 giorni come stima giornaliera.',
+  flow_income: 'Paga',
+  flow_no_events: 'Nessun movimento previsto in questo periodo.',
+  score_title: 'PETO Score',
+  score_sub: 'La tua salute finanziaria secondo i dati della tua app. Non è un ufficio di credito.',
+  score_f_budget: 'Budget rispettato',
+  score_f_savings: 'Risparmi di questo mese',
+  score_f_ontime: 'Pagamenti puntuali',
+  score_f_debt: 'Debiti in calo',
+  score_f_efund: 'Fondo di emergenza',
+  score_h_budget: '{n} di {m} categorie entro il limite',
+  score_h_budget_none: 'Ancora nessun limite: assegnata metà dei punti',
+  score_h_savings: 'Hai risparmiato il {pct}% del tuo reddito',
+  score_h_savings_abs: 'Risparmiato questo mese: {amount}',
+  score_h_ontime: '{n} di {m} pagamenti segnati puntuali',
+  score_h_ontime_none: 'Nessun pagamento in scadenza questo mese',
+  score_h_debt_first: 'La tua prima foto dei debiti: il mese prossimo si confronterà',
+  score_h_debt_zero: 'Senza debiti: continua così',
+  score_h_debt_down: 'I tuoi debiti sono scesi di {amount}',
+  score_h_debt_same: 'I tuoi debiti sono rimasti uguali',
+  score_h_debt_up: 'I tuoi debiti sono saliti di {amount}',
+  score_h_efund: 'Copre il {pct}% di un mese di pagamenti',
+  fam_goals: 'Obiettivi condivisi',
+  fam_goal_empty: 'Ancora nessun obiettivo condiviso.',
+  fam_goal_name: 'Nome dell\'obiettivo',
+  fam_goal_target: 'Obiettivo ($)',
+  fam_goal_add: 'Aggiungi obiettivo',
+  fam_contrib: 'Contribuisci',
+  fam_iou: 'Chi deve a chi',
+  fam_iou_empty: 'Nessuno deve nulla a nessuno.',
+  fam_iou_add: 'Annota un debito',
+  fam_iou_settle: 'Saldato',
+  fam_net_pos: 'gli devono {amount}',
+  fam_net_neg: 'deve {amount}',
+  fam_note_ph: 'Nota (facoltativo)',
+  env_rollover: 'Busta con riporto',
+  env_carry_line: 'Riporto dai mesi precedenti: {amount}',
+  env_zero: 'Modalità base zero',
+  env_zero_help: 'Assegna i tuoi limiti (in equivalente mensile) finché il reddito non assegnato arriva a $0.',
+  env_zero_noincome: 'Aggiungi un reddito questo mese per vedere quanto manca da assegnare.',
+  env_unassigned: 'Non assegnato',
+  env_zero_ok: 'tutto assegnato',
+  pro_open_adv: 'Apri il rapporto avanzato',
+  pro_open_org: 'Apri la modalità organizzatore di san',
+  pin_err_mismatch: 'I PIN non coincidono.',
+  news_c76_direct: 'Novità in PETO Finanzas: centro abbonamenti, rilevatore di piccole spese, flusso di cassa a 90 giorni, PETO Score, acquisti a rate, buste con riporto e assistente di avvio in tre passi.',
   org_err_san_name: 'Scrivi il nome del san.', rep_promo_footer: 'Controlla le tue spese con PETO Finanzas · petofinanzas.com', rep_saved: 'Immagine salvata.', set_sections_summary: '{visible} di {total} visibili',
   org_err_active_exists: 'C’è già un san attivo («{name}»). Eliminalo prima dalla sua scheda se vuoi crearne un altro.',
   app_title: 'PETO Finanzas', build_word: 'Build',
@@ -3025,9 +3498,138 @@ it: {
   widget_san_next: 'Prossimo turno: {name} · {date}',
   widget_san_next_nodate: 'Prossimo turno: {name}',
   back_exit_hint: 'Premi di nuovo indietro per uscire.',
-  ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_pending_btn: '✓ Si apre alla fine', news_c75_direct: '✨ Nuova accoglienza: entri subito e PETO Finanzas ti guida dentro, passo dopo passo. Categorie e pagamenti fissi in un\'unica vista, grafici più chiari e Impostazioni in otto schede.', spend_ctx_below: 'Sei {amount} sotto il ritmo del mese scorso', spend_ctx_above: 'Sei {amount} sopra il ritmo del mese scorso', spend_ctx_bank: 'Banca collegata', sec_card_title: 'Sicurezza', sec_card_read: 'Connessione bancaria in sola lettura: non possiamo mai muovere i tuoi soldi', sec_card_enc: 'I tuoi dati viaggiano e sono salvati cifrati', sec_card_lock: 'Blocco con PIN e impronta', bud_per_semana: 'a settimana', bud_per_quincena: 'ogni due settimane', bud_per_mes: 'al mese', spend_left_periods: 'Ti restano {amount} tra tutti i tuoi periodi.', spend_x_periods: 'Ogni categoria si distribuisce sul suo periodo:', spend_x_cat: '{cat} ({per}): restano {left} ÷ {days} giorni = {daily} oggi', bud_period_aria: 'Periodo del limite per {cat}', nav_gastos: 'Spese', nav_presupuesto: 'Budget', nav_ajustes: 'Impostazioni', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
+  ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_pending_btn: '✓ Si apre alla fine', spend_ctx_below: 'Sei {amount} sotto il ritmo del mese scorso', spend_ctx_above: 'Sei {amount} sopra il ritmo del mese scorso', spend_ctx_bank: 'Banca collegata', sec_card_title: 'Sicurezza', sec_card_read: 'Connessione bancaria in sola lettura: non possiamo mai muovere i tuoi soldi', sec_card_enc: 'I tuoi dati viaggiano e sono salvati cifrati', sec_card_lock: 'Blocco con PIN e impronta', bud_per_semana: 'a settimana', bud_per_quincena: 'ogni due settimane', bud_per_mes: 'al mese', spend_left_periods: 'Ti restano {amount} tra tutti i tuoi periodi.', spend_x_periods: 'Ogni categoria si distribuisce sul suo periodo:', spend_x_cat: '{cat} ({per}): restano {left} ÷ {days} giorni = {daily} oggi', bud_period_aria: 'Periodo del limite per {cat}', nav_gastos: 'Spese', nav_presupuesto: 'Budget', nav_ajustes: 'Impostazioni', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
+  setup_title: 'Configure o seu PETO Finanzas',
+  setup_step_of: 'Passo {n} de 3',
+  setup_step1_t: 'Crie a sua conta',
+  setup_step1_d: 'A sua conta na nuvem mantém o seu dinheiro sincronizado e permite ligar o seu banco.',
+  setup_step2_t: 'Crie o seu PIN e ative a impressão digital',
+  setup_step2_d: 'Um PIN de 4 a 6 dígitos protege a sua app; depois de criado, pode ativar a impressão digital.',
+  setup_step3_t: 'Ligue o seu banco',
+  setup_step3_d: 'Com o seu banco ligado, os saldos e movimentos atualizam-se sozinhos. Pode fazê-lo mais tarde, se preferir.',
+  setup_skip_step: 'Agora não',
+  setup_skip_all: 'Saltar tudo',
+  setup_done: 'Pronto',
+  setup_email_ph: 'O seu e-mail',
+  setup_pass_ph: 'Senha (mínimo de 6)',
+  setup_pin_ph: 'PIN (4 a 6 dígitos)',
+  setup_pin2_ph: 'Repita o PIN',
+  setup_pin_btn: 'Guardar PIN',
+  setup_bank_btn: 'Ligar banco',
+  setup_account_btn: 'Criar conta',
+  home_account_title: 'Crie a sua conta PETO Finanzas',
+  home_account_text: 'Guarde o seu dinheiro na nuvem, sincronize entre dispositivos e ligue o seu banco.',
+  home_account_btn: 'Criar conta',
+  payfreq_label: 'Frequência de pagamento',
+  payfreq_semanal: 'Semanal',
+  payfreq_quincenal: 'A cada duas semanas',
+  payfreq_mensual: 'Mensal',
+  payday_month_label: 'Dia do mês',
+  notif_payday_t: 'Amanhã é dia de pagamento',
+  notif_payday_b: 'O seu próximo salário chega amanhã.',
+  notif_card_t: 'Pagamento de cartão',
+  notif_card_b: '{name}: o seu pagamento vence em {date}.',
+  exit_btn: 'Sair',
+  mr_close: 'Fechar relatório',
+  subs_title: 'Centro de assinaturas',
+  subs_total_month: 'Total por mês',
+  subs_total_year: 'Total por ano',
+  subs_hike: 'O preço subiu',
+  subs_hike_d: 'Era {old}, agora {new}',
+  subs_dup: 'Possível cobrança duplicada',
+  subs_trial: 'Possível teste recém-convertido',
+  subs_in_fixed: 'Nos pagamentos fixos',
+  subs_note: 'O PETO Finanzas apenas deteta e avisa; cancelar uma assinatura é decisão sua em cada serviço.',
+  subs_per_month: 'por mês',
+  ants_title: 'Pequenos gastos do dia a dia',
+  ants_empty: 'Quase nenhumas compras pequenas ultimamente: muito bem.',
+  ants_month: 'Em 30 dias',
+  ants_year_line: 'Custam-lhe {amount} por ano',
+  ants_top_cat: 'Por categoria',
+  ants_top_merch: 'Por loja',
+  ants_count: '{n} compras',
+  ants_max_label: 'Compras até',
+  card_title: 'Os seus cartões',
+  card_limit: 'Limite',
+  card_cut: 'Dia de fecho',
+  card_due: 'Dia de vencimento do pagamento',
+  card_is: 'É um cartão de crédito',
+  card_edit: 'Dados do cartão',
+  card_save: 'Guardar',
+  card_next_cut: 'Fecho: {date} (em {n} dias)',
+  card_next_due: 'Pague até {date} (em {n} dias)',
+  card_avail: 'Disponível',
+  card_debt: 'Dívida',
+  card_none: 'Ainda não há cartões: marque uma conta como cartão ou edite um cartão do seu banco.',
+  inst_btn: 'Registar uma compra em prestações',
+  inst_name: 'Nome da compra',
+  inst_total: 'Valor total',
+  inst_n: 'Número de prestações',
+  inst_day: 'Dia de pagamento',
+  inst_card: 'Cartão (opcional)',
+  inst_none: 'Sem cartão',
+  inst_create: 'Criar prestações',
+  inst_badge: 'Prestação {a} de {b}',
+  inst_created: 'Prestações criadas: {n} pagamentos de {amount}.',
+  inst_err_n: 'As prestações devem ser entre 2 e 60.',
+  inst_delete_confirm: 'Eliminar esta compra em prestações? Os pagamentos futuros serão removidos.',
+  flow_title: 'Fluxo de caixa futuro',
+  flow_d30: '30 dias',
+  flow_d60: '60 dias',
+  flow_d90: '90 dias',
+  flow_start: 'Saldo inicial',
+  flow_end: 'Saldo final',
+  flow_min: 'Mínimo: {amount} em {date}',
+  flow_neg: 'Atenção: primeiro dia no negativo em {date}',
+  flow_ok: 'Nenhum dia no negativo neste período',
+  flow_var_note: 'Inclui o seu gasto variável médio dos últimos 30 dias como estimativa diária.',
+  flow_income: 'Salário',
+  flow_no_events: 'Sem movimentos previstos neste período.',
+  score_title: 'PETO Score',
+  score_sub: 'A sua saúde financeira segundo os dados da sua app. Não é um bureau de crédito.',
+  score_f_budget: 'Orçamento cumprido',
+  score_f_savings: 'Poupança deste mês',
+  score_f_ontime: 'Pagamentos a tempo',
+  score_f_debt: 'Dívidas a descer',
+  score_f_efund: 'Fundo de emergência',
+  score_h_budget: '{n} de {m} categorias dentro do limite',
+  score_h_budget_none: 'Ainda sem limites: são dados metade dos pontos',
+  score_h_savings: 'Poupou {pct}% do seu rendimento',
+  score_h_savings_abs: 'Poupado este mês: {amount}',
+  score_h_ontime: '{n} de {m} pagamentos marcados a tempo',
+  score_h_ontime_none: 'Sem pagamentos vencidos este mês',
+  score_h_debt_first: 'A sua primeira fotografia das dívidas: no próximo mês já compara',
+  score_h_debt_zero: 'Sem dívidas: continue assim',
+  score_h_debt_down: 'As suas dívidas desceram {amount}',
+  score_h_debt_same: 'As suas dívidas ficaram iguais',
+  score_h_debt_up: 'As suas dívidas subiram {amount}',
+  score_h_efund: 'Cobre {pct}% de um mês de pagamentos',
+  fam_goals: 'Metas partilhadas',
+  fam_goal_empty: 'Ainda sem metas partilhadas.',
+  fam_goal_name: 'Nome da meta',
+  fam_goal_target: 'Meta ($)',
+  fam_goal_add: 'Adicionar meta',
+  fam_contrib: 'Contribuir',
+  fam_iou: 'Quem deve a quem',
+  fam_iou_empty: 'Ninguém deve nada a ninguém.',
+  fam_iou_add: 'Anotar dívida',
+  fam_iou_settle: 'Liquidado',
+  fam_net_pos: 'devem-lhe {amount}',
+  fam_net_neg: 'deve {amount}',
+  fam_note_ph: 'Nota (opcional)',
+  env_rollover: 'Envelope com transferência',
+  env_carry_line: 'Transferência de meses anteriores: {amount}',
+  env_zero: 'Modo base zero',
+  env_zero_help: 'Atribua os seus limites (em equivalente mensal) até o rendimento não atribuído chegar a $0.',
+  env_zero_noincome: 'Adicione um rendimento este mês para ver o que falta atribuir.',
+  env_unassigned: 'Não atribuído',
+  env_zero_ok: 'tudo atribuído',
+  pro_open_adv: 'Abrir o relatório avançado',
+  pro_open_org: 'Abrir o modo organizador de san',
+  pin_err_mismatch: 'Os PIN não coincidem.',
+  news_c76_direct: 'Novo no PETO Finanzas: centro de assinaturas, detetor de pequenos gastos, fluxo de caixa a 90 dias, PETO Score, compras em prestações, envelopes com transferência e assistente de início em três passos.',
   org_err_san_name: 'Digite o nome do san.', rep_promo_footer: 'Controle seus gastos com o PETO Finanzas · petofinanzas.com', rep_saved: 'Imagem salva.', set_sections_summary: '{visible} de {total} visíveis',
   org_err_active_exists: 'Já existe um san ativo («{name}»). Exclua-o primeiro no cartão dele se quiser criar outro.',
   app_title: 'PETO Finanzas', build_word: 'Compilação',
@@ -3746,9 +4348,138 @@ pt: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Toque em voltar outra vez para sair.',
-  ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_pending_btn: '✓ Abre ao terminar', news_c75_direct: '✨ Nova boas-vindas: você entra direto e o PETO Finanzas guia você por dentro, passo a passo. Categorias e pagamentos fixos em uma só tela, gráficos mais claros e Ajustes em oito cartões.', spend_ctx_below: 'Você está {amount} abaixo do ritmo do mês passado', spend_ctx_above: 'Você está {amount} acima do ritmo do mês passado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Segurança', sec_card_read: 'Conexão bancária somente leitura: nunca podemos mover seu dinheiro', sec_card_enc: 'Seus dados viajam e são guardados criptografados', sec_card_lock: 'Bloqueio com PIN e impressão digital', bud_per_semana: 'por semana', bud_per_quincena: 'por quinzena', bud_per_mes: 'por mês', spend_left_periods: 'Restam {amount} entre todos os seus períodos.', spend_x_periods: 'Cada categoria é dividida conforme seu próprio período:', spend_x_cat: '{cat} ({per}): restam {left} ÷ {days} dias = {daily} hoje', bud_period_aria: 'Período do limite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Orçamento', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
+  ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_pending_btn: '✓ Abre ao terminar', spend_ctx_below: 'Você está {amount} abaixo do ritmo do mês passado', spend_ctx_above: 'Você está {amount} acima do ritmo do mês passado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Segurança', sec_card_read: 'Conexão bancária somente leitura: nunca podemos mover seu dinheiro', sec_card_enc: 'Seus dados viajam e são guardados criptografados', sec_card_lock: 'Bloqueio com PIN e impressão digital', bud_per_semana: 'por semana', bud_per_quincena: 'por quinzena', bud_per_mes: 'por mês', spend_left_periods: 'Restam {amount} entre todos os seus períodos.', spend_x_periods: 'Cada categoria é dividida conforme seu próprio período:', spend_x_cat: '{cat} ({per}): restam {left} ÷ {days} dias = {daily} hoje', bud_period_aria: 'Período do limite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Orçamento', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
+  setup_title: 'Configurez votre PETO Finanzas',
+  setup_step_of: 'Étape {n} sur 3',
+  setup_step1_t: 'Créez votre compte',
+  setup_step1_d: 'Votre compte cloud garde votre argent synchronisé et vous permet de connecter votre banque.',
+  setup_step2_t: 'Créez votre PIN et activez l\'empreinte',
+  setup_step2_d: 'Un PIN de 4 à 6 chiffres protège votre appli ; une fois créé, vous pourrez activer l\'empreinte.',
+  setup_step3_t: 'Connectez votre banque',
+  setup_step3_d: 'Avec votre banque connectée, vos soldes et opérations se mettent à jour tout seuls. Vous pouvez le faire plus tard si vous préférez.',
+  setup_skip_step: 'Pas maintenant',
+  setup_skip_all: 'Tout passer',
+  setup_done: 'Terminé',
+  setup_email_ph: 'Votre e-mail',
+  setup_pass_ph: 'Mot de passe (6 minimum)',
+  setup_pin_ph: 'PIN (4 à 6 chiffres)',
+  setup_pin2_ph: 'Répétez le PIN',
+  setup_pin_btn: 'Enregistrer le PIN',
+  setup_bank_btn: 'Connecter la banque',
+  setup_account_btn: 'Créer un compte',
+  home_account_title: 'Créez votre compte PETO Finanzas',
+  home_account_text: 'Gardez votre argent dans le cloud, synchronisez entre appareils et connectez votre banque.',
+  home_account_btn: 'Créer un compte',
+  payfreq_label: 'Fréquence de paie',
+  payfreq_semanal: 'Hebdomadaire',
+  payfreq_quincenal: 'Toutes les deux semaines',
+  payfreq_mensual: 'Mensuelle',
+  payday_month_label: 'Jour du mois',
+  notif_payday_t: 'Demain, c\'est jour de paie',
+  notif_payday_b: 'Votre prochaine paie arrive demain.',
+  notif_card_t: 'Paiement de carte',
+  notif_card_b: '{name} : votre paiement est dû le {date}.',
+  exit_btn: 'Quitter',
+  mr_close: 'Fermer le rapport',
+  subs_title: 'Centre d\'abonnements',
+  subs_total_month: 'Total par mois',
+  subs_total_year: 'Total par an',
+  subs_hike: 'Le prix a augmenté',
+  subs_hike_d: 'Avant {old}, maintenant {new}',
+  subs_dup: 'Possible débit en double',
+  subs_trial: 'Possible essai fraîchement converti',
+  subs_in_fixed: 'Dans les paiements fixes',
+  subs_note: 'PETO Finanzas détecte et alerte seulement ; annuler un abonnement est votre décision auprès de chaque service.',
+  subs_per_month: 'par mois',
+  ants_title: 'Petites dépenses du quotidien',
+  ants_empty: 'Presque aucune petite dépense récemment : bravo.',
+  ants_month: 'En 30 jours',
+  ants_year_line: 'Elles vous coûtent {amount} par an',
+  ants_top_cat: 'Par catégorie',
+  ants_top_merch: 'Par magasin',
+  ants_count: '{n} achats',
+  ants_max_label: 'Achats jusqu\'à',
+  card_title: 'Vos cartes',
+  card_limit: 'Limite',
+  card_cut: 'Jour de relevé',
+  card_due: 'Jour d\'échéance du paiement',
+  card_is: 'C\'est une carte de crédit',
+  card_edit: 'Détails de la carte',
+  card_save: 'Enregistrer',
+  card_next_cut: 'Relevé : {date} (dans {n} jours)',
+  card_next_due: 'À payer avant le {date} (dans {n} jours)',
+  card_avail: 'Disponible',
+  card_debt: 'Dette',
+  card_none: 'Pas encore de cartes : marquez un compte comme carte ou modifiez une carte de votre banque.',
+  inst_btn: 'Enregistrer un achat en plusieurs fois',
+  inst_name: 'Nom de l\'achat',
+  inst_total: 'Montant total',
+  inst_n: 'Nombre de versements',
+  inst_day: 'Jour de paiement',
+  inst_card: 'Carte (facultatif)',
+  inst_none: 'Sans carte',
+  inst_create: 'Créer les versements',
+  inst_badge: 'Versement {a} sur {b}',
+  inst_created: 'Versements créés : {n} paiements de {amount}.',
+  inst_err_n: 'Les versements doivent être entre 2 et 60.',
+  inst_delete_confirm: 'Supprimer cet achat en plusieurs fois ? Ses paiements futurs seront retirés.',
+  flow_title: 'Flux de trésorerie futur',
+  flow_d30: '30 jours',
+  flow_d60: '60 jours',
+  flow_d90: '90 jours',
+  flow_start: 'Solde de départ',
+  flow_end: 'Solde final',
+  flow_min: 'Minimum : {amount} le {date}',
+  flow_neg: 'Attention : premier jour dans le rouge le {date}',
+  flow_ok: 'Aucun jour dans le rouge sur cette période',
+  flow_var_note: 'Inclut vos dépenses variables moyennes des 30 derniers jours comme estimation quotidienne.',
+  flow_income: 'Paie',
+  flow_no_events: 'Aucun mouvement prévu sur cette période.',
+  score_title: 'PETO Score',
+  score_sub: 'Votre santé financière d\'après les données de votre appli. Ce n\'est pas un bureau de crédit.',
+  score_f_budget: 'Budget respecté',
+  score_f_savings: 'Épargne de ce mois',
+  score_f_ontime: 'Paiements à temps',
+  score_f_debt: 'Dettes en baisse',
+  score_f_efund: 'Fonds d\'urgence',
+  score_h_budget: '{n} catégories sur {m} dans leur limite',
+  score_h_budget_none: 'Pas encore de limites : la moitié des points accordée',
+  score_h_savings: 'Vous avez épargné {pct}% de vos revenus',
+  score_h_savings_abs: 'Épargné ce mois : {amount}',
+  score_h_ontime: '{n} paiements sur {m} marqués à temps',
+  score_h_ontime_none: 'Aucun paiement dû ce mois-ci pour l\'instant',
+  score_h_debt_first: 'Votre première photo de dettes : le mois prochain comparera',
+  score_h_debt_zero: 'Sans dettes : continuez ainsi',
+  score_h_debt_down: 'Vos dettes ont baissé de {amount}',
+  score_h_debt_same: 'Vos dettes sont restées les mêmes',
+  score_h_debt_up: 'Vos dettes ont augmenté de {amount}',
+  score_h_efund: 'Couvre {pct}% d\'un mois de paiements',
+  fam_goals: 'Objectifs partagés',
+  fam_goal_empty: 'Pas encore d\'objectifs partagés.',
+  fam_goal_name: 'Nom de l\'objectif',
+  fam_goal_target: 'Objectif ($)',
+  fam_goal_add: 'Ajouter un objectif',
+  fam_contrib: 'Contribuer',
+  fam_iou: 'Qui doit à qui',
+  fam_iou_empty: 'Personne ne doit rien à personne.',
+  fam_iou_add: 'Noter une dette',
+  fam_iou_settle: 'Soldé',
+  fam_net_pos: 'on lui doit {amount}',
+  fam_net_neg: 'doit {amount}',
+  fam_note_ph: 'Note (facultatif)',
+  env_rollover: 'Enveloppe avec report',
+  env_carry_line: 'Report des mois précédents : {amount}',
+  env_zero: 'Mode base zéro',
+  env_zero_help: 'Attribuez vos limites (en équivalent mensuel) jusqu\'à ce que le revenu non attribué atteigne $0.',
+  env_zero_noincome: 'Ajoutez un revenu ce mois-ci pour voir ce qu\'il reste à attribuer.',
+  env_unassigned: 'Non attribué',
+  env_zero_ok: 'tout attribué',
+  pro_open_adv: 'Ouvrir le rapport avancé',
+  pro_open_org: 'Ouvrir le mode organisateur de san',
+  pin_err_mismatch: 'Les PIN ne correspondent pas.',
+  news_c76_direct: 'Nouveau dans PETO Finanzas : centre d\'abonnements, détecteur de petites dépenses, flux de trésorerie à 90 jours, PETO Score, achats en plusieurs fois, enveloppes avec report et assistant de démarrage en trois étapes.',
   org_err_san_name: 'Saisis le nom du san.', rep_promo_footer: 'Contrôle tes dépenses avec PETO Finanzas · petofinanzas.com', rep_saved: 'Image enregistrée.', set_sections_summary: '{visible} sur {total} visibles',
   org_err_active_exists: 'Il existe déjà un san actif (« {name} »). Supprime-le d’abord depuis sa fiche si tu veux en créer un autre.',
   app_title: 'PETO Finanzas', build_word: 'Build',
@@ -4467,9 +5198,138 @@ fr: {
   widget_san_next: 'Prochain tour : {name} · {date}',
   widget_san_next_nodate: 'Prochain tour : {name}',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.',
-  ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_pending_btn: '✓ S’ouvre à la fin', news_c75_direct: '✨ Nouvel accueil : tu entres directement et PETO Finanzas te guide à l\'intérieur, étape par étape. Catégories et paiements fixes dans une seule vue, graphiques plus clairs et Réglages en huit cartes.', spend_ctx_below: 'Vous êtes {amount} sous le rythme du mois dernier', spend_ctx_above: 'Vous êtes {amount} au-dessus du rythme du mois dernier', spend_ctx_bank: 'Banque connectée', sec_card_title: 'Sécurité', sec_card_read: 'Connexion bancaire en lecture seule : nous ne pouvons jamais déplacer votre argent', sec_card_enc: 'Vos données voyagent et sont stockées chiffrées', sec_card_lock: 'Verrouillage par code PIN et empreinte', bud_per_semana: 'par semaine', bud_per_quincena: 'par quinzaine', bud_per_mes: 'par mois', spend_left_periods: 'Il vous reste {amount} sur toutes vos périodes.', spend_x_periods: 'Chaque catégorie se répartit sur sa propre période :', spend_x_cat: '{cat} ({per}) : {left} restants ÷ {days} jours = {daily} aujourd’hui', bud_period_aria: 'Période de la limite pour {cat}', nav_gastos: 'Dépenses', nav_presupuesto: 'Budget', nav_ajustes: 'Réglages', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
+  ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_pending_btn: '✓ S’ouvre à la fin', spend_ctx_below: 'Vous êtes {amount} sous le rythme du mois dernier', spend_ctx_above: 'Vous êtes {amount} au-dessus du rythme du mois dernier', spend_ctx_bank: 'Banque connectée', sec_card_title: 'Sécurité', sec_card_read: 'Connexion bancaire en lecture seule : nous ne pouvons jamais déplacer votre argent', sec_card_enc: 'Vos données voyagent et sont stockées chiffrées', sec_card_lock: 'Verrouillage par code PIN et empreinte', bud_per_semana: 'par semaine', bud_per_quincena: 'par quinzaine', bud_per_mes: 'par mois', spend_left_periods: 'Il vous reste {amount} sur toutes vos périodes.', spend_x_periods: 'Chaque catégorie se répartit sur sa propre période :', spend_x_cat: '{cat} ({per}) : {left} restants ÷ {days} jours = {daily} aujourd’hui', bud_period_aria: 'Période de la limite pour {cat}', nav_gastos: 'Dépenses', nav_presupuesto: 'Budget', nav_ajustes: 'Réglages', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
+  setup_title: 'Richte dein PETO Finanzas ein',
+  setup_step_of: 'Schritt {n} von 3',
+  setup_step1_t: 'Erstelle dein Konto',
+  setup_step1_d: 'Dein Cloud-Konto hält dein Geld synchron und lässt dich deine Bank verbinden.',
+  setup_step2_t: 'Erstelle deine PIN und schalte den Fingerabdruck ein',
+  setup_step2_d: 'Eine 4- bis 6-stellige PIN schützt deine App; sobald sie besteht, kannst du den Fingerabdruck einschalten.',
+  setup_step3_t: 'Verbinde deine Bank',
+  setup_step3_d: 'Mit verbundener Bank aktualisieren sich Salden und Buchungen von selbst. Du kannst es später tun, wenn du möchtest.',
+  setup_skip_step: 'Jetzt nicht',
+  setup_skip_all: 'Alles überspringen',
+  setup_done: 'Fertig',
+  setup_email_ph: 'Deine E-Mail',
+  setup_pass_ph: 'Passwort (mindestens 6)',
+  setup_pin_ph: 'PIN (4 bis 6 Stellen)',
+  setup_pin2_ph: 'PIN wiederholen',
+  setup_pin_btn: 'PIN speichern',
+  setup_bank_btn: 'Bank verbinden',
+  setup_account_btn: 'Konto erstellen',
+  home_account_title: 'Erstelle dein PETO Finanzas Konto',
+  home_account_text: 'Bewahre dein Geld in der Cloud auf, synchronisiere zwischen Geräten und verbinde deine Bank.',
+  home_account_btn: 'Konto erstellen',
+  payfreq_label: 'Zahlungsrhythmus',
+  payfreq_semanal: 'Wöchentlich',
+  payfreq_quincenal: 'Alle zwei Wochen',
+  payfreq_mensual: 'Monatlich',
+  payday_month_label: 'Tag des Monats',
+  notif_payday_t: 'Morgen ist Zahltag',
+  notif_payday_b: 'Dein nächster Lohn kommt morgen an.',
+  notif_card_t: 'Kartenzahlung',
+  notif_card_b: '{name}: Deine Zahlung ist am {date} fällig.',
+  exit_btn: 'Beenden',
+  mr_close: 'Bericht schließen',
+  subs_title: 'Abo-Zentrale',
+  subs_total_month: 'Gesamt pro Monat',
+  subs_total_year: 'Gesamt pro Jahr',
+  subs_hike: 'Preis ist gestiegen',
+  subs_hike_d: 'War {old}, jetzt {new}',
+  subs_dup: 'Mögliche doppelte Abbuchung',
+  subs_trial: 'Mögliche gerade umgewandelte Testphase',
+  subs_in_fixed: 'In festen Zahlungen',
+  subs_note: 'PETO Finanzas erkennt und warnt nur; ein Abo zu kündigen ist deine Entscheidung beim jeweiligen Dienst.',
+  subs_per_month: 'pro Monat',
+  ants_title: 'Kleine Alltagsausgaben',
+  ants_empty: 'Kaum kleine Käufe in letzter Zeit: gut gemacht.',
+  ants_month: 'In 30 Tagen',
+  ants_year_line: 'Sie kosten dich {amount} im Jahr',
+  ants_top_cat: 'Nach Kategorie',
+  ants_top_merch: 'Nach Geschäft',
+  ants_count: '{n} Käufe',
+  ants_max_label: 'Käufe bis zu',
+  card_title: 'Deine Karten',
+  card_limit: 'Limit',
+  card_cut: 'Abrechnungstag',
+  card_due: 'Zahlungsfälligkeitstag',
+  card_is: 'Dies ist eine Kreditkarte',
+  card_edit: 'Kartendaten',
+  card_save: 'Speichern',
+  card_next_cut: 'Abrechnung: {date} (in {n} Tagen)',
+  card_next_due: 'Zahle bis {date} (in {n} Tagen)',
+  card_avail: 'Verfügbar',
+  card_debt: 'Schulden',
+  card_none: 'Noch keine Karten: Markiere ein Konto als Karte oder bearbeite eine Karte deiner Bank.',
+  inst_btn: 'Ratenkauf eintragen',
+  inst_name: 'Name des Kaufs',
+  inst_total: 'Gesamtbetrag',
+  inst_n: 'Anzahl der Raten',
+  inst_day: 'Zahlungstag',
+  inst_card: 'Karte (optional)',
+  inst_none: 'Keine Karte',
+  inst_create: 'Raten erstellen',
+  inst_badge: 'Rate {a} von {b}',
+  inst_created: 'Raten erstellt: {n} Zahlungen von {amount}.',
+  inst_err_n: 'Raten müssen zwischen 2 und 60 sein.',
+  inst_delete_confirm: 'Diesen Ratenkauf löschen? Seine künftigen Zahlungen werden entfernt.',
+  flow_title: 'Künftiger Geldfluss',
+  flow_d30: '30 Tage',
+  flow_d60: '60 Tage',
+  flow_d90: '90 Tage',
+  flow_start: 'Anfangssaldo',
+  flow_end: 'Endsaldo',
+  flow_min: 'Tiefststand: {amount} am {date}',
+  flow_neg: 'Achtung: erster Tag im Minus am {date}',
+  flow_ok: 'Kein Tag im Minus in diesem Zeitraum',
+  flow_var_note: 'Enthält deine durchschnittlichen variablen Ausgaben der letzten 30 Tage als tägliche Schätzung.',
+  flow_income: 'Lohn',
+  flow_no_events: 'Keine erwarteten Bewegungen in diesem Zeitraum.',
+  score_title: 'PETO Score',
+  score_sub: 'Deine finanzielle Gesundheit nach den Daten deiner App. Dies ist keine Kreditauskunftei.',
+  score_f_budget: 'Budget eingehalten',
+  score_f_savings: 'Ersparnis diesen Monat',
+  score_f_ontime: 'Zahlungen pünktlich',
+  score_f_debt: 'Schulden sinken',
+  score_f_efund: 'Notfallfonds',
+  score_h_budget: '{n} von {m} Kategorien innerhalb ihres Limits',
+  score_h_budget_none: 'Noch keine Limits: halbe Punkte vergeben',
+  score_h_savings: 'Du hast {pct}% deines Einkommens gespart',
+  score_h_savings_abs: 'Diesen Monat gespart: {amount}',
+  score_h_ontime: '{n} von {m} Zahlungen als pünktlich markiert',
+  score_h_ontime_none: 'Diesen Monat noch keine Zahlungen fällig',
+  score_h_debt_first: 'Dein erstes Schuldenfoto: Nächsten Monat wird verglichen',
+  score_h_debt_zero: 'Schuldenfrei: Bleib dabei',
+  score_h_debt_down: 'Deine Schulden sind um {amount} gesunken',
+  score_h_debt_same: 'Deine Schulden sind gleich geblieben',
+  score_h_debt_up: 'Deine Schulden sind um {amount} gestiegen',
+  score_h_efund: 'Deckt {pct}% eines Monats an Zahlungen',
+  fam_goals: 'Gemeinsame Ziele',
+  fam_goal_empty: 'Noch keine gemeinsamen Ziele.',
+  fam_goal_name: 'Name des Ziels',
+  fam_goal_target: 'Ziel ($)',
+  fam_goal_add: 'Ziel hinzufügen',
+  fam_contrib: 'Beitragen',
+  fam_iou: 'Wer schuldet wem',
+  fam_iou_empty: 'Niemand schuldet irgendetwas.',
+  fam_iou_add: 'Schuld notieren',
+  fam_iou_settle: 'Beglichen',
+  fam_net_pos: 'ihm/ihr werden {amount} geschuldet',
+  fam_net_neg: 'schuldet {amount}',
+  fam_note_ph: 'Notiz (optional)',
+  env_rollover: 'Umschlag mit Übertrag',
+  env_carry_line: 'Übertrag aus früheren Monaten: {amount}',
+  env_zero: 'Nullbasis-Modus',
+  env_zero_help: 'Weise deine Limits (monatlich gerechnet) zu, bis das nicht zugewiesene Einkommen $0 erreicht.',
+  env_zero_noincome: 'Trage diesen Monat ein Einkommen ein, um zu sehen, was noch zuzuweisen ist.',
+  env_unassigned: 'Nicht zugewiesen',
+  env_zero_ok: 'alles zugewiesen',
+  pro_open_adv: 'Erweiterten Bericht öffnen',
+  pro_open_org: 'San-Organizer-Modus öffnen',
+  pin_err_mismatch: 'Die PINs stimmen nicht überein.',
+  news_c76_direct: 'Neu in PETO Finanzas: Abo-Zentrale, Detektor für kleine Ausgaben, Geldfluss für 90 Tage, PETO Score, Ratenkäufe, Umschläge mit Übertrag und ein Start-Assistent in drei Schritten.',
   org_err_san_name: 'Gib den Namen des Sans ein.', rep_promo_footer: 'Kontrolliere deine Ausgaben mit PETO Finanzas · petofinanzas.com', rep_saved: 'Bild gespeichert.', set_sections_summary: '{visible} von {total} sichtbar',
   org_err_active_exists: 'Es gibt bereits einen aktiven San („{name}“). Lösche ihn zuerst auf seiner Karte, wenn du einen neuen erstellen willst.',
   app_title: 'PETO Finanzas', build_word: 'Build',
@@ -5188,9 +6048,138 @@ de: {
   widget_san_next: 'Nächster Zug: {name} · {date}',
   widget_san_next_nodate: 'Nächster Zug: {name}',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.',
-  ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_pending_btn: '✓ Öffnet sich am Ende', news_c75_direct: '✨ Neuer Start: Du steigst direkt ein und PETO Finanzas führt dich Schritt für Schritt durch die App. Kategorien und Fixzahlungen in einer Ansicht, klarere Grafiken und Einstellungen in acht Karten.', spend_ctx_below: 'Du liegst {amount} unter dem Tempo des Vormonats', spend_ctx_above: 'Du liegst {amount} über dem Tempo des Vormonats', spend_ctx_bank: 'Bank verbunden', sec_card_title: 'Sicherheit', sec_card_read: 'Bankverbindung nur lesend: Wir können Ihr Geld niemals bewegen', sec_card_enc: 'Ihre Daten werden verschlüsselt übertragen und gespeichert', sec_card_lock: 'Sperre mit PIN und Fingerabdruck', bud_per_semana: 'pro Woche', bud_per_quincena: 'pro zwei Wochen', bud_per_mes: 'pro Monat', spend_left_periods: 'Dir bleiben {amount} über alle deine Zeiträume.', spend_x_periods: 'Jede Kategorie wird über ihren eigenen Zeitraum verteilt:', spend_x_cat: '{cat} ({per}): {left} übrig ÷ {days} Tage = {daily} heute', bud_period_aria: 'Zeitraum des Limits für {cat}', nav_gastos: 'Ausgaben', nav_presupuesto: 'Budget', nav_ajustes: 'Einstellungen', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
+  ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_pending_btn: '✓ Öffnet sich am Ende', spend_ctx_below: 'Du liegst {amount} unter dem Tempo des Vormonats', spend_ctx_above: 'Du liegst {amount} über dem Tempo des Vormonats', spend_ctx_bank: 'Bank verbunden', sec_card_title: 'Sicherheit', sec_card_read: 'Bankverbindung nur lesend: Wir können Ihr Geld niemals bewegen', sec_card_enc: 'Ihre Daten werden verschlüsselt übertragen und gespeichert', sec_card_lock: 'Sperre mit PIN und Fingerabdruck', bud_per_semana: 'pro Woche', bud_per_quincena: 'pro zwei Wochen', bud_per_mes: 'pro Monat', spend_left_periods: 'Dir bleiben {amount} über alle deine Zeiträume.', spend_x_periods: 'Jede Kategorie wird über ihren eigenen Zeitraum verteilt:', spend_x_cat: '{cat} ({per}): {left} übrig ÷ {days} Tage = {daily} heute', bud_period_aria: 'Zeitraum des Limits für {cat}', nav_gastos: 'Ausgaben', nav_presupuesto: 'Budget', nav_ajustes: 'Einstellungen', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
+  setup_title: '设置你的 PETO Finanzas',
+  setup_step_of: '第 {n} 步，共 3 步',
+  setup_step1_t: '创建你的账户',
+  setup_step1_d: '你的云账户让你的资金保持同步，并让你连接银行。',
+  setup_step2_t: '创建 PIN 并开启指纹',
+  setup_step2_d: '4 到 6 位 PIN 保护你的应用；创建后即可开启指纹。',
+  setup_step3_t: '连接你的银行',
+  setup_step3_d: '连接银行后，你的余额和交易会自动更新。如果你愿意，也可以稍后再做。',
+  setup_skip_step: '暂不',
+  setup_skip_all: '全部跳过',
+  setup_done: '完成',
+  setup_email_ph: '你的邮箱',
+  setup_pass_ph: '密码（至少 6 位）',
+  setup_pin_ph: 'PIN（4 到 6 位）',
+  setup_pin2_ph: '重复输入 PIN',
+  setup_pin_btn: '保存 PIN',
+  setup_bank_btn: '连接银行',
+  setup_account_btn: '创建账户',
+  home_account_title: '创建你的 PETO Finanzas 账户',
+  home_account_text: '将你的资金保存在云端，在设备间同步，并连接你的银行。',
+  home_account_btn: '创建账户',
+  payfreq_label: '发薪频率',
+  payfreq_semanal: '每周',
+  payfreq_quincenal: '每两周',
+  payfreq_mensual: '每月',
+  payday_month_label: '每月几号',
+  notif_payday_t: '明天是发薪日',
+  notif_payday_b: '你的下一笔工资明天到账。',
+  notif_card_t: '卡片付款',
+  notif_card_b: '{name}：你的付款到期日为 {date}。',
+  exit_btn: '退出',
+  mr_close: '关闭报告',
+  subs_title: '订阅中心',
+  subs_total_month: '每月总计',
+  subs_total_year: '每年总计',
+  subs_hike: '价格上涨了',
+  subs_hike_d: '原来 {old}，现在 {new}',
+  subs_dup: '可能重复扣费',
+  subs_trial: '可能试用刚转为付费',
+  subs_in_fixed: '在固定付款中',
+  subs_note: 'PETO Finanzas 只负责检测和提醒；取消订阅由你在每个服务中自行决定。',
+  subs_per_month: '每月',
+  ants_title: '日常小额支出',
+  ants_empty: '最近几乎没有小额消费：做得好。',
+  ants_month: '30 天内',
+  ants_year_line: '它们一年让你花 {amount}',
+  ants_top_cat: '按类别',
+  ants_top_merch: '按商店',
+  ants_count: '{n} 笔消费',
+  ants_max_label: '消费最高达',
+  card_title: '你的卡片',
+  card_limit: '额度',
+  card_cut: '账单日',
+  card_due: '还款日',
+  card_is: '这是信用卡',
+  card_edit: '卡片详情',
+  card_save: '保存',
+  card_next_cut: '账单：{date}（{n} 天后）',
+  card_next_due: '请在 {date} 前付款（{n} 天后）',
+  card_avail: '可用',
+  card_debt: '欠款',
+  card_none: '还没有卡片：将一个账户标记为卡片，或编辑你银行的一张卡。',
+  inst_btn: '登记分期购买',
+  inst_name: '购买名称',
+  inst_total: '总金额',
+  inst_n: '分期期数',
+  inst_day: '付款日',
+  inst_card: '卡片（可选）',
+  inst_none: '无卡片',
+  inst_create: '创建分期',
+  inst_badge: '第 {a} 期，共 {b} 期',
+  inst_created: '分期已创建：{n} 笔付款，每笔 {amount}。',
+  inst_err_n: '分期期数必须在 2 到 60 之间。',
+  inst_delete_confirm: '删除这笔分期购买？其未来付款将被移除。',
+  flow_title: '未来现金流',
+  flow_d30: '30 天',
+  flow_d60: '60 天',
+  flow_d90: '90 天',
+  flow_start: '期初余额',
+  flow_end: '期末余额',
+  flow_min: '最低：{date} 为 {amount}',
+  flow_neg: '注意：{date} 首次出现负数',
+  flow_ok: '此期间没有任何一天为负数',
+  flow_var_note: '包含你过去 30 天的平均可变支出，作为每日估算。',
+  flow_income: '工资',
+  flow_no_events: '此期间没有预计的资金变动。',
+  score_title: 'PETO Score',
+  score_sub: '根据你的应用数据的财务健康状况。这不是征信机构。',
+  score_f_budget: '预算达标',
+  score_f_savings: '本月储蓄',
+  score_f_ontime: '按时付款',
+  score_f_debt: '债务下降',
+  score_f_efund: '应急基金',
+  score_h_budget: '{m} 个类别中有 {n} 个在限额内',
+  score_h_budget_none: '尚未设置限额：给予一半分数',
+  score_h_savings: '你存下了收入的 {pct}%',
+  score_h_savings_abs: '本月已存：{amount}',
+  score_h_ontime: '{m} 笔付款中有 {n} 笔标记为按时',
+  score_h_ontime_none: '本月尚无到期付款',
+  score_h_debt_first: '你的第一张债务快照：下个月将进行比较',
+  score_h_debt_zero: '无债务：保持下去',
+  score_h_debt_down: '你的债务减少了 {amount}',
+  score_h_debt_same: '你的债务保持不变',
+  score_h_debt_up: '你的债务增加了 {amount}',
+  score_h_efund: '覆盖一个月付款的 {pct}%',
+  fam_goals: '共同目标',
+  fam_goal_empty: '尚无共同目标。',
+  fam_goal_name: '目标名称',
+  fam_goal_target: '目标 ($)',
+  fam_goal_add: '添加目标',
+  fam_contrib: '贡献',
+  fam_iou: '谁欠谁',
+  fam_iou_empty: '没有人欠任何东西。',
+  fam_iou_add: '记一笔债务',
+  fam_iou_settle: '已结清',
+  fam_net_pos: '别人欠他/她 {amount}',
+  fam_net_neg: '欠 {amount}',
+  fam_note_ph: '备注（可选）',
+  env_rollover: '带结转的信封',
+  env_carry_line: '以前月份的结转：{amount}',
+  env_zero: '零基模式',
+  env_zero_help: '分配你的限额（按月计算），直到未分配收入达到 $0。',
+  env_zero_noincome: '本月添加一笔收入，查看还剩多少待分配。',
+  env_unassigned: '未分配',
+  env_zero_ok: '全部已分配',
+  pro_open_adv: '打开高级报告',
+  pro_open_org: '打开 san 组织模式',
+  pin_err_mismatch: 'PIN 不一致。',
+  news_c76_direct: 'PETO Finanzas 新功能：订阅中心、小额支出检测器、90 天现金流、PETO Score、分期购买、结转信封和三步启动助手。',
   org_err_san_name: '请输入 san 的名称。', rep_promo_footer: '用 PETO Finanzas 控制你的支出 · petofinanzas.com', rep_saved: '图片已保存。', set_sections_summary: '共 {total} 个，已显示 {visible} 个',
   org_err_active_exists: '已有一个正在进行的 san（“{name}”）。如需新建，请先在其卡片中删除它。',
   app_title: 'PETO Finanzas', build_word: '版本',
@@ -5909,9 +6898,138 @@ zh: {
   widget_san_next: '下一轮：{name} · {date}',
   widget_san_next_nodate: '下一轮：{name}',
   back_exit_hint: '再按一次返回即可退出。',
-  ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_pending_btn: '✓ 完成时打开', news_c75_direct: '✨ 全新欢迎页：直接进入，PETO Finanzas 在应用内一步步引导你。类别和固定支出集中在一处，图表更清晰，设置分为八张卡片。', spend_ctx_below: '你比上个月的节奏少了 {amount}', spend_ctx_above: '你比上个月的节奏多了 {amount}', spend_ctx_bank: '银行已连接', sec_card_title: '安全', sec_card_read: '银行连接为只读:我们永远无法动用你的资金', sec_card_enc: '你的数据在传输和存储时均已加密', sec_card_lock: 'PIN 和指纹锁定', bud_per_semana: '每周', bud_per_quincena: '每两周', bud_per_mes: '每月', spend_left_periods: '所有周期合计还剩 {amount}。', spend_x_periods: '每个类别按自己的周期分摊：', spend_x_cat: '{cat}（{per}）：剩 {left} ÷ {days} 天 = 今天 {daily}', bud_period_aria: '{cat} 的上限周期', nav_gastos: '支出', nav_presupuesto: '预算', nav_ajustes: '设置', ob_bio_label: '用指纹进入（如果我创建了 PIN）', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
+  ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_pending_btn: '✓ 完成时打开', spend_ctx_below: '你比上个月的节奏少了 {amount}', spend_ctx_above: '你比上个月的节奏多了 {amount}', spend_ctx_bank: '银行已连接', sec_card_title: '安全', sec_card_read: '银行连接为只读:我们永远无法动用你的资金', sec_card_enc: '你的数据在传输和存储时均已加密', sec_card_lock: 'PIN 和指纹锁定', bud_per_semana: '每周', bud_per_quincena: '每两周', bud_per_mes: '每月', spend_left_periods: '所有周期合计还剩 {amount}。', spend_x_periods: '每个类别按自己的周期分摊：', spend_x_cat: '{cat}（{per}）：剩 {left} ÷ {days} 天 = 今天 {daily}', bud_period_aria: '{cat} 的上限周期', nav_gastos: '支出', nav_presupuesto: '预算', nav_ajustes: '设置', ob_bio_label: '用指纹进入（如果我创建了 PIN）', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
+  setup_title: 'PETO Finanzas を設定',
+  setup_step_of: 'ステップ {n} / 3',
+  setup_step1_t: 'アカウントを作成',
+  setup_step1_d: 'クラウドアカウントでお金が同期され、銀行を接続できます。',
+  setup_step2_t: 'PINを作成し指紋を有効化',
+  setup_step2_d: '4〜6桁のPINがアプリを守ります。作成後に指紋を有効化できます。',
+  setup_step3_t: '銀行を接続',
+  setup_step3_d: '銀行を接続すると、残高と取引が自動で更新されます。お好みで後からでもできます。',
+  setup_skip_step: '今はしない',
+  setup_skip_all: 'すべてスキップ',
+  setup_done: '完了',
+  setup_email_ph: 'メールアドレス',
+  setup_pass_ph: 'パスワード（6文字以上）',
+  setup_pin_ph: 'PIN（4〜6桁）',
+  setup_pin2_ph: 'PINを再入力',
+  setup_pin_btn: 'PINを保存',
+  setup_bank_btn: '銀行を接続',
+  setup_account_btn: 'アカウントを作成',
+  home_account_title: 'PETO Finanzas アカウントを作成',
+  home_account_text: 'お金をクラウドに保管し、デバイス間で同期し、銀行を接続します。',
+  home_account_btn: 'アカウントを作成',
+  payfreq_label: '給料の頻度',
+  payfreq_semanal: '毎週',
+  payfreq_quincenal: '2週間ごと',
+  payfreq_mensual: '毎月',
+  payday_month_label: '月の日',
+  notif_payday_t: '明日は給料日です',
+  notif_payday_b: '次の給料は明日届きます。',
+  notif_card_t: 'カード支払い',
+  notif_card_b: '{name}：支払い期限は {date} です。',
+  exit_btn: '終了',
+  mr_close: 'レポートを閉じる',
+  subs_title: 'サブスクリプションセンター',
+  subs_total_month: '月合計',
+  subs_total_year: '年合計',
+  subs_hike: '価格が上がりました',
+  subs_hike_d: '以前 {old}、現在 {new}',
+  subs_dup: '重複請求の可能性',
+  subs_trial: 'トライアルが変換された可能性',
+  subs_in_fixed: '固定支払いに含まれます',
+  subs_note: 'PETO Finanzas は検出と警告のみを行います。サブスクリプションの解約は各サービスでご自身の判断です。',
+  subs_per_month: '月あたり',
+  ants_title: '日常の小さな支出',
+  ants_empty: '最近は小さな買い物がほとんどありません：よくできました。',
+  ants_month: '30日間',
+  ants_year_line: '年間 {amount} かかっています',
+  ants_top_cat: 'カテゴリ別',
+  ants_top_merch: '店舗別',
+  ants_count: '{n} 件の購入',
+  ants_max_label: '購入は最大',
+  card_title: 'あなたのカード',
+  card_limit: '限度額',
+  card_cut: '締め日',
+  card_due: '支払い期日',
+  card_is: 'これはクレジットカードです',
+  card_edit: 'カード詳細',
+  card_save: '保存',
+  card_next_cut: '締め：{date}（{n} 日後）',
+  card_next_due: '{date} までに支払い（{n} 日後）',
+  card_avail: '利用可能',
+  card_debt: '借金',
+  card_none: 'まだカードがありません：口座をカードとしてマークするか、銀行のカードを編集してください。',
+  inst_btn: '分割購入を登録',
+  inst_name: '購入名',
+  inst_total: '合計金額',
+  inst_n: '分割回数',
+  inst_day: '支払い日',
+  inst_card: 'カード（任意）',
+  inst_none: 'カードなし',
+  inst_create: '分割を作成',
+  inst_badge: '分割 {a} / {b}',
+  inst_created: '分割を作成しました：{amount} の支払い {n} 回。',
+  inst_err_n: '分割回数は 2〜60 の間でなければなりません。',
+  inst_delete_confirm: 'この分割購入を削除しますか？今後の支払いが削除されます。',
+  flow_title: '将来のキャッシュフロー',
+  flow_d30: '30日',
+  flow_d60: '60日',
+  flow_d90: '90日',
+  flow_start: '開始残高',
+  flow_end: '終了残高',
+  flow_min: '最低：{date} に {amount}',
+  flow_neg: '注意：{date} に初めてマイナスになります',
+  flow_ok: 'この期間にマイナスの日はありません',
+  flow_var_note: '過去30日間の平均変動支出を1日あたりの見積もりとして含みます。',
+  flow_income: '給料',
+  flow_no_events: 'この期間に予定された動きはありません。',
+  score_title: 'PETO Score',
+  score_sub: 'アプリのデータに基づくあなたの財務の健康状態。信用情報機関ではありません。',
+  score_f_budget: '予算を達成',
+  score_f_savings: '今月の貯蓄',
+  score_f_ontime: '期限内の支払い',
+  score_f_debt: '借金が減少',
+  score_f_efund: '緊急資金',
+  score_h_budget: '{m} カテゴリ中 {n} 件が上限内',
+  score_h_budget_none: 'まだ上限がありません：半分のポイントを付与',
+  score_h_savings: '収入の {pct}% を貯蓄しました',
+  score_h_savings_abs: '今月の貯蓄：{amount}',
+  score_h_ontime: '{m} 件中 {n} 件が期限内とマーク',
+  score_h_ontime_none: '今月はまだ支払い期限がありません',
+  score_h_debt_first: '最初の借金スナップショット：来月から比較します',
+  score_h_debt_zero: '借金なし：そのまま続けましょう',
+  score_h_debt_down: '借金が {amount} 減りました',
+  score_h_debt_same: '借金は変わりませんでした',
+  score_h_debt_up: '借金が {amount} 増えました',
+  score_h_efund: '1か月分の支払いの {pct}% をカバー',
+  fam_goals: '共有目標',
+  fam_goal_empty: 'まだ共有目標がありません。',
+  fam_goal_name: '目標名',
+  fam_goal_target: '目標 ($)',
+  fam_goal_add: '目標を追加',
+  fam_contrib: '拠出',
+  fam_iou: '誰が誰に借りがあるか',
+  fam_iou_empty: '誰も何も借りていません。',
+  fam_iou_add: '借金を記録',
+  fam_iou_settle: '清算済み',
+  fam_net_pos: '{amount} 貸しています',
+  fam_net_neg: '{amount} 借りています',
+  fam_note_ph: 'メモ（任意）',
+  env_rollover: '繰り越し付き封筒',
+  env_carry_line: '前月からの繰り越し：{amount}',
+  env_zero: 'ゼロベースモード',
+  env_zero_help: '未割り当ての収入が $0 になるまで上限（月換算）を割り当てます。',
+  env_zero_noincome: '今月の収入を追加すると、割り当て残りが見えます。',
+  env_unassigned: '未割り当て',
+  env_zero_ok: 'すべて割り当て済み',
+  pro_open_adv: '高度なレポートを開く',
+  pro_open_org: 'san オーガナイザーモードを開く',
+  pin_err_mismatch: 'PINが一致しません。',
+  news_c76_direct: 'PETO Finanzas の新機能：サブスクリプションセンター、小さな支出検出、90日キャッシュフロー、PETO Score、分割購入、繰り越し封筒、3ステップ開始アシスタント。',
   org_err_san_name: 'sanの名前を入力してください。', rep_promo_footer: 'PETO Finanzasで支出を管理しよう · petofinanzas.com', rep_saved: '画像を保存しました。', set_sections_summary: '{total}件中{visible}件を表示',
   org_err_active_exists: 'すでにアクティブな san（「{name}」）があります。新しく作るには、まずそのカードから削除してください。',
   app_title: 'PETO Finanzas', build_word: 'ビルド',
@@ -6630,9 +7748,138 @@ ja: {
   widget_san_next: '次のターン：{name} · {date}',
   widget_san_next_nodate: '次のターン：{name}',
   back_exit_hint: 'もう一度戻るを押すと終了します。',
-  ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_pending_btn: '✓ 終了時に開きます', news_c75_direct: '✨ 新しいウェルカム画面：すぐに入れて、PETO Finanzas がアプリ内で一歩ずつ案内します。カテゴリと固定費が1つの画面に、グラフはより見やすく、設定は8枚のカードに。', spend_ctx_below: '先月のペースより {amount} 下回っています', spend_ctx_above: '先月のペースより {amount} 上回っています', spend_ctx_bank: '銀行が接続されています', sec_card_title: 'セキュリティ', sec_card_read: '銀行接続は読み取り専用:あなたの資金を動かすことは決してできません', sec_card_enc: 'データは暗号化されて送信・保存されます', sec_card_lock: 'PINと指紋によるロック', bud_per_semana: '週ごと', bud_per_quincena: '2週間ごと', bud_per_mes: '月ごと', spend_left_periods: 'すべての期間を合わせて、残りは {amount} です。', spend_x_periods: '各カテゴリはそれぞれの期間で按分されます：', spend_x_cat: '{cat}（{per}）：残り {left} ÷ {days} 日 = 今日 {daily}', bud_period_aria: '{cat}の上限期間', nav_gastos: '支出', nav_presupuesto: '予算', nav_ajustes: '設定', ob_bio_label: '指紋で入る（PIN を作成した場合）', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
+  ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_pending_btn: '✓ 終了時に開きます', spend_ctx_below: '先月のペースより {amount} 下回っています', spend_ctx_above: '先月のペースより {amount} 上回っています', spend_ctx_bank: '銀行が接続されています', sec_card_title: 'セキュリティ', sec_card_read: '銀行接続は読み取り専用:あなたの資金を動かすことは決してできません', sec_card_enc: 'データは暗号化されて送信・保存されます', sec_card_lock: 'PINと指紋によるロック', bud_per_semana: '週ごと', bud_per_quincena: '2週間ごと', bud_per_mes: '月ごと', spend_left_periods: 'すべての期間を合わせて、残りは {amount} です。', spend_x_periods: '各カテゴリはそれぞれの期間で按分されます：', spend_x_cat: '{cat}（{per}）：残り {left} ÷ {days} 日 = 今日 {daily}', bud_period_aria: '{cat}の上限期間', nav_gastos: '支出', nav_presupuesto: '予算', nav_ajustes: '設定', ob_bio_label: '指紋で入る（PIN を作成した場合）', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
+  setup_title: 'PETO Finanzas 설정하기',
+  setup_step_of: '3단계 중 {n}단계',
+  setup_step1_t: '계정 만들기',
+  setup_step1_d: '클라우드 계정이 돈을 동기화 상태로 유지하고 은행을 연결할 수 있게 합니다.',
+  setup_step2_t: 'PIN을 만들고 지문 켜기',
+  setup_step2_d: '4~6자리 PIN이 앱을 보호합니다. PIN이 생기면 지문을 켤 수 있습니다.',
+  setup_step3_t: '은행 연결하기',
+  setup_step3_d: '은행이 연결되면 잔액과 거래가 자동으로 업데이트됩니다. 원하면 나중에 해도 됩니다.',
+  setup_skip_step: '지금은 안 함',
+  setup_skip_all: '모두 건너뛰기',
+  setup_done: '완료',
+  setup_email_ph: '이메일',
+  setup_pass_ph: '비밀번호 (최소 6자)',
+  setup_pin_ph: 'PIN (4~6자리)',
+  setup_pin2_ph: 'PIN 다시 입력',
+  setup_pin_btn: 'PIN 저장',
+  setup_bank_btn: '은행 연결',
+  setup_account_btn: '계정 만들기',
+  home_account_title: 'PETO Finanzas 계정 만들기',
+  home_account_text: '돈을 클라우드에 보관하고, 기기 간 동기화하고, 은행을 연결하세요.',
+  home_account_btn: '계정 만들기',
+  payfreq_label: '급여 주기',
+  payfreq_semanal: '매주',
+  payfreq_quincenal: '2주마다',
+  payfreq_mensual: '매월',
+  payday_month_label: '월 중 날짜',
+  notif_payday_t: '내일이 급여일입니다',
+  notif_payday_b: '다음 급여가 내일 들어옵니다.',
+  notif_card_t: '카드 결제',
+  notif_card_b: '{name}: 결제 기한은 {date}입니다.',
+  exit_btn: '나가기',
+  mr_close: '보고서 닫기',
+  subs_title: '구독 센터',
+  subs_total_month: '월 총액',
+  subs_total_year: '연 총액',
+  subs_hike: '가격이 올랐습니다',
+  subs_hike_d: '이전 {old}, 현재 {new}',
+  subs_dup: '중복 청구 가능성',
+  subs_trial: '체험이 방금 전환됐을 가능성',
+  subs_in_fixed: '고정 결제에 포함',
+  subs_note: 'PETO Finanzas는 감지와 알림만 합니다. 구독 취소는 각 서비스에서 본인이 결정합니다.',
+  subs_per_month: '월별',
+  ants_title: '일상 속 작은 지출',
+  ants_empty: '최근 작은 구매가 거의 없습니다: 잘하셨어요.',
+  ants_month: '30일 동안',
+  ants_year_line: '연간 {amount}가 듭니다',
+  ants_top_cat: '카테고리별',
+  ants_top_merch: '상점별',
+  ants_count: '구매 {n}건',
+  ants_max_label: '최대 구매',
+  card_title: '내 카드',
+  card_limit: '한도',
+  card_cut: '결제일 (명세서)',
+  card_due: '납부일',
+  card_is: '신용카드입니다',
+  card_edit: '카드 정보',
+  card_save: '저장',
+  card_next_cut: '명세서: {date} ({n}일 후)',
+  card_next_due: '{date}까지 납부 ({n}일 후)',
+  card_avail: '사용 가능',
+  card_debt: '빚',
+  card_none: '아직 카드가 없습니다: 계정을 카드로 표시하거나 은행 카드 중 하나를 편집하세요.',
+  inst_btn: '할부 구매 등록',
+  inst_name: '구매 이름',
+  inst_total: '총 금액',
+  inst_n: '할부 횟수',
+  inst_day: '납부일',
+  inst_card: '카드 (선택)',
+  inst_none: '카드 없음',
+  inst_create: '할부 만들기',
+  inst_badge: '할부 {a} / {b}',
+  inst_created: '할부가 만들어졌습니다: {amount}씩 {n}회 납부.',
+  inst_err_n: '할부는 2~60회 사이여야 합니다.',
+  inst_delete_confirm: '이 할부 구매를 삭제할까요? 향후 납부가 제거됩니다.',
+  flow_title: '미래 현금 흐름',
+  flow_d30: '30일',
+  flow_d60: '60일',
+  flow_d90: '90일',
+  flow_start: '시작 잔액',
+  flow_end: '종료 잔액',
+  flow_min: '최저: {date}에 {amount}',
+  flow_neg: '주의: {date}에 처음 마이너스가 됩니다',
+  flow_ok: '이 기간에 마이너스인 날이 없습니다',
+  flow_var_note: '최근 30일 평균 변동 지출을 일일 추정치로 포함합니다.',
+  flow_income: '급여',
+  flow_no_events: '이 기간에 예상되는 움직임이 없습니다.',
+  score_title: 'PETO Score',
+  score_sub: '앱 데이터를 바탕으로 한 재무 건강 상태입니다. 신용조회 기관이 아닙니다.',
+  score_f_budget: '예산 준수',
+  score_f_savings: '이번 달 저축',
+  score_f_ontime: '제때 납부',
+  score_f_debt: '빚 감소',
+  score_f_efund: '비상금',
+  score_h_budget: '{m}개 카테고리 중 {n}개가 한도 내',
+  score_h_budget_none: '아직 한도가 없습니다: 절반 점수 부여',
+  score_h_savings: '소득의 {pct}%를 저축했습니다',
+  score_h_savings_abs: '이번 달 저축: {amount}',
+  score_h_ontime: '{m}건 중 {n}건이 제때 납부로 표시됨',
+  score_h_ontime_none: '이번 달 아직 납부 기한이 없습니다',
+  score_h_debt_first: '첫 빚 스냅샷: 다음 달부터 비교합니다',
+  score_h_debt_zero: '빚 없음: 계속 유지하세요',
+  score_h_debt_down: '빚이 {amount} 줄었습니다',
+  score_h_debt_same: '빚이 그대로입니다',
+  score_h_debt_up: '빚이 {amount} 늘었습니다',
+  score_h_efund: '한 달 납부액의 {pct}%를 커버합니다',
+  fam_goals: '공유 목표',
+  fam_goal_empty: '아직 공유 목표가 없습니다.',
+  fam_goal_name: '목표 이름',
+  fam_goal_target: '목표 ($)',
+  fam_goal_add: '목표 추가',
+  fam_contrib: '기여하기',
+  fam_iou: '누가 누구에게 빚졌는지',
+  fam_iou_empty: '아무도 빚진 것이 없습니다.',
+  fam_iou_add: '빚 기록하기',
+  fam_iou_settle: '정산 완료',
+  fam_net_pos: '{amount}를 받을 예정입니다',
+  fam_net_neg: '{amount}를 빚졌습니다',
+  fam_note_ph: '메모 (선택)',
+  env_rollover: '이월 봉투',
+  env_carry_line: '이전 달 이월: {amount}',
+  env_zero: '제로베이스 모드',
+  env_zero_help: '미배정 소득이 $0가 될 때까지 한도(월 환산)를 배정하세요.',
+  env_zero_noincome: '이번 달 소득을 추가하면 배정할 금액이 보입니다.',
+  env_unassigned: '미배정',
+  env_zero_ok: '모두 배정됨',
+  pro_open_adv: '고급 보고서 열기',
+  pro_open_org: 'san 정리 모드 열기',
+  pin_err_mismatch: 'PIN이 일치하지 않습니다.',
+  news_c76_direct: 'PETO Finanzas 새 기능: 구독 센터, 작은 지출 탐지기, 90일 현금 흐름, PETO Score, 할부 구매, 이월 봉투, 3단계 시작 도우미.',
   org_err_san_name: 'san 이름을 입력하세요.', rep_promo_footer: 'PETO Finanzas로 지출을 관리하세요 · petofinanzas.com', rep_saved: '이미지가 저장되었습니다.', set_sections_summary: '{total}개 중 {visible}개 표시',
   org_err_active_exists: '이미 활성 san("{name}")이 있습니다. 새로 만들려면 먼저 해당 카드에서 삭제하세요.',
   app_title: 'PETO Finanzas', build_word: '빌드',
@@ -7351,9 +8598,138 @@ ko: {
   widget_san_next: '다음 차례: {name} · {date}',
   widget_san_next_nodate: '다음 차례: {name}',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.',
-  ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_pending_btn: '✓ 마칠 때 열립니다', news_c75_direct: '✨ 새로운 시작 화면: 바로 들어가면 PETO Finanzas가 앱 안에서 단계별로 안내합니다. 카테고리와 고정 지출이 한 화면에, 그래프는 더 선명하게, 설정은 8개의 카드로.', spend_ctx_below: '지난달 페이스보다 {amount} 아래입니다', spend_ctx_above: '지난달 페이스보다 {amount} 위입니다', spend_ctx_bank: '은행 연결됨', sec_card_title: '보안', sec_card_read: '은행 연결은 읽기 전용: 자금을 절대 이동할 수 없습니다', sec_card_enc: '데이터는 암호화되어 전송되고 저장됩니다', sec_card_lock: 'PIN 및 지문 잠금', bud_per_semana: '주당', bud_per_quincena: '2주당', bud_per_mes: '월당', spend_left_periods: '모든 기간을 합쳐 {amount} 남았습니다.', spend_x_periods: '각 카테고리는 자신의 기간에 맞춰 나뉩니다:', spend_x_cat: '{cat} ({per}): {left} 남음 ÷ {days}일 = 오늘 {daily}', bud_period_aria: '{cat} 한도 기간', nav_gastos: '지출', nav_presupuesto: '예산', nav_ajustes: '설정', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
+  ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_pending_btn: '✓ 마칠 때 열립니다', spend_ctx_below: '지난달 페이스보다 {amount} 아래입니다', spend_ctx_above: '지난달 페이스보다 {amount} 위입니다', spend_ctx_bank: '은행 연결됨', sec_card_title: '보안', sec_card_read: '은행 연결은 읽기 전용: 자금을 절대 이동할 수 없습니다', sec_card_enc: '데이터는 암호화되어 전송되고 저장됩니다', sec_card_lock: 'PIN 및 지문 잠금', bud_per_semana: '주당', bud_per_quincena: '2주당', bud_per_mes: '월당', spend_left_periods: '모든 기간을 합쳐 {amount} 남았습니다.', spend_x_periods: '각 카테고리는 자신의 기간에 맞춰 나뉩니다:', spend_x_cat: '{cat} ({per}): {left} 남음 ÷ {days}일 = 오늘 {daily}', bud_period_aria: '{cat} 한도 기간', nav_gastos: '지출', nav_presupuesto: '예산', nav_ajustes: '설정', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
+  setup_title: 'Настройте ваш PETO Finanzas',
+  setup_step_of: 'Шаг {n} из 3',
+  setup_step1_t: 'Создайте аккаунт',
+  setup_step1_d: 'Ваш облачный аккаунт синхронизирует ваши деньги и позволяет подключить банк.',
+  setup_step2_t: 'Создайте PIN и включите отпечаток',
+  setup_step2_d: 'PIN из 4–6 цифр защищает ваше приложение; после его создания можно включить отпечаток.',
+  setup_step3_t: 'Подключите банк',
+  setup_step3_d: 'С подключённым банком балансы и операции обновляются сами. Можно сделать это позже, если хотите.',
+  setup_skip_step: 'Не сейчас',
+  setup_skip_all: 'Пропустить всё',
+  setup_done: 'Готово',
+  setup_email_ph: 'Ваш e-mail',
+  setup_pass_ph: 'Пароль (минимум 6)',
+  setup_pin_ph: 'PIN (4–6 цифр)',
+  setup_pin2_ph: 'Повторите PIN',
+  setup_pin_btn: 'Сохранить PIN',
+  setup_bank_btn: 'Подключить банк',
+  setup_account_btn: 'Создать аккаунт',
+  home_account_title: 'Создайте аккаунт PETO Finanzas',
+  home_account_text: 'Храните деньги в облаке, синхронизируйте между устройствами и подключайте банк.',
+  home_account_btn: 'Создать аккаунт',
+  payfreq_label: 'Частота выплат',
+  payfreq_semanal: 'Еженедельно',
+  payfreq_quincenal: 'Каждые две недели',
+  payfreq_mensual: 'Ежемесячно',
+  payday_month_label: 'День месяца',
+  notif_payday_t: 'Завтра день зарплаты',
+  notif_payday_b: 'Ваша следующая зарплата придёт завтра.',
+  notif_card_t: 'Платёж по карте',
+  notif_card_b: '{name}: срок вашего платежа — {date}.',
+  exit_btn: 'Выйти',
+  mr_close: 'Закрыть отчёт',
+  subs_title: 'Центр подписок',
+  subs_total_month: 'Итого в месяц',
+  subs_total_year: 'Итого в год',
+  subs_hike: 'Цена выросла',
+  subs_hike_d: 'Было {old}, теперь {new}',
+  subs_dup: 'Возможное двойное списание',
+  subs_trial: 'Возможная пробная версия только что конвертировалась',
+  subs_in_fixed: 'В фиксированных платежах',
+  subs_note: 'PETO Finanzas только обнаруживает и предупреждает; отмена подписки — ваше решение в каждом сервисе.',
+  subs_per_month: 'в месяц',
+  ants_title: 'Мелкие повседневные траты',
+  ants_empty: 'Почти нет мелких покупок в последнее время: отлично.',
+  ants_month: 'За 30 дней',
+  ants_year_line: 'Они обходятся вам в {amount} в год',
+  ants_top_cat: 'По категориям',
+  ants_top_merch: 'По магазинам',
+  ants_count: '{n} покупок',
+  ants_max_label: 'Покупки до',
+  card_title: 'Ваши карты',
+  card_limit: 'Лимит',
+  card_cut: 'День выписки',
+  card_due: 'День платежа',
+  card_is: 'Это кредитная карта',
+  card_edit: 'Данные карты',
+  card_save: 'Сохранить',
+  card_next_cut: 'Выписка: {date} (через {n} дней)',
+  card_next_due: 'Оплатите до {date} (через {n} дней)',
+  card_avail: 'Доступно',
+  card_debt: 'Долг',
+  card_none: 'Карт пока нет: отметьте счёт как карту или отредактируйте карту вашего банка.',
+  inst_btn: 'Записать покупку в рассрочку',
+  inst_name: 'Название покупки',
+  inst_total: 'Общая сумма',
+  inst_n: 'Количество взносов',
+  inst_day: 'День платежа',
+  inst_card: 'Карта (необязательно)',
+  inst_none: 'Без карты',
+  inst_create: 'Создать рассрочку',
+  inst_badge: 'Взнос {a} из {b}',
+  inst_created: 'Рассрочка создана: {n} платежей по {amount}.',
+  inst_err_n: 'Количество взносов должно быть от 2 до 60.',
+  inst_delete_confirm: 'Удалить эту покупку в рассрочку? Её будущие платежи будут удалены.',
+  flow_title: 'Будущий денежный поток',
+  flow_d30: '30 дней',
+  flow_d60: '60 дней',
+  flow_d90: '90 дней',
+  flow_start: 'Начальный баланс',
+  flow_end: 'Конечный баланс',
+  flow_min: 'Минимум: {amount} {date}',
+  flow_neg: 'Внимание: первый день в минусе {date}',
+  flow_ok: 'Ни одного дня в минусе за этот период',
+  flow_var_note: 'Включает ваши средние переменные траты за последние 30 дней как ежедневную оценку.',
+  flow_income: 'Зарплата',
+  flow_no_events: 'Нет ожидаемых движений за этот период.',
+  score_title: 'PETO Score',
+  score_sub: 'Ваше финансовое здоровье по данным приложения. Это не кредитное бюро.',
+  score_f_budget: 'Бюджет соблюдён',
+  score_f_savings: 'Сбережения за месяц',
+  score_f_ontime: 'Платежи вовремя',
+  score_f_debt: 'Долги снижаются',
+  score_f_efund: 'Резервный фонд',
+  score_h_budget: '{n} из {m} категорий в пределах лимита',
+  score_h_budget_none: 'Лимитов пока нет: начислена половина баллов',
+  score_h_savings: 'Вы отложили {pct}% вашего дохода',
+  score_h_savings_abs: 'Отложено за месяц: {amount}',
+  score_h_ontime: '{n} из {m} платежей отмечены вовремя',
+  score_h_ontime_none: 'В этом месяце платежей к сроку пока нет',
+  score_h_debt_first: 'Ваш первый снимок долгов: в следующем месяце уже сравним',
+  score_h_debt_zero: 'Без долгов: так держать',
+  score_h_debt_down: 'Ваши долги уменьшились на {amount}',
+  score_h_debt_same: 'Ваши долги остались прежними',
+  score_h_debt_up: 'Ваши долги выросли на {amount}',
+  score_h_efund: 'Покрывает {pct}% одного месяца платежей',
+  fam_goals: 'Общие цели',
+  fam_goal_empty: 'Общих целей пока нет.',
+  fam_goal_name: 'Название цели',
+  fam_goal_target: 'Цель ($)',
+  fam_goal_add: 'Добавить цель',
+  fam_contrib: 'Внести',
+  fam_iou: 'Кто кому должен',
+  fam_iou_empty: 'Никто никому ничего не должен.',
+  fam_iou_add: 'Записать долг',
+  fam_iou_settle: 'Погашено',
+  fam_net_pos: 'ему/ей должны {amount}',
+  fam_net_neg: 'должен {amount}',
+  fam_note_ph: 'Заметка (необязательно)',
+  env_rollover: 'Конверт с переносом',
+  env_carry_line: 'Перенос из предыдущих месяцев: {amount}',
+  env_zero: 'Режим нулевой базы',
+  env_zero_help: 'Распределяйте лимиты (в месячном эквиваленте), пока нераспределённый доход не достигнет $0.',
+  env_zero_noincome: 'Добавьте доход в этом месяце, чтобы увидеть, что осталось распределить.',
+  env_unassigned: 'Не распределено',
+  env_zero_ok: 'всё распределено',
+  pro_open_adv: 'Открыть расширенный отчёт',
+  pro_open_org: 'Открыть режим организатора san',
+  pin_err_mismatch: 'PIN не совпадают.',
+  news_c76_direct: 'Новое в PETO Finanzas: центр подписок, детектор мелких трат, денежный поток на 90 дней, PETO Score, покупки в рассрочку, конверты с переносом и помощник запуска в три шага.',
   org_err_san_name: 'Введите название сана.', rep_promo_footer: 'Контролируйте свои расходы с PETO Finanzas · petofinanzas.com', rep_saved: 'Изображение сохранено.', set_sections_summary: 'Видимо {visible} из {total}',
   org_err_active_exists: 'Уже есть активный san («{name}»). Сначала удалите его на его карточке, если хотите создать другой.',
   app_title: 'PETO Finanzas', build_word: 'Сборка',
@@ -8072,9 +9448,138 @@ ru: {
   widget_san_next: 'Следующий ход: {name} · {date}',
   widget_san_next_nodate: 'Следующий ход: {name}',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.',
-  ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_pending_btn: '✓ Откроется в конце', news_c75_direct: '✨ Новый стартовый экран: вы сразу попадаете внутрь, и PETO Finanzas ведёт вас по приложению шаг за шагом. Категории и фиксированные платежи в одном месте, графики понятнее, а настройки — в восьми карточках.', spend_ctx_below: 'Вы на {amount} ниже темпа прошлого месяца', spend_ctx_above: 'Вы на {amount} выше темпа прошлого месяца', spend_ctx_bank: 'Банк подключён', sec_card_title: 'Безопасность', sec_card_read: 'Банковское подключение только для чтения: мы никогда не можем перемещать ваши деньги', sec_card_enc: 'Ваши данные передаются и хранятся в зашифрованном виде', sec_card_lock: 'Блокировка по PIN-коду и отпечатку', bud_per_semana: 'в неделю', bud_per_quincena: 'за две недели', bud_per_mes: 'в месяц', spend_left_periods: 'По всем периодам у вас осталось {amount}.', spend_x_periods: 'Каждая категория распределяется по своему периоду:', spend_x_cat: '{cat} ({per}): осталось {left} ÷ {days} дн. = {daily} сегодня', bud_period_aria: 'Период лимита для {cat}', nav_gastos: 'Расходы', nav_presupuesto: 'Бюджет', nav_ajustes: 'Настройки', ob_bio_label: 'Вход по отпечатку (если создам PIN)', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
+  ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_pending_btn: '✓ Откроется в конце', spend_ctx_below: 'Вы на {amount} ниже темпа прошлого месяца', spend_ctx_above: 'Вы на {amount} выше темпа прошлого месяца', spend_ctx_bank: 'Банк подключён', sec_card_title: 'Безопасность', sec_card_read: 'Банковское подключение только для чтения: мы никогда не можем перемещать ваши деньги', sec_card_enc: 'Ваши данные передаются и хранятся в зашифрованном виде', sec_card_lock: 'Блокировка по PIN-коду и отпечатку', bud_per_semana: 'в неделю', bud_per_quincena: 'за две недели', bud_per_mes: 'в месяц', spend_left_periods: 'По всем периодам у вас осталось {amount}.', spend_x_periods: 'Каждая категория распределяется по своему периоду:', spend_x_cat: '{cat} ({per}): осталось {left} ÷ {days} дн. = {daily} сегодня', bud_period_aria: 'Период лимита для {cat}', nav_gastos: 'Расходы', nav_presupuesto: 'Бюджет', nav_ajustes: 'Настройки', ob_bio_label: 'Вход по отпечатку (если создам PIN)', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
+  setup_title: 'अपना PETO Finanzas सेट करें',
+  setup_step_of: 'चरण {n} / 3',
+  setup_step1_t: 'अपना खाता बनाएं',
+  setup_step1_d: 'आपका क्लाउड खाता आपके पैसे को सिंक रखता है और आपको अपना बैंक जोड़ने देता है।',
+  setup_step2_t: 'अपना PIN बनाएं और फ़िंगरप्रिंट चालू करें',
+  setup_step2_d: '4 से 6 अंकों का PIN आपके ऐप की सुरक्षा करता है; PIN बन जाने पर आप फ़िंगरप्रिंट चालू कर सकते हैं।',
+  setup_step3_t: 'अपना बैंक जोड़ें',
+  setup_step3_d: 'बैंक जुड़ने पर आपके बैलेंस और लेन-देन अपने आप अपडेट होते हैं। चाहें तो बाद में भी कर सकते हैं।',
+  setup_skip_step: 'अभी नहीं',
+  setup_skip_all: 'सब छोड़ें',
+  setup_done: 'हो गया',
+  setup_email_ph: 'आपका ईमेल',
+  setup_pass_ph: 'पासवर्ड (कम से कम 6)',
+  setup_pin_ph: 'PIN (4 से 6 अंक)',
+  setup_pin2_ph: 'PIN दोहराएं',
+  setup_pin_btn: 'PIN सहेजें',
+  setup_bank_btn: 'बैंक जोड़ें',
+  setup_account_btn: 'खाता बनाएं',
+  home_account_title: 'अपना PETO Finanzas खाता बनाएं',
+  home_account_text: 'अपने पैसे को क्लाउड में रखें, डिवाइसों में सिंक करें और अपना बैंक जोड़ें।',
+  home_account_btn: 'खाता बनाएं',
+  payfreq_label: 'वेतन की आवृत्ति',
+  payfreq_semanal: 'साप्ताहिक',
+  payfreq_quincenal: 'हर दो सप्ताह',
+  payfreq_mensual: 'मासिक',
+  payday_month_label: 'महीने का दिन',
+  notif_payday_t: 'कल वेतन दिवस है',
+  notif_payday_b: 'आपका अगला वेतन कल आएगा।',
+  notif_card_t: 'कार्ड भुगतान',
+  notif_card_b: '{name}: आपका भुगतान {date} को देय है।',
+  exit_btn: 'बाहर निकलें',
+  mr_close: 'रिपोर्ट बंद करें',
+  subs_title: 'सदस्यता केंद्र',
+  subs_total_month: 'प्रति माह कुल',
+  subs_total_year: 'प्रति वर्ष कुल',
+  subs_hike: 'कीमत बढ़ गई',
+  subs_hike_d: 'पहले {old}, अब {new}',
+  subs_dup: 'संभावित दोहरा शुल्क',
+  subs_trial: 'संभावित ट्रायल अभी बदला गया',
+  subs_in_fixed: 'निश्चित भुगतानों में',
+  subs_note: 'PETO Finanzas केवल पता लगाता है और चेतावनी देता है; सदस्यता रद्द करना प्रत्येक सेवा पर आपका निर्णय है।',
+  subs_per_month: 'प्रति माह',
+  ants_title: 'रोज़मर्रा का छोटा खर्च',
+  ants_empty: 'हाल में लगभग कोई छोटी खरीद नहीं: बहुत बढ़िया।',
+  ants_month: '30 दिनों में',
+  ants_year_line: 'इन पर आपको साल में {amount} खर्च होता है',
+  ants_top_cat: 'श्रेणी के अनुसार',
+  ants_top_merch: 'दुकान के अनुसार',
+  ants_count: '{n} खरीद',
+  ants_max_label: 'अधिकतम खरीद',
+  card_title: 'आपके कार्ड',
+  card_limit: 'सीमा',
+  card_cut: 'स्टेटमेंट दिवस',
+  card_due: 'भुगतान देय दिवस',
+  card_is: 'यह क्रेडिट कार्ड है',
+  card_edit: 'कार्ड विवरण',
+  card_save: 'सहेजें',
+  card_next_cut: 'स्टेटमेंट: {date} ({n} दिनों में)',
+  card_next_due: '{date} तक भुगतान करें ({n} दिनों में)',
+  card_avail: 'उपलब्ध',
+  card_debt: 'कर्ज़',
+  card_none: 'अभी कोई कार्ड नहीं: किसी खाते को कार्ड के रूप में चिह्नित करें या अपने बैंक के किसी कार्ड को संपादित करें।',
+  inst_btn: 'किस्तों में खरीद दर्ज करें',
+  inst_name: 'खरीद का नाम',
+  inst_total: 'कुल राशि',
+  inst_n: 'किस्तों की संख्या',
+  inst_day: 'भुगतान दिवस',
+  inst_card: 'कार्ड (वैकल्पिक)',
+  inst_none: 'कोई कार्ड नहीं',
+  inst_create: 'किस्तें बनाएं',
+  inst_badge: 'किस्त {a} / {b}',
+  inst_created: 'किस्तें बनाई गईं: {amount} के {n} भुगतान।',
+  inst_err_n: 'किस्तें 2 और 60 के बीच होनी चाहिए।',
+  inst_delete_confirm: 'यह किस्त खरीद हटाएं? इसके भविष्य के भुगतान हटा दिए जाएंगे।',
+  flow_title: 'भविष्य का नकदी प्रवाह',
+  flow_d30: '30 दिन',
+  flow_d60: '60 दिन',
+  flow_d90: '90 दिन',
+  flow_start: 'प्रारंभिक बैलेंस',
+  flow_end: 'अंतिम बैलेंस',
+  flow_min: 'न्यूनतम: {date} को {amount}',
+  flow_neg: 'सावधान: {date} को पहला दिन नकारात्मक में',
+  flow_ok: 'इस अवधि में कोई दिन नकारात्मक में नहीं',
+  flow_var_note: 'पिछले 30 दिनों के आपके औसत परिवर्तनशील खर्च को दैनिक अनुमान के रूप में शामिल करता है।',
+  flow_income: 'वेतन',
+  flow_no_events: 'इस अवधि में कोई अपेक्षित गतिविधि नहीं।',
+  score_title: 'PETO Score',
+  score_sub: 'आपके ऐप डेटा के अनुसार आपकी वित्तीय सेहत। यह क्रेडिट ब्यूरो नहीं है।',
+  score_f_budget: 'बजट पटरी पर',
+  score_f_savings: 'इस माह की बचत',
+  score_f_ontime: 'समय पर भुगतान',
+  score_f_debt: 'कर्ज़ घट रहा है',
+  score_f_efund: 'आपातकालीन निधि',
+  score_h_budget: '{m} श्रेणियों में से {n} अपनी सीमा के भीतर',
+  score_h_budget_none: 'अभी कोई सीमा नहीं: आधे अंक दिए गए',
+  score_h_savings: 'आपने अपनी आय का {pct}% बचाया',
+  score_h_savings_abs: 'इस माह बचाया: {amount}',
+  score_h_ontime: '{m} भुगतानों में से {n} समय पर चिह्नित',
+  score_h_ontime_none: 'इस माह अभी कोई भुगतान देय नहीं',
+  score_h_debt_first: 'आपका पहला कर्ज़ स्नैपशॉट: अगले माह तुलना होगी',
+  score_h_debt_zero: 'कर्ज़-मुक्त: ऐसे ही रखें',
+  score_h_debt_down: 'आपका कर्ज़ {amount} घट गया',
+  score_h_debt_same: 'आपका कर्ज़ वैसा ही रहा',
+  score_h_debt_up: 'आपका कर्ज़ {amount} बढ़ गया',
+  score_h_efund: 'एक माह के भुगतानों का {pct}% कवर करता है',
+  fam_goals: 'साझा लक्ष्य',
+  fam_goal_empty: 'अभी कोई साझा लक्ष्य नहीं।',
+  fam_goal_name: 'लक्ष्य का नाम',
+  fam_goal_target: 'लक्ष्य ($)',
+  fam_goal_add: 'लक्ष्य जोड़ें',
+  fam_contrib: 'योगदान दें',
+  fam_iou: 'कौन किसका देनदार है',
+  fam_iou_empty: 'कोई किसी का देनदार नहीं है।',
+  fam_iou_add: 'कर्ज़ दर्ज करें',
+  fam_iou_settle: 'चुकता',
+  fam_net_pos: 'उसे {amount} मिलने हैं',
+  fam_net_neg: '{amount} देना है',
+  fam_note_ph: 'नोट (वैकल्पिक)',
+  env_rollover: 'रोलओवर वाला लिफ़ाफ़ा',
+  env_carry_line: 'पिछले महीनों से रोलओवर: {amount}',
+  env_zero: 'शून्य-आधार मोड',
+  env_zero_help: 'अपनी सीमाएं (मासिक हिसाब से) तब तक सौंपें जब तक असाइन न की गई आय $0 न हो जाए।',
+  env_zero_noincome: 'इस माह आय जोड़ें ताकि पता चले कितना सौंपना बाकी है।',
+  env_unassigned: 'असाइन नहीं किया गया',
+  env_zero_ok: 'सब सौंपा गया',
+  pro_open_adv: 'उन्नत रिपोर्ट खोलें',
+  pro_open_org: 'san आयोजक मोड खोलें',
+  pin_err_mismatch: 'PIN मेल नहीं खाते।',
+  news_c76_direct: 'PETO Finanzas में नया: सदस्यता केंद्र, छोटे खर्च का डिटेक्टर, 90-दिन का नकदी प्रवाह, PETO Score, किस्त खरीद, रोलओवर लिफ़ाफ़े और तीन-चरण वाला स्टार्ट सहायक।',
   org_err_san_name: 'San का नाम लिखें।', rep_promo_footer: 'PETO Finanzas के साथ अपने खर्चों पर नियंत्रण रखें · petofinanzas.com', rep_saved: 'छवि सहेजी गई।', set_sections_summary: '{total} में से {visible} दिख रहे हैं',
   org_err_active_exists: 'पहले से एक सक्रिय san है ("{name}")। नया बनाने के लिए पहले उसे उसके कार्ड से हटाएँ।',
   app_title: 'PETO Finanzas', build_word: 'बिल्ड',
@@ -8793,9 +10298,138 @@ hi: {
   widget_san_next: 'अगली बारी: {name} · {date}',
   widget_san_next_nodate: 'अगली बारी: {name}',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।',
-  ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_pending_btn: '✓ अंत में खुलेगा', news_c75_direct: '✨ नया स्वागत: आप सीधे अंदर जाते हैं और PETO Finanzas ऐप के अंदर कदम-दर-कदम मार्गदर्शन करता है। श्रेणियाँ और निश्चित भुगतान एक ही दृश्य में, स्पष्ट ग्राफ़ और आठ कार्डों में सेटिंग्स।', spend_ctx_below: 'आप पिछले महीने की गति से {amount} नीचे हैं', spend_ctx_above: 'आप पिछले महीने की गति से {amount} ऊपर हैं', spend_ctx_bank: 'बैंक जुड़ा हुआ है', sec_card_title: 'सुरक्षा', sec_card_read: 'बैंक कनेक्शन केवल पढ़ने के लिए: हम आपका पैसा कभी नहीं हिला सकते', sec_card_enc: 'आपका डेटा एन्क्रिप्ट होकर जाता और सहेजा जाता है', sec_card_lock: 'PIN और फ़िंगरप्रिंट लॉक', bud_per_semana: 'प्रति सप्ताह', bud_per_quincena: 'प्रति पखवाड़ा', bud_per_mes: 'प्रति माह', spend_left_periods: 'आपके सभी अवधियों में कुल {amount} बचे हैं।', spend_x_periods: 'हर श्रेणी अपनी अवधि के अनुसार बँटती है:', spend_x_cat: '{cat} ({per}): {left} बचे ÷ {days} दिन = आज {daily}', bud_period_aria: '{cat} के लिए सीमा अवधि', nav_gastos: 'खर्च', nav_presupuesto: 'बजट', nav_ajustes: 'सेटिंग्स', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
+  ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_pending_btn: '✓ अंत में खुलेगा', spend_ctx_below: 'आप पिछले महीने की गति से {amount} नीचे हैं', spend_ctx_above: 'आप पिछले महीने की गति से {amount} ऊपर हैं', spend_ctx_bank: 'बैंक जुड़ा हुआ है', sec_card_title: 'सुरक्षा', sec_card_read: 'बैंक कनेक्शन केवल पढ़ने के लिए: हम आपका पैसा कभी नहीं हिला सकते', sec_card_enc: 'आपका डेटा एन्क्रिप्ट होकर जाता और सहेजा जाता है', sec_card_lock: 'PIN और फ़िंगरप्रिंट लॉक', bud_per_semana: 'प्रति सप्ताह', bud_per_quincena: 'प्रति पखवाड़ा', bud_per_mes: 'प्रति माह', spend_left_periods: 'आपके सभी अवधियों में कुल {amount} बचे हैं।', spend_x_periods: 'हर श्रेणी अपनी अवधि के अनुसार बँटती है:', spend_x_cat: '{cat} ({per}): {left} बचे ÷ {days} दिन = आज {daily}', bud_period_aria: '{cat} के लिए सीमा अवधि', nav_gastos: 'खर्च', nav_presupuesto: 'बजट', nav_ajustes: 'सेटिंग्स', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
+  setup_title: 'إعداد PETO Finanzas الخاص بك',
+  setup_step_of: 'الخطوة {n} من 3',
+  setup_step1_t: 'أنشئ حسابك',
+  setup_step1_d: 'حسابك السحابي يبقي أموالك متزامنة ويتيح لك ربط بنكك.',
+  setup_step2_t: 'أنشئ رمز PIN وفعّل البصمة',
+  setup_step2_d: 'رمز PIN من 4 إلى 6 أرقام يحمي تطبيقك؛ وبعد إنشائه يمكنك تفعيل البصمة.',
+  setup_step3_t: 'اربط بنكك',
+  setup_step3_d: 'مع ربط بنكك، تتحدث أرصدتك ومعاملاتك تلقائيًا. يمكنك فعل ذلك لاحقًا إذا أردت.',
+  setup_skip_step: 'ليس الآن',
+  setup_skip_all: 'تخطي الكل',
+  setup_done: 'تم',
+  setup_email_ph: 'بريدك الإلكتروني',
+  setup_pass_ph: 'كلمة المرور (6 على الأقل)',
+  setup_pin_ph: 'PIN (من 4 إلى 6 أرقام)',
+  setup_pin2_ph: 'كرر رمز PIN',
+  setup_pin_btn: 'حفظ PIN',
+  setup_bank_btn: 'ربط البنك',
+  setup_account_btn: 'إنشاء حساب',
+  home_account_title: 'أنشئ حساب PETO Finanzas الخاص بك',
+  home_account_text: 'احتفظ بأموالك في السحابة، وزامن بين الأجهزة واربط بنكك.',
+  home_account_btn: 'إنشاء حساب',
+  payfreq_label: 'تكرار الراتب',
+  payfreq_semanal: 'أسبوعي',
+  payfreq_quincenal: 'كل أسبوعين',
+  payfreq_mensual: 'شهري',
+  payday_month_label: 'يوم الشهر',
+  notif_payday_t: 'غدًا يوم الراتب',
+  notif_payday_b: 'راتبك القادم يصل غدًا.',
+  notif_card_t: 'دفع البطاقة',
+  notif_card_b: '{name}: دفعتك مستحقة في {date}.',
+  exit_btn: 'خروج',
+  mr_close: 'إغلاق التقرير',
+  subs_title: 'مركز الاشتراكات',
+  subs_total_month: 'المجموع شهريًا',
+  subs_total_year: 'المجموع سنويًا',
+  subs_hike: 'ارتفع السعر',
+  subs_hike_d: 'كان {old}، الآن {new}',
+  subs_dup: 'احتمال خصم مكرر',
+  subs_trial: 'احتمال تجربة تحوّلت للتو',
+  subs_in_fixed: 'في المدفوعات الثابتة',
+  subs_note: 'PETO Finanzas يكتشف ويحذّر فقط؛ إلغاء الاشتراك قرارك لدى كل خدمة.',
+  subs_per_month: 'شهريًا',
+  ants_title: 'النفقات اليومية الصغيرة',
+  ants_empty: 'لا مشتريات صغيرة تقريبًا مؤخرًا: أحسنت.',
+  ants_month: 'في 30 يومًا',
+  ants_year_line: 'تكلفك {amount} سنويًا',
+  ants_top_cat: 'حسب الفئة',
+  ants_top_merch: 'حسب المتجر',
+  ants_count: '{n} عملية شراء',
+  ants_max_label: 'مشتريات حتى',
+  card_title: 'بطاقاتك',
+  card_limit: 'الحد',
+  card_cut: 'يوم كشف الحساب',
+  card_due: 'يوم استحقاق الدفع',
+  card_is: 'هذه بطاقة ائتمان',
+  card_edit: 'تفاصيل البطاقة',
+  card_save: 'حفظ',
+  card_next_cut: 'الكشف: {date} (بعد {n} أيام)',
+  card_next_due: 'ادفع قبل {date} (بعد {n} أيام)',
+  card_avail: 'متاح',
+  card_debt: 'الدين',
+  card_none: 'لا بطاقات بعد: ضع علامة على حساب كبطاقة أو عدّل إحدى بطاقات بنكك.',
+  inst_btn: 'تسجيل شراء بالتقسيط',
+  inst_name: 'اسم الشراء',
+  inst_total: 'المبلغ الإجمالي',
+  inst_n: 'عدد الأقساط',
+  inst_day: 'يوم الدفع',
+  inst_card: 'بطاقة (اختياري)',
+  inst_none: 'بدون بطاقة',
+  inst_create: 'إنشاء الأقساط',
+  inst_badge: 'القسط {a} من {b}',
+  inst_created: 'تم إنشاء الأقساط: {n} دفعة بقيمة {amount}.',
+  inst_err_n: 'يجب أن تكون الأقساط بين 2 و60.',
+  inst_delete_confirm: 'حذف هذا الشراء بالتقسيط؟ ستتم إزالة دفعاته المستقبلية.',
+  flow_title: 'التدفق النقدي المستقبلي',
+  flow_d30: '30 يومًا',
+  flow_d60: '60 يومًا',
+  flow_d90: '90 يومًا',
+  flow_start: 'الرصيد الابتدائي',
+  flow_end: 'الرصيد النهائي',
+  flow_min: 'الأدنى: {amount} في {date}',
+  flow_neg: 'تنبيه: أول يوم بالسالب في {date}',
+  flow_ok: 'لا يوم بالسالب في هذه الفترة',
+  flow_var_note: 'يشمل متوسط إنفاقك المتغير في آخر 30 يومًا كتقدير يومي.',
+  flow_income: 'الراتب',
+  flow_no_events: 'لا حركات متوقعة في هذه الفترة.',
+  score_title: 'PETO Score',
+  score_sub: 'صحتك المالية وفق بيانات تطبيقك. هذا ليس مكتب ائتمان.',
+  score_f_budget: 'الميزانية على المسار',
+  score_f_savings: 'مدخرات هذا الشهر',
+  score_f_ontime: 'المدفوعات في الوقت',
+  score_f_debt: 'الدين يتناقص',
+  score_f_efund: 'صندوق الطوارئ',
+  score_h_budget: '{n} من {m} فئة ضمن حدها',
+  score_h_budget_none: 'لا حدود بعد: تُمنح نصف النقاط',
+  score_h_savings: 'ادخرت {pct}% من دخلك',
+  score_h_savings_abs: 'ادخرت هذا الشهر: {amount}',
+  score_h_ontime: '{n} من {m} دفعة معلمة في الوقت',
+  score_h_ontime_none: 'لا مدفوعات مستحقة بعد هذا الشهر',
+  score_h_debt_first: 'أول لقطة لديونك: الشهر القادم ستتم المقارنة',
+  score_h_debt_zero: 'بدون ديون: ابق هكذا',
+  score_h_debt_down: 'انخفض دينك بمقدار {amount}',
+  score_h_debt_same: 'بقي دينك كما هو',
+  score_h_debt_up: 'ارتفع دينك بمقدار {amount}',
+  score_h_efund: 'يغطي {pct}% من مدفوعات شهر واحد',
+  fam_goals: 'أهداف مشتركة',
+  fam_goal_empty: 'لا أهداف مشتركة بعد.',
+  fam_goal_name: 'اسم الهدف',
+  fam_goal_target: 'الهدف ($)',
+  fam_goal_add: 'إضافة هدف',
+  fam_contrib: 'المساهمة',
+  fam_iou: 'من يدين لمن',
+  fam_iou_empty: 'لا أحد يدين بأي شيء.',
+  fam_iou_add: 'تسجيل دين',
+  fam_iou_settle: 'تمت التسوية',
+  fam_net_pos: 'يُدان له بـ {amount}',
+  fam_net_neg: 'يدين بـ {amount}',
+  fam_note_ph: 'ملاحظة (اختياري)',
+  env_rollover: 'ظرف مع ترحيل',
+  env_carry_line: 'ترحيل من الأشهر السابقة: {amount}',
+  env_zero: 'وضع الأساس الصفري',
+  env_zero_help: 'عيّن حدودك (بما يعادلها شهريًا) حتى يصل الدخل غير المعيّن إلى $0.',
+  env_zero_noincome: 'أضف دخلًا هذا الشهر لترى ما تبقى لتعيينه.',
+  env_unassigned: 'غير معيّن',
+  env_zero_ok: 'تم تعيين الكل',
+  pro_open_adv: 'فتح التقرير المتقدم',
+  pro_open_org: 'فتح وضع منظم san',
+  pin_err_mismatch: 'رمزا PIN غير متطابقين.',
+  news_c76_direct: 'جديد في PETO Finanzas: مركز الاشتراكات، كاشف النفقات الصغيرة، تدفق نقدي لـ90 يومًا، PETO Score، مشتريات بالتقسيط، ظروف مع ترحيل ومساعد بدء من ثلاث خطوات.',
   org_err_san_name: 'اكتب اسم الـ san.', rep_promo_footer: 'تحكّم في مصاريفك مع PETO Finanzas · petofinanzas.com', rep_saved: 'تم حفظ الصورة.', set_sections_summary: '{visible} من {total} ظاهرة',
   org_err_active_exists: 'يوجد سان نشط بالفعل («{name}»). احذفه أولاً من بطاقته إذا أردت إنشاء آخر.',
   app_title: 'PETO Finanzas', build_word: 'الإصدار',
@@ -9514,7 +11148,7 @@ ar: {
   widget_san_next: 'الدور التالي: {name} · {date}',
   widget_san_next_nodate: 'الدور التالي: {name}',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.',
-  ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', ob_exp_amount_ph: 'المبلغ (مثال 25.00)', ob_exp_add: 'سجّل أول مصروف لي', ob_exp_done: '✓ تم التسجيل! بهذه السهولة يُسجَّل المصروف.', ob_fix_title: 'مدفوعاتك الثابتة وميزانيتك', ob_fix_text: 'أضف المدفوعات التي تتكرر كل شهر (الإيجار، الهاتف، الاشتراكات). بها يبني PETO Finanzas ميزانيتك ويحسب كم يمكنك أن تنفق اليوم. يمكنك إضافة المزيد متى شئت.', ob_fix_name_ph: 'الاسم (مثال: الإيجار)', ob_fix_day_ph: 'اليوم (1-31)', ob_fix_add: '＋ أضف دفعة ثابتة', ob_fix_added: '✓ أُضيفت الدفعة الثابتة. أضف أخرى أو تابع.', ob_goal_title: 'هدف الادخار الخاص بك', ob_goal_text: 'امنح هدفك الأول اسمًا ومبلغًا (على سبيل المثال، صندوق الطوارئ). الادخار نحو هدف واضح أسهل بكثير.', ob_goal_name_ph: 'الاسم (مثال: صندوق الطوارئ)', ob_goal_target_ph: 'مبلغ الهدف (مثال: 1,000)', ob_goal_add: 'أنشئ هدفي', ob_goal_added: '✓ تم إنشاء الهدف! ستجده في المدخرات.', ob_san_title: 'السان: ادّخر مع مجموعة', ob_san_text: 'السان (تاندا، كوندينا، سوسو) هو دائرة الادخار الجماعية الكلاسيكية: الجميع يساهم كل أسبوع وكل شخص يأخذ المبلغ كاملًا في دوره. يدير PETO Finanzas الترتيب والأدوار والإيصالات دون دفاتر.', ob_san_btn: 'أنشئ السان الخاص بي عند الانتهاء', ob_bank_title: 'اربط بنكك', ob_bank_text: 'إن شئت، اربط بنكك لتدخل حركاتك تلقائيًا وتبقى أرصدتك محدثة دائمًا. الأمر اختياري: عند إنهاء الترحيب أو لاحقًا في الإعدادات.', ob_bank_btn: 'أريد ربط بنكي', ob_pod_title: 'تعلّم مع البودكاست', ob_pod_text: '«المالية الشخصية»، بودكاست PETO Finanzas: حلقات بالإسبانية مع لوسيا وماركو، بأمثلة وخطوات عملية لأموالك. استمع إليه داخل التطبيق.', ob_pod_btn: 'شاهد البودكاست عند الانتهاء', ob_bell_title: 'فعّل تذكيراتك', ob_bell_text: 'تلقَّ إشعارًا عندما تقترب دفعة ثابتة من الاستحقاق، إضافة إلى ملخص يومك. هكذا لا يفوتك شيء.', ob_bell_btn: 'تفعيل التذكيرات', ob_bell_done: '✓ تم تفعيل التذكيرات.', ob_cloud_btn: 'أنشئ حسابي عند الانتهاء', ob_pending_ok: '✓ تم! عند إنهاء الترحيب سآخذك إلى هناك مباشرة.', ob_pending_btn: '✓ يفتح عند الانتهاء', news_c75_direct: '✨ ترحيب جديد: تدخل مباشرة ويرشدك PETO Finanzas داخل التطبيق خطوة بخطوة. الفئات والمدفوعات الثابتة في عرض واحد، ورسوم أوضح، والإعدادات في ثماني بطاقات.', spend_ctx_below: 'أنت أقل من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_above: 'أنت أعلى من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_bank: 'البنك متصل', sec_card_title: 'الأمان', sec_card_read: 'اتصال مصرفي للقراءة فقط: لا يمكننا أبدًا تحريك أموالك', sec_card_enc: 'بياناتك تنتقل وتُحفظ مشفرة', sec_card_lock: 'القفل بالرقم السري والبصمة', bud_per_semana: 'أسبوعيًا', bud_per_quincena: 'كل أسبوعين', bud_per_mes: 'شهريًا', spend_left_periods: 'تبقّى لك {amount} عبر جميع فتراتك.', spend_x_periods: 'تتوزع كل فئة على فترتها الخاصة:', spend_x_cat: '{cat} ({per}): تبقّى {left} ÷ {days} يوم = {daily} اليوم', bud_period_aria: 'فترة الحد لـ {cat}', nav_gastos: 'المصروفات', nav_presupuesto: 'الميزانية', nav_ajustes: 'الإعدادات', ob_bio_label: 'الدخول بالبصمة (إذا أنشأت رقم PIN)', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
+  ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', ob_exp_amount_ph: 'المبلغ (مثال 25.00)', ob_exp_add: 'سجّل أول مصروف لي', ob_exp_done: '✓ تم التسجيل! بهذه السهولة يُسجَّل المصروف.', ob_fix_title: 'مدفوعاتك الثابتة وميزانيتك', ob_fix_text: 'أضف المدفوعات التي تتكرر كل شهر (الإيجار، الهاتف، الاشتراكات). بها يبني PETO Finanzas ميزانيتك ويحسب كم يمكنك أن تنفق اليوم. يمكنك إضافة المزيد متى شئت.', ob_fix_name_ph: 'الاسم (مثال: الإيجار)', ob_fix_day_ph: 'اليوم (1-31)', ob_fix_add: '＋ أضف دفعة ثابتة', ob_fix_added: '✓ أُضيفت الدفعة الثابتة. أضف أخرى أو تابع.', ob_goal_title: 'هدف الادخار الخاص بك', ob_goal_text: 'امنح هدفك الأول اسمًا ومبلغًا (على سبيل المثال، صندوق الطوارئ). الادخار نحو هدف واضح أسهل بكثير.', ob_goal_name_ph: 'الاسم (مثال: صندوق الطوارئ)', ob_goal_target_ph: 'مبلغ الهدف (مثال: 1,000)', ob_goal_add: 'أنشئ هدفي', ob_goal_added: '✓ تم إنشاء الهدف! ستجده في المدخرات.', ob_san_title: 'السان: ادّخر مع مجموعة', ob_san_text: 'السان (تاندا، كوندينا، سوسو) هو دائرة الادخار الجماعية الكلاسيكية: الجميع يساهم كل أسبوع وكل شخص يأخذ المبلغ كاملًا في دوره. يدير PETO Finanzas الترتيب والأدوار والإيصالات دون دفاتر.', ob_san_btn: 'أنشئ السان الخاص بي عند الانتهاء', ob_bank_title: 'اربط بنكك', ob_bank_text: 'إن شئت، اربط بنكك لتدخل حركاتك تلقائيًا وتبقى أرصدتك محدثة دائمًا. الأمر اختياري: عند إنهاء الترحيب أو لاحقًا في الإعدادات.', ob_bank_btn: 'أريد ربط بنكي', ob_pod_title: 'تعلّم مع البودكاست', ob_pod_text: '«المالية الشخصية»، بودكاست PETO Finanzas: حلقات بالإسبانية مع لوسيا وماركو، بأمثلة وخطوات عملية لأموالك. استمع إليه داخل التطبيق.', ob_pod_btn: 'شاهد البودكاست عند الانتهاء', ob_bell_title: 'فعّل تذكيراتك', ob_bell_text: 'تلقَّ إشعارًا عندما تقترب دفعة ثابتة من الاستحقاق، إضافة إلى ملخص يومك. هكذا لا يفوتك شيء.', ob_bell_btn: 'تفعيل التذكيرات', ob_bell_done: '✓ تم تفعيل التذكيرات.', ob_cloud_btn: 'أنشئ حسابي عند الانتهاء', ob_pending_ok: '✓ تم! عند إنهاء الترحيب سآخذك إلى هناك مباشرة.', ob_pending_btn: '✓ يفتح عند الانتهاء', spend_ctx_below: 'أنت أقل من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_above: 'أنت أعلى من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_bank: 'البنك متصل', sec_card_title: 'الأمان', sec_card_read: 'اتصال مصرفي للقراءة فقط: لا يمكننا أبدًا تحريك أموالك', sec_card_enc: 'بياناتك تنتقل وتُحفظ مشفرة', sec_card_lock: 'القفل بالرقم السري والبصمة', bud_per_semana: 'أسبوعيًا', bud_per_quincena: 'كل أسبوعين', bud_per_mes: 'شهريًا', spend_left_periods: 'تبقّى لك {amount} عبر جميع فتراتك.', spend_x_periods: 'تتوزع كل فئة على فترتها الخاصة:', spend_x_cat: '{cat} ({per}): تبقّى {left} ÷ {days} يوم = {daily} اليوم', bud_period_aria: 'فترة الحد لـ {cat}', nav_gastos: 'المصروفات', nav_presupuesto: 'الميزانية', nav_ajustes: 'الإعدادات', ob_bio_label: 'الدخول بالبصمة (إذا أنشأت رقم PIN)', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
 }
 };
 /* Resuelve el idioma automático: coincidencia exacta con un idioma
@@ -9811,12 +11445,23 @@ function updateBottomNav() {
    de isPro(). NUNCA tocar los anuncios propios ni pedir a nadie
    que lo haga (actividad inválida). En la web no hay plugin y
    no se muestra nada (ni se reserva el hueco). */
+/* Compilación 76: el banner nativo se monta SOBRE el WebView y
+   tapaba los botones de la guía contextual y el botón de
+   continuación de Plaid Link (capturas de Sterlin). Mientras la
+   guía esté activa o Plaid esté abierto, el banner se oculta y
+   se restaura al cerrar. Contador por si hubiera dos motivos a
+   la vez (guía tras Plaid, por ejemplo). */
+let adsSuppressCount = 0;
+function setAdsSuppressed(on) {
+  adsSuppressCount = Math.max(0, adsSuppressCount + (on ? 1 : -1));
+  updateBottomNav();
+}
 function syncAds(navVisible) {
   const ads = capPlugin('PetoAds');
   if (!ads) { document.body.classList.remove('has-ads'); return; }
   let show = false;
   try {
-    show = !!navVisible && !(db && db.settings && db.settings.pro === true);
+    show = !!navVisible && adsSuppressCount === 0 && !(db && db.settings && db.settings.pro === true);
   } catch (e) { show = false; }
   document.body.classList.toggle('has-ads', show);
   try {
@@ -9881,6 +11526,14 @@ function renderDrawer() {
     lock.addEventListener('click', () => { closeMenu(); showLock(); });
     adjList.appendChild(lock);
   }
+  const exitItem = el('button', 'menu-item');
+  exitItem.type = 'button';
+  exitItem.appendChild(el('span', 'menu-icon', '🚪'));
+  const exitText = el('span', 'menu-text');
+  exitText.appendChild(el('span', 'menu-name', t('exit_btn')));
+  exitItem.appendChild(exitText);
+  exitItem.addEventListener('click', () => { exitToWelcome(); });
+  adjList.appendChild(exitItem);
   adjWrap.appendChild(adjList);
   list.appendChild(adjWrap);
 }
@@ -10368,13 +12021,133 @@ function scheduleBackupBannerAutoHide() {
   backupBannerTimerArmed = true;
   setTimeout(() => { backupBannerTimerArmed = false; dismissBackupBanner(); }, 10000);
 }
+/* ---------------- Compilación 76 · Día de cobro con frecuencia --
+   El ajuste dejó de ser solo «un día de la semana»: la frecuencia
+   (semanal, quincenal o mensual) decide qué días son cobro. Estos
+   helpers son la ÚNICA fuente de verdad: los consumen el banner
+   de Inicio, los recordatorios y el calendario de flujo de caja.
+   (El héroe «¿Cuánto puedes gastar hoy?» conserva sus fórmulas
+   verificadas de las Compilaciones 49–68, que no dependen del
+   cobro.) Sin configurar, no hay cobro: los helpers devuelven
+   vacío y la app se comporta como antes. */
+function payFreqOf() {
+  const f = db && db.settings ? db.settings.payFreq : 'semanal';
+  return (f === 'quincenal' || f === 'mensual') ? f : 'semanal';
+}
+function payConfigured() {
+  if (!db || !db.settings) return false;
+  return payFreqOf() === 'mensual' ? db.settings.payMonthDay != null : db.settings.payday != null;
+}
+function isPaydayOn(d) {
+  if (!payConfigured() || !(d instanceof Date) || Number.isNaN(d.getTime())) return false;
+  const s = db.settings;
+  const freq = payFreqOf();
+  if (freq === 'mensual') {
+    const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    return d.getDate() === Math.min(s.payMonthDay, last);
+  }
+  if (d.getDay() !== s.payday) return false;
+  if (freq === 'quincenal' && s.payAnchor) {
+    const a = s.payAnchor.split('-');
+    const anchor = new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2]));
+    const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - anchor) / 86400000);
+    return ((diff % 14) + 14) % 14 === 0;
+  }
+  return true;
+}
+function nextPaydayDate(from) {
+  if (!payConfigured()) return null;
+  const base = (from instanceof Date && !Number.isNaN(from.getTime())) ? from : new Date();
+  for (let i = 0; i < 45; i++) {
+    const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+    if (isPaydayOn(d)) return d;
+  }
+  return null;
+}
+function paydaysInRange(start, days) {
+  const out = [];
+  if (!payConfigured()) return out;
+  for (let i = 0; i < days; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    if (isPaydayOn(d)) out.push(d);
+  }
+  return out;
+}
+/* Estimación del ingreso de UN cobro para proyecciones: el
+   ingreso del mes en curso (o el del mes pasado si este aún no
+   tiene) repartido entre los cobros del mes. 0 si no hay datos:
+   la proyección simplemente no inventa ingresos. */
+function paydayIncomeCents() {
+  if (!payConfigured()) return 0;
+  const now = new Date();
+  let monthly = sumCents(monthCountedIncomes(currentMonthKey()));
+  if (monthly <= 0) {
+    const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    monthly = sumCents(monthCountedIncomes(monthKeyOf(localDateStr(prev))));
+  }
+  if (monthly <= 0) return 0;
+  const first = new Date(now.getFullYear(), now.getMonth(), 1);
+  const count = paydaysInRange(first, new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).length;
+  return count > 0 ? Math.round(monthly / count) : monthly;
+}
+/* Tarjetas de crédito conocidas por la app: las cuentas manuales
+   con datos de tarjeta y las cuentas de crédito del banco (con
+   los datos que la persona escribió en db.cardInfo, porque el
+   banco no entrega límite ni días de corte/pago). */
+function cardTargets() {
+  const out = [];
+  for (const a of (db.accounts || [])) {
+    if (a.cardLimitCents || a.cardCutDay || a.cardDueDay) {
+      out.push({
+        key: 'm:' + a.id, name: a.name, manualId: a.id,
+        limitCents: a.cardLimitCents || 0,
+        cutDay: a.cardCutDay || null, dueDay: a.cardDueDay || null,
+        debtCents: Math.max(0, -accountShownBalance(a))
+      });
+    }
+  }
+  if (typeof bankDebtAccounts === 'function') {
+    for (const acc of bankDebtAccounts()) {
+      if (!acc || acc.type !== 'credit') continue;
+      const info = (db.cardInfo && db.cardInfo[acc.id]) || {};
+      out.push({
+        key: 'b:' + acc.id, name: acc.name || 'Tarjeta', bankId: acc.id,
+        limitCents: info.limitCents || 0,
+        cutDay: info.cutDay || null, dueDay: info.dueDay || null,
+        debtCents: Math.max(0, Math.round(Number(acc.current) || 0))
+      });
+    }
+  }
+  return out;
+}
+/* Próxima fecha (hoy incluida) con ese día del mes, con tope al
+   fin de mes, como los pagos fijos. */
+function nextMonthlyDayDate(day, from) {
+  const base = (from instanceof Date && !Number.isNaN(from.getTime())) ? from : new Date();
+  for (let off = 0; off <= 1; off++) {
+    const y = base.getFullYear();
+    const m = base.getMonth() + off;
+    const last = new Date(y, m + 1, 0).getDate();
+    const d = new Date(y, m, Math.min(day, last));
+    if (d >= new Date(base.getFullYear(), base.getMonth(), base.getDate())) return d;
+  }
+  return null;
+}
+
+function syncPaydayFields() {
+  const freq = payFreqOf();
+  const wdRow = document.getElementById('set-payday-row');
+  const mdRow = document.getElementById('set-paymonthday-row');
+  if (wdRow) wdRow.hidden = freq === 'mensual';
+  if (mdRow) mdRow.hidden = freq !== 'mensual';
+}
+
 function renderBanners() {
   const wrap = document.getElementById('home-banners');
   clearNode(wrap);
   if (!db.settings.reminders) return;
   const st = bannerState();
-  if (db.settings.payday !== null && db.settings.payday !== undefined &&
-      new Date().getDay() === db.settings.payday && !st.payday) {
+  if (payConfigured() && isPaydayOn(new Date()) && !st.payday) {
     wrap.appendChild(makeBanner(t('banner_payday'), () => dismissBanner('payday'),
       () => showView('ingresos')));
   }
@@ -10965,6 +12738,19 @@ function renderNextStep() {
   document.getElementById('next-step-btn').textContent =
     step === 1 ? t('next_step1_btn') : step === 2 ? t('next_step2_btn') : t('next_step3_btn');
 }
+/* Compilación 76: las funciones Pro viven dentro de la tarjeta
+   «PETO Pro» de Ajustes; estos atajos llevan a cada una. El
+   informe avanzado pasa por su puerta Pro de siempre
+   (onAdvOpen → requirePro). */
+function goProAdv() {
+  showView('resumen');
+  onAdvOpen();
+}
+function goProOrg() {
+  showView('san');
+  const s = document.getElementById('org-section');
+  if (s) { try { s.scrollIntoView({ block: 'start' }); } catch (e) { /* sin scroll */ } }
+}
 function goNextStep() {
   const step = nextStepState();
   /* Si la sección destino estaba apagada (p. ej. modo «Lo
@@ -11317,6 +13103,7 @@ function renderHome() {
     goalLine.textContent = '';
   }
   renderBanners();
+  renderHomeAccount();
   renderHomeBank();
   renderProHomeCard();
   renderSpendToday();
@@ -12311,6 +14098,7 @@ function chartBarRow(label, amountText, pct) {
 }
 function renderResumen() {
   renderInsights();
+  renderScoreCard();
   document.getElementById('res-month-label').textContent = monthLabel(chartMonth);
   document.getElementById('res-next').disabled = chartMonth >= currentMonthKey();
   const key = chartMonth;
@@ -12346,6 +14134,249 @@ function renderResumen() {
   renderReport();
   renderTrend();
   renderYearCard();
+  renderFlowCard();
+  renderAntsCard();
+}
+
+/* ---------------- Compilación 76 · PETO Score ----------------------
+   Salud financiera 0–100 calculada SOLO con los datos de la app
+   (nada de buró) y EXPLICABLE: cada factor muestra sus puntos, su
+   peso y el porqué con las cifras de la persona. Cinco factores:
+   presupuesto cumplido (30), ahorro del mes (25), pagos a tiempo
+   (20), deudas a la baja (15) y fondo de emergencia (10). Sin
+   datos en un factor, se otorga un valor neutro y se dice. */
+function computePetoScore() {
+  const key = currentMonthKey();
+  const now = new Date();
+  const factors = [];
+  const cats = Object.keys(db.budgets || {}).filter((c) => (db.budgets[c] || 0) > 0);
+  if (cats.length) {
+    const ok = cats.filter((c) => budgetPeriodSpentCents(c, budgetPeriodOf(c)) <= db.budgets[c]).length;
+    factors.push({ k: 'score_f_budget', pts: Math.round(30 * ok / cats.length), max: 30, hint: t('score_h_budget', { n: ok, m: cats.length }) });
+  } else {
+    factors.push({ k: 'score_f_budget', pts: 15, max: 30, hint: t('score_h_budget_none') });
+  }
+  const inc = sumCents(monthCountedIncomes(key));
+  const sav = monthSavings(key);
+  if (inc > 0) {
+    const pct = sav / inc;
+    const pts = pct >= 0.20 ? 25 : pct >= 0.10 ? 20 : pct >= 0.05 ? 14 : pct > 0 ? 8 : 0;
+    factors.push({ k: 'score_f_savings', pts: pts, max: 25, hint: t('score_h_savings', { pct: Math.round(pct * 100) }) });
+  } else {
+    factors.push({ k: 'score_f_savings', pts: sav > 0 ? 12 : 0, max: 25, hint: t('score_h_savings_abs', { amount: fmt(sav) }) });
+  }
+  let due = 0;
+  let paid = 0;
+  const todayStr = localDateStr(now);
+  for (const f of (db.fixed || [])) {
+    for (const occ of fixedMonthOccurrences(f, now.getFullYear(), now.getMonth())) {
+      if (occ <= todayStr) { due++; if (fixedOccPaid(f, occ)) paid++; }
+    }
+  }
+  if (due === 0) {
+    factors.push({ k: 'score_f_ontime', pts: 20, max: 20, hint: t('score_h_ontime_none') });
+  } else {
+    factors.push({ k: 'score_f_ontime', pts: Math.round(20 * paid / due), max: 20, hint: t('score_h_ontime', { n: paid, m: due }) });
+  }
+  const debt = pendingDebtsTotal();
+  let snap = db.settings.scoreSnap;
+  let debtPts;
+  let debtHint;
+  if (!snap) {
+    debtPts = 8;
+    debtHint = t('score_h_debt_first');
+  } else {
+    const base = snap.debtCents;
+    if (debt === 0 && base === 0) { debtPts = 15; debtHint = t('score_h_debt_zero'); }
+    else if (debt < base) { debtPts = 15; debtHint = t('score_h_debt_down', { amount: fmt(base - debt) }); }
+    else if (debt === base) { debtPts = 10; debtHint = t('score_h_debt_same'); }
+    else { debtPts = 5; debtHint = t('score_h_debt_up', { amount: fmt(debt - base) }); }
+  }
+  factors.push({ k: 'score_f_debt', pts: debtPts, max: 15, hint: debtHint });
+  if (!snap || snap.month !== key) {
+    db.settings.scoreSnap = { month: key, debtCents: debt };
+    if (!demoMode) save();
+  }
+  let fixedMonthly = 0;
+  for (const f of (db.fixed || [])) fixedMonthly += fixedSubsMonthlyCents(f);
+  const refMonth = fixedMonthly > 0 ? fixedMonthly : sumCents(monthCountedExpenses(key));
+  const efund = efundBalanceCents();
+  const efPct = refMonth > 0 ? Math.min(1, efund / refMonth) : (efund > 0 ? 1 : 0);
+  factors.push({ k: 'score_f_efund', pts: Math.round(10 * efPct), max: 10, hint: t('score_h_efund', { pct: Math.round(efPct * 100) }) });
+  const total = factors.reduce((s, f) => s + f.pts, 0);
+  return { total: total, factors: factors };
+}
+function renderScoreCard() {
+  const num = document.getElementById('score-num');
+  const list = document.getElementById('score-factors');
+  if (!num || !list || !db) return;
+  const sc = computePetoScore();
+  num.textContent = String(sc.total);
+  clearNode(list);
+  for (const f of sc.factors) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', t(f.k)));
+    main.appendChild(el('div', 'item-sub', f.hint));
+    li.appendChild(main);
+    li.appendChild(el('span', 'item-amount', f.pts + '/' + f.max));
+    list.appendChild(li);
+  }
+}
+/* ---------------- Compilación 76 · Flujo de caja futuro ------------
+   Proyección día a día a 30/60/90 días: saldo inicial (el banco si
+   hay saldos; si no, las cuentas anotadas), cobros según la
+   frecuencia del ajuste, pagos fijos y cuotas por sus
+   ocurrencias reales, suscripciones detectadas y el gasto
+   variable promedio de los últimos 30 días como estimación.
+   Marca el saldo mínimo y el primer día en negativo. */
+let flowDaysSel = 30;
+function flowStartCents() {
+  if (typeof bankBalancesKnown === 'function' && bankBalancesKnown()) return bankDepositTotalCents();
+  return (db.accounts || []).reduce((s, a) => s + accountShownBalance(a), 0);
+}
+function renderFlowCard() {
+  const body = document.getElementById('flow-body');
+  if (!body || !db) return;
+  clearNode(body);
+  const days = flowDaysSel;
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const events = new Map();
+  const addEv = (dateStr, label, cents) => {
+    if (!events.has(dateStr)) events.set(dateStr, []);
+    events.get(dateStr).push({ label: label, cents: cents });
+  };
+  const perPayday = paydayIncomeCents();
+  if (perPayday > 0) {
+    for (const d of paydaysInRange(start, days)) addEv(localDateStr(d), t('flow_income'), perPayday);
+  }
+  const endMonth = new Date(start.getFullYear(), start.getMonth() + 4, 1);
+  for (const f of (db.fixed || [])) {
+    let y = start.getFullYear();
+    let m = start.getMonth();
+    while (new Date(y, m, 1) < endMonth) {
+      for (const occ of fixedMonthOccurrences(f, y, m)) {
+        const p = occ.split('-');
+        const od = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        if (od >= start && od < new Date(start.getFullYear(), start.getMonth(), start.getDate() + days)) {
+          addEv(occ, f.name, -f.amountCents);
+        }
+      }
+      m++; if (m > 11) { m = 0; y++; }
+    }
+  }
+  const fixedNames = new Set((db.fixed || []).map((f) => f.name.toLowerCase()));
+  for (const d of detectRecurring()) {
+    if (d.freq !== 'month' || fixedNames.has(d.name.toLowerCase())) continue;
+    let nd = d.nextDate;
+    for (let k = 0; k < 4 && nd; k++) {
+      const p = nd.split('-');
+      const od = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+      if (od >= start && od < new Date(start.getFullYear(), start.getMonth(), start.getDate() + days)) {
+        addEv(nd, d.name, -d.amount);
+      }
+      nd = addDaysStr(nd, 30);
+    }
+  }
+  let varSum = 0;
+  const since = addDaysStr(localDateStr(start), -30);
+  for (const e of db.expenses) {
+    if (isTransferMov(e)) continue;
+    if (e.date < since || e.date >= localDateStr(start)) continue;
+    if (fixedNames.has((e.note || '').trim().toLowerCase())) continue;
+    varSum += e.amountCents;
+  }
+  const varDaily = Math.round(varSum / 30);
+  let bal = flowStartCents();
+  let minBal = bal;
+  let minDate = localDateStr(start);
+  let firstNeg = null;
+  const rows = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const ds = localDateStr(d);
+    const evs = events.get(ds) || [];
+    for (const ev of evs) bal += ev.cents;
+    if (varDaily > 0) bal -= varDaily;
+    if (bal < minBal) { minBal = bal; minDate = ds; }
+    if (bal < 0 && !firstNeg) firstNeg = ds;
+    if (evs.length) rows.push({ ds: ds, evs: evs, bal: bal });
+  }
+  body.appendChild(el('p', 'item-sub', t('flow_start') + ': ' + fmt(flowStartCents()) + ' · ' + t('flow_end') + ': ' + fmt(bal)));
+  body.appendChild(el('p', 'item-sub', t('flow_min', { amount: fmt(minBal), date: recurringDateLabel(minDate) })));
+  body.appendChild(el('p', 'item-sub', firstNeg
+    ? t('flow_neg', { date: recurringDateLabel(firstNeg) })
+    : t('flow_ok')));
+  if (varDaily > 0) body.appendChild(el('p', 'item-sub', t('flow_var_note')));
+  const ul = el('ul', 'item-list');
+  for (const r of rows.slice(0, 45)) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', recurringDateLabel(r.ds)));
+    main.appendChild(el('div', 'item-sub', r.evs.map((ev) => ev.label + ' ' + fmt(ev.cents)).join(' · ')));
+    li.appendChild(main);
+    li.appendChild(el('span', 'item-amount', fmt(r.bal)));
+    ul.appendChild(li);
+  }
+  if (!rows.length) body.appendChild(el('p', 'item-sub', t('flow_no_events')));
+  body.appendChild(ul);
+}
+/* ---------------- Compilación 76 · Gastos hormiga ------------------
+   Compras pequeñas y frecuentes: las de hasta el tope elegido en
+   los últimos 30 días, con su costo del mes y el ANUALIZADO en
+   grande, y los principales culpables por categoría y comercio. */
+function renderAntsCard() {
+  const body = document.getElementById('ants-body');
+  if (!body || !db) return;
+  clearNode(body);
+  const maxC = db.settings.antsMaxCents || 1500;
+  const now = new Date();
+  const end = localDateStr(now);
+  const since = addDaysStr(end, -29);
+  const items = (db.expenses || []).filter((e) =>
+    !isTransferMov(e) && e.amountCents > 0 && e.amountCents <= maxC &&
+    e.date >= since && e.date <= end);
+  if (items.length < 3) {
+    body.appendChild(el('p', 'item-sub', t('ants_empty')));
+    return;
+  }
+  const total = items.reduce((s, e) => s + e.amountCents, 0);
+  const annual = Math.round(total * 365 / 30);
+  body.appendChild(el('p', 'item-sub',
+    t('ants_month') + ': ' + fmt(total) + ' (' + items.length + ')'));
+  body.appendChild(el('p', 'score-big', t('ants_year_line', { amount: fmt(annual) })));
+  const byCat = new Map();
+  const byMerch = new Map();
+  for (const e of items) {
+    const c = byCat.get(e.category) || { n: 0, total: 0 };
+    c.n++; c.total += e.amountCents; byCat.set(e.category, c);
+    const note = (e.note || '').trim();
+    if (note) {
+      const mm = byMerch.get(note) || { n: 0, total: 0 };
+      mm.n++; mm.total += e.amountCents; byMerch.set(note, mm);
+    }
+  }
+  const topList = (map, labelOf) => {
+    const arr = [...map.entries()].sort((a, b) => b[1].total - a[1].total).slice(0, 3);
+    const ul = el('ul', 'item-list');
+    for (const [k, v] of arr) {
+      const li = el('li', 'item');
+      const main = el('div', 'item-main');
+      main.appendChild(el('div', 'item-title', labelOf(k)));
+      main.appendChild(el('div', 'item-sub', t('ants_count', { n: v.n })));
+      li.appendChild(main);
+      li.appendChild(el('span', 'item-amount', fmt(v.total)));
+      ul.appendChild(li);
+    }
+    return ul;
+  };
+  body.appendChild(el('h4', null, t('ants_top_cat')));
+  body.appendChild(topList(byCat, (k) => catName(k)));
+  if (byMerch.size) {
+    body.appendChild(el('h4', null, t('ants_top_merch')));
+    body.appendChild(topList(byMerch, (k) => k));
+  }
 }
 
 /* ---------------- TU AÑO EN DINERO (Compilación 45, Bloque Q) -------
@@ -12562,6 +14593,7 @@ let budgetRowInputs = [];
 function updateBudgetTotal() {
   const el = document.getElementById('budget-total');
   if (!el) return;
+  if (db && db.settings && db.settings.zeroBased === true) renderZeroStrip();
   let total = 0;
   for (const row of budgetRowInputs) {
     const cents = parseAmount(row.input.value, false);
@@ -12731,16 +14763,34 @@ function monthReportRowsHTML(d) {
   frag.appendChild(el('p', 'muted small', t('mr_generated')));
   return frag;
 }
-function renderMonthReport() {
+/* Compilación 76 (captura de Sterlin): el informe se quedaba
+   abierto sin forma de recogerlo. Ahora el botón ALTERNAR: con el
+   informe visible lo cierra y vuelve a «Ver el informe»; cerrado,
+   lo genera y lo muestra como siempre. Imprimir sigue forzando
+   abierto (openOnly === true), sin alternar. */
+let mrOpen = false;
+function syncMrButton() {
+  const btn = document.getElementById('mr-generate');
+  if (btn) btn.textContent = t(mrOpen ? 'mr_close' : 'mr_generate');
+}
+function renderMonthReport(openOnly) {
   const out = document.getElementById('mr-output');
   const body = document.getElementById('mr-body');
   if (!out || !body) return;
+  if (openOnly !== true && !out.hidden) {
+    out.hidden = true;
+    mrOpen = false;
+    syncMrButton();
+    return;
+  }
   clearNode(body);
   body.appendChild(monthReportRowsHTML(monthReportData(currentMonthKey())));
   out.hidden = false;
+  mrOpen = true;
+  syncMrButton();
 }
 function printMonthReport() {
-  renderMonthReport();
+  renderMonthReport(true);
   const area = document.getElementById('print-area');
   const body = document.getElementById('mr-body');
   if (!area || !body) return;
@@ -12877,8 +14927,83 @@ function renderBudgetFixedStrip() {
     strip.appendChild(row);
   }
 }
+/* ---------------- Compilación 76 · Sobres con arrastre ------------
+   Opt-in por categoría (db.envelopes): la categoría se comporta
+   como un sobre: lo no gastado de los meses anteriores se suma
+   (y lo pasado se resta) al tope de este mes. El arrastre se
+   calcula desde el primer mes con datos de la persona, con el
+   tope expresado en su equivalente mensual (el de la
+   Compilación 67: semana ×52/12, quincena ×2, mes ×1). */
+function envelopeMonthlyTopCents(cat) {
+  const b = db.budgets[cat] || 0;
+  if (b <= 0) return 0;
+  return budgetMonthlyEquivalentCents(cat, b);
+}
+function envelopeCarryCents(cat, uptoKey) {
+  const top = envelopeMonthlyTopCents(cat);
+  if (top <= 0) return 0;
+  let firstKey = null;
+  for (const e of db.expenses) if (!firstKey || e.date.slice(0, 7) < firstKey) firstKey = e.date.slice(0, 7);
+  for (const i of db.incomes) if (!firstKey || i.date.slice(0, 7) < firstKey) firstKey = i.date.slice(0, 7);
+  if (!firstKey || firstKey >= uptoKey) return 0;
+  let carry = 0;
+  let y = Number(firstKey.slice(0, 4));
+  let m = Number(firstKey.slice(5, 7)) - 1;
+  for (let guard = 0; guard < 60; guard++) {
+    const k = y + '-' + String(m + 1).padStart(2, '0');
+    if (k >= uptoKey) break;
+    let spent = 0;
+    for (const e of monthCountedExpenses(k)) if (e.category === cat) spent += e.amountCents;
+    carry += top - spent;
+    m++; if (m > 11) { m = 0; y++; }
+  }
+  return carry;
+}
+/* ---------------- Compilación 76 · Modo base cero -----------------
+   Opt-in global (settings.zeroBased): la franja sobre la lista de
+   presupuestos enfrenta el ingreso del mes con la suma de topes
+   (en equivalente mensual) y muestra lo que falta por asignar;
+   la meta es dejarlo en $0. */
+function renderZeroStrip() {
+  const box = document.getElementById('budget-zero');
+  if (!box) return;
+  clearNode(box);
+  const row = el('label', 'toggle-row');
+  row.appendChild(el('span', null, t('env_zero')));
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = db.settings.zeroBased === true;
+  cb.addEventListener('change', () => {
+    db.settings.zeroBased = cb.checked;
+    save(); renderBudgets();
+  });
+  row.appendChild(cb);
+  box.appendChild(row);
+  if (db.settings.zeroBased !== true) return;
+  box.appendChild(el('p', 'item-sub', t('env_zero_help')));
+  const income = sumCents(monthCountedIncomes(currentMonthKey()));
+  let assigned = 0;
+  const seen = new Set();
+  for (const r of budgetRowInputs) {
+    seen.add(r.cat);
+    const cents = parseAmount(r.input.value, false);
+    if (cents !== null && cents > 0) assigned += budgetMonthlyEquivalentCents(r.cat, cents);
+  }
+  for (const cat of Object.keys(db.budgets)) {
+    if (!seen.has(cat)) assigned += budgetMonthlyEquivalentCents(cat, db.budgets[cat] || 0);
+  }
+  if (income <= 0) {
+    box.appendChild(el('p', 'item-sub', t('env_zero_noincome')));
+    return;
+  }
+  const left = income - assigned;
+  box.appendChild(el('p', 'item-sub',
+    t('env_unassigned') + ': ' + fmt(left) + (left === 0 ? ' · ' + t('env_zero_ok') : '')));
+}
+
 function renderBudgets() {
   renderBudgetFixedStrip();
+  syncMrButton();
   const key = currentMonthKey();
   const spentByCat = {};
   for (const e of monthCountedExpenses(key)) spentByCat[e.category] = (spentByCat[e.category] || 0) + e.amountCents;
@@ -12922,6 +15047,13 @@ function renderBudgets() {
       fill.style.width = Math.min(100, Math.round(spent / budget * 100)) + '%';
       bar.appendChild(fill);
       main.appendChild(bar);
+      /* Compilación 76: si la categoría es un sobre, su arrastre
+         de meses anteriores se dice en su propia línea (la línea
+         de siempre no cambia). */
+      if (db.envelopes && db.envelopes[cat]) {
+        const carry = envelopeCarryCents(cat, key);
+        if (carry !== 0) main.appendChild(el('div', 'item-sub', t('env_carry_line', { amount: fmt(carry) })));
+      }
     } else {
       main.appendChild(el('div', 'item-sub', t('bud_nolimit', { spent: fmt(spent) })));
     }
@@ -12996,17 +15128,34 @@ function renderBudgets() {
         db.customCategories = db.customCategories.filter((c) => c !== cat);
         delete db.budgets[cat];
         if (db.budgetPeriods) delete db.budgetPeriods[cat];
+        if (db.envelopes) delete db.envelopes[cat];
         for (const e of db.expenses) if (e.category === cat) e.category = 'Otros';
         save(); renderBudgets();
       }));
     }
     editor.appendChild(row);
+    /* Compilación 76: la casilla del sobre vive en el editor de
+       la tarjeta, junto al tope y el período. */
+    const envRow = el('label', 'toggle-row');
+    envRow.appendChild(el('span', null, t('env_rollover')));
+    const envCb = document.createElement('input');
+    envCb.type = 'checkbox';
+    envCb.checked = !!(db.envelopes && db.envelopes[cat]);
+    envCb.addEventListener('change', () => {
+      if (!db.envelopes) db.envelopes = {};
+      if (envCb.checked) db.envelopes[cat] = true;
+      else delete db.envelopes[cat];
+      save(); renderBudgets();
+    });
+    envRow.appendChild(envCb);
+    editor.appendChild(envRow);
     main.appendChild(editor);
     li.appendChild(main);
     ul.appendChild(li);
   }
   const splitHelp = document.getElementById('budget-split-help');
   if (splitHelp) splitHelp.textContent = t('bud_split_help', { pct: effectiveSplit().gastos });
+  renderZeroStrip();
   updateBudgetTotal();
 }
 function onCategorySubmit(ev) {
@@ -13057,6 +15206,14 @@ function fixedMonthOccurrences(f, y, m) {
      cuyo getDay sea el weekday del pago. */
   const lastDay = new Date(y, m + 1, 0).getDate();
   const fmtD = (dd) => y + '-' + String(m + 1).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+  /* Compilación 76: una compra en cuotas solo ocurre dentro de su
+     ventana [instStart, endMonth]; fuera de ella no hay cargo, ni
+     estado pagado, ni aviso, ni registro automático. */
+  if (f.instId) {
+    const mk = y + '-' + String(m + 1).padStart(2, '0');
+    if (f.instStart && mk < f.instStart) return [];
+    if (f.endMonth && mk > f.endMonth) return [];
+  }
   const fr = fixedFreq(f);
   if (fr === 'semanal') {
     const wdn = Number(f.weekday);
@@ -13189,6 +15346,12 @@ function renderFixed() {
       sub = t('fix_sub', { day: item.day, month: monthLabel(key) });
     }
     main.appendChild(el('div', 'item-sub', sub));
+    /* Compilación 76: una compra en cuotas se reconoce en la
+       lista con su avance («Cuota 3 de 12»). */
+    if (item.instId) {
+      const prog = installmentProgress(item);
+      if (prog) main.appendChild(el('div', 'item-sub', t('inst_badge', { a: prog.a, b: prog.b })));
+    }
     li.appendChild(main);
     li.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
     const acts = el('div', 'item-actions');
@@ -13295,13 +15458,118 @@ function recurringDateLabel(dateStr) {
   try { return d.toLocaleDateString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric' }); }
   catch (e) { return dateStr; }
 }
+/* ---------------- Compilación 76 · Centro de suscripciones --------
+   La detección de la Compilación 54 crece a centro completo sin
+   cambiar su base: mismos grupos, misma lista (#recurring-list,
+   mismo botón «Añadir a pagos fijos»). Encima: totales del mes y
+   del año (detectadas + pagos fijos registrados, sin contar dos
+   veces el mismo servicio), y ALERTAS con el historial de cargos:
+   subidas de precio, posibles duplicados y posibles pruebas
+   gratuitas recién convertidas. Solo detección y aviso: PETO
+   Finanzas no cancela nada en nombre de nadie. */
+function fixedSubsMonthlyCents(f) {
+  const fr = fixedFreq(f);
+  if (fr === 'semanal') return Math.round(f.amountCents * 52 / 12);
+  if (fr === 'quincenal') return f.amountCents * 2;
+  return f.amountCents;
+}
+function subscriptionAnalysis() {
+  const groups = new Map();
+  for (const e of db.expenses) {
+    if (isTransferMov(e)) continue;
+    const name = (e.note || '').trim();
+    if (!name) continue;
+    const k = name.toLowerCase();
+    if (!groups.has(k)) groups.set(k, { name: name, items: [] });
+    groups.get(k).items.push(e);
+  }
+  const todayStr = localDateStr(new Date());
+  const detected = detectRecurring().map((r) => {
+    const g = groups.get(r.name.toLowerCase());
+    const items = g ? g.items.slice().sort((a, b) => (a.date < b.date ? -1 : 1)) : [];
+    const last = items.length ? items[items.length - 1] : null;
+    let hike = null;
+    if (items.length >= 3 && last) {
+      const priorMed = recurringMedian(items.slice(0, -1).map((i) => i.amountCents));
+      if (priorMed > 0 && last.amountCents >= Math.round(priorMed * 1.05) &&
+          last.amountCents - priorMed >= 30) {
+        hike = { from: priorMed, to: last.amountCents };
+      }
+    }
+    let dupCharge = false;
+    for (let j = 1; j < items.length; j++) {
+      if (items[j].amountCents === items[j - 1].amountCents &&
+          daysBetweenStr(items[j - 1].date, items[j].date) <= 3) { dupCharge = true; break; }
+    }
+    const inFixed = (db.fixed || []).some((f) => !f.instId &&
+      f.name.toLowerCase() === r.name.toLowerCase());
+    return Object.assign({}, r, {
+      monthlyCents: r.freq === 'week' ? Math.round(r.amount * 52 / 12) : r.amount,
+      hike: hike, dupCharge: dupCharge, inFixed: inFixed
+    });
+  });
+  /* Posible prueba recién convertida: exactamente dos cargos del
+     mismo comercio, el primero pequeño y el segundo claramente
+     mayor, con 5–45 días entre ellos y el segundo reciente. */
+  const trials = [];
+  for (const g of groups.values()) {
+    if (g.items.length !== 2) continue;
+    const items = g.items.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+    const gap = daysBetweenStr(items[0].date, items[1].date);
+    if (gap < 5 || gap > 45) continue;
+    if (items[0].amountCents > 500) continue;
+    if (items[1].amountCents < items[0].amountCents + 100) continue;
+    if (daysBetweenStr(items[1].date, todayStr) > 45) continue;
+    if (detected.some((d) => d.name.toLowerCase() === g.name.toLowerCase())) continue;
+    trials.push({ name: g.name, amount: items[1].amountCents, date: items[1].date });
+  }
+  const fixedSubs = (db.fixed || []).filter((f) => !f.instId).map((f) => ({
+    name: f.name, monthlyCents: fixedSubsMonthlyCents(f), freq: fixedFreq(f)
+  }));
+  let totalMonthly = 0;
+  for (const d of detected) totalMonthly += d.monthlyCents;
+  for (const f of fixedSubs) {
+    if (!detected.some((d) => d.name.toLowerCase() === f.name.toLowerCase())) {
+      totalMonthly += f.monthlyCents;
+    }
+  }
+  return { detected: detected, trials: trials, fixedSubs: fixedSubs, totalMonthly: totalMonthly };
+}
 function renderRecurring() {
   const card = document.getElementById('recurring-card');
   const ul = document.getElementById('recurring-list');
   if (!card || !ul) return;
   const found = (db && Array.isArray(db.expenses)) ? detectRecurring() : [];
   clearNode(ul);
-  card.hidden = !found.length;
+  /* Compilación 76: el centro suma detectadas + pagos fijos y
+     avisa de subidas, duplicados y pruebas convertidas. */
+  const ana = (db && Array.isArray(db.expenses))
+    ? subscriptionAnalysis()
+    : { detected: [], trials: [], fixedSubs: [], totalMonthly: 0 };
+  card.hidden = !(found.length || ana.fixedSubs.length);
+  let head = document.getElementById('subs-head');
+  if (!head) {
+    head = el('div', null);
+    head.id = 'subs-head';
+    card.insertBefore(head, ul);
+  }
+  clearNode(head);
+  if (ana.totalMonthly > 0) {
+    head.appendChild(el('p', 'item-sub',
+      t('subs_total_month') + ': ' + fmt(ana.totalMonthly) + ' · ' +
+      t('subs_total_year') + ': ' + fmt(ana.totalMonthly * 12)));
+  }
+  const byName = {};
+  for (const d of ana.detected) byName[d.name.toLowerCase()] = d;
+  for (const d of ana.detected) {
+    if (d.hike) head.appendChild(el('p', 'item-sub', '⚠ ' + d.name + ': ' +
+      t('subs_hike') + ' · ' + t('subs_hike_d', { old: fmt(d.hike.from), new: fmt(d.hike.to) })));
+    if (d.dupCharge) head.appendChild(el('p', 'item-sub', '⚠ ' + d.name + ': ' + t('subs_dup')));
+  }
+  for (const tr of ana.trials) {
+    head.appendChild(el('p', 'item-sub', '⚠ ' + tr.name + ': ' + t('subs_trial') + ' · ' + fmt(tr.amount)));
+  }
+  head.appendChild(el('p', 'item-sub', t('subs_note')));
   for (const r of found) {
     const li = el('li', 'item');
     const main = el('div', 'item-main');
@@ -13322,9 +15590,32 @@ function renderRecurring() {
       }
       main.appendChild(acts);
     }
+    const ana76 = byName[r.name.toLowerCase()];
+    if (ana76 && ana76.hike) main.appendChild(el('div', 'item-sub', t('subs_hike')));
+    if (ana76 && ana76.dupCharge) main.appendChild(el('div', 'item-sub', t('subs_dup')));
+    if (ana76 && ana76.inFixed) main.appendChild(el('div', 'item-sub', t('subs_in_fixed')));
     li.appendChild(main);
     li.appendChild(el('span', 'item-amount', fmt(r.amount)));
     ul.appendChild(li);
+  }
+  /* Las suscripciones que ya viven como pago fijo se listan con
+     su costo mensual, para que el total del centro se pueda
+     comprobar línea a línea. */
+  let fixedUl = document.getElementById('subs-fixed-list');
+  if (!fixedUl) {
+    fixedUl = el('ul', 'item-list');
+    fixedUl.id = 'subs-fixed-list';
+    card.appendChild(fixedUl);
+  }
+  clearNode(fixedUl);
+  for (const f of ana.fixedSubs) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', f.name));
+    main.appendChild(el('div', 'item-sub', t('subs_in_fixed') + ' · ' + fmt(f.monthlyCents) + ' ' + t('subs_per_month')));
+    li.appendChild(main);
+    li.appendChild(el('span', 'item-amount', fmt(f.monthlyCents)));
+    fixedUl.appendChild(li);
   }
 }
 
@@ -13365,8 +15656,20 @@ function onFixedSubmit(ev) {
 }
 
 /* ---------------- CUENTAS ---------------- */
+function fillAccountCardFields(item) {
+  const isCard = !!(item && (item.cardLimitCents || item.cardCutDay || item.cardDueDay));
+  const cb = document.getElementById('acc-is-card');
+  if (cb) cb.checked = isCard;
+  const box = document.getElementById('acc-card-fields');
+  if (box) box.hidden = !isCard;
+  const set = (id, v) => { const n = document.getElementById(id); if (n) n.value = v || ''; };
+  set('acc-card-limit', item && item.cardLimitCents ? (item.cardLimitCents / 100).toFixed(2) : '');
+  set('acc-card-cut', item && item.cardCutDay ? String(item.cardCutDay) : '');
+  set('acc-card-due', item && item.cardDueDay ? String(item.cardDueDay) : '');
+}
 function resetAccountForm() {
   document.getElementById('account-form').reset();
+  fillAccountCardFields(null);
   document.getElementById('acc-id').value = '';
   document.getElementById('account-form-title').textContent = t('acc_new');
   document.getElementById('acc-cancel-edit').hidden = true;
@@ -13464,6 +15767,7 @@ function onCashSubmit(ev) {
 function renderAccounts() {
   document.getElementById('account-form-title').textContent =
     document.getElementById('acc-id').value ? t('acc_edit') : t('acc_new');
+  renderCards();
   renderCashForm();
   const ul = document.getElementById('account-list');
   clearNode(ul);
@@ -13488,6 +15792,7 @@ function renderAccounts() {
       document.getElementById('acc-id').value = item.id;
       document.getElementById('acc-name').value = item.name;
       document.getElementById('acc-balance').value = (accountShownBalance(item) / 100).toFixed(2);
+      fillAccountCardFields(item);
       document.getElementById('account-form-title').textContent = t('acc_edit');
       document.getElementById('acc-cancel-edit').hidden = false;
       window.scrollTo(0, 0);
@@ -13510,17 +15815,212 @@ function onAccountSubmit(ev) {
   if (cents === null) { showError('acc-error', t('err_balance')); return; }
   const id = document.getElementById('acc-id').value;
   if (!id && db.accounts.length >= MAX_ITEMS) { showError('acc-error', t('err_limit_accounts')); return; }
+  /* Compilación 76: si la casilla «es tarjeta» está marcada, la
+     cuenta guarda límite y días de corte y pago; si no, esos
+     datos se retiran (una cuenta que deja de ser tarjeta no debe
+     seguir avisando vencimientos). */
+  const cardData = {};
+  const isCardEl = document.getElementById('acc-is-card');
+  if (isCardEl && isCardEl.checked) {
+    const lim = parseAmount(document.getElementById('acc-card-limit').value, false);
+    if (lim !== null && lim > 0) cardData.cardLimitCents = lim;
+    for (const [fid, prop] of [['acc-card-cut', 'cardCutDay'], ['acc-card-due', 'cardDueDay']]) {
+      const dv = Math.trunc(Number(document.getElementById(fid).value));
+      if (Number.isFinite(dv) && dv >= 1 && dv <= 31) cardData[prop] = dv;
+    }
+  }
+  const applyCard = (acc) => {
+    delete acc.cardLimitCents; delete acc.cardCutDay; delete acc.cardDueDay;
+    Object.assign(acc, cardData);
+  };
   beginUndo();
   if (id) {
     const found = db.accounts.find((x) => x.id === id);
     /* Compilación 41: teclear un saldo REDEFINE la base (lo tecleado
        menos la suma de movimientos enlazados) para que el saldo
        mostrado sea exactamente el tecleado. */
-    if (found) { found.name = name; found.balanceCents = cents - accountLinkedSum(found.id); }
+    if (found) { found.name = name; found.balanceCents = cents - accountLinkedSum(found.id); applyCard(found); }
   } else {
-    db.accounts.push({ id: uid(), name, balanceCents: cents });
+    const nueva = { id: uid(), name, balanceCents: cents };
+    applyCard(nueva);
+    db.accounts.push(nueva);
   }
   save(); resetAccountForm(); renderAccounts(); showUndoToast();
+}
+
+/* ---------------- Compilación 76 · Tus tarjetas y cuotas ----------
+   Módulo de tarjeta sobre cardTargets(): por cada tarjeta, su
+   límite, el disponible (límite − deuda), el próximo corte y el
+   próximo vencimiento. Las del banco se editan aquí (sus datos
+   viven en db.cardInfo: el banco no los entrega); las manuales se
+   editan en su propio formulario. Y las compras en cuotas: se
+   registran como UN pago fijo mensual con ventana [instStart,
+   endMonth], así heredan registro automático, avisos y flujo. */
+function cardDateLine(day, labelKey) {
+  if (!day) return null;
+  const nd = nextMonthlyDayDate(day, new Date());
+  if (!nd) return null;
+  const n = daysBetweenStr(localDateStr(new Date()), localDateStr(nd));
+  return t(labelKey, { date: recurringDateLabel(localDateStr(nd)), n: n });
+}
+function renderCards() {
+  const list = document.getElementById('cards-list');
+  if (!list || !db) return;
+  clearNode(list);
+  const cards = cardTargets();
+  const empty = document.getElementById('cards-empty');
+  if (empty) empty.hidden = cards.length > 0;
+  for (const card of cards) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', card.name));
+    if (card.limitCents > 0) {
+      main.appendChild(el('div', 'item-sub',
+        t('card_limit') + ': ' + fmt(card.limitCents) + ' · ' +
+        t('card_avail') + ': ' + fmt(Math.max(0, card.limitCents - card.debtCents))));
+    }
+    if (card.debtCents > 0) {
+      main.appendChild(el('div', 'item-sub', t('card_debt') + ': ' + fmt(card.debtCents)));
+    }
+    const cutLine = cardDateLine(card.cutDay, 'card_next_cut');
+    if (cutLine) main.appendChild(el('div', 'item-sub', cutLine));
+    const dueLine = cardDateLine(card.dueDay, 'card_next_due');
+    if (dueLine) main.appendChild(el('div', 'item-sub', dueLine));
+    li.appendChild(main);
+    const acts = el('div', 'item-actions');
+    if (card.manualId) {
+      acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
+        const item = db.accounts.find((x) => x.id === card.manualId);
+        if (!item) return;
+        document.getElementById('acc-id').value = item.id;
+        document.getElementById('acc-name').value = item.name;
+        document.getElementById('acc-balance').value = (accountShownBalance(item) / 100).toFixed(2);
+        fillAccountCardFields(item);
+        document.getElementById('account-form-title').textContent = t('acc_edit');
+        document.getElementById('acc-cancel-edit').hidden = false;
+        window.scrollTo(0, 0);
+      }));
+    } else if (card.bankId) {
+      acts.appendChild(actionButton(t('card_edit'), 'btn-ghost', () => {
+        openBankCardEditor(card, li);
+      }));
+    }
+    li.appendChild(acts);
+    list.appendChild(li);
+  }
+  renderInstallments();
+}
+function openBankCardEditor(card, li) {
+  if (li.querySelector('.bank-card-editor')) return;
+  const info = (db.cardInfo && db.cardInfo[card.bankId]) || {};
+  const box = el('div', 'bank-card-editor');
+  const mkNum = (val, min, max) => {
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.min = String(min); inp.max = String(max); inp.step = '1';
+    inp.value = val || '';
+    return inp;
+  };
+  const lim = document.createElement('input');
+  lim.type = 'number'; lim.inputMode = 'decimal'; lim.min = '0'; lim.step = '0.01';
+  lim.value = info.limitCents ? (info.limitCents / 100).toFixed(2) : '';
+  lim.placeholder = t('card_limit');
+  const cut = mkNum(info.cutDay, 1, 31); cut.placeholder = t('card_cut');
+  const due = mkNum(info.dueDay, 1, 31); due.placeholder = t('card_due');
+  box.appendChild(lim); box.appendChild(cut); box.appendChild(due);
+  box.appendChild(actionButton(t('card_save'), 'btn-secondary', () => {
+    const entry = {};
+    const limC = parseAmount(lim.value, false);
+    if (limC !== null && limC > 0) entry.limitCents = limC;
+    for (const [inp, prop] of [[cut, 'cutDay'], [due, 'dueDay']]) {
+      const dv = Math.trunc(Number(inp.value));
+      if (Number.isFinite(dv) && dv >= 1 && dv <= 31) entry[prop] = dv;
+    }
+    if (!db.cardInfo) db.cardInfo = {};
+    if (Object.keys(entry).length) db.cardInfo[card.bankId] = entry;
+    else delete db.cardInfo[card.bankId];
+    save(); renderCards(); scheduleNotifications();
+  }));
+  li.appendChild(box);
+}
+function installmentProgress(f) {
+  if (!f.instStart || !f.instTotal) return null;
+  const cur = currentMonthKey();
+  const endK = f.endMonth && f.endMonth < cur ? f.endMonth : cur;
+  if (endK < f.instStart) return { a: 0, b: f.instTotal };
+  const a = (Number(endK.slice(0, 4)) - Number(f.instStart.slice(0, 4))) * 12 +
+    (Number(endK.slice(5, 7)) - Number(f.instStart.slice(5, 7))) + 1;
+  return { a: Math.min(a, f.instTotal), b: f.instTotal };
+}
+function renderInstallments() {
+  const ul = document.getElementById('inst-list');
+  if (!ul || !db) return;
+  clearNode(ul);
+  for (const f of (db.fixed || [])) {
+    if (!f.instId) continue;
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', f.name));
+    const prog = installmentProgress(f);
+    if (prog) main.appendChild(el('div', 'item-sub', t('inst_badge', { a: prog.a, b: prog.b })));
+    if (f.instSumCents) main.appendChild(el('div', 'item-sub', t('inst_total') + ': ' + fmt(f.instSumCents)));
+    li.appendChild(main);
+    li.appendChild(el('span', 'item-amount', fmt(f.amountCents)));
+    const acts = el('div', 'item-actions');
+    acts.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
+      if (!window.confirm(t('inst_delete_confirm'))) return;
+      beginUndo();
+      db.fixed = db.fixed.filter((x) => x.id !== f.id);
+      save(); renderFixed(); renderCards(); showUndoToast();
+    }));
+    li.appendChild(acts);
+    ul.appendChild(li);
+  }
+  /* El selector de tarjeta del alta de cuotas se rellena aquí:
+     tarjetas conocidas + «sin tarjeta». */
+  const sel = document.getElementById('inst-card');
+  if (sel) {
+    const prev = sel.value;
+    clearNode(sel);
+    const none = el('option', null, t('inst_none'));
+    none.value = '';
+    sel.appendChild(none);
+    for (const c of cardTargets()) {
+      const opt = el('option', null, c.name);
+      opt.value = c.key;
+      sel.appendChild(opt);
+    }
+    sel.value = prev;
+  }
+}
+function onInstSubmit(ev) {
+  ev.preventDefault();
+  const name = cleanText(document.getElementById('inst-name').value, 60);
+  const total = parseAmount(document.getElementById('inst-total').value, false);
+  const n = Math.trunc(Number(document.getElementById('inst-n').value));
+  const dayRaw = Math.trunc(Number(document.getElementById('inst-day').value));
+  if (!name) { showError('inst-error', t('err_name')); return; }
+  if (total === null || total <= 0) { showError('inst-error', t('err_amount')); return; }
+  if (!Number.isFinite(n) || n < 2 || n > 60) { showError('inst-error', t('inst_err_n')); return; }
+  const base = Math.floor(total / n);
+  if (base <= 0) { showError('inst-error', t('err_amount')); return; }
+  const day = (Number.isFinite(dayRaw) && dayRaw >= 1 && dayRaw <= 31) ? dayRaw : 1;
+  const now = new Date();
+  const startKey = currentMonthKey();
+  const endD = new Date(now.getFullYear(), now.getMonth() + (n - 1), 1);
+  const endKey = endD.getFullYear() + '-' + String(endD.getMonth() + 1).padStart(2, '0');
+  const instId = uid();
+  db.fixed.push({
+    id: uid(), name: name, amountCents: base, day: day,
+    paidMonths: {}, autoMonths: {}, paidOcc: {}, autoOcc: {},
+    instId: instId, instTotal: n, instStart: startKey, endMonth: endKey,
+    instSumCents: total
+  });
+  save();
+  document.getElementById('inst-form').reset();
+  document.getElementById('inst-form').hidden = true;
+  showError('inst-error', '');
+  renderFixed(); renderCards(); scheduleNotifications();
+  showToastMsg(t('inst_created', { n: n, amount: fmt(base) }));
 }
 
 /* ---------------- DEUDAS ---------------- */
@@ -15461,6 +17961,26 @@ function renderSettings() {
   }
   paydaySel.value = (db.settings.payday === null || db.settings.payday === undefined)
     ? '' : String(db.settings.payday);
+  /* Compilación 76: frecuencia de cobro y día del mes. El selector
+     de día de la semana solo se muestra en semanal/quincenal y el
+     de día del mes solo en mensual (syncPaydayFields). */
+  const payFreqSel = document.getElementById('set-payfreq');
+  if (payFreqSel) payFreqSel.value = payFreqOf();
+  const payMonthSel = document.getElementById('set-paymonthday');
+  if (payMonthSel) {
+    if (!payMonthSel.options.length) {
+      const noneMd = el('option', null, '—');
+      noneMd.value = '';
+      payMonthSel.appendChild(noneMd);
+      for (let d = 1; d <= 31; d++) {
+        const opt = el('option', null, String(d));
+        opt.value = String(d);
+        payMonthSel.appendChild(opt);
+      }
+    }
+    payMonthSel.value = db.settings.payMonthDay == null ? '' : String(db.settings.payMonthDay);
+  }
+  syncPaydayFields();
   document.getElementById('set-reminders').checked = db.settings.reminders !== false;
   document.getElementById('set-notifications').checked = db.settings.notifications === true;
   document.getElementById('set-autofixed').checked = db.settings.autoFixed !== false;
@@ -15582,6 +18102,28 @@ function saveSettingsFromForm() {
   const paydayNum = Math.trunc(Number(paydayRaw));
   db.settings.payday = (paydayRaw !== '' && Number.isFinite(paydayNum) && paydayNum >= 0 && paydayNum <= 6)
     ? paydayNum : null;
+  /* Compilación 76: la frecuencia manda. En quincenal, si falta el
+     ancla del ciclo de 14 días, se fija al PRÓXIMO día de cobro:
+     así el ciclo queda determinado sin pedir otra fecha. */
+  const payFreqEl = document.getElementById('set-payfreq');
+  if (payFreqEl && ['semanal', 'quincenal', 'mensual'].includes(payFreqEl.value)) {
+    db.settings.payFreq = payFreqEl.value;
+  }
+  const payMonthEl = document.getElementById('set-paymonthday');
+  if (payMonthEl) {
+    const md = Math.trunc(Number(payMonthEl.value));
+    db.settings.payMonthDay = (payMonthEl.value !== '' && Number.isFinite(md) && md >= 1 && md <= 31) ? md : null;
+  }
+  if (db.settings.payFreq === 'quincenal') {
+    if (!db.settings.payAnchor && db.settings.payday != null) {
+      const nx = new Date();
+      nx.setHours(0, 0, 0, 0);
+      while (nx.getDay() !== db.settings.payday) nx.setDate(nx.getDate() + 1);
+      db.settings.payAnchor = localDateStr(nx);
+    }
+  } else {
+    db.settings.payAnchor = null;
+  }
   db.settings.reminders = document.getElementById('set-reminders').checked === true;
   db.settings.notifications = document.getElementById('set-notifications').checked === true;
   db.settings.autoFixed = document.getElementById('set-autofixed').checked === true;
@@ -16451,7 +18993,10 @@ async function scheduleNotifications() {
       lastNotifSig = '';
       return;
     }
-    const sig = JSON.stringify(db.fixed) + '|' + db.settings.lang;
+    /* Compilación 76: la firma cubre también el cobro (frecuencia)
+       y los vencimientos de tarjeta, para reprogramar al cambiar. */
+    const sig = JSON.stringify(db.fixed) + '|' + db.settings.lang + '|' +
+      JSON.stringify({ p: db.settings.payday, f: db.settings.payFreq, m: db.settings.payMonthDay, a: db.settings.payAnchor, ci: db.cardInfo, ac: (db.accounts || []).map((x) => [x.id, x.cardDueDay || 0]) });
     if (sig === lastNotifSig) return;
     const pending = await LN.getPending();
     if (pending.notifications.length) await LN.cancel(pending);
@@ -16489,6 +19034,35 @@ async function scheduleNotifications() {
         if (dayBefore > now) list.push({ id: notifId(f.id + key + 'b'), title: t('notif_fixed_title'), body: body, isExactNotification: false, schedule: { at: dayBefore } });
         if (due > now) list.push({ id: notifId(f.id + key + 'd'), title: t('notif_fixed_today'), body: body, isExactNotification: false, schedule: { at: due } });
       }
+    }
+    /* Compilación 76: aviso de cobro el día antes (la frecuencia
+       la resuelven los helpers: semanal, quincenal o mensual). */
+    if (payConfigured()) {
+      const seenPay = new Set();
+      let cursor = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      for (let k = 0; k < 3; k++) {
+        const np = nextPaydayDate(cursor);
+        if (!np) break;
+        const key = localDateStr(np);
+        if (seenPay.has(key)) break;
+        seenPay.add(key);
+        const due = new Date(np.getFullYear(), np.getMonth(), np.getDate(), 9, 0, 0);
+        const dayBefore = new Date(due.getTime() - 24 * 3600 * 1000);
+        if (dayBefore > now) list.push({ id: notifId('payday' + key), title: t('notif_payday_t'), body: t('notif_payday_b'), isExactNotification: false, schedule: { at: dayBefore } });
+        cursor = new Date(np.getFullYear(), np.getMonth(), np.getDate() + 1);
+      }
+    }
+    /* Compilación 76: aviso de vencimiento de tarjeta: tres días
+       antes y el mismo día a las 9:00, como los pagos fijos. */
+    for (const card of cardTargets()) {
+      if (!card.dueDay) continue;
+      const nd = nextMonthlyDayDate(card.dueDay, now);
+      if (!nd) continue;
+      const due = new Date(nd.getFullYear(), nd.getMonth(), nd.getDate(), 9, 0, 0);
+      const warn = new Date(due.getTime() - 3 * 24 * 3600 * 1000);
+      const body = t('notif_card_b', { name: card.name, date: recurringDateLabel(localDateStr(nd)) });
+      if (warn > now) list.push({ id: notifId('card' + card.key + 'w'), title: t('notif_card_t'), body: body, isExactNotification: false, schedule: { at: warn } });
+      if (due > now) list.push({ id: notifId('card' + card.key + 'd'), title: t('notif_card_t'), body: body, isExactNotification: false, schedule: { at: due } });
     }
     const sun = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0);
     while (sun.getDay() !== 0 || sun <= now) sun.setDate(sun.getDate() + 1);
@@ -17584,6 +20158,7 @@ function cloudStatus(msg) {
   if (s) s.textContent = msg || '';
 }
 function renderCloudCard() {
+  renderHomeAccount();
   const summaryRowCloud = document.getElementById('summary-email-row');
   if (summaryRowCloud) summaryRowCloud.hidden = !cloudUser;
   renderBankCard();
@@ -17768,6 +20343,17 @@ async function onCloudSignIn() {
     cloudStatus(t('cloud_ok_in'));
   } catch (e) { cloudStatus(''); showError('cloud-error', t('cloud_err_generic')); }
   renderCloudCard();
+}
+/* Compilación 76 (pedido de Sterlin): «Salir» visible — cierra la
+   sesión de la nube si la hay y vuelve a la BIENVENIDA. Los datos
+   locales NO se tocan. Si el dispositivo tiene PIN, el regreso
+   por «Empezar» pasa por el bloqueo (ver onWelcomeStart). */
+async function exitToWelcome() {
+  closeMenu();
+  if (cloudUser) {
+    try { await onCloudSignOut(); } catch (e) { /* la bienvenida se muestra igual */ }
+  }
+  showOnboarding();
 }
 async function onCloudSignOut() {
   const sb = supa();
@@ -18226,6 +20812,32 @@ function bankApplySyncAccounts(out) {
   }
   return changed;
 }
+/* Compilación 76 (punto 18): la marca local de «última
+   sincronización» (la que pinta la franja del banco en Inicio)
+   avanza con CADA sincronización completada, entren o no
+   movimientos o saldos nuevos. bankApplySyncAccounts ya la
+   avanza para las conexiones que traen saldos en la respuesta;
+   esta cubre a las demás conexiones que sincronizaron en la
+   pasada: las que la respuesta lista en out.connections (con
+   connection_id o id), o TODAS las guardadas si la respuesta
+   no las lista (la sync procesa todas las del usuario). */
+function bankStampSyncedAt(out) {
+  if (!db || !db.settings || !Array.isArray(db.settings.bankConns)) return false;
+  const nowIso = new Date().toISOString();
+  let ids = null;
+  if (out && Array.isArray(out.connections)) {
+    ids = new Set(out.connections
+      .map((r) => (r && typeof r === 'object') ? String(r.connection_id || r.id || '') : '')
+      .filter(Boolean));
+  }
+  let changed = false;
+  for (const c of db.settings.bankConns) {
+    if (!c || typeof c !== 'object') continue;
+    if (ids && !ids.has(String(c.id))) continue;
+    if (c.lastSyncedAt !== nowIso) { c.lastSyncedAt = nowIso; changed = true; }
+  }
+  return changed;
+}
 /* Las vistas que dependen de los saldos se repintan tras una
    sincronización que los movió. */
 function refreshBankViews() {
@@ -18339,6 +20951,14 @@ function onBankWaitlistJoin() {
   renderBankCard();
 }
 
+/* Compilación 76: quien no tiene cuenta en la nube ve PRIMERO
+   «Crea tu cuenta» y después «Conecta tu banco»: sin cuenta, el
+   banco ni siquiera puede conectarse (Plaid exige sesión). */
+function renderHomeAccount() {
+  const card = document.getElementById('home-account');
+  if (!card) return;
+  card.hidden = !!(demoMode || cloudUser);
+}
 function renderHomeBank() {
   const wrap = document.getElementById('home-bank');
   if (!wrap) return;
@@ -18677,6 +21297,10 @@ function bankPlaidFrameFix() {
 function bankPlaidOpen(on) {
   const de = document.documentElement;
   if (!de) return;
+  /* Compilación 76: el banner nativo tapaba el botón de
+     continuación de Plaid Link: se retira mientras Link vive y
+     vuelve al cerrar (onExit/onSuccess pasan por aquí). */
+  setAdsSuppressed(!!on);
   if (on) {
     if (de.classList) de.classList.add('plaid-open');
     try { window.scrollTo(0, 0); } catch (e) { /* sin scroll no pasa nada */ }
@@ -18818,6 +21442,17 @@ async function bankRunSync(opts) {
     save();
     refreshBankViews();
   }
+  /* Compilación 76 (punto 18): TODA sincronización completada
+     deja dos marcas aunque no entren movimientos ni saldos
+     nuevos, para que la persona VEA que su banco se sincronizó:
+     el reloj en memoria que frena el re-disparo al volver a la
+     app (bankResumeSync) y la marca local de «última
+     sincronización» de las conexiones sincronizadas en esta
+     pasada (bankStampSyncedAt). La tarjeta de Ajustes también
+     se repinta: su etiqueta sale de las filas recién cargadas. */
+  bankLastSyncDoneAt = Date.now();
+  if (bankStampSyncedAt(out)) save();
+  renderBankCard();
   /* Compilación 51: al terminar CUALQUIER sincronización
      (manual o automática, traiga o no saldos nuevos), Inicio
      se repinta entero — tarjetas, «¿Cuánto puedes gastar
@@ -18886,6 +21521,52 @@ async function bankAutoSync() {
     if (!bankSyncDueOnOpen()) return;
     await bankRunSync({ silent: true });
   } catch (e) { /* silencio: el botón «Sincronizar» sigue disponible */ }
+}
+
+/* ---------- Compilación 76 · Sincronizar también al VOLVER ----
+   (punto 18, pedido de Sterlin al ver su banco conectado con la
+   última sincronización de hacía horas). bankAutoSync cubre el
+   arranque en frío, pero si la app queda en segundo plano y se
+   reabre desde recientes, el WebView se reanuda SIN recargar la
+   página y no había sincronización nueva. Al volver a primer
+   plano se re-dispara la misma sincronización silenciosa, con
+   dos frenos para no martillar a Plaid:
+   - intervalo mínimo entre sincronizaciones automáticas:
+     BANK_RESUME_SYNC_MIN_MS (15 min) desde la última completada
+     (bankLastSyncDoneAt lo estampa bankRunSync al terminar, así
+     la de apertura y la manual también cuentan para el freno);
+   - la red de seguridad de siempre: sin sesión en la nube, sin
+     conexiones sincronizables o en demo no hace nada, y si la
+     sincronización falla, silencio.
+   Con la pantalla de bloqueo visible se espera: enterApp (al
+   desbloquear) vuelve a llamar y el freno decide. */
+const BANK_RESUME_SYNC_MIN_MS = 15 * 60 * 1000;
+let bankLastSyncDoneAt = 0;
+async function bankResumeSync() {
+  if (!PETO_BANK_ENABLED || bankBusy || demoMode) return;
+  if (!supa() || !cloudUser) return;
+  const lock = document.getElementById('view-lock');
+  if (lock && !lock.hidden) return;
+  if (bankLastSyncDoneAt &&
+      Date.now() - bankLastSyncDoneAt < BANK_RESUME_SYNC_MIN_MS) return;
+  try {
+    if (!bankConnections || bankLoadedFor !== cloudUser.id) await bankLoadConnections();
+    if (!bankSyncDueOnOpen()) return;
+    await bankRunSync({ silent: true });
+  } catch (e) { /* silencio: el botón «Sincronizar» sigue disponible */ }
+}
+/* El aviso nativo de «la app volvió a primer plano» (Capacitor
+   App appStateChange): el mismo re-disparo de bankResumeSync,
+   que ya trae sus frenos. Sin plugin (web), basta con el
+   visibilitychange de bindEvents. */
+function initResumeSync() {
+  const App = capPlugin('App');
+  if (!App || typeof App.addListener !== 'function') return;
+  try {
+    App.addListener('appStateChange', (state) => {
+      if (state && state.isActive) bankResumeSync();
+    });
+  } catch (e) { /* sin listener, basta visibilitychange */ }
 }
 
 /* ---------------- Compilación 55 · MIS REGLAS DE CATEGORÍAS ----
@@ -19190,6 +21871,36 @@ function householdSyncSave() {
    de la app (diseño §3): se monta un db completo con los ajustes
    locales y las llaves compartidas remotas, se pasa por validateData
    y se extraen solo las llaves del hogar. */
+/* Compilación 76: las metas compartidas y el registro de
+   «quién debe a quién» viven en el libro del hogar con forma
+   propia (no son las metas ni las deudas del libro personal):
+   se limpian aparte del validateData de siempre. */
+function sharedGoalsClean(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.slice(0, 20).filter((x) => x && typeof x === 'object').map((g) => ({
+    id: cleanId(g.id),
+    name: cleanText(g.name, 60) || 'Meta',
+    targetCents: Math.max(1, cleanCents(g.targetCents, false)),
+    contribs: (Array.isArray(g.contribs) ? g.contribs : []).slice(0, 200)
+      .filter((c) => c && typeof c === 'object').map((c) => ({
+        by: cleanText(c.by, 40),
+        amountCents: cleanCents(c.amountCents, false),
+        ts: Number.isFinite(Number(c.ts)) ? Number(c.ts) : 0
+      }))
+  }));
+}
+function sharedIouClean(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.slice(0, 100).filter((x) => x && typeof x === 'object').map((x) => ({
+    id: cleanId(x.id),
+    from: cleanText(x.from, 40),
+    to: cleanText(x.to, 40),
+    amountCents: cleanCents(x.amountCents, false),
+    note: cleanText(x.note, 80),
+    settled: x.settled === true,
+    ts: Number.isFinite(Number(x.ts)) ? Number(x.ts) : 0
+  })).filter((x) => x.from && x.to && x.from !== x.to && x.amountCents > 0);
+}
 function sharedBookClean(raw) {
   const empty = { expenses: [], incomes: [], budgets: {}, budgetPeriods: {}, fixed: [], customCategories: [] };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return empty;
@@ -19201,7 +21912,9 @@ function sharedBookClean(raw) {
   return {
     expenses: clean.expenses, incomes: clean.incomes, budgets: clean.budgets,
     budgetPeriods: clean.budgetPeriods,
-    fixed: clean.fixed, customCategories: clean.customCategories
+    fixed: clean.fixed, customCategories: clean.customCategories,
+    goals: sharedGoalsClean(raw ? raw.goals : null),
+    iou: sharedIouClean(raw ? raw.iou : null)
   };
 }
 async function householdPull() {
@@ -19221,6 +21934,7 @@ async function householdPull() {
       householdSync = { householdId: hid, lastRemoteAt: '', dirty: true };
     }
     householdSyncSave();
+    renderSharedCard();
   } catch (e) { /* sin red: el libro queda como estaba */ }
 }
 async function householdPush() {
@@ -19419,6 +22133,151 @@ function renderSharedCard() {
     main.appendChild(el('div', 'item-sub', t('shared_role_' + mm.role)));
     li.appendChild(main);
     ul.appendChild(li);
+  }
+  renderFamSections(st);
+}
+/* Compilación 76 · Pareja/familia 2.0: sobre el hogar existente
+   (los permisos ya viven en el rol de cada miembro: dueño,
+   administra, edita o solo ve — y el rol «lector» ya no puede
+   escribir en el libro), la tarjeta gana metas COMPARTIDAS con
+   aportes por miembro y el registro de «quién debe a quién» con
+   saldos netos y botón de saldado. Todo viaja en el libro del
+   hogar (household_data), con la sync de siempre. */
+function renderFamSections(st) {
+  const wrap = document.getElementById('fam-wrap');
+  if (!wrap) return;
+  clearNode(wrap);
+  const book = householdBook;
+  const canEdit = !!st.household && st.household.role !== 'lector';
+  wrap.appendChild(el('h4', null, t('fam_goals')));
+  const goals = book ? (book.goals || []) : [];
+  if (!goals.length) wrap.appendChild(el('p', 'item-sub', t('fam_goal_empty')));
+  const gul = el('ul', 'item-list');
+  for (const g of goals) {
+    const saved = (g.contribs || []).reduce((s, c) => s + c.amountCents, 0);
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', g.name));
+    const pct = g.targetCents > 0 ? Math.min(100, Math.round(saved / g.targetCents * 100)) : 0;
+    main.appendChild(el('div', 'item-sub', fmt(saved) + ' / ' + fmt(g.targetCents) + ' · ' + pct + '%'));
+    li.appendChild(main);
+    if (canEdit) {
+      const acts = el('div', 'item-actions');
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.inputMode = 'decimal'; inp.min = '0'; inp.step = '0.01';
+      inp.placeholder = '$';
+      inp.setAttribute('aria-label', t('fam_contrib'));
+      acts.appendChild(inp);
+      acts.appendChild(actionButton(t('fam_contrib'), 'btn-secondary', () => {
+        const cents = parseAmount(inp.value, false);
+        if (cents === null || cents <= 0 || !householdBook) return;
+        const goal = (householdBook.goals || []).find((x) => x.id === g.id);
+        if (!goal) return;
+        if (!Array.isArray(goal.contribs)) goal.contribs = [];
+        goal.contribs.push({ by: sharedMeName(), amountCents: cents, ts: Date.now() });
+        householdMarkDirty();
+        renderSharedCard();
+      }));
+      li.appendChild(acts);
+    }
+    gul.appendChild(li);
+  }
+  wrap.appendChild(gul);
+  if (canEdit) {
+    const grow = el('div', 'budget-input-row');
+    const gname = document.createElement('input');
+    gname.type = 'text'; gname.maxLength = 60;
+    gname.placeholder = t('fam_goal_name');
+    const gtarget = document.createElement('input');
+    gtarget.type = 'number'; gtarget.inputMode = 'decimal'; gtarget.min = '0'; gtarget.step = '0.01';
+    gtarget.placeholder = t('fam_goal_target');
+    grow.appendChild(gname);
+    grow.appendChild(gtarget);
+    grow.appendChild(actionButton(t('fam_goal_add'), 'btn-secondary', () => {
+      const name = cleanText(gname.value, 60);
+      const cents = parseAmount(gtarget.value, false);
+      if (!name || cents === null || cents <= 0 || !householdBook) return;
+      if (!Array.isArray(householdBook.goals)) householdBook.goals = [];
+      householdBook.goals.push({ id: uid(), name: name, targetCents: cents, contribs: [] });
+      householdMarkDirty();
+      renderSharedCard();
+    }));
+    wrap.appendChild(grow);
+  }
+  wrap.appendChild(el('h4', null, t('fam_iou')));
+  const ious = book ? (book.iou || []) : [];
+  const open = ious.filter((x) => !x.settled);
+  if (!open.length) wrap.appendChild(el('p', 'item-sub', t('fam_iou_empty')));
+  const net = {};
+  for (const x of open) {
+    net[x.from] = (net[x.from] || 0) - x.amountCents;
+    net[x.to] = (net[x.to] || 0) + x.amountCents;
+  }
+  for (const name of Object.keys(net)) {
+    if (net[name] > 0) wrap.appendChild(el('p', 'item-sub', name + ': ' + t('fam_net_pos', { amount: fmt(net[name]) })));
+    else if (net[name] < 0) wrap.appendChild(el('p', 'item-sub', name + ': ' + t('fam_net_neg', { amount: fmt(-net[name]) })));
+  }
+  const iul = el('ul', 'item-list');
+  for (const x of open) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', x.from + ' → ' + x.to));
+    if (x.note) main.appendChild(el('div', 'item-sub', x.note));
+    li.appendChild(main);
+    li.appendChild(el('span', 'item-amount', fmt(x.amountCents)));
+    if (canEdit) {
+      const acts = el('div', 'item-actions');
+      acts.appendChild(actionButton(t('fam_iou_settle'), 'btn-ghost', () => {
+        if (!householdBook) return;
+        const item = (householdBook.iou || []).find((y) => y.id === x.id);
+        if (!item) return;
+        item.settled = true;
+        householdMarkDirty();
+        renderSharedCard();
+      }));
+      li.appendChild(acts);
+    }
+    iul.appendChild(li);
+  }
+  wrap.appendChild(iul);
+  if (canEdit && st.members.length >= 2) {
+    const irow = el('div', 'budget-input-row');
+    const mkSel = () => {
+      const sel = document.createElement('select');
+      for (const mm of st.members) {
+        const opt = el('option', null, mm.name);
+        opt.value = mm.name;
+        sel.appendChild(opt);
+      }
+      return sel;
+    };
+    const fromSel = mkSel();
+    const toSel = mkSel();
+    if (toSel.options.length > 1) toSel.selectedIndex = 1;
+    const amt = document.createElement('input');
+    amt.type = 'number'; amt.inputMode = 'decimal'; amt.min = '0'; amt.step = '0.01';
+    amt.placeholder = '$';
+    const noteInp = document.createElement('input');
+    noteInp.type = 'text'; noteInp.maxLength = 80;
+    noteInp.placeholder = t('fam_note_ph');
+    irow.appendChild(fromSel);
+    irow.appendChild(toSel);
+    irow.appendChild(amt);
+    irow.appendChild(noteInp);
+    irow.appendChild(actionButton(t('fam_iou_add'), 'btn-secondary', () => {
+      const cents = parseAmount(amt.value, false);
+      if (cents === null || cents <= 0 || !householdBook) return;
+      if (fromSel.value === toSel.value) return;
+      if (!Array.isArray(householdBook.iou)) householdBook.iou = [];
+      householdBook.iou.push({
+        id: uid(), from: fromSel.value, to: toSel.value,
+        amountCents: cents, note: cleanText(noteInp.value, 80),
+        settled: false, ts: Date.now()
+      });
+      householdMarkDirty();
+      renderSharedCard();
+    }));
+    wrap.appendChild(irow);
   }
 }
 function onSharedCreate() {
@@ -20427,8 +23286,15 @@ function enterApp() {
   });
   checkWidgetPendingAction();
   /* Compilación 75: quien entra por «Empezar» de la bienvenida nueva
-     recibe el tour contextual dentro de la app, una sola vez. */
-  if (guidePending) { guidePending = false; startGuideTour(); }
+     recibe el tour contextual dentro de la app, una sola vez.
+     Compilación 76: antes del tour corre el asistente de primer
+     uso (cuenta → PIN → banco); el tour arranca al terminarlo. */
+  if (setupPending) { setupPending = false; startSetupWizard(); }
+  else if (guidePending) { guidePending = false; startGuideTour(); }
+  /* Compilación 76 (punto 18): entrar (también tras desbloquear)
+     re-dispara la sincronización del banco si toca; el freno de
+     15 min de bankResumeSync la hace gratis tras la de apertura. */
+  bankResumeSync();
 }
 async function onLockSubmit(ev) {
   ev.preventDefault();
@@ -20453,12 +23319,20 @@ function onWelcomeStart() {
   if (!db || demoMode) return;
   if (!db.settings.onboarded) {
     db.settings.onboarded = true;
-    /* El alta vieja preseleccionaba «Lo esencial» para quien llegaba
-       nuevo: se conserva ese arranque suave. El nombre, el PIN, el
-       país y la moneda se completan cuando la persona quiera, en
-       Ajustes (el PIN también desde Seguridad). */
-    applySectionsMode('essential');
-    guidePending = true;
+    /* Compilación 76 (pedido de Sterlin): la app nace con TODAS
+       las secciones activadas; quien no quiera alguna la apaga
+       en Personalización. Se acabó el arranque reducido. Y el
+       primer uso ya no salta directo a la app: tras «Empezar»
+       corre el asistente de 3 pasos (cuenta, PIN y banco). */
+    applySectionsMode('all');
+    setupPending = true;
+  } else if (db.settings.pinHash) {
+    /* «Salir» deja a la persona en esta bienvenida; si el
+       dispositivo tiene PIN, «Empezar» no puede saltárselo:
+       pasa por la pantalla de bloqueo, como al abrir la app. */
+    save();
+    showLock();
+    return;
   }
   save();
   enterApp();
@@ -20514,9 +23388,19 @@ function clearGuideHighlight() {
     guideAnchorEl = null;
   }
 }
+/* Compilación 76: la guía convive con el banner nativo de AdMob,
+   que se monta sobre el WebView y tapaba sus botones: mientras
+   la guía vive, el banner se retira (setAdsSuppressed). */
+let guideAdsHeld = false;
+function guideAdsHold(on) {
+  if (on === guideAdsHeld) return;
+  guideAdsHeld = on;
+  setAdsSuppressed(on);
+}
 function startGuideTour() {
   if (!db || demoMode || db.settings.guideDone) return;
   if (currentView !== 'home') showView('home');
+  guideAdsHold(true);
   guideStep = -1;
   guideAdvance();
 }
@@ -20542,10 +23426,103 @@ function guideAdvance() {
 }
 function endGuideTour() {
   clearGuideHighlight();
+  guideAdsHold(false);
   guideStep = -1;
   const card = document.getElementById('guide-card');
   if (card) card.hidden = true;
   if (db && !db.settings.guideDone) { db.settings.guideDone = true; save(); }
+}
+
+/* ---------------- Compilación 76 · Asistente de primer uso --------
+   Tras «Empezar», en este orden (pedido de Sterlin): 1) crear la
+   cuenta en la nube, 2) crear el PIN y activar la huella, 3)
+   conectar el banco. Cada paso se puede saltar («Ahora no») y el
+   asistente entero también («Saltar todo»); al terminar o saltar,
+   arranca la guía contextual. Se muestra una sola vez
+   (settings.setupDone); la tarjeta de Inicio lo reabre para
+   quien se quedó sin cuenta. */
+let setupPending = false;
+let setupStep = 0;
+function setupState() {
+  return {
+    account: !!cloudUser,
+    pin: !!(db && db.settings && db.settings.pinHash),
+    bank: (typeof bankStoredConns === 'function') ? bankStoredConns().length > 0 : false
+  };
+}
+function startSetupWizard() {
+  if (!db || demoMode) return;
+  if (db.settings.setupDone) return;
+  setupStep = 0;
+  renderSetupWizard();
+  const w = document.getElementById('setup-wizard');
+  if (w) w.hidden = false;
+}
+function openSetupWizard() {
+  /* Reapertura manual desde la tarjeta de Inicio: vale aunque el
+     asistente ya se hubiera saltado. */
+  if (!db || demoMode) return;
+  setupStep = 0;
+  renderSetupWizard();
+  const w = document.getElementById('setup-wizard');
+  if (w) w.hidden = false;
+}
+function renderSetupWizard() {
+  const st = setupState();
+  const label = document.getElementById('setup-step-label');
+  if (label) label.textContent = t('setup_step_of', { n: setupStep + 1 });
+  for (let i = 0; i < 3; i++) {
+    const pane = document.getElementById('setup-pane-' + i);
+    if (pane) pane.hidden = i !== setupStep;
+  }
+  const done0 = document.getElementById('setup-done-0');
+  if (done0) done0.hidden = !st.account;
+  const done1 = document.getElementById('setup-done-1');
+  if (done1) done1.hidden = !st.pin;
+  const done2 = document.getElementById('setup-done-2');
+  if (done2) done2.hidden = !st.bank;
+}
+function setupAdvance() {
+  if (setupStep < 2) { setupStep += 1; renderSetupWizard(); }
+  else finishSetupWizard();
+}
+function finishSetupWizard() {
+  const w = document.getElementById('setup-wizard');
+  if (w) w.hidden = true;
+  if (db && !db.settings.setupDone) { db.settings.setupDone = true; save(); }
+  startGuideTour();
+}
+async function onSetupSignup() {
+  const email = document.getElementById('setup-email');
+  const pass = document.getElementById('setup-pass');
+  const ce = document.getElementById('cloud-email');
+  const cp = document.getElementById('cloud-pass');
+  if (!email || !pass || !ce || !cp) return;
+  ce.value = email.value;
+  cp.value = pass.value;
+  await onCloudSignUp();
+  if (cloudUser) { setupAdvance(); return; }
+  const err = document.getElementById('cloud-error');
+  showError('setup-error', err && err.textContent ? err.textContent : t('cloud_err_generic'));
+}
+async function onSetupPin() {
+  const p1 = document.getElementById('setup-pin');
+  const p2 = document.getElementById('setup-pin2');
+  if (!p1 || !p2) return;
+  if (!validPinFormat(p1.value)) { showError('setup-pin-error', t('pin_err_format')); return; }
+  if (p1.value !== p2.value) { showError('setup-pin-error', t('pin_err_mismatch')); return; }
+  showError('setup-pin-error', '');
+  await setPin(p1.value);
+  save();
+  renderSetupWizard();
+  maybeOfferBiometric();
+  setupAdvance();
+}
+function onSetupBank() {
+  /* Conectar el banco cierra el paso: Plaid abre encima y al
+     volver, el asistente ya habrá terminado (la guía espera). */
+  finishSetupWizard();
+  bankConnectEntry();
 }
 
 /* ---------------- Inicio ---------------- */
@@ -20976,6 +23953,22 @@ function wireEvents() {
   document.getElementById('fixed-form').addEventListener('submit', onFixedSubmit);
   document.getElementById('fix-freq').addEventListener('change', fixFreqSyncForm);
   document.getElementById('account-form').addEventListener('submit', onAccountSubmit);
+  /* Compilación 76: la casilla «es tarjeta» despliega sus campos;
+     el alta de cuotas tiene su propio formulario y su botón. */
+  const accIsCard = document.getElementById('acc-is-card');
+  if (accIsCard) accIsCard.addEventListener('change', () => {
+    const box = document.getElementById('acc-card-fields');
+    if (box) box.hidden = !accIsCard.checked;
+  });
+  const instForm = document.getElementById('inst-form');
+  if (instForm) instForm.addEventListener('submit', onInstSubmit);
+  const instOpen = document.getElementById('btn-inst-open');
+  if (instOpen) instOpen.addEventListener('click', () => {
+    if (instForm) {
+      instForm.hidden = !instForm.hidden;
+      if (!instForm.hidden) renderInstallments();
+    }
+  });
   /* Compilación 50: «Agregar banco» en Mis cuentas — el mismo
      punto de entrada que la tarjeta de Inicio. */
   const accAddBankBtn = document.getElementById('acc-add-bank');
@@ -21243,7 +24236,47 @@ function wireEvents() {
     if (rc) document.getElementById('exp-category').value = rc;
   });
   /* Compilación 55 · Informe del mes (Presupuesto). */
-  document.getElementById('mr-generate').addEventListener('click', renderMonthReport);
+  document.getElementById('mr-generate').addEventListener('click', () => renderMonthReport());
+  /* Compilación 76: botón Salir de Ajustes, atajos de la tarjeta
+     PETO Pro, botones del asistente de primer uso y de la tarjeta
+     de cuenta de Inicio, y el vaivén de campos del cobro. */
+  const exitBtn = document.getElementById('btn-exit-app');
+  if (exitBtn) exitBtn.addEventListener('click', () => { exitToWelcome(); });
+  const proAdv = document.getElementById('btn-pro-adv');
+  if (proAdv) proAdv.addEventListener('click', () => { goProAdv(); });
+  const proOrg = document.getElementById('btn-pro-org');
+  if (proOrg) proOrg.addEventListener('click', () => { goProOrg(); });
+  const homeAccBtn = document.getElementById('home-account-btn');
+  if (homeAccBtn) homeAccBtn.addEventListener('click', () => { openSetupWizard(); });
+  const su = (id, fn) => { const n = document.getElementById(id); if (n) n.addEventListener('click', fn); };
+  su('setup-signup', () => { onSetupSignup(); });
+  su('setup-pin-btn', () => { onSetupPin(); });
+  su('setup-bank-btn', () => { onSetupBank(); });
+  su('setup-skip-0', () => { setupAdvance(); });
+  su('setup-skip-1', () => { setupAdvance(); });
+  su('setup-skip-2', () => { finishSetupWizard(); });
+  su('setup-skip-all', () => { finishSetupWizard(); });
+  const pfSel = document.getElementById('set-payfreq');
+  if (pfSel) pfSel.addEventListener('change', () => { syncPaydayFields(); });
+  /* Compilación 76: selector 30/60/90 del flujo y tope del
+     detector de gastos hormiga. */
+  for (const fb of document.querySelectorAll('[data-flow-days]')) {
+    fb.addEventListener('click', () => {
+      flowDaysSel = Number(fb.getAttribute('data-flow-days')) || 30;
+      for (const b2 of document.querySelectorAll('[data-flow-days]')) {
+        b2.classList.toggle('active', b2 === fb);
+      }
+      renderFlowCard();
+    });
+  }
+  const antsSel = document.getElementById('ants-max');
+  if (antsSel) antsSel.addEventListener('change', () => {
+    const v = Math.trunc(Number(antsSel.value));
+    if (Number.isFinite(v) && v >= 100 && v <= 10000) {
+      db.settings.antsMaxCents = v;
+      save(); renderAntsCard();
+    }
+  });
   document.getElementById('mr-print').addEventListener('click', printMonthReport);
   document.getElementById('mr-csv').addEventListener('click', downloadMonthCSV);
   document.getElementById('remittance-form').addEventListener('submit', onRemittanceSubmit);
@@ -21427,6 +24460,9 @@ function wireEvents() {
     /* Si se volvió a la app desde el botón «+» de un widget, aquí se
        abre el formulario de gasto (si hay bloqueo, lo hará enterApp). */
     checkWidgetPendingAction();
+    /* Compilación 76 (punto 18): volver a primer plano también
+       re-dispara la sincronización del banco (con su freno). */
+    bankResumeSync();
   });
 }
 
@@ -21478,6 +24514,7 @@ init();
 /* Compilación 31: el botón/gesto de atrás navega dentro de la app
    (sin plugin, en web, no hace nada). */
 initHardwareBack();
+initResumeSync();
 /* La nube se reconcilia justo después del primer pintado, para no
    competir con la apertura (Compilación 28); mientras tanto la app
    funciona local, como siempre. */

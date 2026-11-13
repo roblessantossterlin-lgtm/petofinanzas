@@ -1306,6 +1306,23 @@ html.plaid-open body{
 .guide-card p{margin:0 0 10px}
 .guide-highlight{outline:3px solid var(--accent,#2fae7f) !important;outline-offset:3px;border-radius:12px;position:relative;z-index:55}
 .setacc-nested{box-shadow:none;border:1px dashed var(--line);margin-top:14px}
+/* Compilación 76 (captura de Sterlin): la bienvenida quedaba
+   pegada arriba con media pantalla vacía: ahora el bloque se
+   centra VERTICALMENTE en la pantalla. */
+#view-onboarding{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;box-sizing:border-box}
+#view-onboarding .welcome-box{width:100%;margin:auto 0}
+/* Compilación 76: interruptores de secciones de TRES por línea en
+   Personalización (pedido de Sterlin), con las casillas alineadas
+   en tarjetas cortas para acortar la pantalla. */
+#section-toggles{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+#section-toggles .toggle-row{display:flex;flex-direction:column;align-items:flex-start;gap:.35rem;margin:0;padding:.55rem .6rem;border:1px solid var(--line);border-radius:12px}
+/* Compilación 76: número grande del PETO Score y del detector de
+   gastos hormiga. */
+.score-big{font-size:2rem;font-weight:800;line-height:1.1;margin:.35rem 0}
+/* Compilación 76: el asistente de primer uso reutiliza la tarjeta
+   de la guía; sus campos van en columna con aire. */
+.setup-wizard input{width:100%;margin:.3rem 0;box-sizing:border-box}
+.setup-wizard .setup-done{color:var(--accent,#1a9850);font-weight:700}
 .welcome-box{text-align:center}
 .welcome-box .ob-logo{margin:10px auto}
 .welcome-box #ob-start{width:100%}

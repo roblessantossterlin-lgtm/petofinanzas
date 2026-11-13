@@ -139,6 +139,15 @@
   <main id="view-home" class="view">
     <div id="home-banners"></div>
 
+    <!-- Compilación 76: primero la cuenta, después el banco. -->
+    <section id="home-account" class="card" hidden>
+      <h3 data-i18n="home_account_title">Crea tu cuenta de PETO Finanzas</h3>
+      <p class="muted" data-i18n="home_account_text">Guarda tu dinero en la nube, sincroniza entre dispositivos y conecta tu banco.</p>
+      <div class="form-actions">
+        <button id="home-account-btn" class="btn btn-primary" type="button" data-i18n="home_account_btn">Crear cuenta</button>
+      </div>
+    </section>
+
     <div id="home-bank" hidden></div>
 
     <section id="next-step-card" class="card next-step-card" hidden>
@@ -449,6 +458,13 @@
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_resumen">Resumen</h2>
     <section id="resumen-insights" class="card" hidden></section>
+    <!-- Compilación 76: PETO Score, salud financiera explicable. -->
+    <section id="score-card" class="card">
+      <h3 data-i18n="score_title">PETO Score</h3>
+      <p class="muted small" data-i18n="score_sub">Tu salud financiera según los datos de tu app. No es un buró de crédito.</p>
+      <p class="score-big"><span id="score-num">–</span> / 100</p>
+      <ul id="score-factors" class="item-list"></ul>
+    </section>
     <div class="month-nav">
       <button id="res-prev" class="btn btn-ghost" type="button" data-i18n-aria="month_prev_aria" aria-label="Mes anterior">‹</button>
       <span id="res-month-label" class="month-label"></span>
@@ -479,6 +495,27 @@
       <p id="year-status" class="muted small" aria-live="polite"></p>
     </div>
     <div id="review-card" class="card" hidden></div>
+    <!-- Compilación 76: flujo de caja futuro 30/60/90 días. -->
+    <section id="flow-card" class="card">
+      <h3 data-i18n="flow_title">Flujo de caja futuro</h3>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost active" data-flow-days="30" data-i18n="flow_d30">30 días</button>
+        <button type="button" class="btn btn-ghost" data-flow-days="60" data-i18n="flow_d60">60 días</button>
+        <button type="button" class="btn btn-ghost" data-flow-days="90" data-i18n="flow_d90">90 días</button>
+      </div>
+      <div id="flow-body"></div>
+    </section>
+    <!-- Compilación 76: detector de gastos hormiga anualizado. -->
+    <section id="ants-card" class="card">
+      <h3 data-i18n="ants_title">Gastos hormiga</h3>
+      <label for="ants-max" data-i18n="ants_max_label">Compras de hasta</label>
+      <select id="ants-max">
+        <option value="1000">$10</option>
+        <option value="1500" selected>$15</option>
+        <option value="2500">$25</option>
+      </select>
+      <div id="ants-body"></div>
+    </section>
     <h3 data-i18n="adv_title">Informe avanzado</h3>
     <p class="muted small" data-i18n="adv_note">Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.</p>
     <div id="adv-card" class="card report-card" hidden></div>
@@ -529,6 +566,8 @@
          cuadrícula de categorías (los pagos fijos no tienen
          categoría fiable en los datos). -->
     <section id="budget-fixed-strip" class="card" hidden></section>
+    <!-- Compilación 76: modo base cero (opt-in). -->
+    <section id="budget-zero" class="card"></section>
     <ul id="budget-list" class="item-list budget-grid"></ul>
 
     <!-- Compilación 55: informe del mes imprimible (PDF) y en CSV. -->
@@ -598,7 +637,7 @@
          lectura sobre los movimientos; la tarjeta solo aparece
          cuando hay detecciones. -->
     <section id="recurring-card" class="card" hidden>
-      <h3 data-i18n="rec_title">Cobros que se repiten</h3>
+      <h3 data-i18n="subs_title">Centro de suscripciones</h3>
       <p class="muted small" data-i18n="rec_intro">Detectados en tus movimientos: mismo comercio, monto parecido y periodos regulares. Es solo lectura; nada se crea solo.</p>
       <ul id="recurring-list" class="item-list"></ul>
     </section>
@@ -616,6 +655,18 @@
       <input id="acc-name" type="text" maxlength="60" data-i18n-ph="acc_name_ph" placeholder="Ej.: Efectivo, Banco, Ahorros" required>
       <label for="acc-balance" data-i18n="acc_balance_label">Saldo ($)</label>
       <input id="acc-balance" type="number" inputmode="decimal" min="-9999999" max="9999999" step="0.01" required placeholder="0.00">
+      <label class="toggle-row">
+        <span data-i18n="card_is">Es tarjeta de crédito</span>
+        <input type="checkbox" id="acc-is-card">
+      </label>
+      <div id="acc-card-fields" hidden>
+        <label for="acc-card-limit" data-i18n="card_limit">Límite</label>
+        <input id="acc-card-limit" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+        <label for="acc-card-cut" data-i18n="card_cut">Día de corte</label>
+        <input id="acc-card-cut" type="number" min="1" max="31" step="1" placeholder="1-31">
+        <label for="acc-card-due" data-i18n="card_due">Día de pago</label>
+        <input id="acc-card-due" type="number" min="1" max="31" step="1" placeholder="1-31">
+      </div>
       <p id="acc-error" class="error" role="alert" hidden></p>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" data-i18n="acc_save">Guardar cuenta</button>
@@ -649,6 +700,34 @@
     <section id="acc-bank-wrap" class="card" hidden>
       <h3 data-i18n="bank_from_bank">De tu banco</h3>
       <ul id="acc-bank-list" class="item-list"></ul>
+    </section>
+
+    <!-- Compilación 76: módulo de tarjetas y compras en cuotas. -->
+    <section id="cards-card" class="card">
+      <h3 data-i18n="card_title">Tus tarjetas</h3>
+      <p id="cards-empty" class="empty-state" data-i18n="card_none">Aún no hay tarjetas: marca una cuenta como tarjeta o edita una tarjeta de tu banco.</p>
+      <ul id="cards-list" class="item-list"></ul>
+      <h4 data-i18n="inst_btn">Registrar compra en cuotas</h4>
+      <ul id="inst-list" class="item-list"></ul>
+      <div class="form-actions">
+        <button id="btn-inst-open" type="button" class="btn btn-secondary" data-i18n="inst_create">Crear cuotas</button>
+      </div>
+      <form id="inst-form" class="form-card" autocomplete="off" hidden>
+        <label for="inst-name" data-i18n="inst_name">Nombre de la compra</label>
+        <input id="inst-name" type="text" maxlength="60">
+        <label for="inst-total" data-i18n="inst_total">Monto total</label>
+        <input id="inst-total" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+        <label for="inst-n" data-i18n="inst_n">Número de cuotas</label>
+        <input id="inst-n" type="number" min="2" max="60" step="1" placeholder="12">
+        <label for="inst-day" data-i18n="inst_day">Día de pago</label>
+        <input id="inst-day" type="number" min="1" max="31" step="1" placeholder="1">
+        <label for="inst-card" data-i18n="inst_card">Tarjeta (opcional)</label>
+        <select id="inst-card"></select>
+        <p id="inst-error" class="error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" data-i18n="inst_create">Crear cuotas</button>
+        </div>
+      </form>
     </section>
   </main>
 
@@ -1017,8 +1096,20 @@
       
 
       <h3 data-i18n="set_reminders_title">Recordatorios</h3>
-      <label for="set-payday" data-i18n="set_payday_label">Día de cobro</label>
-      <select id="set-payday"></select>
+      <label for="set-payfreq" data-i18n="payfreq_label">Frecuencia de cobro</label>
+      <select id="set-payfreq">
+        <option value="semanal" data-i18n="payfreq_semanal">Semanal</option>
+        <option value="quincenal" data-i18n="payfreq_quincenal">Quincenal</option>
+        <option value="mensual" data-i18n="payfreq_mensual">Mensual</option>
+      </select>
+      <div id="set-payday-row">
+        <label for="set-payday" data-i18n="set_payday_label">Día de cobro</label>
+        <select id="set-payday"></select>
+      </div>
+      <div id="set-paymonthday-row" hidden>
+        <label for="set-paymonthday" data-i18n="payday_month_label">Día del mes</label>
+        <select id="set-paymonthday"></select>
+      </div>
       <label class="toggle-row">
         <span data-i18n="set_reminders_label">Recordatorios en Inicio</span>
         <input type="checkbox" id="set-reminders">
@@ -1145,9 +1236,10 @@
       <div class="form-actions">
         <button id="btn-pro-open" type="button" class="btn btn-secondary" data-i18n="pro_btn_see">Ver PETO Pro</button>
       </div>
+      <div class="form-actions">
+        <button id="btn-pro-adv" type="button" class="btn btn-ghost" data-i18n="pro_open_adv">Abrir el informe avanzado</button>
+        <button id="btn-pro-org" type="button" class="btn btn-ghost" data-i18n="pro_open_org">Abrir el modo organizador de san</button>
       </div>
-    </section>
-
     <section class="card form-card" id="shared-card">
       <div class="sections-head" id="setacc-shared-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-shared-body">
         <h3 data-i18n="shared_title">Presupuesto compartido</h3>
@@ -1173,11 +1265,15 @@
         <p class="muted" id="shared-household-code"></p>
         <p class="total-line" data-i18n="shared_members_title">Miembros</p>
         <ul id="shared-members" class="item-list"></ul>
+        <div id="fam-wrap"></div>
         <div class="form-actions">
           <button id="btn-shared-leave" type="button" class="btn btn-ghost" data-i18n="shared_leave_btn">Salir del hogar</button>
         </div>
       </div>
       <p id="shared-error" class="error" role="alert" hidden></p>
+      </div>
+    </section>
+
       </div>
     </section>
 
@@ -1364,10 +1460,13 @@
            nueva se sustituye el <li> y se borra la clave anterior de
            los 12 idiomas: nada de historial acumulado. -->
       <ul class="news-list">
-        <li data-i18n="news_c75_direct">✨ Nueva bienvenida: entras directo y PETO Finanzas te guía dentro, paso a paso. Categorías y pagos fijos en una sola vista, gráficas más claras y Ajustes en ocho tarjetas.</li>
+        <li data-i18n="news_c76_direct">✨ Nuevo en PETO Finanzas: centro de suscripciones, gastos hormiga, flujo de caja a 90 días, PETO Score, compras en cuotas, sobres con arrastre y asistente de inicio en tres pasos.</li>
       </ul>
       </div>
     </section>
+    <div class="form-actions">
+      <button id="btn-exit-app" type="button" class="btn btn-secondary" data-i18n="exit_btn">Salir</button>
+    </div>
     <p class="muted small build-label" id="settings-build-label">Compilación 57</p>
   </main>
 
@@ -1383,6 +1482,49 @@
 
   <!-- Compilación 75: tarjeta del tour contextual dentro de la app
        (se muestra una sola vez, en la primera apertura). -->
+  <!-- Compilación 76: asistente de primer uso en tres pasos
+       (cuenta, PIN y huella, banco), tras «Empezar». -->
+  <div id="setup-wizard" class="guide-card setup-wizard" hidden>
+    <h3 data-i18n="setup_title">Configura tu PETO Finanzas</h3>
+    <p id="setup-step-label" class="muted small"></p>
+    <div id="setup-pane-0">
+      <h4 data-i18n="setup_step1_t">Crea tu cuenta</h4>
+      <p class="muted" data-i18n="setup_step1_d">Tu cuenta en la nube guarda tu dinero sincronizado y te deja conectar tu banco.</p>
+      <p class="setup-done" id="setup-done-0" hidden>✓ <span data-i18n="setup_done">Listo</span></p>
+      <input id="setup-email" type="email" autocomplete="email" data-i18n-ph="setup_email_ph" placeholder="Tu correo">
+      <input id="setup-pass" type="password" autocomplete="new-password" data-i18n-ph="setup_pass_ph" placeholder="Contraseña (mínimo 6)">
+      <p id="setup-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="setup-skip-0" type="button" class="btn btn-ghost" data-i18n="setup_skip_step">Ahora no</button>
+        <button id="setup-signup" type="button" class="btn btn-primary" data-i18n="setup_account_btn">Crear cuenta</button>
+      </div>
+    </div>
+    <div id="setup-pane-1" hidden>
+      <h4 data-i18n="setup_step2_t">Crea tu PIN y activa tu huella</h4>
+      <p class="muted" data-i18n="setup_step2_d">Un PIN de 4 a 6 dígitos protege tu app; con el PIN creado podrás activar la huella.</p>
+      <p class="setup-done" id="setup-done-1" hidden>✓ <span data-i18n="setup_done">Listo</span></p>
+      <input id="setup-pin" type="password" inputmode="numeric" autocomplete="new-password" data-i18n-ph="setup_pin_ph" placeholder="PIN (4 a 6 dígitos)">
+      <input id="setup-pin2" type="password" inputmode="numeric" autocomplete="new-password" data-i18n-ph="setup_pin2_ph" placeholder="Repite el PIN">
+      <p id="setup-pin-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="setup-skip-1" type="button" class="btn btn-ghost" data-i18n="setup_skip_step">Ahora no</button>
+        <button id="setup-pin-btn" type="button" class="btn btn-primary" data-i18n="setup_pin_btn">Guardar PIN</button>
+      </div>
+    </div>
+    <div id="setup-pane-2" hidden>
+      <h4 data-i18n="setup_step3_t">Conecta tu banco</h4>
+      <p class="muted" data-i18n="setup_step3_d">Con tu banco conectado, tus saldos y movimientos se actualizan solos. Puedes hacerlo luego si prefieres.</p>
+      <p class="setup-done" id="setup-done-2" hidden>✓ <span data-i18n="setup_done">Listo</span></p>
+      <div class="form-actions">
+        <button id="setup-skip-2" type="button" class="btn btn-ghost" data-i18n="setup_skip_step">Ahora no</button>
+        <button id="setup-bank-btn" type="button" class="btn btn-primary" data-i18n="setup_bank_btn">Conectar banco</button>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button id="setup-skip-all" type="button" class="btn btn-ghost" data-i18n="setup_skip_all">Saltar todo</button>
+    </div>
+  </div>
+
   <div id="guide-card" class="guide-card" hidden>
     <h3 id="guide-title"></h3>
     <p id="guide-text" class="muted"></p>
