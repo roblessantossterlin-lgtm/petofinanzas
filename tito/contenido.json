@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-19",
+  "actualizado": "2026-11-20",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -30,6 +30,20 @@
       "titulo": "La canción de lavarse los dientes",
       "archivo": "assets/cancion-2026-11-19-dientes.mp3",
       "fecha": "2026-11-19"
+    },
+    {
+      "id": "dibujo-2026-11-20-rana",
+      "tipo": "dibujo",
+      "titulo": "Tito y la rana",
+      "archivo": "assets/dibujo-2026-11-20-rana.png",
+      "fecha": "2026-11-20"
+    },
+    {
+      "id": "cancion-2026-11-20-verdad",
+      "tipo": "cancion",
+      "titulo": "La canción de decir la verdad",
+      "archivo": "assets/cancion-2026-11-20-verdad.mp3",
+      "fecha": "2026-11-20"
     }
   ]
 }
