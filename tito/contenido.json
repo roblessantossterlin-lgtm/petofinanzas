@@ -1,0 +1,35 @@
+{
+  "app": "tito-el-zorrito",
+  "version": 1,
+  "actualizado": "2026-11-19",
+  "items": [
+    {
+      "id": "dibujo-2026-11-19-pez",
+      "tipo": "dibujo",
+      "titulo": "Tito y el pez",
+      "archivo": "assets/dibujo-2026-11-19-pez.png",
+      "fecha": "2026-11-19"
+    },
+    {
+      "id": "dibujo-2026-11-19-globo",
+      "tipo": "dibujo",
+      "titulo": "Tito y el globo",
+      "archivo": "assets/dibujo-2026-11-19-globo.png",
+      "fecha": "2026-11-19"
+    },
+    {
+      "id": "dibujo-2026-11-19-arcoiris",
+      "tipo": "dibujo",
+      "titulo": "Tito y el arcoíris",
+      "archivo": "assets/dibujo-2026-11-19-arcoiris.png",
+      "fecha": "2026-11-19"
+    },
+    {
+      "id": "cancion-2026-11-19-dientes",
+      "tipo": "cancion",
+      "titulo": "La canción de lavarse los dientes",
+      "archivo": "assets/cancion-2026-11-19-dientes.mp3",
+      "fecha": "2026-11-19"
+    }
+  ]
+}
