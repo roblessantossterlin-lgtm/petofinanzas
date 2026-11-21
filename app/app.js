@@ -1,290 +1,34 @@
 /* === PETO WEB (carpeta web-app/) ===
-   Copia de app.js (raíz, Compilación 68) con textos adaptados a la
-   web (cuenta en la nube y sincronización en vez de «solo en tu
-   teléfono»: claves footer, set_data_help, lock_note, ob_intro_2 y
-   ob_intro_3 en ES/EN/IT; en los otros 9 idiomas se usa la
-   traducción normal de esas claves). La lógica es la misma; lo
-   específico de navegador vive en web.js y web.css. Al actualizar
-   la app hay que re-copiar y re-aplicar estos textos (ver LEEME.md).
-   Sincronizado el 9-nov-2026 con la Compilación 73: Diseño
-   premium — set de iconos de línea propio que sustituye a
-   los emojis en navegación, secciones y categorías, números
-   tabulares, barras con semáforo (ámbar al 80%), héroe con
-   línea de contexto (ritmo del mes y banco conectado) y
-   tarjeta de Seguridad visible en Ajustes. La capa neón de
-   la 71/72 queda neutralizada por el sistema sobrio.
-   Novedades: news_c73_design sustituye a news_c72_look —
-   1011 claves por idioma (7 nuevas); la caché del service
-   worker sube a peto-web-v48.
-   Sincronizado el 9-nov-2026 con la Compilación 72: Look
-   2030 reforzado — el héroe pasa a cristal con luz propia
-   y número gigante en degradado brillante, las barras
-   suben a 14px con un brillo que se mueve y la dona y la
-   barra inferior ganan resplandor. Solo visual: ni datos
-   ni funciones cambian. Novedades: news_c72_look
-   sustituye a news_c71_look — 1004 claves por idioma; la
-   caché del service worker sube a peto-web-v46.
-   Sincronizado el 8-nov-2026 con la Compilación 71: Look
-   2030 — gráficas con luz en toda la app (barras con degradado
-   y brillo que crecen, dona con resplandor, la tendencia de
-   Resumen como línea suave con área de luz y puntos con
-   brillo en drawTrendCanvas) y tarjetas de cristal. Solo
-   visual: ni datos ni funciones cambian. Novedades:
-   news_c71_look sustituye a news_c70_ads — 1004 claves por
-   idioma; la caché del service worker sube a peto-web-v45.
-   Sincronizado el 7-nov-2026 con la Compilación 70: anuncios
-   de PRUEBA de AdMob en la app (banner de prueba de Google,
-   solo nivel gratis; quien pagó PETO Pro no lo ve; en web no
-   hay plugin y no se muestra nada) y widgets pequeños al día:
-   el Tamaño app (1x1) gana pantalla de configuración de tema
-   — oscuro incluido —, todos los tamaños aceptan el tema
-   automático según el teléfono y el Mini suma el logo de la
-   marca. Novedades: news_c70_ads sustituye a news_c69_widget
-   — 1004 claves por idioma; la caché del service worker sube
-   a peto-web-v44.
-   Sincronizado el 6-nov-2026 con la Compilación 69: el widget
-   de pantalla de inicio queda como el diseño aprobado — el
-   Clásico (4x2) suma el logo, la fila del día («Gastado hoy» y
-   «Queda del mes») y la guarda de fecha del snapshot (si es de
-   otro día, el widget pinta «Abre PETO Finanzas»); el Mini
-   pasa a 4x1 y todos los tamaños se repintan como máximo cada
-   30 min para voltear el día. El lado nativo vive en android/
-   (PetoWidgetPlugin y PetoWidgetRenderer); en web el plugin no
-   existe y la llamada se ignora, como siempre. Novedades:
-   news_c69_widget sustituye a news_c68_freq — 1004 claves por
-   idioma; la caché del service worker sube a peto-web-v43.
-   Sincronizado el 6-nov-2026 con la Compilación 68: frecuencia
-   en Pagos fijos — cada pago fijo puede ser semanal (un día
-   de la semana), quincenal (dos veces al mes: su día y ese
-   día + 14, con tope al fin de mes) o mensual como siempre
-   (db.fixed[].freq; sin freq = mensual, los datos viejos
-   intactos). El registro automático y el estado pagado van
-   por ocurrencia (paidOcc/autoOcc por fecha) en las
-   frecuencias nuevas, y el modo banco descuenta las
-   ocurrencias que faltan del mes. Novedades: news_c68_freq
-   sustituye a news_c67_periodos y se agregan fix_freq_label,
-   fix_freq_mensual, fix_freq_quincenal, fix_freq_semanal,
-   fix_day_first_label, fix_weekday_label, fix_sub_semanal
-   y fix_sub_quincenal — 1004 claves por idioma; la caché
-   del service worker sube a peto-web-v42.
-   Sincronizado el 6-nov-2026 con la Compilación 67: período
-   propio por categoría en Presupuesto — cada tope puede ser
-   semanal, quincenal o mensual (db.budgetPeriods; sin entrada
-   = mes, el histórico) — con su selector en cada fila, las
-   tarjetas y las alertas medidas en la ventana de cada
-   período, y el gasto de hoy repartido por categoría según
-   su período cuando hay períodos mezclados (todo en «mes» =
-   la fórmula de siempre, intacta). Novedades:
-   news_c67_periodos sustituye a news_c66_home y se agregan
-   bud_per_semana, bud_per_quincena, bud_per_mes,
-   spend_left_periods, spend_x_periods, spend_x_cat y
-   bud_period_aria — 996 claves por idioma; la caché del
-   service worker sube a peto-web-v41.
-   Sincronizado el 6-nov-2026 con la Compilación 66: tres
-   arreglos del arranque — el destino diferido del banco de
-   la bienvenida pedía la vista 'settings' (no existe: es
-   'ajustes') y la app aterrizaba EN BLANCO tras configurar;
-   ahora entra a Ajustes y showView cae en Inicio ante un
-   nombre de vista desconocido; «Conectar banco» sin sesión
-   en la nube ya no parece muerto: abre la tarjeta de la
-   cuenta con el aviso claro (bankNeedCloudGuide); y el
-   texto bank_sandbox_note dice la verdad — Plaid corre en
-   PRODUCCIÓN desde el 4-nov-2026, fuera el «Sandbox».
-   Novedades: news_c66_home sustituye a news_c65_nav —
-   989 claves por idioma; la caché del service worker
-   sube a peto-web-v40.
-   Sincronizado el 5-nov-2026 con la Compilación 65: barra
-   inferior flotante de navegación (cápsula) con los cinco
-   destinos principales — Inicio, Gastos, Presupuesto,
-   Resumen y Ajustes — que convive con el menú lateral;
-   visible solo dentro de la app y oculta en la demo.
-   Novedades: news_c65_nav sustituye a news_c64_design y se
-   agregan las etiquetas cortas nav_gastos, nav_presupuesto
-   y nav_ajustes — 989 claves por idioma; la caché del
-   service worker sube a peto-web-v39.
-   Sincronizado el 5-nov-2026 con la Compilación 64: rediseño
-   visual profesional de toda la app (sistema de diseño estilo
-   fintech: héroe verde con resplandor, tarjetas elevadas,
-   navegación pulida y bienvenida renovada con barra de
-   progreso), botones «al terminar» del tour que quedan
-   marcados («✓ Se abre al terminar», clave nueva
-   ob_pending_btn) y el botón de recordatorios que ahora SÍ
-   enciende el ajuste antes de programar. Novedades:
-   news_c64_design sustituye a news_c63_tour — 986 claves por
-   idioma; la caché del service worker sube a peto-web-v38.
-   Sincronizado el 5-nov-2026 con la Compilación 63: el tour
-   de bienvenida pasa de 3 a 9 láminas y ahora CONFIGURA en el
-   camino — primer gasto real, pagos fijos, primera meta de
-   ahorro, destinos «al terminar» (san, banco, podcast y nube),
-   recordatorios y la huella junto al PIN — y el banco se
-   sincroniza en CADA apertura de la app (antes: solo si
-   pasaban ~6 h). Novedades: news_c63_tour sustituye a
-   news_c62_signin — 985 claves por idioma; la caché del
-   service worker sube a peto-web-v37.
-   Sincronizado el 4-nov-2026 con la Compilación 62: la
-   bienvenida trae «Ya tengo cuenta · Iniciar sesión» para
-   quien ya es cliente: entra con su cuenta en la nube y
-   sus datos bajan solos, sin pasar por el alta ni por
-   Ajustes. Novedades: news_c62_signin sustituye a
-   news_c61_backup y news_c61_nextstep — 954 claves por
-   idioma; la caché del service worker sube a
-   peto-web-v36.
-   Sincronizado el 4-nov-2026 con la Compilación 61: el aviso
-   de respaldo llega una vez por semana y se quita solo a los
-   10 segundos, y la tarjeta «Tu siguiente paso» desaparece al
-   completar los pasos (un banco conectado ya cuenta como
-   cuenta). Novedades: news_c61_backup y news_c61_nextstep
-   sustituyen a news_c60_panel y news_c60_settings — 952
-   claves por idioma; la caché del service worker sube a
-   peto-web-v35.
-   Sincronizado el 3-nov-2026 con la Compilación 60: panel
-   visual en Inicio (este mes vs. el pasado, fondo de
-   emergencia, top de categorías y flujo de caja de 6 meses),
-   tarjetas por categoría en Presupuesto, la conexión bancaria
-   arriba en Ajustes y TODAS las tarjetas de Ajustes nacen
-   cerradas (el estado vive en la sesión; los saltos desde
-   otra pantalla abren su tarjeta destino). Novedades:
-   news_c60_panel y news_c60_settings sustituyen a
-   news_c59_features y news_c59_country — 952 claves por
-   idioma (20 nuevas del panel y las 2 de Novedades); la
-   caché del service worker sube a peto-web-v34.
-   Sincronizado el 3-nov-2026 con la Compilación 59: exportar
-   todos los movimientos en CSV desde Ajustes, la tarjeta diaria
-   se explica en un toque con su desglose real, botón de aviso
-   por WhatsApp en el san, «Sacar efectivo» entre cuentas en un
-   toque (transferencia fuera de totales), resumen «Hoy» en
-   Inicio y la capa de país (país en la bienvenida y en Ajustes;
-   tarjeta de banco según el país: Plaid en EE. UU. y «llega
-   pronto» con lista de espera en el resto; moneda inicial según
-   el país; nombre local del san: tanda en México y cundina en
-   Puerto Rico). Novedades: news_c59_features y news_c59_country
-   sustituyen a news_c58_fixes y news_c58_san (932 claves por
-   idioma).
-   Sincronizado el 31-oct-2026 con la Compilación 57 (arreglos del
-   informe de testers, día 4): las notificaciones se programan
-   inexactas (isExactNotification:false) para que guardar nunca abra
-   «Alarmas y recordatorios»; los flotantes + y 🔍 se ocultan con un
-   panel abierto o el foco en un campo y el respiro inferior de la
-   app sube a 10.5rem; el ahorro de un ingreso mayor que el ingreso
-   pide confirmación y un periodo del san sin pagos también; el
-   idioma de la bienvenida se pide una sola vez (selector de
-   arriba); los formularios de bienvenida y de PIN llevan novalidate
-   para que el error del PIN sea el específico de la app (4 a 6
-   números); y el reparto por ingreso mezcla la señal real con las
-   proporciones base en vez de volcar todo en una categoría.
-   Novedades: news_c57_fixes y news_c57_san sustituyen a
-   news_c56_cards y news_c56_split (892 claves por idioma).
-   Sincronizado el 28-oct-2026 con la Compilación 56: TODAS
-   las tarjetas de Ajustes se retraen con el patrón de
-   «Secciones visibles» (cabecera con título, resumen corto
-   y flecha; el estado se guarda en settings.setAcc y las
-   tarjetas nacen abiertas), el reparto de ingresos estrena
-   tarjeta propia fuera del formulario del perfil (con su
-   reparto vigente en la cabecera y el guardado automático
-   de la 53 intacto) y la cuenta en la nube también queda en
-   su propia tarjeta. Novedades: news_c56_cards y
-   news_c56_split sustituyen a news_c55_voice y
-   news_c55_smart (889 claves por idioma).
-   Sincronizado el 28-oct-2026 con la Compilación 55: gastos e
-   ingresos por voz (el dictado rellena el formulario con el
-   plugin nativo o la Web Speech API; sin ninguna de las dos,
-   el botón se oculta), fondo de emergencia en Ahorros con
-   meta editable y barra de avance (el saldo de ahorros más
-   el del banco de la 51), plan de salida de deudas en Mis
-   deudas (pago mensual planeado, fecha estimada con interés
-   si está anotado y aviso si el pago no cubre el interés),
-   total del año en Remesas y destinatario prellenado, reglas
-   propias de categorización en Ajustes (se aplican a lo del
-   banco que cae en el comodín, al dictar y al escribir la
-   nota) e informe del mes imprimible/PDF y en CSV desde
-   Presupuesto. Novedades: news_c55_voice y news_c55_smart
-   sustituyen a news_c54_budget y news_c54_recurring (884
-   claves por idioma).
-   Sincronizado el 28-oct-2026 con la Compilación 54: topes
-   sugeridos con el gasto real en Presupuesto (promedio de los
-   últimos meses con datos contra el tope; solo cambia al
-   tocar «Usar»), borrado de los movimientos importados del
-   banco desde Ajustes (solo los de la sincronización, con
-   confirmación, aunque el banco ya esté desconectado),
-   proyección de fin de mes en Inicio según el ritmo de gasto
-   y detector de cobros repetidos en Pagos fijos (solo
-   lectura, con costo anual y próxima fecha esperada).
-   Novedades: news_c54_budget y news_c54_recurring sustituyen
-   a news_c53_autosave y news_c53_welcome (849 claves por
-   idioma).
-   Sincronizado el 28-oct-2026 con la Compilación 53: los
-   ajustes se guardan solos (sin botón «Guardar ajustes»: el
-   reparto se persiste al escribir y el aviso de la suma va en
-   vivo en la tarjeta; los cálculos usan el último reparto que
-   sumó 100) y la bienvenida fluye sola (las láminas avanzan
-   cada ~4 s y al terminar pasan directo a la configuración
-   inicial, sin pulsar «Siguiente»; también se pueden deslizar
-   y la rotación se pausa al tocar y se reanuda sola).
-   Novedades: news_c53_autosave y news_c53_welcome sustituyen
-   a news_c52_security (834 claves por idioma).
-   Sincronizado el 28-oct-2026 con la Compilación 51: el banco
-   también mueve los Ahorros y el gasto diario (decisión del
-   dueño: «todo saliendo del banco») — los saldos de las
-   cuentas de ahorro del banco (ahorro, money market, CD y
-   HSA) se suman a la tarjeta «Ahorros del mes» y se listan
-   de solo lectura en Ahorros (es presentación: el ahorro
-   manual y los totales de la app no cambian), y «¿Cuánto
-   puedes gastar hoy?» sale del saldo real de depósito menos
-   los pagos fijos que faltan este mes; al terminar cada
-   sincronización, Inicio se repinta entero. Novedades:
-   news_c51_savings y news_c51_spend (830 claves por idioma).
-   Sincronizado el 28-oct-2026 con la Compilación 50: el banco
-   mueve el Dinero disponible y las Deudas pendientes (cada
-   sincronización trae también los saldos de las cuentas:
-   el disponible suma los depósitos y las deudas suman
-   tarjetas y préstamos, sin doble conteo con los
-   movimientos importados; secciones «De tu banco» de solo
-   lectura en Mis cuentas y Mis deudas; el ahorro sigue
-   manual) y el banco queda visible fuera de Ajustes
-   (tarjeta «Conecta tu banco» o tira del banco en Inicio y
-   botón «Agregar banco» en Mis cuentas). Novedades: solo
-   news_c50 (826 claves por idioma). Y con la Compilación
-   49 (27-oct-2026): la
-   sincronización bancaria automática (al conectar el banco
-   la app sincroniza sola, sin tocar el botón; y al abrirla
-   trae lo nuevo si la última sincronización tiene más de ~6
-   horas), la categorización automática al importar (cada
-   movimiento cae en su categoría — Comida, Gasolina,
-   Transporte, Salud… — y al re-sincronizar se corrigen los
-   que quedaron en «Otros», sin tocar lo puesto a mano) y los
-   avisos de Inicio tocables, que llevan a donde se
-   solucionan (el del tope, a Presupuesto con la categoría
-   resaltada; el del respaldo, a Ajustes). Y su última
->    pieza: las transferencias entre cuentas propias y los
->    pagos de tarjeta ya no cuentan como gasto — van a la
->    casilla «Transferencias» con su marca y quedan fuera de
->    totales, topes y gráfica (la exclusión es por la marca;
->    BANK_MAP_VERSION = 4: la sincronización completa corre
->    otra vez y re-clasifica lo ya importado, sin tocar lo
->    puesto a mano; la versión 4 suma el autopago genérico
->    de tarjeta a las transferencias). Novedades: solo
-   news_c49 (815 claves por idioma). Y con la Compilación
-   48: el blindaje de la ventana de Plaid Link (en el WebView
-   de Android salía diminuta y anclada al final de la app:
-   ahora se fuerza a pantalla completa con CSS !important y
-   un refuerzo por código mientras el Link está abierto; y
-   Novedades queda solo con lo de la versión vigente). Y con
-   la Compilación 47: la
-   recuperación de contraseña de la cuenta en la nube (enlace
-   «¿Olvidaste tu contraseña?» en Ajustes y pantalla de contraseña
-   nueva al llegar desde el correo; el enlace de recuperación
-   aterriza SIEMPRE en esta web, también si se pidió desde el
-   teléfono; 836 claves por idioma). Y con la Compilación 46: la conexión
-   bancaria con Plaid en Sandbox (tarjeta en Ajustes con
+   PETO Finanzas · Compilación 31
+   - 100% local: sin red, sin cuentas, sin rastreadores, sin SDKs.
+   - Los datos viven solo en localStorage de este dispositivo.
+   - Todo texto del usuario se pinta con textContent (sin innerHTML),
+     y toda entrada se valida y se limita antes de guardarse.
+   ============================================================ */
 'use strict';
 
-/* ---------------- Constantes ---------------- */
-'use strict';
+/* ---------------- Área segura iOS (clase «ios» en <html>) ----------------
+   En iPhone el WebView de Capacitor dibuja a pantalla completa BAJO
+   la barra de estado y la isla dinámica (el HTML ya declara
+   viewport-fit=cover): sin esto, el encabezado quedaba debajo de
+   la hora, la señal y la batería (captura de Sterlin, 20-nov-2026).
+   Aquí solo se marca la plataforma en <html>; el relleno con los
+   insets seguros vive en styles.css bajo «html.ios», así que en
+   Android y en la web no cambia absolutamente nada. */
+function applyPlatformClass() {
+  try {
+    if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function' &&
+        window.Capacitor.getPlatform() === 'ios') {
+      document.documentElement.classList.add('ios');
+    }
+  } catch (e) { /* sin puente nativo: vista web, sin clase */ }
+}
+applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 78';
-const BUILD_NUM = 78;
+const BUILD_LABEL = 'Compilación 81';
+const BUILD_NUM = 81;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1444,8 +1188,8 @@ es: {
   setup_step_of: 'Paso {n} de 3',
   setup_step1_t: 'Crea tu cuenta',
   setup_step1_d: 'Tu cuenta en la nube guarda tu dinero sincronizado y te deja conectar tu banco.',
-  setup_step2_t: 'Crea tu PIN y activa tu huella',
-  setup_step2_d: 'Un PIN de 4 a 6 dígitos protege tu app; con el PIN creado podrás activar la huella.',
+  setup_step2_t: 'Crea tu PIN y activa tu huella', setup_step2_t_faceid: 'Desbloqueo con Face ID', setup_step2_t_generic: 'Desbloqueo con datos biométricos',
+  setup_step2_d: 'Un PIN de 4 a 6 dígitos protege tu app; con el PIN creado podrás activar la huella.', setup_step2_d_faceid: 'Usa Face ID además de tu PIN para entrar sin escribirlo cada vez. Puedes cambiarlo luego en Ajustes.', setup_step2_d_generic: 'Usa tus datos biométricos además de tu PIN para entrar sin escribirlo cada vez. Puedes cambiarlo luego en Ajustes.',
   setup_step3_t: 'Conecta tu banco',
   setup_step3_d: 'Con tu banco conectado, tus saldos y movimientos se actualizan solos. Puedes hacerlo luego si prefieres.',
   setup_skip_step: 'Ahora no',
@@ -1580,17 +1324,17 @@ es: {
   menu_open_aria: 'Abrir menú', menu_close_aria: 'Cerrar menú', sec_home: 'Inicio', key_home: 'Tu pantalla principal',
   set_notif_label: 'Notificaciones con la app cerrada', set_notif_help: 'Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO Finanzas esté cerrada.',
   set_autofixed_label: 'Registrar pagos fijos automáticamente', set_autofixed_help: 'Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.',
-  set_bio_label: 'Desbloqueo con huella', set_bio_help: 'Entra con tu huella además del PIN (necesitas tener un PIN activo).',
-  bio_btn: '👆 Entrar con huella', bio_reason: 'Confirma que eres tú para abrir PETO Finanzas',
-  bio_need_pin: 'La huella necesita un PIN activo: crea tu PIN en Ajustes → Seguridad y luego la huella funcionará al abrir la app.',
+  set_bio_label: 'Desbloqueo con huella', set_bio_label_faceid: 'Desbloqueo con Face ID', set_bio_label_generic: 'Desbloqueo con datos biométricos', set_bio_help: 'Entra con tu huella además del PIN (necesitas tener un PIN activo).', set_bio_help_faceid: 'Entra con Face ID además de tu PIN (necesitas un PIN activo).', set_bio_help_generic: 'Entra con tus datos biométricos además de tu PIN (necesitas un PIN activo).',
+  bio_btn: '👆 Entrar con huella', bio_btn_faceid: '👆 Entrar con Face ID', bio_btn_generic: '👆 Entrar con biometría', bio_reason: 'Confirma que eres tú para abrir PETO Finanzas',
+  bio_need_pin: 'La huella necesita un PIN activo: crea tu PIN en Ajustes → Seguridad y luego la huella funcionará al abrir la app.', bio_need_pin_faceid: 'Primero crea un PIN: Face ID funciona junto con tu PIN.', bio_need_pin_generic: 'Primero crea un PIN: los datos biométricos funcionan junto con tu PIN.',
   bio_failed: 'La huella no se pudo verificar. Escribe tu PIN.',
   bio_unavailable: 'La huella no está disponible en este teléfono. Escribe tu PIN.',
-  bio_not_enrolled: 'Este teléfono no tiene ninguna huella registrada. Regístrala en los ajustes del teléfono o escribe tu PIN.',
-  bio_offer_title: '¿Desbloquear con tu huella?',
-  bio_offer_text: 'Acabas de crear tu PIN. Si quieres, puedes entrar a PETO Finanzas con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?',
-  bio_offer_yes: 'Sí, activar la huella',
+  bio_not_enrolled: 'Este teléfono no tiene ninguna huella registrada. Regístrala en los ajustes del teléfono o escribe tu PIN.', bio_not_enrolled_faceid: 'Este teléfono no tiene Face ID configurado. Actívalo en los ajustes del teléfono.', bio_not_enrolled_generic: 'Este dispositivo no tiene datos biométricos configurados. Actívalos en los ajustes del dispositivo.',
+  bio_offer_title: '¿Desbloquear con tu huella?', bio_offer_title_faceid: '¿Entrar con Face ID?', bio_offer_title_generic: '¿Entrar con datos biométricos?',
+  bio_offer_text: 'Acabas de crear tu PIN. Si quieres, puedes entrar a PETO Finanzas con tu huella en vez de escribir el PIN cada vez. ¿Lo activamos ahora?', bio_offer_text_faceid: 'Activa Face ID para entrar a PETO Finanzas sin escribir tu PIN cada vez.', bio_offer_text_generic: 'Activa tus datos biométricos para entrar a PETO Finanzas sin escribir tu PIN cada vez.',
+  bio_offer_yes: 'Sí, activar la huella', bio_offer_yes_faceid: 'Activar Face ID', bio_offer_yes_generic: 'Activar datos biométricos',
   bio_offer_no: 'Ahora no',
-  bio_activated: 'Listo: el desbloqueo con huella quedó activado.',
+  bio_activated: 'Listo: el desbloqueo con huella quedó activado.', bio_activated_faceid: 'Face ID activado.', bio_activated_generic: 'Datos biométricos activados.',
   fix_auto_suffix: '(pago fijo automático)',
   backup_pass_label: 'Contraseña de la copia cifrada', backup_pass_ph: 'Mínimo 4 caracteres',
   data_export_enc: 'Guardar copia con contraseña',
@@ -1702,7 +1446,7 @@ es: {
   cloud_recovery_done: 'Contraseña actualizada. Ya puedes entrar.',
   key_settings: 'Nombre, reparto, texto, secciones, PIN',
   footer: 'PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono',
-  tile_available: 'Dinero disponible', tile_available_aria: 'Dinero disponible: ir a Mis cuentas',
+  tile_available: 'Dinero disponible', tile_info_aria: '¿Qué es este número?', tile_available_aria: 'Dinero disponible: ir a Mis cuentas',
   tile_accounts: 'Saldo en tus cuentas', tile_accounts_aria: 'Saldo en tus cuentas: ir a Mis cuentas', tile_accounts_help: 'Suma de tus cuentas. La actualizas tú al crear o editar una cuenta.',
   tile_savings: 'Ahorros del mes', tile_savings_aria: 'Ahorros del mes: ir a Ahorros',
   tile_debts: 'Deudas pendientes', tile_debts_aria: 'Deudas pendientes: ir a Mis deudas',
@@ -1902,10 +1646,23 @@ es: {
   pro_benefit_report: '📊 Informe avanzado: compara meses y exporta en CSV',
   pro_benefit_shared: '🏠 Presupuesto compartido con tu hogar',
   pro_benefit_org: '🤝 Modo organizador de san: la tanda de todo el grupo',
-  pro_coming_text: 'La compra dentro de la app llega con el lanzamiento en Google Play. Mientras tanto puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar Pro por $4.99 al mes.',
+  pro_coming_text: 'La compra dentro de la app no está disponible en este dispositivo por ahora. Puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar PETO Pro por $4.99 al mes.',
+  pro_coming_text_ios: 'La compra dentro de la app no está disponible en este dispositivo por ahora. Puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar PETO Pro por $4.99 al mes.',
   pro_waitlist_btn: 'Anotarme en la lista de espera',
   pro_waitlist_done: 'Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.',
   pro_close: 'Ahora no',
+  pro_buy_btn: 'Suscribirme a PETO Pro',
+  pro_trial_btn: 'Empezar mis 14 días gratis',
+  pro_checking: 'Comprobando disponibilidad…',
+  pro_buying: 'Procesando…',
+  pro_trial_line: 'Los primeros 14 días son gratis.',
+  pro_renew_line: 'Después se cobra el precio indicado y la suscripción se renueva cada mes hasta que la canceles. Puedes cancelarla cuando quieras desde los ajustes de tu cuenta de la tienda.',
+  pro_restore_btn: 'Restaurar compra',
+  pro_buy_cancelled: 'Compra cancelada. No se hizo ningún cargo.',
+  pro_buy_error: 'No se pudo completar la compra. Inténtalo de nuevo.',
+  pro_buy_pending: 'Tu pago quedó pendiente de aprobación. PETO Pro se activará en cuanto la tienda lo confirme.',
+  pro_restore_none: 'No encontramos una suscripción activa para restaurar.',
+  pro_per_month: 'al mes',
   pro_tag: 'PRO',
   adv_title: 'Informe avanzado',
   adv_note: 'Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.',
@@ -2044,15 +1801,15 @@ es: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Pulsa atrás otra vez para salir.',
-  ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_pending_btn: '✓ Se abre al terminar', spend_ctx_below: 'Vas {amount} por debajo de tu ritmo del mes pasado', spend_ctx_above: 'Vas {amount} por encima de tu ritmo del mes pasado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Seguridad', sec_card_read: 'Conexión bancaria de solo lectura: nunca podemos mover tu dinero', sec_card_enc: 'Tus datos viajan y se guardan cifrados', sec_card_lock: 'Bloqueo con PIN y huella', bud_per_semana: 'por semana', bud_per_quincena: 'por quincena', bud_per_mes: 'por mes', spend_left_periods: 'Te quedan {amount} entre todos tus períodos.', spend_x_periods: 'Cada categoría se reparte según su propio período:', spend_x_cat: '{cat} ({per}): quedan {left} ÷ {days} días = {daily} hoy', bud_period_aria: 'Período del límite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Presupuesto', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar con huella (si creo un PIN)', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
+  ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_pending_btn: '✓ Se abre al terminar', spend_ctx_below: 'Vas {amount} por debajo de tu ritmo del mes pasado', spend_ctx_above: 'Vas {amount} por encima de tu ritmo del mes pasado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Seguridad', sec_card_read: 'Conexión bancaria de solo lectura: nunca podemos mover tu dinero', sec_card_enc: 'Tus datos viajan y se guardan cifrados', sec_card_lock: 'Bloqueo con PIN y huella', sec_card_lock_faceid: 'Bloqueo con PIN y Face ID', sec_card_lock_generic: 'Bloqueo con PIN y datos biométricos', bud_per_semana: 'por semana', bud_per_quincena: 'por quincena', bud_per_mes: 'por mes', spend_left_periods: 'Te quedan {amount} entre todos tus períodos.', spend_x_periods: 'Cada categoría se reparte según su propio período:', spend_x_cat: '{cat} ({per}): quedan {left} ÷ {days} días = {daily} hoy', bud_period_aria: 'Período del límite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Presupuesto', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar con huella (si creo un PIN)', ob_bio_label_faceid: 'Entrar con Face ID (si creo un PIN)', ob_bio_label_generic: 'Entrar con datos biométricos (si creo un PIN)', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
   setup_title: 'Set up your PETO Finanzas',
   setup_step_of: 'Step {n} of 3',
   setup_step1_t: 'Create your account',
   setup_step1_d: 'Your cloud account keeps your money synced and lets you connect your bank.',
-  setup_step2_t: 'Create your PIN and turn on fingerprint',
-  setup_step2_d: 'A 4 to 6 digit PIN protects your app; once it exists you can turn on fingerprint.',
+  setup_step2_t: 'Create your PIN and turn on fingerprint', setup_step2_t_faceid: 'Face ID unlock', setup_step2_t_generic: 'Biometric unlock',
+  setup_step2_d: 'A 4 to 6 digit PIN protects your app; once it exists you can turn on fingerprint.', setup_step2_d_faceid: 'Use Face ID as well as your PIN to get in without typing it every time. You can change this later in Settings.', setup_step2_d_generic: 'Use your biometrics as well as your PIN to get in without typing it every time. You can change this later in Settings.',
   setup_step3_t: 'Connect your bank',
   setup_step3_d: 'With your bank connected, your balances and transactions update on their own. You can do it later if you prefer.',
   setup_skip_step: 'Not now',
@@ -2187,17 +1944,17 @@ en: {
   menu_open_aria: 'Open menu', menu_close_aria: 'Close menu', sec_home: 'Home', key_home: 'Your main screen',
   set_notif_label: 'Notifications when the app is closed', set_notif_help: 'Alerts for your fixed payments the day before and on the day, even when PETO Finanzas is closed.',
   set_autofixed_label: 'Record fixed payments automatically', set_autofixed_help: 'When a fixed payment is due, the expense is recorded for you. You can undo it right away.',
-  set_bio_label: 'Fingerprint unlock', set_bio_help: 'Unlock with your fingerprint as well as your PIN (an active PIN is required).',
-  bio_btn: '👆 Unlock with fingerprint', bio_reason: 'Confirm it is you to open PETO Finanzas',
-  bio_need_pin: 'Fingerprint unlock needs an active PIN: create your PIN in Settings → Security and fingerprint will work when you open the app.',
+  set_bio_label: 'Fingerprint unlock', set_bio_label_faceid: 'Face ID unlock', set_bio_label_generic: 'Biometric unlock', set_bio_help: 'Unlock with your fingerprint as well as your PIN (an active PIN is required).', set_bio_help_faceid: 'Unlock with Face ID as well as your PIN (an active PIN is required).', set_bio_help_generic: 'Unlock with your biometrics as well as your PIN (an active PIN is required).',
+  bio_btn: '👆 Unlock with fingerprint', bio_btn_faceid: '👆 Unlock with Face ID', bio_btn_generic: '👆 Unlock with biometrics', bio_reason: 'Confirm it is you to open PETO Finanzas',
+  bio_need_pin: 'Fingerprint unlock needs an active PIN: create your PIN in Settings → Security and fingerprint will work when you open the app.', bio_need_pin_faceid: 'Create a PIN first: Face ID works together with your PIN.', bio_need_pin_generic: 'Create a PIN first: biometrics work together with your PIN.',
   bio_failed: 'Fingerprint could not be verified. Type your PIN.',
   bio_unavailable: 'Fingerprint is not available on this phone. Type your PIN.',
-  bio_not_enrolled: 'This phone has no fingerprint enrolled. Enroll one in the phone settings or type your PIN.',
-  bio_offer_title: 'Unlock with your fingerprint?',
-  bio_offer_text: 'You just created your PIN. If you want, you can open PETO Finanzas with your fingerprint instead of typing your PIN every time. Turn it on now?',
-  bio_offer_yes: 'Yes, turn on fingerprint',
+  bio_not_enrolled: 'This phone has no fingerprint enrolled. Enroll one in the phone settings or type your PIN.', bio_not_enrolled_faceid: 'This phone has no Face ID set up. Turn it on in your phone settings.', bio_not_enrolled_generic: 'This device has no biometrics set up. Turn them on in your device settings.',
+  bio_offer_title: 'Unlock with your fingerprint?', bio_offer_title_faceid: 'Get in with Face ID?', bio_offer_title_generic: 'Get in with biometrics?',
+  bio_offer_text: 'You just created your PIN. If you want, you can open PETO Finanzas with your fingerprint instead of typing your PIN every time. Turn it on now?', bio_offer_text_faceid: 'Turn on Face ID to open PETO Finanzas without typing your PIN every time.', bio_offer_text_generic: 'Turn on biometrics to open PETO Finanzas without typing your PIN every time.',
+  bio_offer_yes: 'Yes, turn on fingerprint', bio_offer_yes_faceid: 'Turn on Face ID', bio_offer_yes_generic: 'Turn on biometrics',
   bio_offer_no: 'Not now',
-  bio_activated: 'Done: fingerprint unlock is now on.',
+  bio_activated: 'Done: fingerprint unlock is now on.', bio_activated_faceid: 'Face ID turned on.', bio_activated_generic: 'Biometrics turned on.',
   fix_auto_suffix: '(automatic fixed payment)',
   backup_pass_label: 'Encrypted backup password', backup_pass_ph: 'At least 4 characters',
   data_export_enc: 'Save backup with password',
@@ -2309,7 +2066,7 @@ en: {
   cloud_recovery_done: 'Password updated. You can now sign in.',
   key_settings: 'Name, split, text, sections, PIN',
   footer: 'PETO Web · With your cloud account, your data syncs with your phone',
-  tile_available: 'Available money', tile_available_aria: 'Available money: go to My accounts',
+  tile_available: 'Available money', tile_info_aria: 'What is this number?', tile_available_aria: 'Available money: go to My accounts',
   tile_accounts: 'Balance in your accounts', tile_accounts_aria: 'Balance in your accounts: go to My accounts', tile_accounts_help: 'The sum of your accounts. You update it yourself when you create or edit an account.',
   tile_savings: 'Savings this month', tile_savings_aria: 'Savings this month: go to Savings',
   tile_debts: 'Pending debts', tile_debts_aria: 'Pending debts: go to My debts',
@@ -2509,10 +2266,23 @@ en: {
   pro_benefit_report: '📊 Advanced report: compare months and export CSV',
   pro_benefit_shared: '🏠 Shared budget with your household',
   pro_benefit_org: '🤝 San organizer mode: the whole group’s tanda',
-  pro_coming_text: 'In-app purchase arrives with the Google Play launch. Meanwhile you can join the waiting list: we will let you know as soon as you can turn on Pro for $4.99 a month.',
+  pro_coming_text: 'In-app purchase is not available on this device right now. You can join the waiting list: we will let you know as soon as you can turn on PETO Pro for $4.99 a month.',
+  pro_coming_text_ios: 'In-app purchase is not available on this device right now. You can join the waiting list: we will let you know as soon as you can turn on PETO Pro for $4.99 a month.',
   pro_waitlist_btn: 'Join the waiting list',
   pro_waitlist_done: 'You are on the list ✅ We will let you know when Pro is available.',
   pro_close: 'Not now',
+  pro_buy_btn: 'Subscribe to PETO Pro',
+  pro_trial_btn: 'Start my 14 free days',
+  pro_checking: 'Checking availability…',
+  pro_buying: 'Processing…',
+  pro_trial_line: 'Your first 14 days are free.',
+  pro_renew_line: 'After that, the price shown is charged and the subscription renews every month until you cancel. You can cancel anytime from your store account settings.',
+  pro_restore_btn: 'Restore purchase',
+  pro_buy_cancelled: 'Purchase cancelled. You were not charged.',
+  pro_buy_error: 'The purchase could not be completed. Please try again.',
+  pro_buy_pending: 'Your payment is pending approval. PETO Pro will turn on as soon as the store confirms it.',
+  pro_restore_none: 'We could not find an active subscription to restore.',
+  pro_per_month: 'a month',
   pro_tag: 'PRO',
   adv_title: 'Advanced report',
   adv_note: 'A PETO Pro feature: this month vs the previous one, every category and a CSV export of the month.',
@@ -2651,15 +2421,15 @@ en: {
   widget_san_next: 'Next turn: {name} · {date}',
   widget_san_next_nodate: 'Next turn: {name}',
   back_exit_hint: 'Press back again to exit.',
-  ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_pending_btn: '✓ Opens when you finish', spend_ctx_below: 'You are {amount} below last month’s pace', spend_ctx_above: 'You are {amount} above last month’s pace', spend_ctx_bank: 'Bank connected', sec_card_title: 'Security', sec_card_read: 'Read-only bank connection: we can never move your money', sec_card_enc: 'Your data travels and is stored encrypted', sec_card_lock: 'PIN and fingerprint lock', bud_per_semana: 'per week', bud_per_quincena: 'per two weeks', bud_per_mes: 'per month', spend_left_periods: 'You have {amount} left across all your periods.', spend_x_periods: 'Each category is spread over its own period:', spend_x_cat: '{cat} ({per}): {left} left ÷ {days} days = {daily} today', bud_period_aria: 'Limit period for {cat}', nav_gastos: 'Expenses', nav_presupuesto: 'Budget', nav_ajustes: 'Settings', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
+  ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_pending_btn: '✓ Opens when you finish', spend_ctx_below: 'You are {amount} below last month’s pace', spend_ctx_above: 'You are {amount} above last month’s pace', spend_ctx_bank: 'Bank connected', sec_card_title: 'Security', sec_card_read: 'Read-only bank connection: we can never move your money', sec_card_enc: 'Your data travels and is stored encrypted', sec_card_lock: 'PIN and fingerprint lock', sec_card_lock_faceid: 'PIN and Face ID lock', sec_card_lock_generic: 'PIN and biometric lock', bud_per_semana: 'per week', bud_per_quincena: 'per two weeks', bud_per_mes: 'per month', spend_left_periods: 'You have {amount} left across all your periods.', spend_x_periods: 'Each category is spread over its own period:', spend_x_cat: '{cat} ({per}): {left} left ÷ {days} days = {daily} today', bud_period_aria: 'Limit period for {cat}', nav_gastos: 'Expenses', nav_presupuesto: 'Budget', nav_ajustes: 'Settings', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', ob_bio_label_faceid: 'Get in with Face ID (if I create a PIN)', ob_bio_label_generic: 'Get in with biometrics (if I create a PIN)', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
   setup_title: 'Configura il tuo PETO Finanzas',
   setup_step_of: 'Passo {n} di 3',
   setup_step1_t: 'Crea il tuo account',
   setup_step1_d: 'Il tuo account cloud mantiene i tuoi soldi sincronizzati e ti permette di collegare la tua banca.',
-  setup_step2_t: 'Crea il tuo PIN e attiva l\'impronta',
-  setup_step2_d: 'Un PIN da 4 a 6 cifre protegge la tua app; una volta creato potrai attivare l\'impronta.',
+  setup_step2_t: 'Crea il tuo PIN e attiva l\'impronta', setup_step2_t_faceid: 'Sblocco con Face ID', setup_step2_t_generic: 'Sblocco con dati biometrici',
+  setup_step2_d: 'Un PIN da 4 a 6 cifre protegge la tua app; una volta creato potrai attivare l\'impronta.', setup_step2_d_faceid: 'Usa Face ID oltre al PIN per entrare senza digitarlo ogni volta. Puoi cambiarlo in seguito in Impostazioni.', setup_step2_d_generic: 'Usa i tuoi dati biometrici oltre al PIN per entrare senza digitarlo ogni volta. Puoi cambiarlo in seguito in Impostazioni.',
   setup_step3_t: 'Collega la tua banca',
   setup_step3_d: 'Con la banca collegata, saldi e movimenti si aggiornano da soli. Puoi farlo dopo se preferisci.',
   setup_skip_step: 'Non ora',
@@ -2812,19 +2582,19 @@ it: {
   set_notif_help: 'Avvisi dei tuoi pagamenti fissi un giorno prima e lo stesso giorno, anche se PETO Finanzas è chiusa.',
   set_autofixed_label: 'Registra i pagamenti fissi automaticamente',
   set_autofixed_help: 'Quando un pagamento fisso scade, la spesa si registra da sola. Puoi annullarla subito.',
-  set_bio_label: 'Sblocca con l’impronta digitale',
-  set_bio_help: 'Entra con la tua impronta digitale oltre al PIN (devi avere un PIN attivo).',
-  bio_btn: '👆 Entra con l’impronta digitale',
+  set_bio_label: 'Sblocca con l’impronta digitale', set_bio_label_faceid: 'Sblocco con Face ID', set_bio_label_generic: 'Sblocco con dati biometrici',
+  set_bio_help: 'Entra con la tua impronta digitale oltre al PIN (devi avere un PIN attivo).', set_bio_help_faceid: 'Sblocca con Face ID oltre al PIN (serve un PIN attivo).', set_bio_help_generic: 'Sblocca con i tuoi dati biometrici oltre al PIN (serve un PIN attivo).',
+  bio_btn: '👆 Entra con l’impronta digitale', bio_btn_faceid: '👆 Entra con Face ID', bio_btn_generic: '👆 Entra con la biometria',
   bio_reason: 'Conferma che sei tu per aprire PETO Finanzas',
-  bio_need_pin: 'L’impronta ha bisogno di un PIN attivo: crea il tuo PIN in Impostazioni → Sicurezza e poi l’impronta funzionerà all’apertura dell’app.',
+  bio_need_pin: 'L’impronta ha bisogno di un PIN attivo: crea il tuo PIN in Impostazioni → Sicurezza e poi l’impronta funzionerà all’apertura dell’app.', bio_need_pin_faceid: 'Prima crea un PIN: Face ID funziona insieme al tuo PIN.', bio_need_pin_generic: 'Prima crea un PIN: i dati biometrici funzionano insieme al tuo PIN.',
   bio_failed: 'Non è stato possibile verificare l’impronta. Inserisci il PIN.',
   bio_unavailable: 'L’impronta non è disponibile su questo telefono. Inserisci il PIN.',
-  bio_not_enrolled: 'Questo telefono non ha nessuna impronta registrata. Registrala nelle impostazioni del telefono o inserisci il PIN.',
-  bio_offer_title: 'Sbloccare con l’impronta digitale?',
-  bio_offer_text: 'Hai appena creato il tuo PIN. Se vuoi, puoi entrare in PETO Finanzas con l’impronta invece di digitare il PIN ogni volta. Lo attiviamo ora?',
-  bio_offer_yes: 'Sì, attiva l’impronta',
+  bio_not_enrolled: 'Questo telefono non ha nessuna impronta registrata. Registrala nelle impostazioni del telefono o inserisci il PIN.', bio_not_enrolled_faceid: 'Questo telefono non ha Face ID configurato. Attivalo nelle impostazioni del telefono.', bio_not_enrolled_generic: 'Questo dispositivo non ha dati biometrici configurati. Attivali nelle impostazioni del dispositivo.',
+  bio_offer_title: 'Sbloccare con l’impronta digitale?', bio_offer_title_faceid: 'Entrare con Face ID?', bio_offer_title_generic: 'Entrare con i dati biometrici?',
+  bio_offer_text: 'Hai appena creato il tuo PIN. Se vuoi, puoi entrare in PETO Finanzas con l’impronta invece di digitare il PIN ogni volta. Lo attiviamo ora?', bio_offer_text_faceid: 'Attiva Face ID per entrare in PETO Finanzas senza digitare il PIN ogni volta.', bio_offer_text_generic: 'Attiva i tuoi dati biometrici per entrare in PETO Finanzas senza digitare il PIN ogni volta.',
+  bio_offer_yes: 'Sì, attiva l’impronta', bio_offer_yes_faceid: 'Attiva Face ID', bio_offer_yes_generic: 'Attiva dati biometrici',
   bio_offer_no: 'Non ora',
-  bio_activated: 'Fatto: lo sblocco con l’impronta è attivo.',
+  bio_activated: 'Fatto: lo sblocco con l’impronta è attivo.', bio_activated_faceid: 'Face ID attivato.', bio_activated_generic: 'Dati biometrici attivati.',
   fix_auto_suffix: '(pagamento fisso automatico)',
   backup_pass_label: 'Password della copia crittografata',
   backup_pass_ph: 'Minimo 4 caratteri',
@@ -2985,7 +2755,7 @@ it: {
   cloud_recovery_done: 'Password aggiornata. Ora puoi accedere.',
   key_settings: 'Nome, ripartizione, testo, sezioni, PIN',
   footer: 'PETO Web · Con il tuo account nel cloud, i tuoi dati si sincronizzano con il tuo telefono',
-  tile_available: 'Denaro disponibile',
+  tile_available: 'Denaro disponibile', tile_info_aria: 'Che cos’è questo numero?',
   tile_accounts: 'Saldo nei tuoi conti', tile_accounts_aria: 'Saldo nei tuoi conti: vai a I miei conti', tile_accounts_help: 'La somma dei tuoi conti. La aggiorni tu quando crei o modifichi un conto.',
   tile_available_aria: 'Denaro disponibile: vai a I miei conti',
   tile_savings: 'Risparmi del mese',
@@ -3359,10 +3129,23 @@ it: {
   pro_benefit_report: '📊 Resoconto avanzato: confronta i mesi ed esporta in CSV',
   pro_benefit_shared: '🏠 Budget condiviso con la tua casa',
   pro_benefit_org: '🤝 Modalità organizzatore del san: la tanda di tutto il gruppo',
-  pro_coming_text: 'L’acquisto in-app arriva con il lancio su Google Play. Intanto puoi iscriverti alla lista d’attesa: ti avviseremo appena potrai attivare Pro a $4.99 al mese.',
+  pro_coming_text: 'L’acquisto in-app non è disponibile su questo dispositivo per ora. Puoi iscriverti alla lista d’attesa: ti avviseremo appena potrai attivare PETO Pro a $4.99 al mese.',
+  pro_coming_text_ios: 'L’acquisto in-app non è disponibile su questo dispositivo per ora. Puoi iscriverti alla lista d’attesa: ti avviseremo appena potrai attivare PETO Pro a $4.99 al mese.',
   pro_waitlist_btn: 'Iscrivimi alla lista d’attesa',
   pro_waitlist_done: 'Sei in lista ✅ Ti avviseremo quando Pro sarà disponibile.',
   pro_close: 'Non ora',
+  pro_buy_btn: 'Abbonati a PETO Pro',
+  pro_trial_btn: 'Inizia i miei 14 giorni gratis',
+  pro_checking: 'Verifica della disponibilità…',
+  pro_buying: 'Elaborazione…',
+  pro_trial_line: 'I primi 14 giorni sono gratuiti.',
+  pro_renew_line: 'Dopo, viene addebitato il prezzo indicato e l’abbonamento si rinnova ogni mese finché non lo annulli. Puoi annullarlo quando vuoi dalle impostazioni del tuo account dello store.',
+  pro_restore_btn: 'Ripristina acquisto',
+  pro_buy_cancelled: 'Acquisto annullato. Non ti è stato addebitato nulla.',
+  pro_buy_error: 'Non è stato possibile completare l’acquisto. Riprova.',
+  pro_buy_pending: 'Il tuo pagamento è in attesa di approvazione. PETO Pro si attiverà appena lo store lo confermerà.',
+  pro_restore_none: 'Non abbiamo trovato un abbonamento attivo da ripristinare.',
+  pro_per_month: 'al mese',
   pro_tag: 'PRO',
   adv_title: 'Resoconto avanzato',
   adv_note: 'Funzione di PETO Pro: questo mese a confronto con il precedente, tutte le categorie ed esportazione del mese in CSV.',
@@ -3501,15 +3284,15 @@ it: {
   widget_san_next: 'Prossimo turno: {name} · {date}',
   widget_san_next_nodate: 'Prossimo turno: {name}',
   back_exit_hint: 'Premi di nuovo indietro per uscire.',
-  ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_pending_btn: '✓ Si apre alla fine', spend_ctx_below: 'Sei {amount} sotto il ritmo del mese scorso', spend_ctx_above: 'Sei {amount} sopra il ritmo del mese scorso', spend_ctx_bank: 'Banca collegata', sec_card_title: 'Sicurezza', sec_card_read: 'Connessione bancaria in sola lettura: non possiamo mai muovere i tuoi soldi', sec_card_enc: 'I tuoi dati viaggiano e sono salvati cifrati', sec_card_lock: 'Blocco con PIN e impronta', bud_per_semana: 'a settimana', bud_per_quincena: 'ogni due settimane', bud_per_mes: 'al mese', spend_left_periods: 'Ti restano {amount} tra tutti i tuoi periodi.', spend_x_periods: 'Ogni categoria si distribuisce sul suo periodo:', spend_x_cat: '{cat} ({per}): restano {left} ÷ {days} giorni = {daily} oggi', bud_period_aria: 'Periodo del limite per {cat}', nav_gastos: 'Spese', nav_presupuesto: 'Budget', nav_ajustes: 'Impostazioni', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
+  ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_pending_btn: '✓ Si apre alla fine', spend_ctx_below: 'Sei {amount} sotto il ritmo del mese scorso', spend_ctx_above: 'Sei {amount} sopra il ritmo del mese scorso', spend_ctx_bank: 'Banca collegata', sec_card_title: 'Sicurezza', sec_card_read: 'Connessione bancaria in sola lettura: non possiamo mai muovere i tuoi soldi', sec_card_enc: 'I tuoi dati viaggiano e sono salvati cifrati', sec_card_lock: 'Blocco con PIN e impronta', sec_card_lock_faceid: 'Blocco con PIN e Face ID', sec_card_lock_generic: 'Blocco con PIN e dati biometrici', bud_per_semana: 'a settimana', bud_per_quincena: 'ogni due settimane', bud_per_mes: 'al mese', spend_left_periods: 'Ti restano {amount} tra tutti i tuoi periodi.', spend_x_periods: 'Ogni categoria si distribuisce sul suo periodo:', spend_x_cat: '{cat} ({per}): restano {left} ÷ {days} giorni = {daily} oggi', bud_period_aria: 'Periodo del limite per {cat}', nav_gastos: 'Spese', nav_presupuesto: 'Budget', nav_ajustes: 'Impostazioni', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', ob_bio_label_faceid: 'Entra con Face ID (se creo un PIN)', ob_bio_label_generic: 'Entra con i dati biometrici (se creo un PIN)', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
   setup_title: 'Configure o seu PETO Finanzas',
   setup_step_of: 'Passo {n} de 3',
   setup_step1_t: 'Crie a sua conta',
   setup_step1_d: 'A sua conta na nuvem mantém o seu dinheiro sincronizado e permite ligar o seu banco.',
-  setup_step2_t: 'Crie o seu PIN e ative a impressão digital',
-  setup_step2_d: 'Um PIN de 4 a 6 dígitos protege a sua app; depois de criado, pode ativar a impressão digital.',
+  setup_step2_t: 'Crie o seu PIN e ative a impressão digital', setup_step2_t_faceid: 'Desbloqueio com Face ID', setup_step2_t_generic: 'Desbloqueio com dados biométricos',
+  setup_step2_d: 'Um PIN de 4 a 6 dígitos protege a sua app; depois de criado, pode ativar a impressão digital.', setup_step2_d_faceid: 'Use o Face ID além do seu PIN para entrar sem digitá-lo toda vez. Você pode mudar isso depois em Ajustes.', setup_step2_d_generic: 'Use seus dados biométricos além do seu PIN para entrar sem digitá-lo toda vez. Você pode mudar isso depois em Ajustes.',
   setup_step3_t: 'Ligue o seu banco',
   setup_step3_d: 'Com o seu banco ligado, os saldos e movimentos atualizam-se sozinhos. Pode fazê-lo mais tarde, se preferir.',
   setup_skip_step: 'Agora não',
@@ -3662,19 +3445,19 @@ pt: {
   set_notif_help: 'Avisos dos seus pagamentos fixos um dia antes e no próprio dia, mesmo com o PETO Finanzas fechado.',
   set_autofixed_label: 'Registrar pagamentos fixos automaticamente',
   set_autofixed_help: 'Quando um pagamento fixo vence, o gasto é registrado para você. Você pode desfazer na hora.',
-  set_bio_label: 'Desbloqueio com impressão digital',
-  set_bio_help: 'Entre com sua impressão digital além do PIN (é necessário um PIN ativo).',
-  bio_btn: '👆 Entrar com impressão digital',
+  set_bio_label: 'Desbloqueio com impressão digital', set_bio_label_faceid: 'Desbloqueio com Face ID', set_bio_label_generic: 'Desbloqueio com dados biométricos',
+  set_bio_help: 'Entre com sua impressão digital além do PIN (é necessário um PIN ativo).', set_bio_help_faceid: 'Desbloqueie com Face ID além do seu PIN (é preciso um PIN ativo).', set_bio_help_generic: 'Desbloqueie com seus dados biométricos além do seu PIN (é preciso um PIN ativo).',
+  bio_btn: '👆 Entrar com impressão digital', bio_btn_faceid: '👆 Entrar com Face ID', bio_btn_generic: '👆 Entrar com biometria',
   bio_reason: 'Confirme que é você para abrir o PETO Finanzas',
-  bio_need_pin: 'A impressão digital precisa de um PIN ativo: crie seu PIN em Ajustes → Segurança e a digital funcionará ao abrir o app.',
+  bio_need_pin: 'A impressão digital precisa de um PIN ativo: crie seu PIN em Ajustes → Segurança e a digital funcionará ao abrir o app.', bio_need_pin_faceid: 'Primeiro crie um PIN: o Face ID funciona junto com o seu PIN.', bio_need_pin_generic: 'Primeiro crie um PIN: os dados biométricos funcionam junto com o seu PIN.',
   bio_failed: 'Não foi possível verificar a impressão digital. Digite seu PIN.',
   bio_unavailable: 'A impressão digital não está disponível neste telefone. Digite seu PIN.',
-  bio_not_enrolled: 'Este telefone não tem nenhuma impressão digital cadastrada. Cadastre uma nos ajustes do telefone ou digite seu PIN.',
-  bio_offer_title: 'Desbloquear com sua impressão digital?',
-  bio_offer_text: 'Você acabou de criar seu PIN. Se quiser, pode abrir o PETO Finanzas com sua impressão digital em vez de digitar o PIN toda vez. Ativamos agora?',
-  bio_offer_yes: 'Sim, ativar a impressão digital',
+  bio_not_enrolled: 'Este telefone não tem nenhuma impressão digital cadastrada. Cadastre uma nos ajustes do telefone ou digite seu PIN.', bio_not_enrolled_faceid: 'Este telefone não tem Face ID configurado. Ative-o nos ajustes do telefone.', bio_not_enrolled_generic: 'Este dispositivo não tem dados biométricos configurados. Ative-os nos ajustes do dispositivo.',
+  bio_offer_title: 'Desbloquear com sua impressão digital?', bio_offer_title_faceid: 'Entrar com Face ID?', bio_offer_title_generic: 'Entrar com dados biométricos?',
+  bio_offer_text: 'Você acabou de criar seu PIN. Se quiser, pode abrir o PETO Finanzas com sua impressão digital em vez de digitar o PIN toda vez. Ativamos agora?', bio_offer_text_faceid: 'Ative o Face ID para entrar no PETO Finanzas sem digitar seu PIN toda vez.', bio_offer_text_generic: 'Ative seus dados biométricos para entrar no PETO Finanzas sem digitar seu PIN toda vez.',
+  bio_offer_yes: 'Sim, ativar a impressão digital', bio_offer_yes_faceid: 'Ativar Face ID', bio_offer_yes_generic: 'Ativar dados biométricos',
   bio_offer_no: 'Agora não',
-  bio_activated: 'Pronto: o desbloqueio com impressão digital está ativado.',
+  bio_activated: 'Pronto: o desbloqueio com impressão digital está ativado.', bio_activated_faceid: 'Face ID ativado.', bio_activated_generic: 'Dados biométricos ativados.',
   fix_auto_suffix: '(pagamento fixo automático)',
   backup_pass_label: 'Senha da cópia criptografada',
   backup_pass_ph: 'Mínimo de 4 caracteres',
@@ -3835,7 +3618,7 @@ pt: {
   cloud_recovery_done: 'Senha atualizada. Você já pode entrar.',
   key_settings: 'Nome, divisão, texto, seções, PIN',
   footer: 'PETO Finanzas · Funciona sem internet · A nuvem é opcional: seus dados, sua decisão',
-  tile_available: 'Dinheiro disponível',
+  tile_available: 'Dinheiro disponível', tile_info_aria: 'O que é este número?',
   tile_accounts: 'Saldo nas suas contas', tile_accounts_aria: 'Saldo nas suas contas: ir para Minhas contas', tile_accounts_help: 'A soma das suas contas. Você a atualiza ao criar ou editar uma conta.',
   tile_available_aria: 'Dinheiro disponível: ir para Minhas contas',
   tile_savings: 'Poupança deste mês',
@@ -4208,10 +3991,23 @@ pt: {
   pro_benefit_report: '📊 Relatório avançado: compare meses e exporte CSV',
   pro_benefit_shared: '🏠 Orçamento compartilhado com sua casa',
   pro_benefit_org: '🤝 Modo organizador de san: a tanda de todo o grupo',
-  pro_coming_text: 'A compra dentro do app chega com o lançamento no Google Play. Enquanto isso você pode entrar na lista de espera: avisaremos assim que você puder ativar o Pro por $4.99 por mês.',
+  pro_coming_text: 'A compra dentro do app não está disponível neste dispositivo por enquanto. Você pode entrar na lista de espera: avisaremos assim que você puder ativar o PETO Pro por $4.99 por mês.',
+  pro_coming_text_ios: 'A compra dentro do app não está disponível neste dispositivo por enquanto. Você pode entrar na lista de espera: avisaremos assim que você puder ativar o PETO Pro por $4.99 por mês.',
   pro_waitlist_btn: 'Entrar na lista de espera',
   pro_waitlist_done: 'Você está na lista ✅ Avisaremos quando o Pro estiver disponível.',
   pro_close: 'Agora não',
+  pro_buy_btn: 'Assinar o PETO Pro',
+  pro_trial_btn: 'Começar meus 14 dias grátis',
+  pro_checking: 'Verificando disponibilidade…',
+  pro_buying: 'Processando…',
+  pro_trial_line: 'Os primeiros 14 dias são grátis.',
+  pro_renew_line: 'Depois, o preço indicado é cobrado e a assinatura se renova todo mês até você cancelar. Você pode cancelar quando quiser nas configurações da sua conta da loja.',
+  pro_restore_btn: 'Restaurar compra',
+  pro_buy_cancelled: 'Compra cancelada. Nada foi cobrado.',
+  pro_buy_error: 'Não foi possível concluir a compra. Tente de novo.',
+  pro_buy_pending: 'Seu pagamento ficou pendente de aprovação. O PETO Pro será ativado assim que a loja confirmar.',
+  pro_restore_none: 'Não encontramos uma assinatura ativa para restaurar.',
+  pro_per_month: 'por mês',
   pro_tag: 'PRO',
   adv_title: 'Relatório avançado',
   adv_note: 'Uma função do PETO Pro: este mês vs o anterior, cada categoria e uma exportação CSV do mês.',
@@ -4351,15 +4147,15 @@ pt: {
   widget_san_next: 'Próximo turno: {name} · {date}',
   widget_san_next_nodate: 'Próximo turno: {name}',
   back_exit_hint: 'Toque em voltar outra vez para sair.',
-  ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_pending_btn: '✓ Abre ao terminar', spend_ctx_below: 'Você está {amount} abaixo do ritmo do mês passado', spend_ctx_above: 'Você está {amount} acima do ritmo do mês passado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Segurança', sec_card_read: 'Conexão bancária somente leitura: nunca podemos mover seu dinheiro', sec_card_enc: 'Seus dados viajam e são guardados criptografados', sec_card_lock: 'Bloqueio com PIN e impressão digital', bud_per_semana: 'por semana', bud_per_quincena: 'por quinzena', bud_per_mes: 'por mês', spend_left_periods: 'Restam {amount} entre todos os seus períodos.', spend_x_periods: 'Cada categoria é dividida conforme seu próprio período:', spend_x_cat: '{cat} ({per}): restam {left} ÷ {days} dias = {daily} hoje', bud_period_aria: 'Período do limite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Orçamento', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
+  ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_pending_btn: '✓ Abre ao terminar', spend_ctx_below: 'Você está {amount} abaixo do ritmo do mês passado', spend_ctx_above: 'Você está {amount} acima do ritmo do mês passado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Segurança', sec_card_read: 'Conexão bancária somente leitura: nunca podemos mover seu dinheiro', sec_card_enc: 'Seus dados viajam e são guardados criptografados', sec_card_lock: 'Bloqueio com PIN e impressão digital', sec_card_lock_faceid: 'Bloqueio com PIN e Face ID', sec_card_lock_generic: 'Bloqueio com PIN e dados biométricos', bud_per_semana: 'por semana', bud_per_quincena: 'por quinzena', bud_per_mes: 'por mês', spend_left_periods: 'Restam {amount} entre todos os seus períodos.', spend_x_periods: 'Cada categoria é dividida conforme seu próprio período:', spend_x_cat: '{cat} ({per}): restam {left} ÷ {days} dias = {daily} hoje', bud_period_aria: 'Período do limite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Orçamento', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', ob_bio_label_faceid: 'Entrar com Face ID (se eu criar um PIN)', ob_bio_label_generic: 'Entrar com dados biométricos (se eu criar um PIN)', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
   setup_title: 'Configurez votre PETO Finanzas',
   setup_step_of: 'Étape {n} sur 3',
   setup_step1_t: 'Créez votre compte',
   setup_step1_d: 'Votre compte cloud garde votre argent synchronisé et vous permet de connecter votre banque.',
-  setup_step2_t: 'Créez votre PIN et activez l\'empreinte',
-  setup_step2_d: 'Un PIN de 4 à 6 chiffres protège votre appli ; une fois créé, vous pourrez activer l\'empreinte.',
+  setup_step2_t: 'Créez votre PIN et activez l\'empreinte', setup_step2_t_faceid: 'Déverrouillage par Face ID', setup_step2_t_generic: 'Déverrouillage par données biométriques',
+  setup_step2_d: 'Un PIN de 4 à 6 chiffres protège votre appli ; une fois créé, vous pourrez activer l\'empreinte.', setup_step2_d_faceid: 'Utilisez Face ID en plus de votre code PIN pour entrer sans le saisir à chaque fois. Vous pourrez changer cela plus tard dans Réglages.', setup_step2_d_generic: 'Utilisez vos données biométriques en plus de votre code PIN pour entrer sans le saisir à chaque fois. Vous pourrez changer cela plus tard dans Réglages.',
   setup_step3_t: 'Connectez votre banque',
   setup_step3_d: 'Avec votre banque connectée, vos soldes et opérations se mettent à jour tout seuls. Vous pouvez le faire plus tard si vous préférez.',
   setup_skip_step: 'Pas maintenant',
@@ -4512,19 +4308,19 @@ fr: {
   set_notif_help: 'Des alertes pour tes paiements fixes la veille et le jour même, même quand PETO Finanzas est fermée.',
   set_autofixed_label: 'Enregistrer les paiements fixes automatiquement',
   set_autofixed_help: 'Quand un paiement fixe arrive à échéance, la dépense est enregistrée pour toi. Tu peux l’annuler aussitôt.',
-  set_bio_label: 'Déverrouillage par empreinte digitale',
-  set_bio_help: 'Entre avec ton empreinte en plus de ton code PIN (un code PIN actif est nécessaire).',
-  bio_btn: '👆 Entrer avec l’empreinte digitale',
+  set_bio_label: 'Déverrouillage par empreinte digitale', set_bio_label_faceid: 'Déverrouillage par Face ID', set_bio_label_generic: 'Déverrouillage par données biométriques',
+  set_bio_help: 'Entre avec ton empreinte en plus de ton code PIN (un code PIN actif est nécessaire).', set_bio_help_faceid: 'Déverrouillez avec Face ID en plus de votre PIN (un PIN actif est requis).', set_bio_help_generic: 'Déverrouillez avec vos données biométriques en plus de votre PIN (un PIN actif est requis).',
+  bio_btn: '👆 Entrer avec l’empreinte digitale', bio_btn_faceid: '👆 Entrer avec Face ID', bio_btn_generic: '👆 Entrer avec la biométrie',
   bio_reason: 'Confirme que c’est bien toi pour ouvrir PETO Finanzas',
-  bio_need_pin: 'L’empreinte digitale nécessite un code PIN actif : crée ton code PIN dans Réglages → Sécurité et l’empreinte fonctionnera à l’ouverture de l’appli.',
+  bio_need_pin: 'L’empreinte digitale nécessite un code PIN actif : crée ton code PIN dans Réglages → Sécurité et l’empreinte fonctionnera à l’ouverture de l’appli.', bio_need_pin_faceid: 'Créez d\'abord un PIN : Face ID fonctionne avec votre PIN.', bio_need_pin_generic: 'Créez d\'abord un PIN : les données biométriques fonctionnent avec votre PIN.',
   bio_failed: 'L’empreinte n’a pas pu être vérifiée. Tape ton code PIN.',
   bio_unavailable: 'L’empreinte digitale n’est pas disponible sur ce téléphone. Tape ton code PIN.',
-  bio_not_enrolled: 'Ce téléphone n’a aucune empreinte enregistrée. Enregistres-en une dans les réglages du téléphone ou tape ton code PIN.',
-  bio_offer_title: 'Déverrouiller avec ton empreinte ?',
-  bio_offer_text: 'Tu viens de créer ton code PIN. Si tu veux, tu peux ouvrir PETO Finanzas avec ton empreinte au lieu de taper ton code PIN à chaque fois. On l’active maintenant ?',
-  bio_offer_yes: 'Oui, activer l’empreinte',
+  bio_not_enrolled: 'Ce téléphone n’a aucune empreinte enregistrée. Enregistres-en une dans les réglages du téléphone ou tape ton code PIN.', bio_not_enrolled_faceid: 'Ce téléphone n\'a pas Face ID configuré. Activez-le dans les réglages du téléphone.', bio_not_enrolled_generic: 'Cet appareil n\'a pas de données biométriques configurées. Activez-les dans les réglages de l\'appareil.',
+  bio_offer_title: 'Déverrouiller avec ton empreinte ?', bio_offer_title_faceid: 'Entrer avec Face ID ?', bio_offer_title_generic: 'Entrer avec vos données biométriques ?',
+  bio_offer_text: 'Tu viens de créer ton code PIN. Si tu veux, tu peux ouvrir PETO Finanzas avec ton empreinte au lieu de taper ton code PIN à chaque fois. On l’active maintenant ?', bio_offer_text_faceid: 'Activez Face ID pour ouvrir PETO Finanzas sans saisir votre PIN à chaque fois.', bio_offer_text_generic: 'Activez vos données biométriques pour ouvrir PETO Finanzas sans saisir votre PIN à chaque fois.',
+  bio_offer_yes: 'Oui, activer l’empreinte', bio_offer_yes_faceid: 'Activer Face ID', bio_offer_yes_generic: 'Activer les données biométriques',
   bio_offer_no: 'Pas maintenant',
-  bio_activated: 'C’est fait : le déverrouillage par empreinte est activé.',
+  bio_activated: 'C’est fait : le déverrouillage par empreinte est activé.', bio_activated_faceid: 'Face ID activé.', bio_activated_generic: 'Données biométriques activées.',
   fix_auto_suffix: '(paiement fixe automatique)',
   backup_pass_label: 'Mot de passe de la copie chiffrée',
   backup_pass_ph: 'Au moins 4 caractères',
@@ -4685,7 +4481,7 @@ fr: {
   cloud_recovery_done: 'Mot de passe mis à jour. Tu peux maintenant te connecter.',
   key_settings: 'Nom, répartition, texte, sections, PIN',
   footer: 'PETO Finanzas · Fonctionne hors ligne · Le cloud est facultatif : tes données, ton choix',
-  tile_available: 'Argent disponible',
+  tile_available: 'Argent disponible', tile_info_aria: 'Qu’est-ce que ce nombre ?',
   tile_accounts: 'Solde de tes comptes', tile_accounts_aria: 'Solde de tes comptes : aller à Mes comptes', tile_accounts_help: 'La somme de tes comptes. C’est toi qui la mets à jour quand tu crées ou modifies un compte.',
   tile_available_aria: 'Argent disponible : aller à Mes comptes',
   tile_savings: 'Épargne de ce mois-ci',
@@ -5053,15 +4849,28 @@ fr: {
   pro_status_waitlist: 'Tu es sur la liste d’attente de PETO Pro.',
   pro_btn_see: 'Voir PETO Pro',
   pro_wall_title: 'Ceci est une fonction PETO Pro ⭐',
-  pro_price_line: 'Seulement 1,99 $ par mois',
+  pro_price_line: 'Seulement 4,99 $ par mois',
   pro_benefit_cloud: '☁️ Cloud illimité pour tes données',
   pro_benefit_report: '📊 Rapport avancé : compare les mois et exporte en CSV',
   pro_benefit_shared: '🏠 Budget partagé avec ton foyer',
   pro_benefit_org: '🤝 Mode organisateur de san : la tanda de tout le groupe',
-  pro_coming_text: 'L’achat dans l’appli arrive avec le lancement sur Google Play. En attendant, tu peux rejoindre la liste d’attente : nous te préviendrons dès que tu pourras activer Pro pour 1,99 $ par mois.',
+  pro_coming_text: 'L’achat dans l’appli n’est pas disponible sur cet appareil pour le moment. Tu peux rejoindre la liste d’attente : nous te préviendrons dès que tu pourras activer PETO Pro pour 4,99 $ par mois.',
+  pro_coming_text_ios: 'L’achat dans l’appli n’est pas disponible sur cet appareil pour le moment. Tu peux rejoindre la liste d’attente : nous te préviendrons dès que tu pourras activer PETO Pro pour 4,99 $ par mois.',
   pro_waitlist_btn: 'Rejoindre la liste d’attente',
   pro_waitlist_done: 'Tu es sur la liste ✅ Nous te préviendrons quand Pro sera disponible.',
   pro_close: 'Pas maintenant',
+  pro_buy_btn: 'S’abonner à PETO Pro',
+  pro_trial_btn: 'Commencer mes 14 jours gratuits',
+  pro_checking: 'Vérification de la disponibilité…',
+  pro_buying: 'Traitement…',
+  pro_trial_line: 'Les 14 premiers jours sont gratuits.',
+  pro_renew_line: 'Ensuite, le prix indiqué est prélevé et l’abonnement se renouvelle chaque mois jusqu’à annulation. Tu peux l’annuler à tout moment dans les réglages de ton compte de la boutique.',
+  pro_restore_btn: 'Restaurer l’achat',
+  pro_buy_cancelled: 'Achat annulé. Aucun montant n’a été prélevé.',
+  pro_buy_error: 'L’achat n’a pas pu être terminé. Réessaie.',
+  pro_buy_pending: 'Ton paiement est en attente d’approbation. PETO Pro s’activera dès que la boutique le confirmera.',
+  pro_restore_none: 'Nous n’avons trouvé aucun abonnement actif à restaurer.',
+  pro_per_month: 'par mois',
   pro_tag: 'PRO',
   adv_title: 'Rapport avancé',
   adv_note: 'Une fonction PETO Pro : ce mois-ci contre le mois précédent, chaque catégorie et un export CSV du mois.',
@@ -5201,15 +5010,15 @@ fr: {
   widget_san_next: 'Prochain tour : {name} · {date}',
   widget_san_next_nodate: 'Prochain tour : {name}',
   back_exit_hint: 'Appuyez à nouveau sur retour pour quitter.',
-  ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_pending_btn: '✓ S’ouvre à la fin', spend_ctx_below: 'Vous êtes {amount} sous le rythme du mois dernier', spend_ctx_above: 'Vous êtes {amount} au-dessus du rythme du mois dernier', spend_ctx_bank: 'Banque connectée', sec_card_title: 'Sécurité', sec_card_read: 'Connexion bancaire en lecture seule : nous ne pouvons jamais déplacer votre argent', sec_card_enc: 'Vos données voyagent et sont stockées chiffrées', sec_card_lock: 'Verrouillage par code PIN et empreinte', bud_per_semana: 'par semaine', bud_per_quincena: 'par quinzaine', bud_per_mes: 'par mois', spend_left_periods: 'Il vous reste {amount} sur toutes vos périodes.', spend_x_periods: 'Chaque catégorie se répartit sur sa propre période :', spend_x_cat: '{cat} ({per}) : {left} restants ÷ {days} jours = {daily} aujourd’hui', bud_period_aria: 'Période de la limite pour {cat}', nav_gastos: 'Dépenses', nav_presupuesto: 'Budget', nav_ajustes: 'Réglages', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
+  ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_pending_btn: '✓ S’ouvre à la fin', spend_ctx_below: 'Vous êtes {amount} sous le rythme du mois dernier', spend_ctx_above: 'Vous êtes {amount} au-dessus du rythme du mois dernier', spend_ctx_bank: 'Banque connectée', sec_card_title: 'Sécurité', sec_card_read: 'Connexion bancaire en lecture seule : nous ne pouvons jamais déplacer votre argent', sec_card_enc: 'Vos données voyagent et sont stockées chiffrées', sec_card_lock: 'Verrouillage par code PIN et empreinte', sec_card_lock_faceid: 'Verrouillage par code PIN et Face ID', sec_card_lock_generic: 'Verrouillage par code PIN et données biométriques', bud_per_semana: 'par semaine', bud_per_quincena: 'par quinzaine', bud_per_mes: 'par mois', spend_left_periods: 'Il vous reste {amount} sur toutes vos périodes.', spend_x_periods: 'Chaque catégorie se répartit sur sa propre période :', spend_x_cat: '{cat} ({per}) : {left} restants ÷ {days} jours = {daily} aujourd’hui', bud_period_aria: 'Période de la limite pour {cat}', nav_gastos: 'Dépenses', nav_presupuesto: 'Budget', nav_ajustes: 'Réglages', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', ob_bio_label_faceid: 'Entrer avec Face ID (si je crée un PIN)', ob_bio_label_generic: 'Entrer avec vos données biométriques (si je crée un PIN)', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
   setup_title: 'Richte dein PETO Finanzas ein',
   setup_step_of: 'Schritt {n} von 3',
   setup_step1_t: 'Erstelle dein Konto',
   setup_step1_d: 'Dein Cloud-Konto hält dein Geld synchron und lässt dich deine Bank verbinden.',
-  setup_step2_t: 'Erstelle deine PIN und schalte den Fingerabdruck ein',
-  setup_step2_d: 'Eine 4- bis 6-stellige PIN schützt deine App; sobald sie besteht, kannst du den Fingerabdruck einschalten.',
+  setup_step2_t: 'Erstelle deine PIN und schalte den Fingerabdruck ein', setup_step2_t_faceid: 'Entsperren mit Face ID', setup_step2_t_generic: 'Entsperren mit biometrischen Daten',
+  setup_step2_d: 'Eine 4- bis 6-stellige PIN schützt deine App; sobald sie besteht, kannst du den Fingerabdruck einschalten.', setup_step2_d_faceid: 'Nutze Face ID zusätzlich zu deiner PIN, um dich anzumelden, ohne sie jedes Mal einzutippen. Du kannst das später in den Einstellungen ändern.', setup_step2_d_generic: 'Nutze deine biometrischen Daten zusätzlich zu deiner PIN, um dich anzumelden, ohne sie jedes Mal einzutippen. Du kannst das später in den Einstellungen ändern.',
   setup_step3_t: 'Verbinde deine Bank',
   setup_step3_d: 'Mit verbundener Bank aktualisieren sich Salden und Buchungen von selbst. Du kannst es später tun, wenn du möchtest.',
   setup_skip_step: 'Jetzt nicht',
@@ -5362,19 +5171,19 @@ de: {
   set_notif_help: 'Hinweise zu deinen Festzahlungen am Vortag und am Fälligkeitstag, auch wenn PETO Finanzas geschlossen ist.',
   set_autofixed_label: 'Festzahlungen automatisch eintragen',
   set_autofixed_help: 'Wenn eine Festzahlung fällig wird, wird die Ausgabe für dich eingetragen. Du kannst es sofort rückgängig machen.',
-  set_bio_label: 'Entsperrung per Fingerabdruck',
-  set_bio_help: 'Entsperre mit deinem Fingerabdruck zusätzlich zur PIN (eine aktive PIN ist nötig).',
-  bio_btn: '👆 Mit Fingerabdruck entsperren',
+  set_bio_label: 'Entsperrung per Fingerabdruck', set_bio_label_faceid: 'Entsperren mit Face ID', set_bio_label_generic: 'Entsperren mit biometrischen Daten',
+  set_bio_help: 'Entsperre mit deinem Fingerabdruck zusätzlich zur PIN (eine aktive PIN ist nötig).', set_bio_help_faceid: 'Entsperre mit Face ID zusätzlich zu deiner PIN (eine aktive PIN ist erforderlich).', set_bio_help_generic: 'Entsperre mit deinen biometrischen Daten zusätzlich zu deiner PIN (eine aktive PIN ist erforderlich).',
+  bio_btn: '👆 Mit Fingerabdruck entsperren', bio_btn_faceid: '👆 Mit Face ID entsperren', bio_btn_generic: '👆 Mit Biometrie entsperren',
   bio_reason: 'Bestätige, dass du es bist, um PETO Finanzas zu öffnen',
-  bio_need_pin: 'Die Fingerabdruck-Entsperrung braucht eine aktive PIN: Erstelle deine PIN in Einstellungen → Sicherheit, dann funktioniert der Fingerabdruck beim Öffnen der App.',
+  bio_need_pin: 'Die Fingerabdruck-Entsperrung braucht eine aktive PIN: Erstelle deine PIN in Einstellungen → Sicherheit, dann funktioniert der Fingerabdruck beim Öffnen der App.', bio_need_pin_faceid: 'Erstelle zuerst eine PIN: Face ID funktioniert zusammen mit deiner PIN.', bio_need_pin_generic: 'Erstelle zuerst eine PIN: Biometrische Daten funktionieren zusammen mit deiner PIN.',
   bio_failed: 'Der Fingerabdruck konnte nicht bestätigt werden. Gib deine PIN ein.',
   bio_unavailable: 'Fingerabdruck ist auf diesem Telefon nicht verfügbar. Gib deine PIN ein.',
-  bio_not_enrolled: 'Auf diesem Telefon ist kein Fingerabdruck gespeichert. Speichere einen in den Telefoneinstellungen oder gib deine PIN ein.',
-  bio_offer_title: 'Mit Fingerabdruck entsperren?',
-  bio_offer_text: 'Du hast gerade deine PIN erstellt. Wenn du möchtest, kannst du PETO Finanzas mit deinem Fingerabdruck öffnen, statt jedes Mal die PIN zu tippen. Jetzt aktivieren?',
-  bio_offer_yes: 'Ja, Fingerabdruck aktivieren',
+  bio_not_enrolled: 'Auf diesem Telefon ist kein Fingerabdruck gespeichert. Speichere einen in den Telefoneinstellungen oder gib deine PIN ein.', bio_not_enrolled_faceid: 'Auf diesem Telefon ist Face ID nicht eingerichtet. Aktiviere es in den Telefoneinstellungen.', bio_not_enrolled_generic: 'Auf diesem Gerät sind keine biometrischen Daten eingerichtet. Aktiviere sie in den Geräteeinstellungen.',
+  bio_offer_title: 'Mit Fingerabdruck entsperren?', bio_offer_title_faceid: 'Mit Face ID anmelden?', bio_offer_title_generic: 'Mit biometrischen Daten anmelden?',
+  bio_offer_text: 'Du hast gerade deine PIN erstellt. Wenn du möchtest, kannst du PETO Finanzas mit deinem Fingerabdruck öffnen, statt jedes Mal die PIN zu tippen. Jetzt aktivieren?', bio_offer_text_faceid: 'Aktiviere Face ID, um PETO Finanzas zu öffnen, ohne jedes Mal deine PIN einzutippen.', bio_offer_text_generic: 'Aktiviere deine biometrischen Daten, um PETO Finanzas zu öffnen, ohne jedes Mal deine PIN einzutippen.',
+  bio_offer_yes: 'Ja, Fingerabdruck aktivieren', bio_offer_yes_faceid: 'Face ID aktivieren', bio_offer_yes_generic: 'Biometrische Daten aktivieren',
   bio_offer_no: 'Nicht jetzt',
-  bio_activated: 'Fertig: Die Entsperrung per Fingerabdruck ist jetzt an.',
+  bio_activated: 'Fertig: Die Entsperrung per Fingerabdruck ist jetzt an.', bio_activated_faceid: 'Face ID aktiviert.', bio_activated_generic: 'Biometrische Daten aktiviert.',
   fix_auto_suffix: '(automatische Festzahlung)',
   backup_pass_label: 'Passwort der verschlüsselten Kopie',
   backup_pass_ph: 'Mindestens 4 Zeichen',
@@ -5535,7 +5344,7 @@ de: {
   cloud_recovery_done: 'Passwort aktualisiert. Du kannst dich jetzt anmelden.',
   key_settings: 'Name, Aufteilung, Text, Abschnitte, PIN',
   footer: 'PETO Finanzas · Funktioniert offline · Die Cloud ist optional: deine Daten, deine Entscheidung',
-  tile_available: 'Verfügbares Geld',
+  tile_available: 'Verfügbares Geld', tile_info_aria: 'Was ist diese Zahl?',
   tile_accounts: 'Guthaben auf deinen Konten', tile_accounts_aria: 'Guthaben auf deinen Konten: zu Meine Konten', tile_accounts_help: 'Die Summe deiner Konten. Du aktualisierst sie selbst, wenn du ein Konto anlegst oder bearbeitest.',
   tile_available_aria: 'Verfügbares Geld: zu Meine Konten',
   tile_savings: 'Ersparnisse in diesem Monat',
@@ -5903,15 +5712,28 @@ de: {
   pro_status_waitlist: 'Du bist auf der Warteliste von PETO Pro.',
   pro_btn_see: 'PETO Pro ansehen',
   pro_wall_title: 'Das ist eine PETO-Pro-Funktion ⭐',
-  pro_price_line: 'Nur 1,99 $ pro Monat',
+  pro_price_line: 'Nur 4,99 $ pro Monat',
   pro_benefit_cloud: '☁️ Unbegrenzte Cloud für deine Daten',
   pro_benefit_report: '📊 Erweiterter Bericht: Monate vergleichen und CSV exportieren',
   pro_benefit_shared: '🏠 Gemeinsames Budget mit deinem Haushalt',
   pro_benefit_org: '🤝 San-Organisator-Modus: die Tanda der ganzen Gruppe',
-  pro_coming_text: 'Der In-App-Kauf kommt mit dem Start bei Google Play. Inzwischen kannst du dich auf die Warteliste setzen: Wir geben dir Bescheid, sobald du Pro für 1,99 $ pro Monat aktivieren kannst.',
+  pro_coming_text: 'Der In-App-Kauf ist auf diesem Gerät gerade nicht verfügbar. Du kannst dich auf die Warteliste setzen: Wir geben dir Bescheid, sobald du PETO Pro für 4,99 $ pro Monat aktivieren kannst.',
+  pro_coming_text_ios: 'Der In-App-Kauf ist auf diesem Gerät gerade nicht verfügbar. Du kannst dich auf die Warteliste setzen: Wir geben dir Bescheid, sobald du PETO Pro für 4,99 $ pro Monat aktivieren kannst.',
   pro_waitlist_btn: 'Auf die Warteliste',
   pro_waitlist_done: 'Du bist auf der Liste ✅ Wir geben dir Bescheid, wenn Pro verfügbar ist.',
   pro_close: 'Nicht jetzt',
+  pro_buy_btn: 'PETO Pro abonnieren',
+  pro_trial_btn: 'Meine 14 Gratis-Tage starten',
+  pro_checking: 'Verfügbarkeit wird geprüft…',
+  pro_buying: 'Wird verarbeitet…',
+  pro_trial_line: 'Die ersten 14 Tage sind gratis.',
+  pro_renew_line: 'Danach wird der angezeigte Preis berechnet und das Abo verlängert sich jeden Monat, bis du kündigst. Du kannst jederzeit in den Einstellungen deines Store-Kontos kündigen.',
+  pro_restore_btn: 'Kauf wiederherstellen',
+  pro_buy_cancelled: 'Kauf abgebrochen. Es wurde nichts berechnet.',
+  pro_buy_error: 'Der Kauf konnte nicht abgeschlossen werden. Bitte versuch es erneut.',
+  pro_buy_pending: 'Deine Zahlung wartet auf Genehmigung. PETO Pro wird aktiviert, sobald der Store sie bestätigt.',
+  pro_restore_none: 'Wir konnten kein aktives Abo zum Wiederherstellen finden.',
+  pro_per_month: 'pro Monat',
   pro_tag: 'PRO',
   adv_title: 'Erweiterter Bericht',
   adv_note: 'Eine PETO-Pro-Funktion: dieser Monat gegen den vorigen, jede Kategorie und ein CSV-Export des Monats.',
@@ -6051,15 +5873,15 @@ de: {
   widget_san_next: 'Nächster Zug: {name} · {date}',
   widget_san_next_nodate: 'Nächster Zug: {name}',
   back_exit_hint: 'Nochmals Zurück drücken zum Beenden.',
-  ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_pending_btn: '✓ Öffnet sich am Ende', spend_ctx_below: 'Du liegst {amount} unter dem Tempo des Vormonats', spend_ctx_above: 'Du liegst {amount} über dem Tempo des Vormonats', spend_ctx_bank: 'Bank verbunden', sec_card_title: 'Sicherheit', sec_card_read: 'Bankverbindung nur lesend: Wir können Ihr Geld niemals bewegen', sec_card_enc: 'Ihre Daten werden verschlüsselt übertragen und gespeichert', sec_card_lock: 'Sperre mit PIN und Fingerabdruck', bud_per_semana: 'pro Woche', bud_per_quincena: 'pro zwei Wochen', bud_per_mes: 'pro Monat', spend_left_periods: 'Dir bleiben {amount} über alle deine Zeiträume.', spend_x_periods: 'Jede Kategorie wird über ihren eigenen Zeitraum verteilt:', spend_x_cat: '{cat} ({per}): {left} übrig ÷ {days} Tage = {daily} heute', bud_period_aria: 'Zeitraum des Limits für {cat}', nav_gastos: 'Ausgaben', nav_presupuesto: 'Budget', nav_ajustes: 'Einstellungen', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
+  ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_pending_btn: '✓ Öffnet sich am Ende', spend_ctx_below: 'Du liegst {amount} unter dem Tempo des Vormonats', spend_ctx_above: 'Du liegst {amount} über dem Tempo des Vormonats', spend_ctx_bank: 'Bank verbunden', sec_card_title: 'Sicherheit', sec_card_read: 'Bankverbindung nur lesend: Wir können Ihr Geld niemals bewegen', sec_card_enc: 'Ihre Daten werden verschlüsselt übertragen und gespeichert', sec_card_lock: 'Sperre mit PIN und Fingerabdruck', sec_card_lock_faceid: 'Sperre mit PIN und Face ID', sec_card_lock_generic: 'Sperre mit PIN und biometrischen Daten', bud_per_semana: 'pro Woche', bud_per_quincena: 'pro zwei Wochen', bud_per_mes: 'pro Monat', spend_left_periods: 'Dir bleiben {amount} über alle deine Zeiträume.', spend_x_periods: 'Jede Kategorie wird über ihren eigenen Zeitraum verteilt:', spend_x_cat: '{cat} ({per}): {left} übrig ÷ {days} Tage = {daily} heute', bud_period_aria: 'Zeitraum des Limits für {cat}', nav_gastos: 'Ausgaben', nav_presupuesto: 'Budget', nav_ajustes: 'Einstellungen', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', ob_bio_label_faceid: 'Mit Face ID anmelden (wenn ich eine PIN erstelle)', ob_bio_label_generic: 'Mit biometrischen Daten anmelden (wenn ich eine PIN erstelle)', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
   setup_title: '设置你的 PETO Finanzas',
   setup_step_of: '第 {n} 步，共 3 步',
   setup_step1_t: '创建你的账户',
   setup_step1_d: '你的云账户让你的资金保持同步，并让你连接银行。',
-  setup_step2_t: '创建 PIN 并开启指纹',
-  setup_step2_d: '4 到 6 位 PIN 保护你的应用；创建后即可开启指纹。',
+  setup_step2_t: '创建 PIN 并开启指纹', setup_step2_t_faceid: 'Face ID 解锁', setup_step2_t_generic: '生物识别解锁',
+  setup_step2_d: '4 到 6 位 PIN 保护你的应用；创建后即可开启指纹。', setup_step2_d_faceid: '除了 PIN 之外，还可使用 Face ID 登录，无需每次输入。之后可在“设置”中更改。', setup_step2_d_generic: '除了 PIN 之外，还可使用生物识别登录，无需每次输入。之后可在“设置”中更改。',
   setup_step3_t: '连接你的银行',
   setup_step3_d: '连接银行后，你的余额和交易会自动更新。如果你愿意，也可以稍后再做。',
   setup_skip_step: '暂不',
@@ -6212,19 +6034,19 @@ zh: {
   set_notif_help: '即使 PETO Finanzas 已关闭，也会在固定付款的前一天和当天提醒你。',
   set_autofixed_label: '自动记录固定付款',
   set_autofixed_help: '固定付款到期时，支出会自动为你记下。你可以立即撤销。',
-  set_bio_label: '指纹解锁',
-  set_bio_help: '除 PIN 外还可用指纹进入（需要已启用的 PIN）。',
-  bio_btn: '👆 用指纹进入',
+  set_bio_label: '指纹解锁', set_bio_label_faceid: 'Face ID 解锁', set_bio_label_generic: '生物识别解锁',
+  set_bio_help: '除 PIN 外还可用指纹进入（需要已启用的 PIN）。', set_bio_help_faceid: '使用 Face ID 以及 PIN 解锁（需要有效的 PIN）。', set_bio_help_generic: '使用生物识别以及 PIN 解锁（需要有效的 PIN）。',
+  bio_btn: '👆 用指纹进入', bio_btn_faceid: '👆 用 Face ID 进入', bio_btn_generic: '👆 用生物识别进入',
   bio_reason: '确认是你本人，以打开 PETO Finanzas',
-  bio_need_pin: '指纹解锁需要已启用的 PIN：请先在「设置 → 安全」中创建 PIN，之后打开应用时即可用指纹。',
+  bio_need_pin: '指纹解锁需要已启用的 PIN：请先在「设置 → 安全」中创建 PIN，之后打开应用时即可用指纹。', bio_need_pin_faceid: '请先创建 PIN：Face ID 与你的 PIN 配合使用。', bio_need_pin_generic: '请先创建 PIN：生物识别与你的 PIN 配合使用。',
   bio_failed: '指纹无法验证。请输入你的 PIN。',
   bio_unavailable: '这部手机不支持指纹。请输入你的 PIN。',
-  bio_not_enrolled: '这部手机没有录入任何指纹。请在手机设置中录入指纹，或输入你的 PIN。',
-  bio_offer_title: '用指纹解锁？',
-  bio_offer_text: '你刚刚创建了 PIN。如果你愿意，可以用指纹打开 PETO Finanzas，不必每次都输入 PIN。现在开启吗？',
-  bio_offer_yes: '好，开启指纹',
+  bio_not_enrolled: '这部手机没有录入任何指纹。请在手机设置中录入指纹，或输入你的 PIN。', bio_not_enrolled_faceid: '此手机未设置 Face ID。请在手机设置中开启。', bio_not_enrolled_generic: '此设备未设置生物识别。请在设备设置中开启。',
+  bio_offer_title: '用指纹解锁？', bio_offer_title_faceid: '使用 Face ID 登录？', bio_offer_title_generic: '使用生物识别登录？',
+  bio_offer_text: '你刚刚创建了 PIN。如果你愿意，可以用指纹打开 PETO Finanzas，不必每次都输入 PIN。现在开启吗？', bio_offer_text_faceid: '开启 Face ID，无需每次输入 PIN 即可打开 PETO Finanzas。', bio_offer_text_generic: '开启生物识别，无需每次输入 PIN 即可打开 PETO Finanzas。',
+  bio_offer_yes: '好，开启指纹', bio_offer_yes_faceid: '开启 Face ID', bio_offer_yes_generic: '开启生物识别',
   bio_offer_no: '以后再说',
-  bio_activated: '完成：指纹解锁已开启。',
+  bio_activated: '完成：指纹解锁已开启。', bio_activated_faceid: 'Face ID 已开启。', bio_activated_generic: '生物识别已开启。',
   fix_auto_suffix: '（自动固定付款）',
   backup_pass_label: '加密备份密码',
   backup_pass_ph: '至少 4 个字符',
@@ -6385,7 +6207,7 @@ zh: {
   cloud_recovery_done: '密码已更新。现在可以登录了。',
   key_settings: '姓名、分配、文字、版块、PIN',
   footer: 'PETO Finanzas · 离线可用 · 云端可选：你的数据，你做主',
-  tile_available: '可用资金',
+  tile_available: '可用资金', tile_info_aria: '这个数字是什么？',
   tile_accounts: '你的账户余额', tile_accounts_aria: '你的账户余额：前往我的账户', tile_accounts_help: '你所有账户的总和。创建或编辑账户时由你自己更新。',
   tile_available_aria: '可用资金：前往我的账户',
   tile_savings: '本月储蓄',
@@ -6758,10 +6580,23 @@ zh: {
   pro_benefit_report: '📊 高级报告：比较月份并导出 CSV',
   pro_benefit_shared: '🏠 与你的家庭共享预算',
   pro_benefit_org: '🤝 San 组织者模式：整个小组的 tanda',
-  pro_coming_text: '应用内购买将随 Google Play 上线而来。在此之前你可以加入等候名单：当你可以以每月 $4.99 启用 Pro 时，我们会通知你。',
+  pro_coming_text: '此设备目前无法进行应用内购买。你可以加入等候名单：当你可以以每月 $4.99 启用 PETO Pro 时，我们会通知你。',
+  pro_coming_text_ios: '此设备目前无法进行应用内购买。你可以加入等候名单：当你可以以每月 $4.99 启用 PETO Pro 时，我们会通知你。',
   pro_waitlist_btn: '加入等候名单',
   pro_waitlist_done: '你已在名单上 ✅ 当 Pro 可用时我们会通知你。',
   pro_close: '以后再说',
+  pro_buy_btn: '订阅 PETO Pro',
+  pro_trial_btn: '开始我的 14 天免费试用',
+  pro_checking: '正在检查可用性…',
+  pro_buying: '处理中…',
+  pro_trial_line: '前 14 天免费。',
+  pro_renew_line: '之后将按所示价格收费，订阅每月自动续订，直到你取消。你可以随时在商店账户设置中取消。',
+  pro_restore_btn: '恢复购买',
+  pro_buy_cancelled: '购买已取消。未收取任何费用。',
+  pro_buy_error: '无法完成购买。请重试。',
+  pro_buy_pending: '你的付款正在等待批准。商店确认后，PETO Pro 将自动启用。',
+  pro_restore_none: '未找到可恢复的有效订阅。',
+  pro_per_month: '每月',
   pro_tag: 'PRO',
   adv_title: '高级报告',
   adv_note: '这是 PETO Pro 功能：本月与上月对比、每个类别，以及本月的 CSV 导出。',
@@ -6901,15 +6736,15 @@ zh: {
   widget_san_next: '下一轮：{name} · {date}',
   widget_san_next_nodate: '下一轮：{name}',
   back_exit_hint: '再按一次返回即可退出。',
-  ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_pending_btn: '✓ 完成时打开', spend_ctx_below: '你比上个月的节奏少了 {amount}', spend_ctx_above: '你比上个月的节奏多了 {amount}', spend_ctx_bank: '银行已连接', sec_card_title: '安全', sec_card_read: '银行连接为只读:我们永远无法动用你的资金', sec_card_enc: '你的数据在传输和存储时均已加密', sec_card_lock: 'PIN 和指纹锁定', bud_per_semana: '每周', bud_per_quincena: '每两周', bud_per_mes: '每月', spend_left_periods: '所有周期合计还剩 {amount}。', spend_x_periods: '每个类别按自己的周期分摊：', spend_x_cat: '{cat}（{per}）：剩 {left} ÷ {days} 天 = 今天 {daily}', bud_period_aria: '{cat} 的上限周期', nav_gastos: '支出', nav_presupuesto: '预算', nav_ajustes: '设置', ob_bio_label: '用指纹进入（如果我创建了 PIN）', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
+  ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_pending_btn: '✓ 完成时打开', spend_ctx_below: '你比上个月的节奏少了 {amount}', spend_ctx_above: '你比上个月的节奏多了 {amount}', spend_ctx_bank: '银行已连接', sec_card_title: '安全', sec_card_read: '银行连接为只读:我们永远无法动用你的资金', sec_card_enc: '你的数据在传输和存储时均已加密', sec_card_lock: 'PIN 和指纹锁定', sec_card_lock_faceid: 'PIN 和 Face ID 锁定', sec_card_lock_generic: 'PIN 和生物识别锁定', bud_per_semana: '每周', bud_per_quincena: '每两周', bud_per_mes: '每月', spend_left_periods: '所有周期合计还剩 {amount}。', spend_x_periods: '每个类别按自己的周期分摊：', spend_x_cat: '{cat}（{per}）：剩 {left} ÷ {days} 天 = 今天 {daily}', bud_period_aria: '{cat} 的上限周期', nav_gastos: '支出', nav_presupuesto: '预算', nav_ajustes: '设置', ob_bio_label: '用指纹进入（如果我创建了 PIN）', ob_bio_label_faceid: '使用 Face ID 进入（如果我创建 PIN）', ob_bio_label_generic: '使用生物识别进入（如果我创建 PIN）', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
   setup_title: 'PETO Finanzas を設定',
   setup_step_of: 'ステップ {n} / 3',
   setup_step1_t: 'アカウントを作成',
   setup_step1_d: 'クラウドアカウントでお金が同期され、銀行を接続できます。',
-  setup_step2_t: 'PINを作成し指紋を有効化',
-  setup_step2_d: '4〜6桁のPINがアプリを守ります。作成後に指紋を有効化できます。',
+  setup_step2_t: 'PINを作成し指紋を有効化', setup_step2_t_faceid: 'Face ID でロック解除', setup_step2_t_generic: '生体認証でロック解除',
+  setup_step2_d: '4〜6桁のPINがアプリを守ります。作成後に指紋を有効化できます。', setup_step2_d_faceid: 'PIN に加えて Face ID を使えば、毎回入力せずにログインできます。後から設定で変更できます。', setup_step2_d_generic: 'PIN に加えて生体認証を使えば、毎回入力せずにログインできます。後から設定で変更できます。',
   setup_step3_t: '銀行を接続',
   setup_step3_d: '銀行を接続すると、残高と取引が自動で更新されます。お好みで後からでもできます。',
   setup_skip_step: '今はしない',
@@ -7062,19 +6897,19 @@ ja: {
   set_notif_help: 'PETO Finanzasを閉じていても、固定支払いの前日と当日に知らせます。',
   set_autofixed_label: '固定支払いを自動で記録',
   set_autofixed_help: '固定支払いの期日が来ると、支出が自動で記録されます。すぐに元に戻すこともできます。',
-  set_bio_label: '指紋ロック解除',
-  set_bio_help: 'PINに加えて指紋でも入れるようにします（有効なPINが必要です）。',
-  bio_btn: '👆 指紋で入る',
+  set_bio_label: '指紋ロック解除', set_bio_label_faceid: 'Face ID でロック解除', set_bio_label_generic: '生体認証でロック解除',
+  set_bio_help: 'PINに加えて指紋でも入れるようにします（有効なPINが必要です）。', set_bio_help_faceid: 'PIN に加えて Face ID でロックを解除します（有効な PIN が必要です）。', set_bio_help_generic: 'PIN に加えて生体認証でロックを解除します（有効な PIN が必要です）。',
+  bio_btn: '👆 指紋で入る', bio_btn_faceid: '👆 Face IDで入る', bio_btn_generic: '👆 生体認証で入る',
   bio_reason: 'PETO Finanzasを開くために本人確認をしてください',
-  bio_need_pin: '指紋ロック解除には有効なPINが必要です。「設定 → セキュリティ」でPINを作成すると、アプリを開くときに指紋が使えます。',
+  bio_need_pin: '指紋ロック解除には有効なPINが必要です。「設定 → セキュリティ」でPINを作成すると、アプリを開くときに指紋が使えます。', bio_need_pin_faceid: 'まず PIN を作成してください：Face ID は PIN と組み合わせて使います。', bio_need_pin_generic: 'まず PIN を作成してください：生体認証は PIN と組み合わせて使います。',
   bio_failed: '指紋を確認できませんでした。PINを入力してください。',
   bio_unavailable: 'このスマートフォンでは指紋は使えません。PINを入力してください。',
-  bio_not_enrolled: 'このスマートフォンには指紋が登録されていません。スマートフォンの設定で登録するか、PINを入力してください。',
-  bio_offer_title: '指紋でロック解除しますか？',
-  bio_offer_text: 'PINを作成しました。よければ、毎回PINを入力する代わりに指紋でPETO Finanzasを開けます。今すぐオンにしますか？',
-  bio_offer_yes: 'はい、指紋をオンにする',
+  bio_not_enrolled: 'このスマートフォンには指紋が登録されていません。スマートフォンの設定で登録するか、PINを入力してください。', bio_not_enrolled_faceid: 'このスマートフォンには Face ID が設定されていません。スマートフォンの設定で有効にしてください。', bio_not_enrolled_generic: 'このデバイスには生体認証が設定されていません。デバイスの設定で有効にしてください。',
+  bio_offer_title: '指紋でロック解除しますか？', bio_offer_title_faceid: 'Face ID で入りますか？', bio_offer_title_generic: '生体認証で入りますか？',
+  bio_offer_text: 'PINを作成しました。よければ、毎回PINを入力する代わりに指紋でPETO Finanzasを開けます。今すぐオンにしますか？', bio_offer_text_faceid: 'Face ID を有効にすると、毎回 PIN を入力せずに PETO Finanzas を開けます。', bio_offer_text_generic: '生体認証を有効にすると、毎回 PIN を入力せずに PETO Finanzas を開けます。',
+  bio_offer_yes: 'はい、指紋をオンにする', bio_offer_yes_faceid: 'Face ID を有効にする', bio_offer_yes_generic: '生体認証を有効にする',
   bio_offer_no: '後で',
-  bio_activated: '完了：指紋ロック解除がオンになりました。',
+  bio_activated: '完了：指紋ロック解除がオンになりました。', bio_activated_faceid: 'Face ID を有効にしました。', bio_activated_generic: '生体認証を有効にしました。',
   fix_auto_suffix: '（自動の固定支払い）',
   backup_pass_label: '暗号化バックアップのパスワード',
   backup_pass_ph: '4文字以上',
@@ -7235,7 +7070,7 @@ ja: {
   cloud_recovery_done: 'パスワードを更新しました。ログインできます。',
   key_settings: '名前、配分、文字、セクション、PIN',
   footer: 'PETO Finanzas · オフラインで動作 · クラウドは任意：あなたのデータ、あなたの選択',
-  tile_available: '利用可能なお金',
+  tile_available: '利用可能なお金', tile_info_aria: 'この数字について',
   tile_accounts: '口座の残高', tile_accounts_aria: '口座の残高：マイアカウントへ', tile_accounts_help: '口座の合計です。口座を作成・編集するときに自分で更新します。',
   tile_available_aria: '利用可能なお金：私の口座へ',
   tile_savings: '今月の貯蓄',
@@ -7608,10 +7443,23 @@ ja: {
   pro_benefit_report: '📊 高度なレポート：月を比較しCSVで書き出し',
   pro_benefit_shared: '🏠 世帯との共有予算',
   pro_benefit_org: '🤝 san主催者モード：グループ全体のtanda',
-  pro_coming_text: 'アプリ内購入はGoogle Playでの公開とともに来ます。それまでは待機リストに参加できます。月額4.99ドルでProを有効化できるようになったらお知らせします。',
+  pro_coming_text: 'このデバイスでは現在、アプリ内購入を利用できません。待機リストに参加できます。月額4.99ドルでProを有効化できるようになったらお知らせします。',
+  pro_coming_text_ios: 'このデバイスでは現在、アプリ内購入を利用できません。待機リストに参加できます。月額4.99ドルでProを有効化できるようになったらお知らせします。',
   pro_waitlist_btn: '待機リストに参加',
   pro_waitlist_done: 'リストに登録されました ✅ Proが利用可能になったらお知らせします。',
   pro_close: '後で',
+  pro_buy_btn: 'PETO Proを購読',
+  pro_trial_btn: '14日間無料を始める',
+  pro_checking: '利用可能か確認中…',
+  pro_buying: '処理中…',
+  pro_trial_line: '最初の14日間は無料です。',
+  pro_renew_line: 'その後は表示価格が請求され、解約するまで毎月自動更新されます。ストアのアカウント設定からいつでも解約できます。',
+  pro_restore_btn: '購入を復元',
+  pro_buy_cancelled: '購入がキャンセルされました。請求は発生していません。',
+  pro_buy_error: '購入を完了できませんでした。もう一度お試しください。',
+  pro_buy_pending: '支払いは承認待ちです。ストアが確認するとPETO Proが有効になります。',
+  pro_restore_none: '復元できる有効な購読が見つかりませんでした。',
+  pro_per_month: '月額',
   pro_tag: 'PRO',
   adv_title: '高度なレポート',
   adv_note: 'PETO Proの機能です。今月と先月の比較、すべてのカテゴリ、月のCSVエクスポート。',
@@ -7751,15 +7599,15 @@ ja: {
   widget_san_next: '次のターン：{name} · {date}',
   widget_san_next_nodate: '次のターン：{name}',
   back_exit_hint: 'もう一度戻るを押すと終了します。',
-  ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_pending_btn: '✓ 終了時に開きます', spend_ctx_below: '先月のペースより {amount} 下回っています', spend_ctx_above: '先月のペースより {amount} 上回っています', spend_ctx_bank: '銀行が接続されています', sec_card_title: 'セキュリティ', sec_card_read: '銀行接続は読み取り専用:あなたの資金を動かすことは決してできません', sec_card_enc: 'データは暗号化されて送信・保存されます', sec_card_lock: 'PINと指紋によるロック', bud_per_semana: '週ごと', bud_per_quincena: '2週間ごと', bud_per_mes: '月ごと', spend_left_periods: 'すべての期間を合わせて、残りは {amount} です。', spend_x_periods: '各カテゴリはそれぞれの期間で按分されます：', spend_x_cat: '{cat}（{per}）：残り {left} ÷ {days} 日 = 今日 {daily}', bud_period_aria: '{cat}の上限期間', nav_gastos: '支出', nav_presupuesto: '予算', nav_ajustes: '設定', ob_bio_label: '指紋で入る（PIN を作成した場合）', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
+  ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_pending_btn: '✓ 終了時に開きます', spend_ctx_below: '先月のペースより {amount} 下回っています', spend_ctx_above: '先月のペースより {amount} 上回っています', spend_ctx_bank: '銀行が接続されています', sec_card_title: 'セキュリティ', sec_card_read: '銀行接続は読み取り専用:あなたの資金を動かすことは決してできません', sec_card_enc: 'データは暗号化されて送信・保存されます', sec_card_lock: 'PINと指紋によるロック', sec_card_lock_faceid: 'PINとFace IDによるロック', sec_card_lock_generic: 'PINと生体認証によるロック', bud_per_semana: '週ごと', bud_per_quincena: '2週間ごと', bud_per_mes: '月ごと', spend_left_periods: 'すべての期間を合わせて、残りは {amount} です。', spend_x_periods: '各カテゴリはそれぞれの期間で按分されます：', spend_x_cat: '{cat}（{per}）：残り {left} ÷ {days} 日 = 今日 {daily}', bud_period_aria: '{cat}の上限期間', nav_gastos: '支出', nav_presupuesto: '予算', nav_ajustes: '設定', ob_bio_label: '指紋で入る（PIN を作成した場合）', ob_bio_label_faceid: 'Face ID で入る（PIN を作成した場合）', ob_bio_label_generic: '生体認証で入る（PIN を作成した場合）', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
   setup_title: 'PETO Finanzas 설정하기',
   setup_step_of: '3단계 중 {n}단계',
   setup_step1_t: '계정 만들기',
   setup_step1_d: '클라우드 계정이 돈을 동기화 상태로 유지하고 은행을 연결할 수 있게 합니다.',
-  setup_step2_t: 'PIN을 만들고 지문 켜기',
-  setup_step2_d: '4~6자리 PIN이 앱을 보호합니다. PIN이 생기면 지문을 켤 수 있습니다.',
+  setup_step2_t: 'PIN을 만들고 지문 켜기', setup_step2_t_faceid: 'Face ID 잠금 해제', setup_step2_t_generic: '생체 인증 잠금 해제',
+  setup_step2_d: '4~6자리 PIN이 앱을 보호합니다. PIN이 생기면 지문을 켤 수 있습니다.', setup_step2_d_faceid: 'PIN과 함께 Face ID를 사용하면 매번 입력하지 않고 로그인할 수 있습니다. 나중에 설정에서 변경할 수 있습니다.', setup_step2_d_generic: 'PIN과 함께 생체 인증을 사용하면 매번 입력하지 않고 로그인할 수 있습니다. 나중에 설정에서 변경할 수 있습니다.',
   setup_step3_t: '은행 연결하기',
   setup_step3_d: '은행이 연결되면 잔액과 거래가 자동으로 업데이트됩니다. 원하면 나중에 해도 됩니다.',
   setup_skip_step: '지금은 안 함',
@@ -7912,19 +7760,19 @@ ko: {
   set_notif_help: 'PETO Finanzas가 닫혀 있어도 고정 지출 전날과 당일에 알려줍니다.',
   set_autofixed_label: '고정 지출 자동 기록',
   set_autofixed_help: '고정 지출 기한이 되면 지출이 자동으로 기록됩니다. 바로 되돌릴 수도 있습니다.',
-  set_bio_label: '지문 잠금 해제',
-  set_bio_help: 'PIN과 함께 지문으로도 들어갑니다(활성화된 PIN 필요).',
-  bio_btn: '👆 지문으로 들어가기',
+  set_bio_label: '지문 잠금 해제', set_bio_label_faceid: 'Face ID 잠금 해제', set_bio_label_generic: '생체 인증 잠금 해제',
+  set_bio_help: 'PIN과 함께 지문으로도 들어갑니다(활성화된 PIN 필요).', set_bio_help_faceid: 'PIN과 함께 Face ID로 잠금을 해제합니다(활성 PIN 필요).', set_bio_help_generic: 'PIN과 함께 생체 인증으로 잠금을 해제합니다(활성 PIN 필요).',
+  bio_btn: '👆 지문으로 들어가기', bio_btn_faceid: '👆 Face ID로 들어가기', bio_btn_generic: '👆 생체 인증으로 들어가기',
   bio_reason: 'PETO Finanzas를 열기 위해 본인임을 확인하세요',
-  bio_need_pin: '지문 잠금 해제에는 활성화된 PIN이 필요합니다. 설정 → 보안에서 PIN을 만들면 앱을 열 때 지문이 작동합니다.',
+  bio_need_pin: '지문 잠금 해제에는 활성화된 PIN이 필요합니다. 설정 → 보안에서 PIN을 만들면 앱을 열 때 지문이 작동합니다.', bio_need_pin_faceid: '먼저 PIN을 만드세요: Face ID는 PIN과 함께 작동합니다.', bio_need_pin_generic: '먼저 PIN을 만드세요: 생체 인증은 PIN과 함께 작동합니다.',
   bio_failed: '지문을 확인할 수 없습니다. PIN을 입력하세요.',
   bio_unavailable: '이 휴대전화에서는 지문을 사용할 수 없습니다. PIN을 입력하세요.',
-  bio_not_enrolled: '이 휴대전화에는 등록된 지문이 없습니다. 휴대전화 설정에서 등록하거나 PIN을 입력하세요.',
-  bio_offer_title: '지문으로 잠금을 풀까요?',
-  bio_offer_text: '방금 PIN을 만들었습니다. 원하면 매번 PIN을 입력하는 대신 지문으로 PETO Finanzas를 열 수 있습니다. 지금 켤까요?',
-  bio_offer_yes: '네, 지문 켜기',
+  bio_not_enrolled: '이 휴대전화에는 등록된 지문이 없습니다. 휴대전화 설정에서 등록하거나 PIN을 입력하세요.', bio_not_enrolled_faceid: '이 휴대폰에는 Face ID가 설정되어 있지 않습니다. 휴대폰 설정에서 켜세요.', bio_not_enrolled_generic: '이 기기에는 생체 인증이 설정되어 있지 않습니다. 기기 설정에서 켜세요.',
+  bio_offer_title: '지문으로 잠금을 풀까요?', bio_offer_title_faceid: 'Face ID로 들어갈까요?', bio_offer_title_generic: '생체 인증으로 들어갈까요?',
+  bio_offer_text: '방금 PIN을 만들었습니다. 원하면 매번 PIN을 입력하는 대신 지문으로 PETO Finanzas를 열 수 있습니다. 지금 켤까요?', bio_offer_text_faceid: 'Face ID를 켜면 매번 PIN을 입력하지 않고 PETO Finanzas를 열 수 있습니다.', bio_offer_text_generic: '생체 인증을 켜면 매번 PIN을 입력하지 않고 PETO Finanzas를 열 수 있습니다.',
+  bio_offer_yes: '네, 지문 켜기', bio_offer_yes_faceid: 'Face ID 켜기', bio_offer_yes_generic: '생체 인증 켜기',
   bio_offer_no: '나중에',
-  bio_activated: '완료: 지문 잠금 해제가 켜졌습니다.',
+  bio_activated: '완료: 지문 잠금 해제가 켜졌습니다.', bio_activated_faceid: 'Face ID가 켜졌습니다.', bio_activated_generic: '생체 인증이 켜졌습니다.',
   fix_auto_suffix: '(자동 고정 지출)',
   backup_pass_label: '암호화 백업 비밀번호',
   backup_pass_ph: '최소 4자',
@@ -8085,7 +7933,7 @@ ko: {
   cloud_recovery_done: '비밀번호가 업데이트되었습니다. 이제 로그인할 수 있습니다.',
   key_settings: '이름, 분배, 글자, 섹션, PIN',
   footer: 'PETO Finanzas · 오프라인으로 작동 · 클라우드는 선택 사항: 내 데이터, 내 결정',
-  tile_available: '사용 가능한 돈',
+  tile_available: '사용 가능한 돈', tile_info_aria: '이 숫자는 무엇인가요?',
   tile_accounts: '내 계좌 잔고', tile_accounts_aria: '내 계좌 잔고: 내 계좌로 이동', tile_accounts_help: '내 계좌들의 합계예요. 계좌를 만들거나 수정할 때 직접 업데이트합니다.',
   tile_available_aria: '사용 가능한 돈: 내 계좌로 이동',
   tile_savings: '이번 달 저축',
@@ -8458,10 +8306,23 @@ ko: {
   pro_benefit_report: '📊 고급 보고서: 월 비교와 CSV 내보내기',
   pro_benefit_shared: '🏠 가구와의 공유 예산',
   pro_benefit_org: '🤝 san 주최자 모드: 그룹 전체의 tanda',
-  pro_coming_text: '인앱 구매는 Google Play 출시와 함께 옵니다. 그전까지 대기자 명단에 참여할 수 있습니다. 월 $4.99로 Pro를 켤 수 있게 되면 알려드리겠습니다.',
+  pro_coming_text: '이 기기에서는 지금 인앱 구매를 사용할 수 없습니다. 대기자 명단에 참여할 수 있습니다. 월 $4.99로 Pro를 켤 수 있게 되면 알려드리겠습니다.',
+  pro_coming_text_ios: '이 기기에서는 지금 인앱 구매를 사용할 수 없습니다. 대기자 명단에 참여할 수 있습니다. 월 $4.99로 Pro를 켤 수 있게 되면 알려드리겠습니다.',
   pro_waitlist_btn: '대기자 명단에 참여',
   pro_waitlist_done: '명단에 올랐습니다 ✅ Pro를 사용할 수 있게 되면 알려드리겠습니다.',
   pro_close: '나중에',
+  pro_buy_btn: 'PETO Pro 구독하기',
+  pro_trial_btn: '14일 무료 시작하기',
+  pro_checking: '사용 가능 여부 확인 중…',
+  pro_buying: '처리 중…',
+  pro_trial_line: '처음 14일은 무료입니다.',
+  pro_renew_line: '이후에는 표시된 가격이 청구되고 취소할 때까지 매월 자동 갱신됩니다. 스토어 계정 설정에서 언제든지 취소할 수 있습니다.',
+  pro_restore_btn: '구매 복원',
+  pro_buy_cancelled: '구매가 취소되었습니다. 청구되지 않았습니다.',
+  pro_buy_error: '구매를 완료할 수 없습니다. 다시 시도해 주세요.',
+  pro_buy_pending: '결제가 승인 대기 중입니다. 스토어가 확인하면 PETO Pro가 켜집니다.',
+  pro_restore_none: '복원할 활성 구독을 찾을 수 없습니다.',
+  pro_per_month: '월',
   pro_tag: 'PRO',
   adv_title: '고급 보고서',
   adv_note: 'PETO Pro 기능입니다. 이번 달과 지난달 비교, 모든 카테고리, 그리고 월의 CSV 내보내기.',
@@ -8601,15 +8462,15 @@ ko: {
   widget_san_next: '다음 차례: {name} · {date}',
   widget_san_next_nodate: '다음 차례: {name}',
   back_exit_hint: '한 번 더 뒤로를 누르면 종료됩니다.',
-  ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_pending_btn: '✓ 마칠 때 열립니다', spend_ctx_below: '지난달 페이스보다 {amount} 아래입니다', spend_ctx_above: '지난달 페이스보다 {amount} 위입니다', spend_ctx_bank: '은행 연결됨', sec_card_title: '보안', sec_card_read: '은행 연결은 읽기 전용: 자금을 절대 이동할 수 없습니다', sec_card_enc: '데이터는 암호화되어 전송되고 저장됩니다', sec_card_lock: 'PIN 및 지문 잠금', bud_per_semana: '주당', bud_per_quincena: '2주당', bud_per_mes: '월당', spend_left_periods: '모든 기간을 합쳐 {amount} 남았습니다.', spend_x_periods: '각 카테고리는 자신의 기간에 맞춰 나뉩니다:', spend_x_cat: '{cat} ({per}): {left} 남음 ÷ {days}일 = 오늘 {daily}', bud_period_aria: '{cat} 한도 기간', nav_gastos: '지출', nav_presupuesto: '예산', nav_ajustes: '설정', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
+  ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_pending_btn: '✓ 마칠 때 열립니다', spend_ctx_below: '지난달 페이스보다 {amount} 아래입니다', spend_ctx_above: '지난달 페이스보다 {amount} 위입니다', spend_ctx_bank: '은행 연결됨', sec_card_title: '보안', sec_card_read: '은행 연결은 읽기 전용: 자금을 절대 이동할 수 없습니다', sec_card_enc: '데이터는 암호화되어 전송되고 저장됩니다', sec_card_lock: 'PIN 및 지문 잠금', sec_card_lock_faceid: 'PIN 및 Face ID 잠금', sec_card_lock_generic: 'PIN 및 생체 인증 잠금', bud_per_semana: '주당', bud_per_quincena: '2주당', bud_per_mes: '월당', spend_left_periods: '모든 기간을 합쳐 {amount} 남았습니다.', spend_x_periods: '각 카테고리는 자신의 기간에 맞춰 나뉩니다:', spend_x_cat: '{cat} ({per}): {left} 남음 ÷ {days}일 = 오늘 {daily}', bud_period_aria: '{cat} 한도 기간', nav_gastos: '지출', nav_presupuesto: '예산', nav_ajustes: '설정', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', ob_bio_label_faceid: 'Face ID로 들어가기 (PIN을 만드는 경우)', ob_bio_label_generic: '생체 인증으로 들어가기 (PIN을 만드는 경우)', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
   setup_title: 'Настройте ваш PETO Finanzas',
   setup_step_of: 'Шаг {n} из 3',
   setup_step1_t: 'Создайте аккаунт',
   setup_step1_d: 'Ваш облачный аккаунт синхронизирует ваши деньги и позволяет подключить банк.',
-  setup_step2_t: 'Создайте PIN и включите отпечаток',
-  setup_step2_d: 'PIN из 4–6 цифр защищает ваше приложение; после его создания можно включить отпечаток.',
+  setup_step2_t: 'Создайте PIN и включите отпечаток', setup_step2_t_faceid: 'Разблокировка по Face ID', setup_step2_t_generic: 'Разблокировка по биометрии',
+  setup_step2_d: 'PIN из 4–6 цифр защищает ваше приложение; после его создания можно включить отпечаток.', setup_step2_d_faceid: 'Используйте Face ID вместе с PIN-кодом, чтобы входить без ввода каждый раз. Позже это можно изменить в «Настройках».', setup_step2_d_generic: 'Используйте биометрию вместе с PIN-кодом, чтобы входить без ввода каждый раз. Позже это можно изменить в «Настройках».',
   setup_step3_t: 'Подключите банк',
   setup_step3_d: 'С подключённым банком балансы и операции обновляются сами. Можно сделать это позже, если хотите.',
   setup_skip_step: 'Не сейчас',
@@ -8762,19 +8623,19 @@ ru: {
   set_notif_help: 'Напоминания о ваших постоянных платежах за день и в день оплаты, даже когда PETO Finanzas закрыто.',
   set_autofixed_label: 'Записывать постоянные платежи автоматически',
   set_autofixed_help: 'Когда наступает срок постоянного платежа, расход записывается за вас. Его можно сразу отменить.',
-  set_bio_label: 'Вход по отпечатку пальца',
-  set_bio_help: 'Вход по отпечатку пальца в дополнение к PIN (нужен активный PIN).',
-  bio_btn: '👆 Войти по отпечатку',
+  set_bio_label: 'Вход по отпечатку пальца', set_bio_label_faceid: 'Разблокировка по Face ID', set_bio_label_generic: 'Разблокировка по биометрии',
+  set_bio_help: 'Вход по отпечатку пальца в дополнение к PIN (нужен активный PIN).', set_bio_help_faceid: 'Разблокировка по Face ID вместе с вашим PIN-кодом (требуется активный PIN).', set_bio_help_generic: 'Разблокировка по биометрии вместе с вашим PIN-кодом (требуется активный PIN).',
+  bio_btn: '👆 Войти по отпечатку', bio_btn_faceid: '👆 Войти по Face ID', bio_btn_generic: '👆 Войти по биометрии',
   bio_reason: 'Подтвердите, что это вы, чтобы открыть PETO Finanzas',
-  bio_need_pin: 'Для входа по отпечатку нужен активный PIN: создайте PIN в «Настройки → Безопасность», и отпечаток будет работать при открытии приложения.',
+  bio_need_pin: 'Для входа по отпечатку нужен активный PIN: создайте PIN в «Настройки → Безопасность», и отпечаток будет работать при открытии приложения.', bio_need_pin_faceid: 'Сначала создайте PIN: Face ID работает вместе с вашим PIN-кодом.', bio_need_pin_generic: 'Сначала создайте PIN: биометрия работает вместе с вашим PIN-кодом.',
   bio_failed: 'Не удалось подтвердить отпечаток. Введите ваш PIN.',
   bio_unavailable: 'Отпечаток пальца недоступен на этом телефоне. Введите ваш PIN.',
-  bio_not_enrolled: 'На этом телефоне не зарегистрирован ни один отпечаток. Зарегистрируйте его в настройках телефона или введите PIN.',
-  bio_offer_title: 'Входить по отпечатку пальца?',
-  bio_offer_text: 'Вы только что создали PIN. Если хотите, можете открывать PETO Finanzas отпечатком пальца вместо ввода PIN каждый раз. Включить сейчас?',
-  bio_offer_yes: 'Да, включить отпечаток',
+  bio_not_enrolled: 'На этом телефоне не зарегистрирован ни один отпечаток. Зарегистрируйте его в настройках телефона или введите PIN.', bio_not_enrolled_faceid: 'На этом телефоне Face ID не настроен. Включите его в настройках телефона.', bio_not_enrolled_generic: 'На этом устройстве биометрия не настроена. Включите её в настройках устройства.',
+  bio_offer_title: 'Входить по отпечатку пальца?', bio_offer_title_faceid: 'Входить по Face ID?', bio_offer_title_generic: 'Входить по биометрии?',
+  bio_offer_text: 'Вы только что создали PIN. Если хотите, можете открывать PETO Finanzas отпечатком пальца вместо ввода PIN каждый раз. Включить сейчас?', bio_offer_text_faceid: 'Включите Face ID, чтобы открывать PETO Finanzas без ввода PIN-кода каждый раз.', bio_offer_text_generic: 'Включите биометрию, чтобы открывать PETO Finanzas без ввода PIN-кода каждый раз.',
+  bio_offer_yes: 'Да, включить отпечаток', bio_offer_yes_faceid: 'Включить Face ID', bio_offer_yes_generic: 'Включить биометрию',
   bio_offer_no: 'Не сейчас',
-  bio_activated: 'Готово: вход по отпечатку пальца включён.',
+  bio_activated: 'Готово: вход по отпечатку пальца включён.', bio_activated_faceid: 'Face ID включён.', bio_activated_generic: 'Биометрия включена.',
   fix_auto_suffix: '(автоматический постоянный платёж)',
   backup_pass_label: 'Пароль зашифрованной копии',
   backup_pass_ph: 'Минимум 4 символа',
@@ -8935,7 +8796,7 @@ ru: {
   cloud_recovery_done: 'Пароль обновлён. Теперь можно войти.',
   key_settings: 'Имя, распределение, текст, разделы, PIN',
   footer: 'PETO Finanzas · Работает офлайн · Облако необязательно: ваши данные — ваш выбор',
-  tile_available: 'Доступные деньги',
+  tile_available: 'Доступные деньги', tile_info_aria: 'Что это за число?',
   tile_accounts: 'Баланс на твоих счетах', tile_accounts_aria: 'Баланс на твоих счетах: перейти в Мои счета', tile_accounts_help: 'Сумма по всем твоим счетам. Ты сам обновляешь её, когда создаёшь или меняешь счёт.',
   tile_available_aria: 'Доступные деньги: перейти в Мои счета',
   tile_savings: 'Сбережения в этом месяце',
@@ -9303,15 +9164,28 @@ ru: {
   pro_status_waitlist: 'Вы в списке ожидания PETO Pro.',
   pro_btn_see: 'Смотреть PETO Pro',
   pro_wall_title: 'Это функция PETO Pro ⭐',
-  pro_price_line: 'Всего $1,99 в месяц',
+  pro_price_line: 'Всего $4,99 в месяц',
   pro_benefit_cloud: '☁️ Безлимитное облако для ваших данных',
   pro_benefit_report: '📊 Расширенный отчёт: сравнение месяцев и экспорт в CSV',
   pro_benefit_shared: '🏠 Общий бюджет с вашим домохозяйством',
   pro_benefit_org: '🤝 Режим организатора сана: танда всей группы',
-  pro_coming_text: 'Покупка в приложении появится с запуском в Google Play. А пока вы можете вступить в список ожидания: мы сообщим, как только вы сможете включить Pro за $1,99 в месяц.',
+  pro_coming_text: 'Покупка в приложении сейчас недоступна на этом устройстве. Вы можете вступить в список ожидания: мы сообщим, как только вы сможете включить Pro за $4,99 в месяц.',
+  pro_coming_text_ios: 'Покупка в приложении сейчас недоступна на этом устройстве. Вы можете вступить в список ожидания: мы сообщим, как только вы сможете включить Pro за $4,99 в месяц.',
   pro_waitlist_btn: 'Вступить в список ожидания',
   pro_waitlist_done: 'Вы в списке ✅ Мы сообщим, когда Pro станет доступен.',
   pro_close: 'Не сейчас',
+  pro_buy_btn: 'Подписаться на PETO Pro',
+  pro_trial_btn: 'Начать мои 14 бесплатных дней',
+  pro_checking: 'Проверка доступности…',
+  pro_buying: 'Обработка…',
+  pro_trial_line: 'Первые 14 дней — бесплатно.',
+  pro_renew_line: 'Затем списывается указанная цена, и подписка продлевается каждый месяц, пока вы её не отмените. Отменить можно в любой момент в настройках вашего аккаунта магазина.',
+  pro_restore_btn: 'Восстановить покупку',
+  pro_buy_cancelled: 'Покупка отменена. Списаний не было.',
+  pro_buy_error: 'Не удалось завершить покупку. Попробуйте ещё раз.',
+  pro_buy_pending: 'Ваш платёж ожидает одобрения. PETO Pro включится, как только магазин его подтвердит.',
+  pro_restore_none: 'Мы не нашли активную подписку для восстановления.',
+  pro_per_month: 'в месяц',
   pro_tag: 'PRO',
   adv_title: 'Расширенный отчёт',
   adv_note: 'Функция PETO Pro: этот месяц против предыдущего, каждая категория и экспорт месяца в CSV.',
@@ -9451,15 +9325,15 @@ ru: {
   widget_san_next: 'Следующий ход: {name} · {date}',
   widget_san_next_nodate: 'Следующий ход: {name}',
   back_exit_hint: 'Нажмите «назад» ещё раз, чтобы выйти.',
-  ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_pending_btn: '✓ Откроется в конце', spend_ctx_below: 'Вы на {amount} ниже темпа прошлого месяца', spend_ctx_above: 'Вы на {amount} выше темпа прошлого месяца', spend_ctx_bank: 'Банк подключён', sec_card_title: 'Безопасность', sec_card_read: 'Банковское подключение только для чтения: мы никогда не можем перемещать ваши деньги', sec_card_enc: 'Ваши данные передаются и хранятся в зашифрованном виде', sec_card_lock: 'Блокировка по PIN-коду и отпечатку', bud_per_semana: 'в неделю', bud_per_quincena: 'за две недели', bud_per_mes: 'в месяц', spend_left_periods: 'По всем периодам у вас осталось {amount}.', spend_x_periods: 'Каждая категория распределяется по своему периоду:', spend_x_cat: '{cat} ({per}): осталось {left} ÷ {days} дн. = {daily} сегодня', bud_period_aria: 'Период лимита для {cat}', nav_gastos: 'Расходы', nav_presupuesto: 'Бюджет', nav_ajustes: 'Настройки', ob_bio_label: 'Вход по отпечатку (если создам PIN)', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
+  ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_pending_btn: '✓ Откроется в конце', spend_ctx_below: 'Вы на {amount} ниже темпа прошлого месяца', spend_ctx_above: 'Вы на {amount} выше темпа прошлого месяца', spend_ctx_bank: 'Банк подключён', sec_card_title: 'Безопасность', sec_card_read: 'Банковское подключение только для чтения: мы никогда не можем перемещать ваши деньги', sec_card_enc: 'Ваши данные передаются и хранятся в зашифрованном виде', sec_card_lock: 'Блокировка по PIN-коду и отпечатку', sec_card_lock_faceid: 'Блокировка по PIN-коду и Face ID', sec_card_lock_generic: 'Блокировка по PIN-коду и биометрии', bud_per_semana: 'в неделю', bud_per_quincena: 'за две недели', bud_per_mes: 'в месяц', spend_left_periods: 'По всем периодам у вас осталось {amount}.', spend_x_periods: 'Каждая категория распределяется по своему периоду:', spend_x_cat: '{cat} ({per}): осталось {left} ÷ {days} дн. = {daily} сегодня', bud_period_aria: 'Период лимита для {cat}', nav_gastos: 'Расходы', nav_presupuesto: 'Бюджет', nav_ajustes: 'Настройки', ob_bio_label: 'Вход по отпечатку (если создам PIN)', ob_bio_label_faceid: 'Вход по Face ID (если создам PIN)', ob_bio_label_generic: 'Вход по биометрии (если создам PIN)', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
   setup_title: 'अपना PETO Finanzas सेट करें',
   setup_step_of: 'चरण {n} / 3',
   setup_step1_t: 'अपना खाता बनाएं',
   setup_step1_d: 'आपका क्लाउड खाता आपके पैसे को सिंक रखता है और आपको अपना बैंक जोड़ने देता है।',
-  setup_step2_t: 'अपना PIN बनाएं और फ़िंगरप्रिंट चालू करें',
-  setup_step2_d: '4 से 6 अंकों का PIN आपके ऐप की सुरक्षा करता है; PIN बन जाने पर आप फ़िंगरप्रिंट चालू कर सकते हैं।',
+  setup_step2_t: 'अपना PIN बनाएं और फ़िंगरप्रिंट चालू करें', setup_step2_t_faceid: 'Face ID से अनलॉक', setup_step2_t_generic: 'बायोमेट्रिक्स से अनलॉक',
+  setup_step2_d: '4 से 6 अंकों का PIN आपके ऐप की सुरक्षा करता है; PIN बन जाने पर आप फ़िंगरप्रिंट चालू कर सकते हैं।', setup_step2_d_faceid: 'अपने PIN के साथ Face ID का उपयोग करें ताकि हर बार टाइप किए बिना अंदर आ सकें। आप इसे बाद में सेटिंग्स में बदल सकते हैं।', setup_step2_d_generic: 'अपने PIN के साथ बायोमेट्रिक्स का उपयोग करें ताकि हर बार टाइप किए बिना अंदर आ सकें। आप इसे बाद में सेटिंग्स में बदल सकते हैं।',
   setup_step3_t: 'अपना बैंक जोड़ें',
   setup_step3_d: 'बैंक जुड़ने पर आपके बैलेंस और लेन-देन अपने आप अपडेट होते हैं। चाहें तो बाद में भी कर सकते हैं।',
   setup_skip_step: 'अभी नहीं',
@@ -9612,19 +9486,19 @@ hi: {
   set_notif_help: 'PETO Finanzas बंद होने पर भी, आपके निश्चित भुगतानों की सूचना एक दिन पहले और उसी दिन।',
   set_autofixed_label: 'निश्चित भुगतान स्वचालित दर्ज करें',
   set_autofixed_help: 'जब कोई निश्चित भुगतान देय होता है, तो खर्च आपके लिए दर्ज हो जाता है। आप तुरंत उसे वापस कर सकते हैं।',
-  set_bio_label: 'फ़िंगरप्रिंट अनलॉक',
-  set_bio_help: 'PIN के साथ फ़िंगरप्रिंट से भी प्रवेश करें (सक्रिय PIN आवश्यक है)।',
-  bio_btn: '👆 फ़िंगरप्रिंट से प्रवेश करें',
+  set_bio_label: 'फ़िंगरप्रिंट अनलॉक', set_bio_label_faceid: 'Face ID से अनलॉक', set_bio_label_generic: 'बायोमेट्रिक्स से अनलॉक',
+  set_bio_help: 'PIN के साथ फ़िंगरप्रिंट से भी प्रवेश करें (सक्रिय PIN आवश्यक है)।', set_bio_help_faceid: 'अपने PIN के साथ Face ID से अनलॉक करें (सक्रिय PIN आवश्यक है)।', set_bio_help_generic: 'अपने PIN के साथ बायोमेट्रिक्स से अनलॉक करें (सक्रिय PIN आवश्यक है)।',
+  bio_btn: '👆 फ़िंगरप्रिंट से प्रवेश करें', bio_btn_faceid: '👆 Face ID से प्रवेश करें', bio_btn_generic: '👆 बायोमेट्रिक्स से प्रवेश करें',
   bio_reason: 'PETO Finanzas खोलने के लिए पुष्टि करें कि यह आप ही हैं',
-  bio_need_pin: 'फ़िंगरप्रिंट अनलॉक के लिए सक्रिय PIN चाहिए: सेटिंग → सुरक्षा में अपना PIN बनाएँ, फिर ऐप खोलते समय फ़िंगरप्रिंट काम करेगा।',
+  bio_need_pin: 'फ़िंगरप्रिंट अनलॉक के लिए सक्रिय PIN चाहिए: सेटिंग → सुरक्षा में अपना PIN बनाएँ, फिर ऐप खोलते समय फ़िंगरप्रिंट काम करेगा।', bio_need_pin_faceid: 'पहले PIN बनाएं: Face ID आपके PIN के साथ काम करता है।', bio_need_pin_generic: 'पहले PIN बनाएं: बायोमेट्रिक्स आपके PIN के साथ काम करता है।',
   bio_failed: 'फ़िंगरप्रिंट सत्यापित नहीं हो सका। अपना PIN लिखें।',
   bio_unavailable: 'इस फ़ोन पर फ़िंगरप्रिंट उपलब्ध नहीं है। अपना PIN लिखें।',
-  bio_not_enrolled: 'इस फ़ोन में कोई फ़िंगरप्रिंट दर्ज नहीं है। फ़ोन की सेटिंग में दर्ज करें या अपना PIN लिखें।',
-  bio_offer_title: 'फ़िंगरप्रिंट से अनलॉक करें?',
-  bio_offer_text: 'आपने अभी अपना PIN बनाया है। चाहें तो हर बार PIN लिखने के बजाय फ़िंगरप्रिंट से PETO Finanzas खोल सकते हैं। अभी चालू करें?',
-  bio_offer_yes: 'हाँ, फ़िंगरप्रिंट चालू करें',
+  bio_not_enrolled: 'इस फ़ोन में कोई फ़िंगरप्रिंट दर्ज नहीं है। फ़ोन की सेटिंग में दर्ज करें या अपना PIN लिखें।', bio_not_enrolled_faceid: 'इस फ़ोन में Face ID सेट नहीं है। इसे अपने फ़ोन की सेटिंग्स में चालू करें।', bio_not_enrolled_generic: 'इस डिवाइस में बायोमेट्रिक्स सेट नहीं है। इसे अपने डिवाइस की सेटिंग्स में चालू करें।',
+  bio_offer_title: 'फ़िंगरप्रिंट से अनलॉक करें?', bio_offer_title_faceid: 'Face ID से अंदर आएं?', bio_offer_title_generic: 'बायोमेट्रिक्स से अंदर आएं?',
+  bio_offer_text: 'आपने अभी अपना PIN बनाया है। चाहें तो हर बार PIN लिखने के बजाय फ़िंगरप्रिंट से PETO Finanzas खोल सकते हैं। अभी चालू करें?', bio_offer_text_faceid: 'Face ID चालू करें ताकि हर बार PIN टाइप किए बिना PETO Finanzas खोल सकें।', bio_offer_text_generic: 'बायोमेट्रिक्स चालू करें ताकि हर बार PIN टाइप किए बिना PETO Finanzas खोल सकें।',
+  bio_offer_yes: 'हाँ, फ़िंगरप्रिंट चालू करें', bio_offer_yes_faceid: 'Face ID चालू करें', bio_offer_yes_generic: 'बायोमेट्रिक्स चालू करें',
   bio_offer_no: 'अभी नहीं',
-  bio_activated: 'हो गया: फ़िंगरप्रिंट अनलॉक अब चालू है।',
+  bio_activated: 'हो गया: फ़िंगरप्रिंट अनलॉक अब चालू है।', bio_activated_faceid: 'Face ID चालू हो गया।', bio_activated_generic: 'बायोमेट्रिक्स चालू हो गया।',
   fix_auto_suffix: '(स्वचालित निश्चित भुगतान)',
   backup_pass_label: 'एन्क्रिप्ट किए बैकअप का पासवर्ड',
   backup_pass_ph: 'कम से कम 4 अक्षर',
@@ -9785,7 +9659,7 @@ hi: {
   cloud_recovery_done: 'पासवर्ड अपडेट हो गया। अब आप प्रवेश कर सकते हैं।',
   key_settings: 'नाम, बँटवारा, अक्षर, अनुभाग, PIN',
   footer: 'PETO Finanzas · ऑफ़लाइन काम करता है · क्लाउड वैकल्पिक है: आपका डेटा, आपका फ़ैसला',
-  tile_available: 'उपलब्ध पैसे',
+  tile_available: 'उपलब्ध पैसे', tile_info_aria: 'यह संख्या क्या है?',
   tile_accounts: 'तुम्हारे खातों का बैलेंस', tile_accounts_aria: 'तुम्हारे खातों का बैलेंस: मेरे खाते पर जाएँ', tile_accounts_help: 'तुम्हारे खातों का कुल जोड़। खाता बनाते या बदलते समय तुम खुद इसे अपडेट करते हो।',
   tile_available_aria: 'उपलब्ध पैसे: मेरे खातों पर जाएँ',
   tile_savings: 'इस माह की बचत',
@@ -10158,10 +10032,23 @@ hi: {
   pro_benefit_report: '📊 उन्नत रिपोर्ट: माहों की तुलना और CSV निर्यात',
   pro_benefit_shared: '🏠 अपने घर के साथ साझा बजट',
   pro_benefit_org: '🤝 San आयोजक मोड: पूरे समूह की tanda',
-  pro_coming_text: 'ऐप में ख़रीद Google Play लॉन्च के साथ आएगी। तब तक आप प्रतीक्षा सूची में जुड़ सकते हैं: जैसे ही आप $4.99 प्रति माह पर Pro चालू कर सकेंगे, हम आपको बता देंगे।',
+  pro_coming_text: 'इस डिवाइस पर अभी ऐप में ख़रीद उपलब्ध नहीं है। आप प्रतीक्षा सूची में जुड़ सकते हैं: जैसे ही आप $4.99 प्रति माह पर PETO Pro चालू कर सकेंगे, हम आपको बता देंगे।',
+  pro_coming_text_ios: 'इस डिवाइस पर अभी ऐप में ख़रीद उपलब्ध नहीं है। आप प्रतीक्षा सूची में जुड़ सकते हैं: जैसे ही आप $4.99 प्रति माह पर PETO Pro चालू कर सकेंगे, हम आपको बता देंगे।',
   pro_waitlist_btn: 'प्रतीक्षा सूची में जुड़ें',
   pro_waitlist_done: 'आप सूची में हैं ✅ जब Pro उपलब्ध होगा, तो हम आपको बता देंगे।',
   pro_close: 'अभी नहीं',
+  pro_buy_btn: 'PETO Pro की सदस्यता लें',
+  pro_trial_btn: 'मेरे 14 मुफ़्त दिन शुरू करें',
+  pro_checking: 'उपलब्धता जांची जा रही है…',
+  pro_buying: 'प्रोसेस हो रहा है…',
+  pro_trial_line: 'पहले 14 दिन मुफ़्त हैं।',
+  pro_renew_line: 'उसके बाद दिखाई गई कीमत ली जाएगी और सदस्यता हर माह अपने आप नवीनीकृत होगी, जब तक आप रद्द न करें। आप अपने स्टोर खाता सेटिंग से कभी भी रद्द कर सकते हैं।',
+  pro_restore_btn: 'ख़रीद बहाल करें',
+  pro_buy_cancelled: 'ख़रीद रद्द हो गई। कोई शुल्क नहीं लिया गया।',
+  pro_buy_error: 'ख़रीद पूरी नहीं हो सकी। फिर से कोशिश करें।',
+  pro_buy_pending: 'आपका भुगतान मंज़ूरी के इंतज़ार में है। स्टोर की पुष्टि होते ही PETO Pro चालू हो जाएगा।',
+  pro_restore_none: 'बहाल करने के लिए कोई सक्रिय सदस्यता नहीं मिली।',
+  pro_per_month: 'प्रति माह',
   pro_tag: 'PRO',
   adv_title: 'उन्नत रिपोर्ट',
   adv_note: 'यह PETO Pro की सुविधा है: यह माह बनाम पिछला माह, हर श्रेणी और माह का CSV निर्यात।',
@@ -10301,15 +10188,15 @@ hi: {
   widget_san_next: 'अगली बारी: {name} · {date}',
   widget_san_next_nodate: 'अगली बारी: {name}',
   back_exit_hint: 'बाहर निकलने के लिए फिर से बैक दबाएँ।',
-  ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_pending_btn: '✓ अंत में खुलेगा', spend_ctx_below: 'आप पिछले महीने की गति से {amount} नीचे हैं', spend_ctx_above: 'आप पिछले महीने की गति से {amount} ऊपर हैं', spend_ctx_bank: 'बैंक जुड़ा हुआ है', sec_card_title: 'सुरक्षा', sec_card_read: 'बैंक कनेक्शन केवल पढ़ने के लिए: हम आपका पैसा कभी नहीं हिला सकते', sec_card_enc: 'आपका डेटा एन्क्रिप्ट होकर जाता और सहेजा जाता है', sec_card_lock: 'PIN और फ़िंगरप्रिंट लॉक', bud_per_semana: 'प्रति सप्ताह', bud_per_quincena: 'प्रति पखवाड़ा', bud_per_mes: 'प्रति माह', spend_left_periods: 'आपके सभी अवधियों में कुल {amount} बचे हैं।', spend_x_periods: 'हर श्रेणी अपनी अवधि के अनुसार बँटती है:', spend_x_cat: '{cat} ({per}): {left} बचे ÷ {days} दिन = आज {daily}', bud_period_aria: '{cat} के लिए सीमा अवधि', nav_gastos: 'खर्च', nav_presupuesto: 'बजट', nav_ajustes: 'सेटिंग्स', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
+  ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_pending_btn: '✓ अंत में खुलेगा', spend_ctx_below: 'आप पिछले महीने की गति से {amount} नीचे हैं', spend_ctx_above: 'आप पिछले महीने की गति से {amount} ऊपर हैं', spend_ctx_bank: 'बैंक जुड़ा हुआ है', sec_card_title: 'सुरक्षा', sec_card_read: 'बैंक कनेक्शन केवल पढ़ने के लिए: हम आपका पैसा कभी नहीं हिला सकते', sec_card_enc: 'आपका डेटा एन्क्रिप्ट होकर जाता और सहेजा जाता है', sec_card_lock: 'PIN और फ़िंगरप्रिंट लॉक', sec_card_lock_faceid: 'PIN और Face ID लॉक', sec_card_lock_generic: 'PIN और बायोमेट्रिक्स लॉक', bud_per_semana: 'प्रति सप्ताह', bud_per_quincena: 'प्रति पखवाड़ा', bud_per_mes: 'प्रति माह', spend_left_periods: 'आपके सभी अवधियों में कुल {amount} बचे हैं।', spend_x_periods: 'हर श्रेणी अपनी अवधि के अनुसार बँटती है:', spend_x_cat: '{cat} ({per}): {left} बचे ÷ {days} दिन = आज {daily}', bud_period_aria: '{cat} के लिए सीमा अवधि', nav_gastos: 'खर्च', nav_presupuesto: 'बजट', nav_ajustes: 'सेटिंग्स', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', ob_bio_label_faceid: 'Face ID से प्रवेश (अगर मैं PIN बनाऊं)', ob_bio_label_generic: 'बायोमेट्रिक्स से प्रवेश (अगर मैं PIN बनाऊं)', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
   setup_title: 'إعداد PETO Finanzas الخاص بك',
   setup_step_of: 'الخطوة {n} من 3',
   setup_step1_t: 'أنشئ حسابك',
   setup_step1_d: 'حسابك السحابي يبقي أموالك متزامنة ويتيح لك ربط بنكك.',
-  setup_step2_t: 'أنشئ رمز PIN وفعّل البصمة',
-  setup_step2_d: 'رمز PIN من 4 إلى 6 أرقام يحمي تطبيقك؛ وبعد إنشائه يمكنك تفعيل البصمة.',
+  setup_step2_t: 'أنشئ رمز PIN وفعّل البصمة', setup_step2_t_faceid: 'إلغاء القفل بـ Face ID', setup_step2_t_generic: 'إلغاء القفل بالمقاييس الحيوية',
+  setup_step2_d: 'رمز PIN من 4 إلى 6 أرقام يحمي تطبيقك؛ وبعد إنشائه يمكنك تفعيل البصمة.', setup_step2_d_faceid: 'استخدم Face ID إضافة إلى الرقم السري للدخول دون كتابته في كل مرة. يمكنك تغيير ذلك لاحقًا في الإعدادات.', setup_step2_d_generic: 'استخدم مقاييسك الحيوية إضافة إلى الرقم السري للدخول دون كتابته في كل مرة. يمكنك تغيير ذلك لاحقًا في الإعدادات.',
   setup_step3_t: 'اربط بنكك',
   setup_step3_d: 'مع ربط بنكك، تتحدث أرصدتك ومعاملاتك تلقائيًا. يمكنك فعل ذلك لاحقًا إذا أردت.',
   setup_skip_step: 'ليس الآن',
@@ -10462,19 +10349,19 @@ ar: {
   set_notif_help: 'تنبيهات بدفعاتك الثابتة قبلها بيوم وفي يومها، حتى عندما يكون PETO Finanzas مغلقًا.',
   set_autofixed_label: 'تسجيل الدفعات الثابتة تلقائيًا',
   set_autofixed_help: 'عند استحقاق دفعة ثابتة، يُسجَّل المصروف عنك تلقائيًا. ويمكنك التراجع فورًا.',
-  set_bio_label: 'فتح القفل بالبصمة',
-  set_bio_help: 'ادخل ببصمتك بالإضافة إلى رمز PIN (يلزم رمز PIN مفعّل).',
-  bio_btn: '👆 ادخل بالبصمة',
+  set_bio_label: 'فتح القفل بالبصمة', set_bio_label_faceid: 'إلغاء القفل بـ Face ID', set_bio_label_generic: 'إلغاء القفل بالمقاييس الحيوية',
+  set_bio_help: 'ادخل ببصمتك بالإضافة إلى رمز PIN (يلزم رمز PIN مفعّل).', set_bio_help_faceid: 'ألغِ القفل بـ Face ID إضافة إلى الرقم السري (يلزم رقم سري نشط).', set_bio_help_generic: 'ألغِ القفل بمقاييسك الحيوية إضافة إلى الرقم السري (يلزم رقم سري نشط).',
+  bio_btn: '👆 ادخل بالبصمة', bio_btn_faceid: '👆 ادخل بـ Face ID', bio_btn_generic: '👆 ادخل بالمقاييس الحيوية',
   bio_reason: 'أكّد أنك أنت لفتح PETO Finanzas',
-  bio_need_pin: 'فتح القفل بالبصمة يحتاج إلى رمز PIN مفعّل: أنشئ رمز PIN في الإعدادات ← الأمان وستعمل البصمة عند فتح التطبيق.',
+  bio_need_pin: 'فتح القفل بالبصمة يحتاج إلى رمز PIN مفعّل: أنشئ رمز PIN في الإعدادات ← الأمان وستعمل البصمة عند فتح التطبيق.', bio_need_pin_faceid: 'أنشئ رقمًا سريًا أولًا: يعمل Face ID مع رقمك السري.', bio_need_pin_generic: 'أنشئ رقمًا سريًا أولًا: تعمل المقاييس الحيوية مع رقمك السري.',
   bio_failed: 'تعذّر التحقق من البصمة. اكتب رمز PIN.',
   bio_unavailable: 'البصمة غير متاحة في هذا الهاتف. اكتب رمز PIN.',
-  bio_not_enrolled: 'لا توجد بصمة مسجّلة في هذا الهاتف. سجّل واحدة في إعدادات الهاتف أو اكتب رمز PIN.',
-  bio_offer_title: 'فتح القفل ببصمتك؟',
-  bio_offer_text: 'لقد أنشأت للتو رمز PIN. إذا أردت، يمكنك فتح PETO Finanzas ببصمتك بدلًا من كتابة الرمز في كل مرة. هل نفعّله الآن؟',
-  bio_offer_yes: 'نعم، فعّل البصمة',
+  bio_not_enrolled: 'لا توجد بصمة مسجّلة في هذا الهاتف. سجّل واحدة في إعدادات الهاتف أو اكتب رمز PIN.', bio_not_enrolled_faceid: 'لم يتم إعداد Face ID في هذا الهاتف. قم بتفعيله في إعدادات الهاتف.', bio_not_enrolled_generic: 'لم يتم إعداد المقاييس الحيوية في هذا الجهاز. قم بتفعيلها في إعدادات الجهاز.',
+  bio_offer_title: 'فتح القفل ببصمتك؟', bio_offer_title_faceid: 'الدخول بـ Face ID؟', bio_offer_title_generic: 'الدخول بالمقاييس الحيوية؟',
+  bio_offer_text: 'لقد أنشأت للتو رمز PIN. إذا أردت، يمكنك فتح PETO Finanzas ببصمتك بدلًا من كتابة الرمز في كل مرة. هل نفعّله الآن؟', bio_offer_text_faceid: 'قم بتفعيل Face ID لفتح PETO Finanzas دون كتابة الرقم السري في كل مرة.', bio_offer_text_generic: 'قم بتفعيل مقاييسك الحيوية لفتح PETO Finanzas دون كتابة الرقم السري في كل مرة.',
+  bio_offer_yes: 'نعم، فعّل البصمة', bio_offer_yes_faceid: 'تفعيل Face ID', bio_offer_yes_generic: 'تفعيل المقاييس الحيوية',
   bio_offer_no: 'ليس الآن',
-  bio_activated: 'تم: فتح القفل بالبصمة أصبح مفعّلًا.',
+  bio_activated: 'تم: فتح القفل بالبصمة أصبح مفعّلًا.', bio_activated_faceid: 'تم تفعيل Face ID.', bio_activated_generic: 'تم تفعيل المقاييس الحيوية.',
   fix_auto_suffix: '(دفعة ثابتة تلقائية)',
   backup_pass_label: 'كلمة مرور النسخة المشفّرة',
   backup_pass_ph: '4 أحرف على الأقل',
@@ -10635,7 +10522,7 @@ ar: {
   cloud_recovery_done: 'تم تحديث كلمة المرور. يمكنك الآن تسجيل الدخول.',
   key_settings: 'الاسم، التقسيم، النص، الأقسام، PIN',
   footer: 'PETO Finanzas · يعمل دون إنترنت · السحابة اختيارية: بياناتك، قرارك',
-  tile_available: 'الأموال المتاحة',
+  tile_available: 'الأموال المتاحة', tile_info_aria: 'ما هذا الرقم؟',
   tile_accounts: 'رصيد حساباتك', tile_accounts_aria: 'رصيد حساباتك: الذهاب إلى حساباتي', tile_accounts_help: 'مجموع حساباتك. أنت تُحدّثه بنفسك عند إنشاء حساب أو تعديله.',
   tile_available_aria: 'الأموال المتاحة: الذهاب إلى حساباتي',
   tile_savings: 'مدّخرات هذا الشهر',
@@ -11008,10 +10895,23 @@ ar: {
   pro_benefit_report: '📊 التقرير المتقدّم: قارن الأشهر وصدّر CSV',
   pro_benefit_shared: '🏠 ميزانية مشتركة مع منزلك',
   pro_benefit_org: '🤝 وضع منظّم الـ san: tanda المجموعة كلها',
-  pro_coming_text: 'تصل الشراءات داخل التطبيق مع إطلاق Google Play. في هذه الأثناء يمكنك الانضمام إلى قائمة الانتظار: سنعلمك فور أن تتمكن من تفعيل Pro مقابل $4.99 شهريًا.',
+  pro_coming_text: 'الشراء داخل التطبيق غير متاح على هذا الجهاز الآن. يمكنك الانضمام إلى قائمة الانتظار: سنعلمك فور أن تتمكن من تفعيل PETO Pro مقابل $4.99 شهريًا.',
+  pro_coming_text_ios: 'الشراء داخل التطبيق غير متاح على هذا الجهاز الآن. يمكنك الانضمام إلى قائمة الانتظار: سنعلمك فور أن تتمكن من تفعيل PETO Pro مقابل $4.99 شهريًا.',
   pro_waitlist_btn: 'الانضمام إلى قائمة الانتظار',
   pro_waitlist_done: 'أنت على القائمة ✅ سنعلمك عندما يتاح Pro.',
   pro_close: 'ليس الآن',
+  pro_buy_btn: 'اشترك في PETO Pro',
+  pro_trial_btn: 'ابدأ أيامي الـ14 المجانية',
+  pro_checking: 'جارٍ التحقق من التوفر…',
+  pro_buying: 'جارٍ المعالجة…',
+  pro_trial_line: 'أول 14 يومًا مجانًا.',
+  pro_renew_line: 'بعد ذلك يُخصم السعر الموضّح ويتجدد الاشتراك كل شهر حتى تلغيه. يمكنك الإلغاء في أي وقت من إعدادات حسابك في المتجر.',
+  pro_restore_btn: 'استعادة الشراء',
+  pro_buy_cancelled: 'تم إلغاء الشراء. لم يتم خصم أي مبلغ.',
+  pro_buy_error: 'تعذّر إكمال الشراء. حاول مرة أخرى.',
+  pro_buy_pending: 'دفعتك بانتظار الموافقة. سيُفعَّل PETO Pro بمجرد تأكيد المتجر.',
+  pro_restore_none: 'لم نجد اشتراكًا نشطًا لاستعادته.',
+  pro_per_month: 'شهريًا',
   pro_tag: 'PRO',
   adv_title: 'التقرير المتقدّم',
   adv_note: 'ميزة من PETO Pro: هذا الشهر مقابل السابق، كل فئة وتصدير CSV للشهر.',
@@ -11151,7 +11051,7 @@ ar: {
   widget_san_next: 'الدور التالي: {name} · {date}',
   widget_san_next_nodate: 'الدور التالي: {name}',
   back_exit_hint: 'اضغط رجوع مرة أخرى للخروج.',
-  ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', ob_exp_amount_ph: 'المبلغ (مثال 25.00)', ob_exp_add: 'سجّل أول مصروف لي', ob_exp_done: '✓ تم التسجيل! بهذه السهولة يُسجَّل المصروف.', ob_fix_title: 'مدفوعاتك الثابتة وميزانيتك', ob_fix_text: 'أضف المدفوعات التي تتكرر كل شهر (الإيجار، الهاتف، الاشتراكات). بها يبني PETO Finanzas ميزانيتك ويحسب كم يمكنك أن تنفق اليوم. يمكنك إضافة المزيد متى شئت.', ob_fix_name_ph: 'الاسم (مثال: الإيجار)', ob_fix_day_ph: 'اليوم (1-31)', ob_fix_add: '＋ أضف دفعة ثابتة', ob_fix_added: '✓ أُضيفت الدفعة الثابتة. أضف أخرى أو تابع.', ob_goal_title: 'هدف الادخار الخاص بك', ob_goal_text: 'امنح هدفك الأول اسمًا ومبلغًا (على سبيل المثال، صندوق الطوارئ). الادخار نحو هدف واضح أسهل بكثير.', ob_goal_name_ph: 'الاسم (مثال: صندوق الطوارئ)', ob_goal_target_ph: 'مبلغ الهدف (مثال: 1,000)', ob_goal_add: 'أنشئ هدفي', ob_goal_added: '✓ تم إنشاء الهدف! ستجده في المدخرات.', ob_san_title: 'السان: ادّخر مع مجموعة', ob_san_text: 'السان (تاندا، كوندينا، سوسو) هو دائرة الادخار الجماعية الكلاسيكية: الجميع يساهم كل أسبوع وكل شخص يأخذ المبلغ كاملًا في دوره. يدير PETO Finanzas الترتيب والأدوار والإيصالات دون دفاتر.', ob_san_btn: 'أنشئ السان الخاص بي عند الانتهاء', ob_bank_title: 'اربط بنكك', ob_bank_text: 'إن شئت، اربط بنكك لتدخل حركاتك تلقائيًا وتبقى أرصدتك محدثة دائمًا. الأمر اختياري: عند إنهاء الترحيب أو لاحقًا في الإعدادات.', ob_bank_btn: 'أريد ربط بنكي', ob_pod_title: 'تعلّم مع البودكاست', ob_pod_text: '«المالية الشخصية»، بودكاست PETO Finanzas: حلقات بالإسبانية مع لوسيا وماركو، بأمثلة وخطوات عملية لأموالك. استمع إليه داخل التطبيق.', ob_pod_btn: 'شاهد البودكاست عند الانتهاء', ob_bell_title: 'فعّل تذكيراتك', ob_bell_text: 'تلقَّ إشعارًا عندما تقترب دفعة ثابتة من الاستحقاق، إضافة إلى ملخص يومك. هكذا لا يفوتك شيء.', ob_bell_btn: 'تفعيل التذكيرات', ob_bell_done: '✓ تم تفعيل التذكيرات.', ob_cloud_btn: 'أنشئ حسابي عند الانتهاء', ob_pending_ok: '✓ تم! عند إنهاء الترحيب سآخذك إلى هناك مباشرة.', ob_pending_btn: '✓ يفتح عند الانتهاء', spend_ctx_below: 'أنت أقل من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_above: 'أنت أعلى من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_bank: 'البنك متصل', sec_card_title: 'الأمان', sec_card_read: 'اتصال مصرفي للقراءة فقط: لا يمكننا أبدًا تحريك أموالك', sec_card_enc: 'بياناتك تنتقل وتُحفظ مشفرة', sec_card_lock: 'القفل بالرقم السري والبصمة', bud_per_semana: 'أسبوعيًا', bud_per_quincena: 'كل أسبوعين', bud_per_mes: 'شهريًا', spend_left_periods: 'تبقّى لك {amount} عبر جميع فتراتك.', spend_x_periods: 'تتوزع كل فئة على فترتها الخاصة:', spend_x_cat: '{cat} ({per}): تبقّى {left} ÷ {days} يوم = {daily} اليوم', bud_period_aria: 'فترة الحد لـ {cat}', nav_gastos: 'المصروفات', nav_presupuesto: 'الميزانية', nav_ajustes: 'الإعدادات', ob_bio_label: 'الدخول بالبصمة (إذا أنشأت رقم PIN)', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
+  ob_signin_btn: 'لدي حساب بالفعل · تسجيل الدخول', ob_signin_help: 'تستخدم PETO Finanzas على هاتف آخر أو على الويب؟ سجّل الدخول ببريدك وستنزل بياناتك تلقائيًا.', ob_signin_back: 'رجوع', ob_exp_amount_ph: 'المبلغ (مثال 25.00)', ob_exp_add: 'سجّل أول مصروف لي', ob_exp_done: '✓ تم التسجيل! بهذه السهولة يُسجَّل المصروف.', ob_fix_title: 'مدفوعاتك الثابتة وميزانيتك', ob_fix_text: 'أضف المدفوعات التي تتكرر كل شهر (الإيجار، الهاتف، الاشتراكات). بها يبني PETO Finanzas ميزانيتك ويحسب كم يمكنك أن تنفق اليوم. يمكنك إضافة المزيد متى شئت.', ob_fix_name_ph: 'الاسم (مثال: الإيجار)', ob_fix_day_ph: 'اليوم (1-31)', ob_fix_add: '＋ أضف دفعة ثابتة', ob_fix_added: '✓ أُضيفت الدفعة الثابتة. أضف أخرى أو تابع.', ob_goal_title: 'هدف الادخار الخاص بك', ob_goal_text: 'امنح هدفك الأول اسمًا ومبلغًا (على سبيل المثال، صندوق الطوارئ). الادخار نحو هدف واضح أسهل بكثير.', ob_goal_name_ph: 'الاسم (مثال: صندوق الطوارئ)', ob_goal_target_ph: 'مبلغ الهدف (مثال: 1,000)', ob_goal_add: 'أنشئ هدفي', ob_goal_added: '✓ تم إنشاء الهدف! ستجده في المدخرات.', ob_san_title: 'السان: ادّخر مع مجموعة', ob_san_text: 'السان (تاندا، كوندينا، سوسو) هو دائرة الادخار الجماعية الكلاسيكية: الجميع يساهم كل أسبوع وكل شخص يأخذ المبلغ كاملًا في دوره. يدير PETO Finanzas الترتيب والأدوار والإيصالات دون دفاتر.', ob_san_btn: 'أنشئ السان الخاص بي عند الانتهاء', ob_bank_title: 'اربط بنكك', ob_bank_text: 'إن شئت، اربط بنكك لتدخل حركاتك تلقائيًا وتبقى أرصدتك محدثة دائمًا. الأمر اختياري: عند إنهاء الترحيب أو لاحقًا في الإعدادات.', ob_bank_btn: 'أريد ربط بنكي', ob_pod_title: 'تعلّم مع البودكاست', ob_pod_text: '«المالية الشخصية»، بودكاست PETO Finanzas: حلقات بالإسبانية مع لوسيا وماركو، بأمثلة وخطوات عملية لأموالك. استمع إليه داخل التطبيق.', ob_pod_btn: 'شاهد البودكاست عند الانتهاء', ob_bell_title: 'فعّل تذكيراتك', ob_bell_text: 'تلقَّ إشعارًا عندما تقترب دفعة ثابتة من الاستحقاق، إضافة إلى ملخص يومك. هكذا لا يفوتك شيء.', ob_bell_btn: 'تفعيل التذكيرات', ob_bell_done: '✓ تم تفعيل التذكيرات.', ob_cloud_btn: 'أنشئ حسابي عند الانتهاء', ob_pending_ok: '✓ تم! عند إنهاء الترحيب سآخذك إلى هناك مباشرة.', ob_pending_btn: '✓ يفتح عند الانتهاء', spend_ctx_below: 'أنت أقل من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_above: 'أنت أعلى من إيقاع الشهر الماضي بمقدار {amount}', spend_ctx_bank: 'البنك متصل', sec_card_title: 'الأمان', sec_card_read: 'اتصال مصرفي للقراءة فقط: لا يمكننا أبدًا تحريك أموالك', sec_card_enc: 'بياناتك تنتقل وتُحفظ مشفرة', sec_card_lock: 'القفل بالرقم السري والبصمة', sec_card_lock_faceid: 'القفل بالرقم السري و Face ID', sec_card_lock_generic: 'القفل بالرقم السري والمقاييس الحيوية', bud_per_semana: 'أسبوعيًا', bud_per_quincena: 'كل أسبوعين', bud_per_mes: 'شهريًا', spend_left_periods: 'تبقّى لك {amount} عبر جميع فتراتك.', spend_x_periods: 'تتوزع كل فئة على فترتها الخاصة:', spend_x_cat: '{cat} ({per}): تبقّى {left} ÷ {days} يوم = {daily} اليوم', bud_period_aria: 'فترة الحد لـ {cat}', nav_gastos: 'المصروفات', nav_presupuesto: 'الميزانية', nav_ajustes: 'الإعدادات', ob_bio_label: 'الدخول بالبصمة (إذا أنشأت رقم PIN)', ob_bio_label_faceid: 'الدخول بـ Face ID (إذا أنشأت رقم PIN)', ob_bio_label_generic: 'الدخول بالمقاييس الحيوية (إذا أنشأت رقم PIN)', panel_vs_title: '📊 هذا الشهر مقابل الشهر الماضي', panel_vs_empty: 'لا توجد بعد بيانات من الشهر الماضي للمقارنة.', panel_vs_cur: 'هذا الشهر', panel_vs_prev: 'الشهر الماضي', panel_week: 'الأسبوع {n}', panel_vs_up: '⬆ أنت أعلى بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_down: '⬇ أنت أقل بمقدار {amount} من نفس فترة الشهر الماضي ({pct}%)', panel_vs_same: 'أنت متساوٍ مع نفس فترة الشهر الماضي.', panel_top_title: '🏆 الفئات الأكثر إنفاقًا هذا الشهر', panel_top_empty: 'لا توجد مصروفات بعد هذا الشهر.', panel_flow_title: '💵 التدفق النقدي', panel_flow_empty: 'عندما تكون لديك حركات لعدة أشهر، سترى هنا كيف يدخل مالك ويخرج.', panel_flow_in: 'الدخل', panel_flow_out: 'المصروفات', panel_flow_net: 'الصافي: {amount}', panel_bc_title: '🎯 تقدّم حدودك', panel_bc_budget: 'الميزانية', panel_bc_spent: 'أُنفق', panel_bc_left: 'المتبقي', panel_bc_empty: 'ليست لديك حدود حسب الفئة بعد: حدّد واحدًا في القائمة وسيظهر تقدّمه هنا.'
 }
 };
 /* Resuelve el idioma automático: coincidencia exacta con un idioma
@@ -11172,7 +11072,29 @@ function lang() {
 /* Valida un valor del selector: un idioma concreto o 'auto'. */
 function validLangSetting(v) { return (v === 'auto' || LANGS.includes(v)) ? v : 'auto'; }
 function localeTag() { return LOCALES[lang()] || 'en-US'; }
+/* Compilación 81: los textos biométricos visibles (Ajustes, bloqueo,
+   bienvenida y ayuda) se nombran según la plataforma, como ya hacía
+   el botón de bloqueo en la Comp. 80: «Face ID» en iOS (nombre
+   propio, sin traducir), huella en Android y «datos biométricos»
+   genérico en cualquier otra plataforma (la web). Cada clave de la
+   lista tiene sus variantes <clave>_faceid y <clave>_generic en los
+   12 idiomas; t() resuelve la variante aquí, así tanto el barrido
+   data-i18n como las llamadas directas pintan el texto correcto. */
+const BIO_PLATFORM_KEYS = ['setup_step2_t', 'setup_step2_d', 'set_bio_label', 'set_bio_help',
+  'bio_need_pin', 'bio_not_enrolled', 'bio_offer_title', 'bio_offer_text', 'bio_offer_yes',
+  'bio_activated', 'sec_card_lock', 'ob_bio_label'];
+function bioPlatform() {
+  try { return (window.Capacitor && window.Capacitor.getPlatform()) || ''; } catch (e) { return ''; }
+}
+function bioKey(key) {
+  if (!BIO_PLATFORM_KEYS.includes(key)) return key;
+  const p = bioPlatform();
+  if (p === 'ios') return key + '_faceid';
+  if (p === 'android') return key;
+  return key + '_generic';
+}
 function t(key, vars) {
+  key = bioKey(key);
   let s = (I18N[lang()] && I18N[lang()][key]) || I18N.es[key] || key;
   if (vars) for (const k of Object.keys(vars)) s = s.split('{' + k + '}').join(String(vars[k]));
   return s;
@@ -12381,7 +12303,7 @@ function monthProjectionInfo() {
    entre los días que quedan; banco = (saldo de depósitos menos
    pagos fijos restantes) entre los días que quedan. */
 let spendExplainOpen = false;
-function renderSpendExplain(info) {
+function renderSpendExplain(info, extraLines) {
   const box = document.getElementById('spend-explain');
   const btn = document.getElementById('spend-how-btn');
   if (!box || !btn) return;
@@ -12390,6 +12312,11 @@ function renderSpendExplain(info) {
   if (!info || !spendExplainOpen) return;
   clearNode(box);
   const lines = [];
+  /* Compilación 80 (punto 2): las líneas que antes ocupaban la
+     tarjeta (lo que queda, la nota y la proyección) abren la
+     explicación: la tarjeta queda corta y todo su texto vive
+     detrás del botón «¿Cómo sale este número?». */
+  for (const extra of (extraLines || [])) if (extra) lines.push(extra);
   if (info.bank) {
     lines.push(t('spend_x_bank_balance', { amount: fmt(bankDepositTotalCents()) }));
     lines.push(t('spend_x_bank_fixed', { amount: fmt(bankFixedRemainingCents(currentMonthKey())) }));
@@ -12445,18 +12372,22 @@ function renderSpendToday() {
   /* Compilación 54: la línea de proyección vive en esta tarjeta
      y se repinta con ella (también cuando no hay número diario). */
   const projEl = document.getElementById('spend-projection');
+  let projText = '';
   if (projEl) {
     const proj = monthProjectionInfo();
-    projEl.textContent = proj
+    projText = proj
       ? t('proj_line', { amount: fmt(proj.projected), budget: fmt(proj.budget) })
       : '';
+    projEl.textContent = projText;
   }
   const info = dailySpendInfo();
   const createBtn = document.getElementById('spend-create-btn');
   if (!info) {
     valueEl.textContent = '—';
     noteEl.textContent = t('spend_guide');
-    if (leftEl) leftEl.textContent = '';
+    noteEl.hidden = false;
+    if (leftEl) { leftEl.textContent = ''; leftEl.hidden = true; }
+    if (projEl) projEl.hidden = !projText;
     if (createBtn) createBtn.hidden = false;
     const ctxEarly = document.getElementById('spend-context');
     if (ctxEarly) ctxEarly.innerHTML = '';
@@ -12468,37 +12399,47 @@ function renderSpendToday() {
   valueEl.textContent = fmt(info.daily);
   /* Compilación 51: en modo banco la nota y la línea de estado
      son las del banco; la de «te pasaste por…» del presupuesto
-     NO se muestra (ese sobrepaso es del modo presupuesto). */
-  noteEl.textContent = info.bank
+     NO se muestra (ese sobrepaso es del modo presupuesto).
+     Compilación 80 (punto 2): la nota ya no se pinta en la
+     tarjeta — queda corta con título, número y contexto —; su
+     texto se guarda en el elemento oculto y abre la explicación
+     de «¿Cómo sale este número?» (ver renderSpendExplain). */
+  const noteText = info.bank
     ? t('spend_note_bank')
     : (info.over ? t('spend_over') : t('spend_note'));
+  noteEl.textContent = noteText;
+  noteEl.hidden = true;
   const ctxEl = document.getElementById('spend-context');
   if (ctxEl) ctxEl.innerHTML = spendContextHtml(info);
-  if (leftEl) {
-    if (info.bank) {
-      if (info.left <= 0) {
-        leftEl.textContent = t('spend_bank_over');
-      } else if (info.daysLeft === 1) {
-        leftEl.textContent = t('spend_left_one', { amount: fmt(info.left) });
-      } else {
-        leftEl.textContent = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
-      }
-    } else if (info.mixed) {
-      /* Compilación 67: con períodos mezclados no hay un solo
-         conteo de días honesto: la línea dice lo que queda entre
-         TODOS los períodos, sin prometer días de un solo mes. */
-      leftEl.textContent = info.over ? '' : t('spend_left_periods', { amount: fmt(info.left) });
-    } else if (info.left < 0) {
-      leftEl.textContent = t('spend_over_by', { amount: fmt(-info.left) });
-    } else if (info.over) {
-      leftEl.textContent = '';
+  /* Compilación 80 (punto 2): la línea «te quedan…» se calcula
+     igual que siempre (y se guarda en el elemento, oculto), pero
+     ya no ocupa la tarjeta: abre la explicación del botón. */
+  let leftText = '';
+  if (info.bank) {
+    if (info.left <= 0) {
+      leftText = t('spend_bank_over');
     } else if (info.daysLeft === 1) {
-      leftEl.textContent = t('spend_left_one', { amount: fmt(info.left) });
+      leftText = t('spend_left_one', { amount: fmt(info.left) });
     } else {
-      leftEl.textContent = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
+      leftText = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
     }
+  } else if (info.mixed) {
+    /* Compilación 67: con períodos mezclados no hay un solo
+       conteo de días honesto: la línea dice lo que queda entre
+       TODOS los períodos, sin prometer días de un solo mes. */
+    leftText = info.over ? '' : t('spend_left_periods', { amount: fmt(info.left) });
+  } else if (info.left < 0) {
+    leftText = t('spend_over_by', { amount: fmt(-info.left) });
+  } else if (info.over) {
+    leftText = '';
+  } else if (info.daysLeft === 1) {
+    leftText = t('spend_left_one', { amount: fmt(info.left) });
+  } else {
+    leftText = t('spend_left', { amount: fmt(info.left), days: info.daysLeft });
   }
-  renderSpendExplain(info);
+  if (leftEl) { leftEl.textContent = leftText; leftEl.hidden = true; }
+  if (projEl) projEl.hidden = true;
+  renderSpendExplain(info, [leftText, noteText, projText]);
   syncWidgetSummary(info);
 }
 
@@ -13055,23 +12996,23 @@ function renderHome() {
      se actualiza solo con cada gasto e ingreso»); sin cuentas no
      hace falta ayuda y queda oculta, como siempre. */
   const availLabel = document.getElementById('tile-available-label');
-  const availSub = document.getElementById('sum-available-sub');
   const availTile = document.getElementById('tile-available');
   availLabel.textContent = t('tile_available');
   availTile.setAttribute('aria-label', t('tile_available_aria'));
   /* Compilación 50: si el banco aporta saldos al número, la
      ayuda lo dice; si no, la ayuda de siempre cuando hay
-     cuentas internas, y oculta cuando no hay ninguna. */
-  if (bankBalancesKnown()) {
-    availSub.textContent = t('tile_available_help_bank');
-    availSub.hidden = false;
-  } else if ((db.accounts || []).length > 0) {
-    availSub.textContent = t('tile_available_help');
-    availSub.hidden = false;
-  } else {
-    availSub.textContent = '';
-    availSub.hidden = true;
-  }
+     cuentas internas, y oculta cuando no hay ninguna.
+     Compilación 80 (punto 1): la ayuda ya no ocupa un párrafo en
+     la tarjeta: vive en una ventanita que abre el ⓘ junto al
+     título, para que las tres tarjetas queden cortas y parejas. */
+  const availInfoBtn = document.getElementById('tile-available-info-btn');
+  const availInfoPop = document.getElementById('tile-available-info-pop');
+  const availHelp = bankBalancesKnown()
+    ? t('tile_available_help_bank')
+    : ((db.accounts || []).length > 0 ? t('tile_available_help') : '');
+  if (availInfoPop) availInfoPop.textContent = availHelp;
+  if (availInfoBtn) availInfoBtn.hidden = !availHelp;
+  if (!availHelp && availInfoPop) availInfoPop.hidden = true;
   renderNextStep();
   /* Compilación 51: la tarjeta «Ahorros del mes» suma, SOLO en
      pantalla, los saldos de las cuentas de ahorro del banco
@@ -13430,14 +13371,22 @@ function renderExpenses() {
   const expImportRow = document.getElementById('exp-import-row');
   if (expImportRow) expImportRow.hidden = list.length > 0;
   for (const item of list) {
-    const li = el('li', 'item');
-    const main = el('div', 'item-main');
-    main.appendChild(el('div', 'item-title', catName(item.category) + (item.biz ? ' 💼' : '')));
-    main.appendChild(el('div', 'item-sub', prettyDate(item.date) + (item.note ? ' · ' + item.note : '')));
+    /* Compilación 80 (punto 6): la fila va en COLUMNA — línea
+       superior con el nombre (ellipsis) y el monto a la derecha,
+       la descripción a ancho completo debajo y los botones en su
+       propia fila. En una sola fila horizontal (principal +
+       monto + foto + 3 botones) el bloque principal se aplastaba
+       en pantallas estrechas: el monto se imprimía sobre el
+       título y la descripción caía en una columna de una palabra
+       por línea. */
+    const li = el('li', 'item exp-row');
+    const top = el('div', 'exp-top');
+    top.appendChild(el('div', 'item-title exp-title', catName(item.category) + (item.biz ? ' 💼' : '')));
+    top.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
+    li.appendChild(top);
+    li.appendChild(el('div', 'item-sub exp-desc', prettyDate(item.date) + (item.note ? ' · ' + item.note : '')));
     const expSrcTag = movementSourceTag(item, false);
-    if (expSrcTag) main.appendChild(el('div', 'item-sub', expSrcTag));
-    li.appendChild(main);
-    li.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
+    if (expSrcTag) li.appendChild(el('div', 'item-sub', expSrcTag));
     if (item.photo) {
       const thumb = document.createElement('img');
       thumb.className = 'receipt-thumb';
@@ -13446,7 +13395,7 @@ function renderExpenses() {
       thumb.addEventListener('click', () => openPhoto(item.photo));
       li.appendChild(thumb);
     }
-    const acts = el('div', 'item-actions');
+    const acts = el('div', 'item-actions exp-actions');
     acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
       beginUndo();
       /* La copia conserva la marca de transferencia si la trae:
@@ -15030,7 +14979,7 @@ function renderBudgets() {
     const main = el('div', 'item-main');
     const budHead = el('div', 'bc-head bud-head');
     budHead.appendChild(catChipEl(cat));
-    budHead.appendChild(el('div', 'item-title', catName(cat)));
+    budHead.appendChild(el('div', 'item-title bud-title', catName(cat)));
     /* Compilación 75: % del gasto del mes de esta categoría y la
        cabecera como botón que abre el editor de la tarjeta. */
     const pctMonth = totalMonthSpent > 0
@@ -15043,8 +14992,11 @@ function renderBudgets() {
       main.appendChild(el('div', 'item-sub',
         (spent <= budget
           ? t('bud_spent_left', { spent: fmt(spent), budget: fmt(budget), left: fmt(budget - spent) })
-          : t('bud_spent_over', { spent: fmt(spent), budget: fmt(budget), over: fmt(spent - budget) })) +
-        ' · ' + t('bud_per_' + period)));
+          : t('bud_spent_over', { spent: fmt(spent), budget: fmt(budget), over: fmt(spent - budget) }))));
+      /* Compilación 80 (punto 8): el período va en su propia línea
+         pequeña; pegado a la línea de gasto la partía en tres
+         líneas y estiraba la tarjeta. */
+      main.appendChild(el('div', 'item-sub bud-period', t('bud_per_' + period)));
       const bar = el('div', 'budget-bar');
       const fill = el('div', 'budget-fill' + budgetFillClass(spent, budget));
       fill.style.width = Math.min(100, Math.round(spent / budget * 100)) + '%';
@@ -19157,6 +19109,18 @@ async function scheduleDailySummary() {
       title/subtitle; con las viejas el diálogo salía genérico. */
 let bioPromptOpen = false;
 let bioAutoTimer = null;
+/* Compilación 80 (punto 3): el botón de entrada se nombra según
+   la plataforma: «Face ID» en iOS (nombre propio, no se
+   traduce), huella en Android y biometría genérica si la
+   plataforma no se reconoce. */
+function bioBtnText() {
+  let platform = '';
+  try { platform = (window.Capacitor && window.Capacitor.getPlatform()) || ''; } catch (e) { platform = ''; }
+  if (platform === 'ios') return t('bio_btn_faceid');
+  if (platform === 'android') return t('bio_btn');
+  return t('bio_btn_generic');
+}
+
 function bioPlugin() {
   /* Ambos nombres, por compatibilidad si algún día se carga el JS del
      plugin (que también se registra como BiometricAuthNative). */
@@ -19230,6 +19194,7 @@ async function refreshBioButton() {
        (con PIN/patrón), porque el diálogo admite la credencial del
        dispositivo. */
     if (r && (r.isAvailable || r.deviceIsSecure)) {
+      btn.textContent = bioBtnText();
       btn.hidden = false;
       /* La huella se pide sola al mostrar el bloqueo: un toque menos. */
       bioAutoTimer = setTimeout(() => { tryBiometric(); }, 350);
@@ -22879,30 +22844,39 @@ function answerReview() {
    avanzado, presupuesto compartido y modo organizador de san. Lo
    básico sigue gratis. Precio fijado por Sterlin (23-oct-2026):
    $4.99/mes.
-   ESTADO DE LA FACTURACIÓN (actualizado 24-oct-2026): el plugin de
-   Google Play Billing YA está integrado en el proyecto y cableado
-   en la capa PetoBilling (ver abajo): capacitor-plugin-cdv-purchase
-   13.19.1, con Billing Library 9. Lo que falta es de tienda, no de
-   código: crear la suscripción PRO_PRODUCT_ID a $4.99/mes en Play
-   Console y verificar el cobro en una pista de prueba con una
-   compilación que lleve el plugin (pasos en pro-billing/NOTAS.md).
-   Hasta esa verificación, la pantalla de Pro se sigue presentando
-   como «muy pronto» con su lista de espera LOCAL
-   (settings.proWaitlist) y NADA se simula como si fuera una compra
-   real: sin puente nativo, PetoBilling.available queda en false.
+   ESTADO DE LA FACTURACIÓN (actualizado 20-nov-2026): el plugin de
+   cobro está integrado y cableado en la capa PetoBilling (ver abajo):
+   capacitor-plugin-cdv-purchase 13.19.1, que habla con Google Play
+   Billing 9 en Android y con StoreKit 2 en iOS, con el mismo producto
+   PRO_PRODUCT_ID en las dos tiendas. El muro de pago muestra la
+   COMPRA REAL cuando la tienda responde en ese dispositivo: botón de
+   suscripción con el precio localizado que devuelve la tienda, la
+   prueba gratis de 14 días si la tienda la ofrece, los términos de
+   renovación automática y «Restaurar compra». La lista de espera
+   LOCAL (settings.proWaitlist) queda SOLO como respaldo genuino
+   cuando la tienda no está disponible en ese aparato (p. ej. la web
+   pública, sin puente nativo: PetoBilling.available queda en false).
+   En iOS el texto del muro nunca nombra a Google Play (clave
+   pro_coming_text_ios; Apple rechaza esa mención). NADA se simula
+   como si fuera una compra real: sin tienda, purchase()/restore()
+   devuelven billing_no_disponible y no tocan el estado.
    El estado Pro vive en settings.pro y SOLO lo enciende la capa de
-   facturación (PetoBilling) cuando Play confirme la suscripción.
+   facturación (PetoBilling) cuando la tienda confirme la suscripción.
    EXCEPCIÓN DE PRUEBA CERRADA (decisión de Sterlin, 23-oct-2026):
    mientras PETO_PRO_OPEN_TEST sea true, isPro() devuelve true para
    todos y el muro no aparece, para que Sterlin y los testers puedan
    usar el compartido, el organizador y el informe avanzado antes de
    que exista el cobro. La tarjeta de Ajustes lo muestra tal cual
-   (pro_status_test). Al activar Play Billing: bandera en false. */
+   (pro_status_test). La fuente conserva la bandera en true; los
+   flujos de compilación de tienda (Android release e iOS) la cambian
+   a false SOLO en la copia que compilan, nunca en el código. */
 const PRO_PRICE_TEXT = '$4.99';
 const PRO_PRODUCT_ID = 'peto_pro_mensual';
-/* PRUEBA CERRADA: Pro abierto para Sterlin y los testers; poner en
-   false al activar Play Billing. No escribe settings.pro: solo hace
-   que isPro() devuelva true mientras dure la prueba. */
+/* PRUEBA CERRADA: Pro abierto para Sterlin y los testers en la
+   fuente. Las builds de tienda la compilan en false (parche de los
+   workflows de Android release e iOS sobre la copia sincronizada).
+   No escribe settings.pro: solo hace que isPro() devuelva true
+   mientras dure la prueba. */
 const PETO_PRO_OPEN_TEST = true;
 function isPro() {
   return PETO_PRO_OPEN_TEST || !!(db && db.settings && db.settings.pro === true);
@@ -23011,19 +22985,27 @@ const PetoBilling = {
     return this._ensureInit();
   },
 
-  /* Consulta del producto en la tienda (título y precio localizados). */
+  /* Consulta del producto en la tienda (título y precio localizados).
+     El precio devuelto es el de la fase RECURRENTE (la de pago
+     periódico), no el de la prueba gratis: si la tienda ofrece prueba,
+     su fase viene marcada con paymentMode «FreeTrial» y aquí se salta
+     para el precio y se anota en hasTrial. */
   async productInfo() {
     if (!(await this._ensureInit())) return null;
     const C = window.CdvPurchase;
     const product = C.store.get(PRO_PRODUCT_ID, this._platform(C));
     if (!product) return null;
-    const phases = product.pricing && product.pricing.phases;
-    const phase = phases && phases.length ? phases[0] : null;
+    const phases = (product.pricing && product.pricing.phases) || [];
+    const trialMode = (C.PaymentMode && C.PaymentMode.FREE_TRIAL) || 'FreeTrial';
+    const isTrialPhase = (p) => !!p && (p.paymentMode === trialMode || p.paymentMode === 'FREE_TRIAL');
+    const trialPhase = phases.find(isTrialPhase) || null;
+    const paidPhase = phases.find((p) => p && !isTrialPhase(p) && p.price) || phases[phases.length - 1] || null;
     return {
       id: product.id,
       title: product.title || '',
-      priceText: phase ? (phase.price || '') : '',
-      currency: phase ? (phase.currency || '') : ''
+      priceText: paidPhase ? (paidPhase.price || '') : '',
+      currency: paidPhase ? (paidPhase.currency || '') : '',
+      hasTrial: !!trialPhase
     };
   },
 
@@ -23073,9 +23055,35 @@ function renderProCard() {
     : isPro() ? t('pro_status_active')
     : (db.settings.proWaitlist ? t('pro_status_waitlist') : t('pro_status_free'));
 }
+/* Estado del muro: lo último que respondió la tienda en este aparato.
+   proWallInfo = productInfo() si la tienda cargó el producto;
+   proWallChecked = true cuando la tienda ya respondió una vez (con o
+   sin producto). Sin respuesta todavía, el muro se pinta «comprobando»
+   y al llegar la respuesta se repinta con la variante que toque. */
+let proWallInfo = null;
+let proWallChecked = false;
+
+/* Plataforma actual ('ios' | 'android' | 'web') para los textos del
+   muro: en iOS jamás se nombra a Google Play (Apple lo rechaza). */
+function proPlatformName() {
+  try {
+    if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function') {
+      return window.Capacitor.getPlatform();
+    }
+  } catch (e) { /* sin puente nativo: web */ }
+  return 'web';
+}
+function proComingTextKey() {
+  return proPlatformName() === 'ios' ? 'pro_coming_text_ios' : 'pro_coming_text';
+}
+
 function renderProPaywall() {
   const price = document.getElementById('pro-price-line');
-  if (price) price.textContent = t('pro_price_line');
+  if (price) {
+    price.textContent = (proWallInfo && proWallInfo.priceText)
+      ? proWallInfo.priceText + ' ' + t('pro_per_month')
+      : t('pro_price_line');
+  }
   const ul = document.getElementById('pro-benefits');
   if (ul) {
     clearNode(ul);
@@ -23083,16 +23091,74 @@ function renderProPaywall() {
       ul.appendChild(el('li', 'item', t(k)));
     }
   }
+  const coming = document.getElementById('pro-coming-text');
+  if (coming) coming.textContent = t(proComingTextKey());
   const onList = !!(db && db.settings && db.settings.proWaitlist);
   const btn = document.getElementById('pro-waitlist-btn');
   if (btn) btn.hidden = onList;
   const done = document.getElementById('pro-waitlist-done');
   if (done) done.hidden = !onList;
+  paintProWallVariant();
 }
+
+/* Pinta la variante del muro según lo que haya respondido la tienda:
+   - con producto cargado: COMPRA REAL (botón de suscripción, prueba
+     gratis si la tienda la ofrece, términos de renovación y
+     «Restaurar compra»);
+   - sin respuesta aún: «comprobando» (botón deshabilitado);
+   - tienda no disponible en este aparato: LISTA DE ESPERA, solo como
+     respaldo genuino (la web pública no tiene puente de compras). */
+function paintProWallVariant() {
+  const buyBox = document.getElementById('pro-buy-box');
+  const waitBox = document.getElementById('pro-waitlist-box');
+  const buyBtn = document.getElementById('pro-buy-btn');
+  const terms = document.getElementById('pro-buy-terms');
+  const restoreBtn = document.getElementById('pro-restore-btn');
+  if (!buyBox || !waitBox) return;
+  if (proWallInfo) {
+    buyBox.hidden = false;
+    waitBox.hidden = true;
+    if (buyBtn) {
+      buyBtn.disabled = false;
+      buyBtn.textContent = proWallInfo.hasTrial ? t('pro_trial_btn') : t('pro_buy_btn');
+    }
+    if (terms) {
+      terms.hidden = false;
+      terms.textContent = (proWallInfo.hasTrial ? t('pro_trial_line') + ' ' : '') + t('pro_renew_line');
+    }
+    if (restoreBtn) { restoreBtn.hidden = false; restoreBtn.disabled = false; }
+  } else if (!proWallChecked) {
+    buyBox.hidden = false;
+    waitBox.hidden = true;
+    if (buyBtn) {
+      buyBtn.disabled = true;
+      buyBtn.textContent = t('pro_checking');
+    }
+    if (terms) terms.hidden = true;
+    if (restoreBtn) restoreBtn.hidden = true;
+  } else {
+    buyBox.hidden = true;
+    waitBox.hidden = false;
+  }
+}
+
+/* Pregunta a la tienda por el producto y repinta el muro si sigue
+   abierto. Sin puente (web) productInfo() devuelve null y el muro
+   cae en la lista de espera, que es su respaldo genuino. */
+async function refreshProWall() {
+  let info = null;
+  try { info = await PetoBilling.productInfo(); } catch (e) { info = null; }
+  proWallInfo = info;
+  proWallChecked = true;
+  const o = document.getElementById('pro-paywall');
+  if (o && !o.hidden) renderProPaywall();
+}
+
 function showProPaywall() {
   renderProPaywall();
   const o = document.getElementById('pro-paywall');
   if (o) o.hidden = false;
+  refreshProWall();
 }
 function hideProPaywall() {
   const o = document.getElementById('pro-paywall');
@@ -23104,13 +23170,56 @@ function onProWaitlist() {
   renderProPaywall();
   renderProCard();
 }
-/* Botón de compra — la UI lo mostrará cuando la facturación esté
-   verificada en Play (ver pro-billing/NOTAS.md). No finge resultados:
-   purchase() inicializa la tienda de forma perezosa y, si la
-   facturación no está disponible, no toca el estado Pro. */
+function proWallMsg(key) {
+  const msg = document.getElementById('pro-buy-msg');
+  if (!msg) return;
+  msg.hidden = false;
+  msg.textContent = t(key);
+}
+/* ¿La tienda devolvió «pago cancelado» (la persona cerró la hoja de
+   pago)? CdvPurchase lo normaliza a su código PAYMENT_CANCELLED. */
+function proBuyWasCancelled(r) {
+  if (!r || r.code == null) return false;
+  const EC = window.CdvPurchase && window.CdvPurchase.ErrorCode;
+  if (EC && r.code === EC.PAYMENT_CANCELLED) return true;
+  return r.code === 6777006; /* ERROR_CODES_BASE (6777000) + 6 */
+}
+/* Botón de compra del muro: llama al flujo de compra de PetoBilling
+   (la inicialización de la tienda es perezosa y vive dentro de
+   purchase()). Estados: comprando (botón deshabilitado con
+   «Procesando…»), éxito (Pro activo y el muro se cierra), pago
+   diferido (aviso de pendiente), cancelado por la persona (mensaje
+   suave, sin tono de error) y error real (mensaje entendible). No
+   finge resultados: sin tienda, purchase() devuelve
+   billing_no_disponible y no toca el estado Pro. */
 async function onProBuy() {
-  const r = await PetoBilling.purchase();
-  if (r && r.ok) { renderProCard(); hideProPaywall(); }
+  const btn = document.getElementById('pro-buy-btn');
+  if (btn) { btn.disabled = true; btn.textContent = t('pro_buying'); }
+  const msg0 = document.getElementById('pro-buy-msg');
+  if (msg0) msg0.hidden = true;
+  let r = null;
+  try { r = await PetoBilling.purchase(); } catch (e) { r = { ok: false, reason: 'error' }; }
+  if (r && r.ok && !r.pending) { renderProCard(); hideProPaywall(); return r; }
+  renderProPaywall();
+  if (r && r.pending) proWallMsg('pro_buy_pending');
+  else if (proBuyWasCancelled(r)) proWallMsg('pro_buy_cancelled');
+  else proWallMsg('pro_buy_error');
+  return r;
+}
+/* «Restaurar compra»: para quien ya pagó en otro aparato o reinstaló.
+   Si la tienda confirma la suscripción, Pro se enciende y el muro se
+   cierra; si no hay nada que restaurar, se dice sin tono de error. */
+async function onProRestore() {
+  const btn = document.getElementById('pro-restore-btn');
+  if (btn) btn.disabled = true;
+  const msg0 = document.getElementById('pro-buy-msg');
+  if (msg0) msg0.hidden = true;
+  let r = null;
+  try { r = await PetoBilling.restore(); } catch (e) { r = { ok: false, reason: 'error' }; }
+  if (r && r.ok) { renderProCard(); hideProPaywall(); return r; }
+  renderProPaywall();
+  if (r && r.reason === 'restore_error') proWallMsg('pro_buy_error');
+  else proWallMsg('pro_restore_none');
   return r;
 }
 
@@ -24393,6 +24502,8 @@ function wireEvents() {
   document.getElementById('btn-pro-open').addEventListener('click', showProPaywall);
   document.getElementById('pro-close').addEventListener('click', hideProPaywall);
   document.getElementById('pro-waitlist-btn').addEventListener('click', onProWaitlist);
+  document.getElementById('pro-buy-btn').addEventListener('click', onProBuy);
+  document.getElementById('pro-restore-btn').addEventListener('click', onProRestore);
   document.getElementById('pro-paywall').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) hideProPaywall(); });
   document.getElementById('btn-org-pro').addEventListener('click', showProPaywall);
   document.getElementById('btn-adv-open').addEventListener('click', onAdvOpen);
@@ -24516,6 +24627,22 @@ function wireEvents() {
     spendExplainOpen = !spendExplainOpen;
     renderSpendToday();
   });
+  /* Compilación 80 (punto 1): el ⓘ de la tarjeta de disponible
+     abre/cierra su ventanita de ayuda SIN navegar a Cuentas: el
+     toque se detiene antes de llegar al botón de la tarjeta. */
+  const tileInfoBtn = document.getElementById('tile-available-info-btn');
+  if (tileInfoBtn) {
+    const toggleTileInfo = (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      const pop = document.getElementById('tile-available-info-pop');
+      if (pop) pop.hidden = !pop.hidden;
+    };
+    tileInfoBtn.addEventListener('click', toggleTileInfo);
+    tileInfoBtn.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') toggleTileInfo(ev);
+    });
+  }
   const cashFormEl = document.getElementById('cash-form');
   if (cashFormEl) cashFormEl.addEventListener('submit', onCashSubmit);
   document.getElementById('btn-biometric').addEventListener('click', tryBiometric);
