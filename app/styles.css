@@ -364,7 +364,7 @@ html[data-theme="oscuro"][data-accent="naranja"]{--accent:#e07f2e;--accent-dark:
    llega hasta ~9.6rem desde abajo), para que el último botón de
    cualquier formulario — p. ej. el «Agregar» del san — siempre se
    pueda desplazar por encima de ellos. Antes solo despejaba el +. */
-#app-shell{padding-bottom:10.5rem}
+#app-shell{padding-bottom:13rem}
 .fab{
   position:fixed;right:1.1rem;bottom:1.1rem;z-index:40;
   width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
@@ -1009,13 +1009,13 @@ select:focus, textarea:focus{
   background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 150%);
   color:#fff;box-shadow:0 6px 14px rgba(6,60,40,.35);
 }
-body.has-bottomnav #app-shell{padding-bottom:calc(10.5rem + 92px)}
+body.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px)}
 body.has-bottomnav .fab{bottom:calc(1.1rem + 92px)}
 body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px)}
 body.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px)}
 /* Compilación 70: con el banner de prueba visible (solo la app,
    nivel gratis), todo sube lo que ocupa el anuncio (50px + aire). */
-body.has-ads.has-bottomnav #app-shell{padding-bottom:calc(10.5rem + 92px + 60px)}
+body.has-ads.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + 60px)}
 body.has-ads.has-bottomnav .fab{bottom:calc(1.1rem + 92px + 60px)}
 body.has-ads.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + 60px)}
 body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px)}
@@ -1326,3 +1326,93 @@ html.plaid-open body{
 .welcome-box{text-align:center}
 .welcome-box .ob-logo{margin:10px auto}
 .welcome-box #ob-start{width:100%}
+
+/* ================= Área segura iOS (isla dinámica y notch) =================
+   SOLO iPhone nativo: app.js pone la clase «ios» en <html> cuando
+   Capacitor dice plataforma iOS; sin esa clase ninguna de estas
+   reglas existe y Android y la web quedan intactos, píxel a píxel.
+   El WebView de iOS dibuja bajo la barra de estado (el HTML ya
+   declara viewport-fit=cover), así que el contenido en flujo se
+   baja con el inset superior y cada elemento fijo suma el inset
+   de su lado. La cápsula de navegación inferior y la barra del
+   visor público ya sumaban el inset inferior sin clase: quedan
+   como están. */
+/* El relleno del body baja TODAS las vistas en flujo (encabezado,
+   bloqueo, bienvenida, visor público…) bajo la isla dinámica. */
+html.ios body{padding-top:env(safe-area-inset-top)}
+html.ios #view-onboarding{min-height:calc(100dvh - env(safe-area-inset-top))}
+html.ios .demo-banner{top:env(safe-area-inset-top)}
+html.ios #ptr-indicator{top:calc(10px + env(safe-area-inset-top))}
+html.ios #san-public-topbar{height:calc(44px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}
+html.ios #san-public.pub-top-on{padding-top:calc(1rem + 44px + env(safe-area-inset-top))}
+html.ios .menu-drawer{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+/* Fijos de abajo: suman el inset de la barra de inicio a su
+   posición de siempre, con la misma escalera de clases que usa
+   la CSS base (has-bottomnav y has-ads). */
+html.ios #app-shell{padding-bottom:calc(13rem + env(safe-area-inset-bottom))}
+html.ios .fab{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
+html.ios .fab-search{bottom:calc(1.1rem + 76px + env(safe-area-inset-bottom))}
+html.ios .undo-toast{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
+html.ios .chooser{padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
+html.ios .podcast-player{bottom:calc(.6rem + env(safe-area-inset-bottom))}
+html.ios .guide-card{bottom:calc(var(--nav-h,64px) + 22px + env(safe-area-inset-bottom))}
+html.ios body.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + env(safe-area-inset-bottom))}
+html.ios body.has-bottomnav .fab{bottom:calc(1.1rem + 92px + env(safe-area-inset-bottom))}
+html.ios body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + env(safe-area-inset-bottom))}
+html.ios body.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + env(safe-area-inset-bottom))}
+html.ios body.has-ads.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + 60px + env(safe-area-inset-bottom))}
+html.ios body.has-ads.has-bottomnav .fab{bottom:calc(1.1rem + 92px + 60px + env(safe-area-inset-bottom))}
+html.ios body.has-ads.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + 60px + env(safe-area-inset-bottom))}
+html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px + env(safe-area-inset-bottom))}
+
+/* ================= Compilación 80 =================
+   Tarjetas de Inicio compactas (la ayuda del disponible vive en
+   una ventanita tras el ⓘ), fila de gasto en columna, parrilla
+   de Presupuesto compacta y respiro inferior mayor (12rem) para
+   que los flotantes nunca tapen el último contenido. */
+.tile-info-btn{
+  position:absolute;top:.3rem;left:.55rem;color:var(--accent-dark);
+  font-size:.95rem;line-height:1;cursor:pointer;
+}
+.tile-info-pop{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:30;
+  width:min(250px,82vw);padding:.6rem .7rem;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:0 8px 22px rgba(0,0,0,.22);
+  font-size:.78rem;font-weight:600;color:var(--accent-dark);
+  text-align:left;line-height:1.35;white-space:normal;
+}
+.item.exp-row{flex-direction:column;align-items:stretch;gap:.35rem}
+.exp-top{display:flex;align-items:baseline;gap:.6rem}
+.exp-title{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-desc{overflow-wrap:break-word}
+.exp-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+.budget-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:720px){.budget-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.budget-grid .bud-card{padding:.55rem .6rem;min-width:0}
+.bud-title{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bud-card .item-sub{font-size:.8rem;line-height:1.3}
+.bud-period{font-size:.72rem}
+
+/* ================= Compilación 81 =================
+   Botones flotantes de cristal («Liquid Glass», pedido de Sterlin):
+   los dos flotantes (la lupa y el +) dejan el verde sólido y pasan
+   a cristal transparente en AMBAS plataformas, sin distinción: el
+   fondo es el tinte verde de la marca translúcido y detrás se ve
+   el contenido desenfocado con el material del sistema
+   (backdrop-filter: desenfoque + saturación), con borde fino claro
+   y sombra suave. Así, al pasar sobre una tarjeta o el pie, el
+   contenido se sigue viendo a través de ellos y dejan de «tapar».
+   Los iconos quedan en blanco con sombra de texto para leerse
+   sobre cualquier fondo. El respiro inferior del shell sube a
+   13rem: al final del scroll, el pie y la última tarjeta quedan
+   completos por encima de los dos flotantes en todos los estados
+   (con/sin barra inferior, con/sin anuncios, iOS y Android). */
+.fab{
+  background:color-mix(in srgb, var(--accent) 55%, transparent);
+  -webkit-backdrop-filter:blur(14px) saturate(1.7);
+  backdrop-filter:blur(14px) saturate(1.7);
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:0 8px 22px rgba(6,60,40,.28), inset 0 1px 0 rgba(255,255,255,.35);
+  text-shadow:0 1px 3px rgba(0,40,24,.5);
+}
