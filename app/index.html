@@ -179,7 +179,8 @@
       <button id="tile-available" class="summary-item" type="button" data-i18n-aria="tile_available_aria" aria-label="Dinero disponible: ir a Mis cuentas">
         <span class="summary-label" id="tile-available-label" data-i18n="tile_available">Dinero disponible</span>
         <span id="sum-available" class="summary-value">$0.00</span>
-        <span id="sum-available-sub" class="summary-sub" hidden></span>
+        <span id="tile-available-info-btn" class="tile-info-btn" role="button" tabindex="0" data-i18n-aria="tile_info_aria" aria-label="¿Qué es este número?" hidden>ⓘ</span>
+        <span id="tile-available-info-pop" class="tile-info-pop" hidden></span>
         <span class="summary-go" aria-hidden="true">›</span>
       </button>
       <button id="tile-savings" class="summary-item" type="button" data-i18n-aria="tile_savings_aria" aria-label="Ahorros del mes: ir a Ahorros">
@@ -1562,10 +1563,18 @@
       <h3 data-i18n="pro_wall_title">Esto es de PETO Pro ⭐</h3>
       <p id="pro-price-line" class="total-line"></p>
       <ul id="pro-benefits" class="item-list"></ul>
-      <p class="muted" data-i18n="pro_coming_text">La compra dentro de la app llega con el lanzamiento en Google Play. Mientras tanto puedes anotarte en la lista de espera: te avisaremos en cuanto puedas activar Pro por $4.99 al mes.</p>
+      <div id="pro-buy-box" hidden>
+        <button id="pro-buy-btn" type="button" class="btn btn-primary btn-big"></button>
+        <p id="pro-buy-terms" class="muted"></p>
+        <p id="pro-buy-msg" class="muted" hidden></p>
+        <button id="pro-restore-btn" type="button" class="btn btn-ghost" data-i18n="pro_restore_btn">Restaurar compra</button>
+      </div>
+      <div id="pro-waitlist-box">
+      <p id="pro-coming-text" class="muted"></p>
       <button id="pro-waitlist-btn" type="button" class="btn btn-primary btn-big" data-i18n="pro_waitlist_btn">Anotarme en la lista de espera</button>
       <a class="btn btn-ghost" href="../precios/">Ver precios y planes de PETO Pro</a>
       <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
+      </div>
       <button id="pro-close" type="button" class="btn btn-ghost" data-i18n="pro_close">Ahora no</button>
     </div>
   </div>
