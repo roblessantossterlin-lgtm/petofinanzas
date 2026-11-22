@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-21",
+  "actualizado": "2026-11-22",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -58,6 +58,20 @@
       "titulo": "La canción de ayudar en casa",
       "archivo": "assets/cancion-2026-11-21-ayudar.mp3",
       "fecha": "2026-11-21"
+    },
+    {
+      "id": "dibujo-2026-11-22-casa",
+      "tipo": "dibujo",
+      "titulo": "Tito y la casa",
+      "archivo": "assets/dibujo-2026-11-22-casa.png",
+      "fecha": "2026-11-22"
+    },
+    {
+      "id": "cancion-2026-11-22-paciencia",
+      "tipo": "cancion",
+      "titulo": "La canción de la paciencia",
+      "archivo": "assets/cancion-2026-11-22-paciencia.mp3",
+      "fecha": "2026-11-22"
     }
   ]
 }
