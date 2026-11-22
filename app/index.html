@@ -42,6 +42,21 @@
   </div>
 </section>
 
+<!-- ============ CHAT CON SU DINERO (IA Pro · Compilación 84) ============
+     Pantalla propia fuera del shell, como la de bloqueo: la
+     conversación vive solo aquí (no se guarda) y la IA responde
+     con el resumen agregado que la app arma en el teléfono. -->
+<section id="view-chat" class="view chat-view" hidden>
+  <button class="btn btn-back" type="button" id="ai-chat-back" data-i18n="back">← Todas las opciones</button>
+  <h2 data-i18n="ai2_chat_title">Pregúntale a tu dinero</h2>
+  <div id="ai-chat-msgs" class="chat-msgs"></div>
+  <p id="ai-chat-status" class="muted small" aria-live="polite"></p>
+  <form id="ai-chat-form" class="chat-form" autocomplete="off">
+    <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
+    <button class="btn btn-primary" type="submit" data-i18n="ai2_chat_send">Preguntar</button>
+  </form>
+</section>
+
 <!-- ============ BIENVENIDA / PRIMER USO ============ -->
 <section id="view-onboarding" class="view" hidden>
   <div class="onboarding-box welcome-box">
@@ -228,6 +243,27 @@
     <section id="home-panel-efund" class="card"></section>
     <section id="home-panel-top" class="card"></section>
     <section id="home-panel-flow" class="card"></section>
+
+    <!-- Compilación 84 · IA Pro (Fase 2) en Inicio: la entrada al
+         chat y las tarjetas de resumen semanal y alerta de flujo.
+         Sus cuerpos los pintan renderAiWeeklyCard/renderAiFlowCard. -->
+    <section id="ai2-chat-card" class="card">
+      <h3 data-i18n="ai2_chat_card_title">💬 Chat con tu dinero</h3>
+      <p class="muted" data-i18n="ai2_chat_card_text">Pregunta en palabras simples y la IA responde con tus números: gastos por categoría, ahorro, presupuesto y tus últimos movimientos.</p>
+      <div class="form-actions">
+        <button id="ai2-chat-open" class="btn btn-primary" type="button" data-i18n="ai2_chat_open">Abrir el chat</button>
+      </div>
+    </section>
+
+    <section id="ai2-weekly-card" class="card">
+      <h3 data-i18n="ai2_week_title">🗓️ Tu semana en dinero</h3>
+      <div id="ai2-weekly-body"></div>
+    </section>
+
+    <section id="ai2-flow-card" class="card">
+      <h3 data-i18n="ai2_flow_title">🔔 Alerta de flujo</h3>
+      <div id="ai2-flow-body"></div>
+    </section>
 
     <div id="home-streak" class="streak-pill" hidden></div>
 
