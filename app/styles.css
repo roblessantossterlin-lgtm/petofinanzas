@@ -1416,3 +1416,10 @@ html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px
   box-shadow:0 8px 22px rgba(6,60,40,.28), inset 0 1px 0 rgba(255,255,255,.35);
   text-shadow:0 1px 3px rgba(0,40,24,.5);
 }
+
+/* ================= Compilación 83 =================
+   IA Pro (Fase 1): la caja de la sugerencia de categoría en
+   la lista de gastos y el respiro del formulario de texto. */
+.ai-suggest-box{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.35rem}
+.ai-suggest-box:empty{display:none}
+#ai-text-form{margin-bottom:1rem}

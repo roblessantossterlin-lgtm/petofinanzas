@@ -258,6 +258,16 @@
     </div>
     <p class="total-line"><span data-i18n="exp_total_label">Total del mes:</span> <strong id="exp-total">$0.00</strong></p>
 
+    <form id="ai-text-form" class="card form-card" autocomplete="off">
+      <h3 data-i18n="ai_text_label">Registrar con IA (Pro)</h3>
+      <label for="ai-text-input" data-i18n="ai_text_help">Escribe el gasto como lo dirías y la IA llena el formulario de abajo: tú lo revisas y lo guardas.</label>
+      <input id="ai-text-input" type="text" maxlength="200" data-i18n-ph="ai_text_ph" placeholder="Ej.: gasté 20 en gasolina ayer">
+      <p id="ai-text-status" class="muted small" aria-live="polite"></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-secondary" data-i18n="ai_text_btn">Crear gasto</button>
+      </div>
+    </form>
+
     <form id="expense-form" class="card form-card" autocomplete="off">
       <h3 id="expense-form-title">Nuevo gasto</h3>
       <input type="hidden" id="exp-id">
@@ -266,8 +276,11 @@
       <div class="form-actions">
         <button id="exp-voice" type="button" class="btn btn-secondary" data-i18n="voice_btn">Dictar</button>
         <button id="exp-ocr" type="button" class="btn btn-secondary" data-i18n="ocr_btn">Foto de recibo</button>
+        <button id="exp-ai-receipt" type="button" class="btn btn-secondary" data-i18n="ai_receipt_btn">✨ Recibo con IA</button>
       </div>
       <p class="muted small" data-i18n="ocr_help">La foto se lee aquí, en tu teléfono: nada se sube a internet. Relleno el monto, la fecha y el comercio; tú lo revisas antes de guardar.</p>
+      <p class="muted small" data-i18n="ai_help">Con IA (Pro) la foto viaja segura a nuestro servidor de IA y regresa con monto, fecha, comercio y categoría. Tú revisas todo antes de guardar.</p>
+      <input id="exp-ai-photo" type="file" accept="image/*" hidden>
       <p id="exp-voice-status" class="muted small" aria-live="polite"></p>
       <label for="exp-category" data-i18n="category_label">Categoría</label>
       <select id="exp-category" required></select>
