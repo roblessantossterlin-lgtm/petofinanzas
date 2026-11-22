@@ -385,6 +385,15 @@ body.fabs-off .fab{display:none}
 .chooser-card{
   background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:1rem;width:100%;max-width:480px;display:flex;flex-direction:column;gap:.6rem;
+  /* Compilación 84: una hoja modal ALTA (el muro de pago con su
+     lista de beneficios) no puede desbordarse por arriba del
+     contenedor: como .chooser ancla abajo (flex-end), la tarjeta
+     crecía hasta meterse bajo la barra de estado (captura de
+     Sterlin en iPhone: «Only $4.99 a month» montado con la hora
+     y la batería). Altura máxima = la del contenedor (que en iOS
+     ya descuenta los insets seguros) y scroll INTERNO si no cabe.
+     Cuando el contenido cabe, nada cambia en ninguna plataforma. */
+  max-height:100%;overflow-y:auto;
 }
 .chooser-card h3{margin:.2rem 0 .4rem;text-align:center}
 
@@ -1353,7 +1362,8 @@ html.ios #app-shell{padding-bottom:calc(13rem + env(safe-area-inset-bottom))}
 html.ios .fab{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
 html.ios .fab-search{bottom:calc(1.1rem + 76px + env(safe-area-inset-bottom))}
 html.ios .undo-toast{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
-html.ios .chooser{padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
+html.ios .chooser{padding-top:calc(1rem + env(safe-area-inset-top));padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
+html.ios .photo-overlay{padding-top:calc(1rem + env(safe-area-inset-top));padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
 html.ios .podcast-player{bottom:calc(.6rem + env(safe-area-inset-bottom))}
 html.ios .guide-card{bottom:calc(var(--nav-h,64px) + 22px + env(safe-area-inset-bottom))}
 html.ios body.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + env(safe-area-inset-bottom))}
@@ -1423,3 +1433,25 @@ html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px
 .ai-suggest-box{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.35rem}
 .ai-suggest-box:empty{display:none}
 #ai-text-form{margin-bottom:1rem}
+
+/* ================= Compilación 84 · IA Pro (Fase 2) =================
+   El chat con su dinero (pantalla propia: la zona de mensajes
+   ocupa el alto y el formulario queda pegado abajo), las
+   etiquetas del detector de suscripciones y las líneas de las
+   tarjetas de Inicio (resumen semanal y alerta de flujo). */
+.chat-view{display:flex;flex-direction:column;height:100dvh}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem;padding:.5rem 0}
+.chat-row{display:flex}
+.chat-row.user{justify-content:flex-end}
+.chat-bubble{max-width:85%;padding:.6rem .8rem;border-radius:var(--radius);background:var(--card);border:1px solid var(--line);white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-row.user .chat-bubble{background:var(--accent-soft);border-color:var(--accent-soft)}
+.chat-form{display:flex;gap:.5rem;align-items:center}
+.chat-form input{flex:1}
+.ai-tag{flex:none;align-self:center;font-size:.78rem;font-weight:600;padding:.2rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.ai-tag-subscription{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent-soft)}
+.ai-tag-maybe{background:var(--amber-soft);color:var(--amber);border-color:var(--amber-soft)}
+.ai-subs-h{margin:.9rem 0 .3rem}
+.ai-week-line{margin:.3rem 0}
+.ai-flow-warn{color:var(--danger);font-weight:600}
+.ai-flow-ok{color:var(--accent-dark);font-weight:600}
+#ai-subs-box:empty{display:none}
