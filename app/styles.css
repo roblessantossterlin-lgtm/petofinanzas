@@ -1608,3 +1608,10 @@ html.ios body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px +
 body.chat-open{overflow:hidden}
 .perms-view{position:fixed;inset:0;height:auto;width:100%;z-index:45;overscroll-behavior:none}
 .perms-body{min-height:0}
+
+/* Compilación 87 · PETO-C87-HOME — «Inicio en orden»: las tarjetas
+   que se reducen a una fila (fondo de emergencia sin meta ni saldo,
+   y la alerta de flujo cuando todo va bien) pierden el cuerpo de
+   tarjeta grande y quedan como una línea compacta accionable. */
+.home87-compact{padding-top:.55rem;padding-bottom:.55rem}
+.home87-efund-row{width:100%;text-align:left;font-weight:600}

@@ -246,33 +246,9 @@
 
     <section id="home-today" class="card"></section>
 
-    <section id="home-panel-vs" class="card"></section>
-    <section id="home-panel-efund" class="card"></section>
-    <section id="home-panel-top" class="card"></section>
-    <section id="home-panel-flow" class="card"></section>
-
-    <!-- Compilación 84 · IA Pro (Fase 2) en Inicio: las tarjetas de
-         resumen semanal y alerta de flujo (sus cuerpos los pintan
-         renderAiWeeklyCard/renderAiFlowCard). Compilación 85
-         (cambio 4): la tarjeta «Chat con tu dinero» se eliminó de
-         Inicio — el chat vive en el botón flotante único. -->
-
-    <section id="ai2-weekly-card" class="card">
-      <h3 data-i18n="ai2_week_title">🗓️ Tu semana en dinero</h3>
-      <div id="ai2-weekly-body"></div>
-    </section>
-
-    <section id="ai2-flow-card" class="card">
-      <h3 data-i18n="ai2_flow_title">🔔 Alerta de flujo</h3>
-      <div id="ai2-flow-body"></div>
-    </section>
-
-    <div id="home-streak" class="streak-pill" hidden></div>
-
-    <div id="home-podcast" class="menu-group" hidden></div>
-
-    <div id="home-san" class="menu-group" hidden></div>
-
+    <!-- Compilación 87 (punto 1): LA tarjeta de categorías de Inicio
+         (dona + top 3), en su sitio del orden fijo: tras el
+         presupuesto del mes y antes de la alerta de flujo. -->
     <section id="home-chart" class="card chart-card">
       <h3 class="chart-title" data-i18n="chart_title">En qué se va tu dinero</h3>
       <div class="chart-flex">
@@ -283,6 +259,34 @@
         </div>
       </div>
     </section>
+
+
+    <!-- Compilación 84 · IA Pro (Fase 2) en Inicio: las tarjetas de
+         resumen semanal y alerta de flujo (sus cuerpos los pintan
+         renderAiWeeklyCard/renderAiFlowCard). Compilación 85
+         (cambio 4): la tarjeta «Chat con tu dinero» se eliminó de
+         Inicio — el chat vive en el botón flotante único. -->
+
+    <section id="ai2-flow-card" class="card">
+      <h3 data-i18n="ai2_flow_title">🔔 Alerta de flujo</h3>
+      <div id="ai2-flow-body"></div>
+    </section>
+
+    <section id="ai2-weekly-card" class="card">
+      <h3 data-i18n="ai2_week_title">🗓️ Tu semana en dinero</h3>
+      <div id="ai2-weekly-body"></div>
+    </section>
+
+    <section id="home-panel-vs" class="card"></section>
+    <section id="home-panel-efund" class="card"></section>
+    <section id="home-panel-flow" class="card"></section>
+
+    <div id="home-streak" class="streak-pill" hidden></div>
+
+    <div id="home-podcast" class="menu-group" hidden></div>
+
+    <div id="home-san" class="menu-group" hidden></div>
+
   </main>
 
   <!-- ======= GASTOS ======= -->
@@ -1651,6 +1655,16 @@
   </footer>
 </section>
 <!-- Compilación 86 · Añadido 10: explicación cuando un permiso está denegado. -->
+<!-- Compilación 87 (punto 4): la «semana en dinero» completa vive
+     aquí, en su propia vista; en Inicio solo van 2 líneas + Ver más. -->
+<div id="home87-week-modal" class="chooser" hidden role="dialog" aria-modal="true">
+  <div class="chooser-card">
+    <h3 data-i18n="ai2_week_title">🗓️ Tu semana en dinero</h3>
+    <div id="home87-week-body"></div>
+    <button type="button" id="home87-week-refresh" class="btn primary" data-i18n="ai2_week_regen">Actualizar</button>
+    <button type="button" id="home87-week-close" class="btn" data-i18n="photo_close">Cerrar</button>
+  </div>
+</div>
 <div id="perm-explain-modal" class="chooser" hidden role="dialog" aria-modal="true">
   <div class="chooser-card">
     <h3 id="perm-explain-title"></h3>
