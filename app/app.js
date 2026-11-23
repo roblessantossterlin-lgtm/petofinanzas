@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 91';
-const BUILD_NUM = 91;
+const BUILD_LABEL = 'Compilación 92';
+const BUILD_NUM = 92;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1192,7 +1192,7 @@ function bizModeOn() {
    aunque su fila no se vea, y el guardado la lee igual). */
 function applyBizModeUI() {
   const on = bizModeOn();
-  for (const id of ['exp-biz-row', 'inc-biz-row', 'split-negocio-label', 'split-negocio']) {
+  for (const id of ['exp-biz-row', 'inc-biz-row', 'split-negocio-label', 'split-negocio', 'split-negocio-row92']) {
     const n = document.getElementById(id);
     if (n) n.hidden = !on;
   }
@@ -1359,6 +1359,9 @@ es: {
   c90_unassigned_noincome: 'Tienes {amount} en límites, pero sin un ingreso anotado este mes no se puede saber cuánto falta por asignar.',
   c91_share_title: 'Compartir',
   c91_flow_payday: 'Próximo cobro: {date}',
+  c92_pin_row: 'Cambiar PIN',
+  c92_backup_row: 'Copias de seguridad',
+  c92_split_total: 'Total: {total}%',
   pro_open_adv: 'Abrir el informe avanzado',
   pro_open_org: 'Abrir el modo organizador de san',
   pin_err_mismatch: 'Los PIN no coinciden.',
@@ -1991,6 +1994,9 @@ en: {
   c90_unassigned_noincome: 'You have {amount} in limits, but with no income recorded this month there is no way to know what is left to assign.',
   c91_share_title: 'Share',
   c91_flow_payday: 'Next payday: {date}',
+  c92_pin_row: 'Change PIN',
+  c92_backup_row: 'Backups',
+  c92_split_total: 'Total: {total}%',
   pro_open_adv: 'Open the advanced report',
   pro_open_org: 'Open the san organizer mode',
   pin_err_mismatch: 'The PINs do not match.',
@@ -2623,6 +2629,9 @@ it: {
   c90_unassigned_noincome: 'Hai {amount} di limiti, ma senza un reddito registrato questo mese non si può sapere quanto manca da assegnare.',
   c91_share_title: 'Condividi',
   c91_flow_payday: 'Prossima paga: {date}',
+  c92_pin_row: 'Cambia PIN',
+  c92_backup_row: 'Copie di sicurezza',
+  c92_split_total: 'Totale: {total}%',
   pro_open_adv: 'Apri il rapporto avanzato',
   pro_open_org: 'Apri la modalità organizzatore di san',
   pin_err_mismatch: 'I PIN non coincidono.',
@@ -3498,6 +3507,9 @@ pt: {
   c90_unassigned_noincome: 'Você tem {amount} em limites, mas sem uma renda registrada neste mês não dá para saber quanto falta atribuir.',
   c91_share_title: 'Compartilhar',
   c91_flow_payday: 'Próximo pagamento: {date}',
+  c92_pin_row: 'Alterar PIN',
+  c92_backup_row: 'Cópias de segurança',
+  c92_split_total: 'Total: {total}%',
   pro_open_adv: 'Abrir o relatório avançado',
   pro_open_org: 'Abrir o modo organizador de san',
   pin_err_mismatch: 'Os PIN não coincidem.',
@@ -4373,6 +4385,9 @@ fr: {
   c90_unassigned_noincome: 'Vous avez {amount} de limites, mais sans revenu enregistré ce mois-ci, impossible de savoir ce qu’il reste à attribuer.',
   c91_share_title: 'Partager',
   c91_flow_payday: 'Prochaine paie : {date}',
+  c92_pin_row: 'Changer le code PIN',
+  c92_backup_row: 'Sauvegardes',
+  c92_split_total: 'Total : {total}%',
   pro_open_adv: 'Ouvrir le rapport avancé',
   pro_open_org: 'Ouvrir le mode organisateur de san',
   pin_err_mismatch: 'Les PIN ne correspondent pas.',
@@ -5248,6 +5263,9 @@ de: {
   c90_unassigned_noincome: 'Du hast {amount} an Limits, aber ohne ein in diesem Monat erfasstes Einkommen lässt sich nicht sagen, was noch zuzuweisen ist.',
   c91_share_title: 'Teilen',
   c91_flow_payday: 'Nächster Zahltag: {date}',
+  c92_pin_row: 'PIN ändern',
+  c92_backup_row: 'Sicherungen',
+  c92_split_total: 'Gesamt: {total}%',
   pro_open_adv: 'Erweiterten Bericht öffnen',
   pro_open_org: 'San-Organizer-Modus öffnen',
   pin_err_mismatch: 'Die PINs stimmen nicht überein.',
@@ -6123,6 +6141,9 @@ zh: {
   c90_unassigned_noincome: '你已设置 {amount} 的限额，但本月没有记录收入，无法知道还剩多少未分配。',
   c91_share_title: '分享',
   c91_flow_payday: '下一次发薪日：{date}',
+  c92_pin_row: '更改 PIN',
+  c92_backup_row: '备份',
+  c92_split_total: '总计：{total}%',
   pro_open_adv: '打开高级报告',
   pro_open_org: '打开 san 组织模式',
   pin_err_mismatch: 'PIN 不一致。',
@@ -6998,6 +7019,9 @@ ja: {
   c90_unassigned_noincome: '上限は {amount} ありますが、今月の収入が記録されていないため、あといくら割り当てられるか分かりません。',
   c91_share_title: '共有',
   c91_flow_payday: '次回の給料日：{date}',
+  c92_pin_row: 'PINを変更',
+  c92_backup_row: 'バックアップ',
+  c92_split_total: '合計：{total}%',
   pro_open_adv: '高度なレポートを開く',
   pro_open_org: 'san オーガナイザーモードを開く',
   pin_err_mismatch: 'PINが一致しません。',
@@ -7873,6 +7897,9 @@ ko: {
   c90_unassigned_noincome: '한도가 {amount} 있지만 이번 달 수입이 기록되지 않아 얼마를 더 배정할 수 있는지 알 수 없습니다.',
   c91_share_title: '공유',
   c91_flow_payday: '다음 급여일: {date}',
+  c92_pin_row: 'PIN 변경',
+  c92_backup_row: '백업',
+  c92_split_total: '합계: {total}%',
   pro_open_adv: '고급 보고서 열기',
   pro_open_org: 'san 정리 모드 열기',
   pin_err_mismatch: 'PIN이 일치하지 않습니다.',
@@ -8748,6 +8775,9 @@ ru: {
   c90_unassigned_noincome: 'У вас {amount} в лимитах, но без дохода, записанного в этом месяце, нельзя узнать, сколько осталось распределить.',
   c91_share_title: 'Поделиться',
   c91_flow_payday: 'Следующая зарплата: {date}',
+  c92_pin_row: 'Сменить PIN',
+  c92_backup_row: 'Резервные копии',
+  c92_split_total: 'Итого: {total}%',
   pro_open_adv: 'Открыть расширенный отчёт',
   pro_open_org: 'Открыть режим организатора san',
   pin_err_mismatch: 'PIN не совпадают.',
@@ -9623,6 +9653,9 @@ hi: {
   c90_unassigned_noincome: 'आपकी सीमाएँ {amount} हैं, लेकिन इस महीने कोई आय दर्ज न होने से यह पता नहीं चलता कि कितना आवंटित करना बाकी है।',
   c91_share_title: 'साझा करें',
   c91_flow_payday: 'अगली तनख्वाह: {date}',
+  c92_pin_row: 'PIN बदलें',
+  c92_backup_row: 'बैकअप',
+  c92_split_total: 'कुल: {total}%',
   pro_open_adv: 'उन्नत रिपोर्ट खोलें',
   pro_open_org: 'san आयोजक मोड खोलें',
   pin_err_mismatch: 'PIN मेल नहीं खाते।',
@@ -10498,6 +10531,9 @@ ar: {
   c90_unassigned_noincome: 'لديك {amount} من الحدود، لكن دون دخل مسجل هذا الشهر لا يمكن معرفة كم يتبقى للتخصيص.',
   c91_share_title: 'مشاركة',
   c91_flow_payday: 'يوم القبض التالي: {date}',
+  c92_pin_row: 'تغيير الرقم السري',
+  c92_backup_row: 'النسخ الاحتياطية',
+  c92_split_total: 'المجموع: {total}%',
   pro_open_adv: 'فتح التقرير المتقدم',
   pro_open_org: 'فتح وضع منظم san',
   pin_err_mismatch: 'رمزا PIN غير متطابقين.',
@@ -18378,6 +18414,56 @@ function toggleSetAcc(key) {
   save();
   applySetAcc();
 }
+/* Compilación 92 (puntos 1 y 2): el ÍNDICE de Ajustes — siete
+   filas en una tarjeta sobre las secciones. Tocar una fila ABRE
+   su sección y CIERRA las demás (acordeón real) y la trae a la
+   vista; tocar la de la sección ya abierta la cierra. Las
+   cabeceras de las tarjetas siguen abriendo/cerrando como
+   siempre (toggleSetAcc) y los saltos desde otra pantalla
+   (openSetAccCard) no cambian. Personalización vive en su propio
+   cuerpo (sections-body) y obedece la misma regla. */
+const SET92_INDEX_KEYS = ['profile', 'bank', 'pro', 'split', 'security', 'news'];
+function set92ScrollTo(node) {
+  if (node && typeof node.scrollIntoView === 'function') {
+    try { node.scrollIntoView({ block: 'start' }); } catch (e) { /* sin scroll */ }
+  }
+}
+function set92SectionsOpen(open) {
+  const head = document.getElementById('sections-toggle');
+  const body = document.getElementById('sections-body');
+  if (!head || !body) return;
+  body.hidden = !open;
+  head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const chevron = head.querySelector('.sections-chevron');
+  if (chevron) chevron.textContent = open ? '▾' : '▸';
+}
+function set92IndexGo(key) {
+  if (key === 'sections') {
+    const body = document.getElementById('sections-body');
+    const willOpen = !body || body.hidden;
+    const st = setAccState();
+    for (const k of SET92_INDEX_KEYS) st[k] = false;
+    applySetAcc();
+    set92SectionsOpen(willOpen);
+    if (willOpen) set92ScrollTo(document.getElementById('sections-toggle'));
+    return;
+  }
+  const st = setAccState();
+  const willOpen = st[key] !== true;
+  for (const k of SET92_INDEX_KEYS) st[k] = false;
+  st[key] = willOpen;
+  if (db && db.settings) {
+    if (!db.settings.setAcc) {
+      db.settings.setAcc = { profile: null, split: null, cloud: null, shared: null, security: null, data: null, bank: null, pro: null, privacy: null, rules: null, news: null };
+    }
+    for (const k of SET92_INDEX_KEYS) db.settings.setAcc[k] = st[k];
+    db.settings.setAcc[key] = willOpen;
+    save();
+  }
+  set92SectionsOpen(false);
+  applySetAcc();
+  if (willOpen) set92ScrollTo(document.getElementById('setacc-' + key + '-head'));
+}
 /* Los resúmenes cortos de las cabeceras: nombre en el perfil,
    el reparto vigente (el efectivo, no el editado a medias) en
    la tarjeta del reparto, el hogar o «Sin hogar», «PIN activo»
@@ -18562,6 +18648,10 @@ function updateSplitSumNote() {
   const sp = readSplitInputs() || db.settings.split;
   const total = splitSum(sp);
   showError('set-error', total !== 100 ? t('set_err_sum', { total: total }) : '');
+  /* Compilación 92 (punto 6): la suma EN VIVO, siempre visible al
+     pie de las filas compactas del reparto (sume o no sume 100). */
+  const sumEl92 = document.getElementById('split-sum92');
+  if (sumEl92) sumEl92.textContent = t('c92_split_total', { total: total });
   /* Compilación 56: la cabecera de la tarjeta del reparto
      refleja el reparto vigente (el efectivo) al momento. */
   updateSetAccSummaries();
@@ -22788,6 +22878,18 @@ function renderBankCard() {
     const sandP = document.getElementById('bank-sandbox-p');
     if (sandP) sandP.hidden = true;
   }
+  /* Compilación 92 (punto 4): el texto completo de Plaid solo
+     se ve cuando NO hay banco conectado; con banco conectado la
+     tarjeta va al grano y manda la lista de conexiones (el
+     nombre ya va en el resumen de la cabecera). En el caso
+     «llega pronto» (soon) los párrafos ya quedaron ocultos. */
+  if (!soon) {
+    const conns92 = bankStoredConns();
+    const helpP92 = document.getElementById('bank-help-p');
+    if (helpP92) helpP92.hidden = conns92.length > 0;
+    const sandP92 = document.getElementById('bank-sandbox-p');
+    if (sandP92) sandP92.hidden = conns92.length > 0;
+  }
   /* Compilación 56: la cabecera de la tarjeta del banco (nombre
      del banco o «Sin conectar») se refresca con cada pintado,
      también con el cuerpo retraído. */
@@ -26347,7 +26449,11 @@ function wireEvents() {
   document.getElementById('ob-signin-panel').addEventListener('submit', onObSignIn);
   document.getElementById('ob-signin-back').addEventListener('click', closeObSignIn);
   document.getElementById('ob-signin-forgot').addEventListener('click', onObForgot);
-  document.getElementById('set-demo-btn').addEventListener('click', enterDemo);
+  /* Compilación 92 (punto 9): la demo ya no vive en Ajustes
+     (su botón salió de «Tus datos»); la entrada queda en la
+     bienvenida (ob-demo-btn, cableada arriba). */
+  const setDemoBtn92 = document.getElementById('set-demo-btn');
+  if (setDemoBtn92) setDemoBtn92.addEventListener('click', enterDemo);
   document.getElementById('demo-exit').addEventListener('click', exitDemo);
 
   /* Foto de recibo: elegir, quitar y ver en grande. El botón visible
@@ -26517,6 +26623,29 @@ function wireEvents() {
      de cuenta de Inicio, y el vaivén de campos del cobro. */
   const exitBtn = document.getElementById('btn-exit-app');
   if (exitBtn) exitBtn.addEventListener('click', () => { exitToWelcome(); });
+  /* Compilación 92: las filas del ÍNDICE de Ajustes (puntos 1 y
+     2) y las filas de navegación «Cambiar PIN ›» (punto 7) y
+     «Copias de seguridad ›» (punto 8), que abren/cierran su
+     bloque sin tocar los ids de dentro. */
+  document.querySelectorAll('#set92-index [data-acc92]').forEach((row92) => {
+    row92.addEventListener('click', () => set92IndexGo(row92.getAttribute('data-acc92')));
+  });
+  const pinRow92 = document.getElementById('set92-pin-row');
+  if (pinRow92) pinRow92.addEventListener('click', () => {
+    const form = document.getElementById('pin-form');
+    if (!form) return;
+    const open = form.hidden;
+    form.hidden = !open;
+    pinRow92.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  const backupRow92 = document.getElementById('set92-backup-row');
+  if (backupRow92) backupRow92.addEventListener('click', () => {
+    const body = document.getElementById('set92-backup-body');
+    if (!body) return;
+    const open = body.hidden;
+    body.hidden = !open;
+    backupRow92.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
   const proAdv = document.getElementById('btn-pro-adv');
   if (proAdv) proAdv.addEventListener('click', () => { goProAdv(); });
   const proOrg = document.getElementById('btn-pro-org');

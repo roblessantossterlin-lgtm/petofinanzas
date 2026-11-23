@@ -1138,6 +1138,21 @@
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_ajustes">Ajustes y personalización</h2>
 
+    <!-- Compilación 92 (puntos 1 y 2): ÍNDICE de las 7 secciones —
+         una sola tarjeta con filas de una línea, visible sin
+         scroll. Cada fila abre/cierra su sección (acordeón real:
+         al abrir una se cierran las demás) y la trae a la vista.
+         Las cabeceras de siempre siguen funcionando igual. -->
+    <nav class="card set92-index" id="set92-index" aria-label="Ajustes">
+      <button type="button" class="set92-index-row" data-acc92="profile"><span data-i18n="set_group_account">Cuenta</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="bank"><span>🏦 <span data-i18n="bank_title">Conexión bancaria</span></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="pro"><span>⭐ <span data-i18n="pro_title">PETO Pro</span></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="split"><span data-i18n="set_group_rules">Reglas de tu dinero</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="security"><span data-i18n="set_group_security">Seguridad y privacidad</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="sections"><span data-i18n="set_group_personalization">Personalización</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="news"><span data-i18n="set_news_title">Novedades</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+    </nav>
+
     <!-- Compilación 75: Ajustes en OCHO tarjetas, por importancia:
          1 Cuenta (perfil + cuenta en la nube), 2 Conexión bancaria,
          3 PETO Pro, 4 Presupuesto compartido, 5 Reglas de tu dinero
@@ -1202,28 +1217,28 @@
         <span data-i18n="set_notif_label">Notificaciones con la app cerrada</span>
         <input type="checkbox" id="set-notifications">
       </label>
-      <p class="muted small" data-i18n="set_notif_help">Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO Finanzas esté cerrada.</p>
+      <p class="muted small set92-oneline" data-i18n="set_notif_help">Avisos de tus pagos fijos un día antes y el mismo día, aunque PETO Finanzas esté cerrada.</p>
       <label class="toggle-row">
         <span data-i18n="set_autofixed_label">Registrar pagos fijos automáticamente</span>
         <input type="checkbox" id="set-autofixed">
       </label>
-      <p class="muted small" data-i18n="set_autofixed_help">Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.</p>
+      <p class="muted small set92-oneline" data-i18n="set_autofixed_help">Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.</p>
 
       <h3 data-i18n="summary_title">Resumen diario</h3>
-      <p class="muted small" data-i18n="summary_help">Un aviso con lo que gastaste ayer y lo que puedes gastar hoy, a la hora que elijas.</p>
+      <p class="muted small set92-oneline" data-i18n="summary_help">Un aviso con lo que gastaste ayer y lo que puedes gastar hoy, a la hora que elijas.</p>
       <label class="toggle-row"><span data-i18n="summary_notif_label">Resumen por notificación</span><input type="checkbox" id="set-summary"></label>
       <label for="set-summary-time" data-i18n="summary_time_label">Hora del resumen</label>
       <input id="set-summary-time" type="time">
       <div id="summary-email-row" hidden>
         <label class="toggle-row"><span data-i18n="summary_email_label">Recibir también por correo</span><input type="checkbox" id="set-summary-email"></label>
-        <p class="muted small" data-i18n="summary_email_help">Solo con tu cuenta en la nube activa: el mismo resumen llega también a tu correo.</p>
+        <p class="muted small set92-oneline" data-i18n="summary_email_help">Solo con tu cuenta en la nube activa: el mismo resumen llega también a tu correo.</p>
       </div>
 
       <label class="toggle-row">
-        <span><span data-i18n="set_biz_label">Tengo un negocio</span><br>
-        <span class="muted small" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</span></span>
+        <span data-i18n="set_biz_label">Tengo un negocio</span>
         <input type="checkbox" id="set-biz">
       </label>
+      <p class="muted small set92-oneline" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</p>
 
       
       <section class="card form-card setacc-nested" id="settings-cloud">
@@ -1233,7 +1248,7 @@
               <span class="sections-chevron" aria-hidden="true">▸</span>
             </div>
             <div id="setacc-cloud-body" hidden>
-            <p class="muted small" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
+            <p class="muted small set92-oneline" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
             <div id="cloud-signedout">
               <label for="cloud-email" data-i18n="cloud_email">Correo electrónico</label>
               <input id="cloud-email" type="email" autocomplete="email" maxlength="120">
@@ -1297,7 +1312,7 @@
       </div>
       <div id="bank-wipe-wrap" hidden>
         <hr>
-        <p class="muted small" data-i18n="bank_wipe_help">Borra solo los movimientos que entraron con la sincronización del banco. Tus movimientos anotados a mano no se tocan.</p>
+        <p class="muted small set92-oneline" data-i18n="bank_wipe_help">Borra solo los movimientos que entraron con la sincronización del banco. Tus movimientos anotados a mano no se tocan.</p>
         <div class="form-actions">
           <button id="btn-bank-wipe" type="button" class="btn btn-danger" data-i18n="bank_wipe_btn">🗑️ Borrar movimientos importados</button>
         </div>
@@ -1315,19 +1330,18 @@
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
       <div id="setacc-pro-body" hidden>
-      <p class="muted small" data-i18n="pro_card_text">La nube sin límites, el informe avanzado, el presupuesto compartido y el modo organizador de san.</p>
-      <p id="pro-status" class="total-line"></p>
-      <div class="form-actions">
-        <button id="btn-pro-open" type="button" class="btn btn-secondary" data-i18n="pro_btn_see">Ver PETO Pro</button>
-      </div>
-      <div class="form-actions">
-        <button id="btn-pro-cancel" type="button" class="btn btn-ghost" data-i18n="ai4_cancel_btn" hidden>Cancelar Pro</button>
+      <!-- Compilación 92 (punto 5): Pro en Ajustes se reduce a UNA
+           fila pequeña: el estado y Cancelar (o «Ver PETO Pro» sin
+           Pro). Fuera el texto largo y los botones del informe
+           avanzado y del organizador de san: viven en sus vistas.
+           Los enlaces de cancelación por plataforma de la
+           Compilación 86 se conservan tal cual. -->
+      <div class="pro-row92">
+        <p id="pro-status" class="pro-status92"></p>
+        <button id="btn-pro-open" type="button" class="btn btn-secondary btn-small" data-i18n="pro_btn_see">Ver PETO Pro</button>
+        <button id="btn-pro-cancel" type="button" class="btn btn-ghost btn-small" data-i18n="ai4_cancel_btn" hidden>Cancelar Pro</button>
       </div>
       <p id="pro-cancel-note" class="muted small" hidden></p>
-      <div class="form-actions">
-        <button id="btn-pro-adv" type="button" class="btn btn-ghost" data-i18n="pro_open_adv">Abrir el informe avanzado</button>
-        <button id="btn-pro-org" type="button" class="btn btn-ghost" data-i18n="pro_open_org">Abrir el modo organizador de san</button>
-      </div>
     <section class="card form-card" id="shared-card">
       <div class="sections-head" id="setacc-shared-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-shared-body">
         <h3 data-i18n="shared_title">Presupuesto compartido</h3>
@@ -1335,7 +1349,7 @@
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
       <div id="setacc-shared-body" hidden>
-      <p class="muted small" id="shared-note" data-i18n="shared_preview_note">🔧 Vista previa del diseño: todavía no se conecta con otras cuentas. Sirve para probar cómo se verá crear un hogar, unirse con un código y ver los miembros.</p>
+      <p class="muted small set92-oneline" id="shared-note" data-i18n="shared_preview_note">🔧 Vista previa del diseño: todavía no se conecta con otras cuentas. Sirve para probar cómo se verá crear un hogar, unirse con un código y ver los miembros.</p>
       <div id="shared-none">
         <label for="shared-name" data-i18n="shared_create_label">Nombre del hogar</label>
         <input id="shared-name" type="text" maxlength="60">
@@ -1377,15 +1391,29 @@
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
       <div id="setacc-split-body" hidden>
-      <p class="muted small" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
-      <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
-      <input id="split-ahorro" type="number" min="0" max="100" step="1">
-      <label for="split-negocio" id="split-negocio-label" data-i18n="split_negocio">Negocio</label>
-      <input id="split-negocio" type="number" min="0" max="100" step="1">
-      <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
-      <input id="split-gastos" type="number" min="0" max="100" step="1">
-      <label for="split-familia" data-i18n="split_familia">Familia</label>
-      <input id="split-familia" type="number" min="0" max="100" step="1">
+      <p class="muted small set92-oneline" data-i18n="set_split_help">Los cuatro números deben sumar 100. Estos porcentajes son solo una sugerencia de cómo repartir tu ingreso: el ahorro nunca se guarda solo, siempre anotas tú cuánto ahorraste de verdad en cada ingreso.</p>
+      <!-- Compilación 92 (punto 6): las reglas de dinero en
+           filas compactas (nombre a la izquierda, % a la derecha)
+           con la SUMA EN VIVO al pie. La regla de la casa no
+           cambia: el reparto es una sugerencia que escribe la
+           persona; el ahorro nunca se aplica solo. -->
+      <div class="split-row92">
+        <label for="split-ahorro" data-i18n="split_ahorro">Ahorro</label>
+        <span class="split-in92"><input id="split-ahorro" type="number" min="0" max="100" step="1"><span aria-hidden="true">%</span></span>
+      </div>
+      <div class="split-row92" id="split-negocio-row92">
+        <label for="split-negocio" id="split-negocio-label" data-i18n="split_negocio">Negocio</label>
+        <span class="split-in92"><input id="split-negocio" type="number" min="0" max="100" step="1"><span aria-hidden="true">%</span></span>
+      </div>
+      <div class="split-row92">
+        <label for="split-gastos" data-i18n="split_gastos">Gastos</label>
+        <span class="split-in92"><input id="split-gastos" type="number" min="0" max="100" step="1"><span aria-hidden="true">%</span></span>
+      </div>
+      <div class="split-row92">
+        <label for="split-familia" data-i18n="split_familia">Familia</label>
+        <span class="split-in92"><input id="split-familia" type="number" min="0" max="100" step="1"><span aria-hidden="true">%</span></span>
+      </div>
+      <p class="split-sum92" id="split-sum92">Total: 100%</p>
       <p id="set-error" class="error" role="alert" hidden></p>
       <!-- Compilación 53: ya NO hay botón «Guardar ajustes» — la
            tarjeta se guarda sola (el reparto en cada tecla y el
@@ -1399,7 +1427,7 @@
               <span class="sections-chevron" aria-hidden="true">▸</span>
             </div>
             <div id="setacc-rules-body" hidden>
-            <p class="muted small" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
+            <p class="muted small set92-oneline" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
             <ul id="rules-list" class="item-list"></ul>
             <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
             <label for="rule-match" data-i18n="rules_match_label">Texto que contiene la nota o el comercio</label>
@@ -1423,16 +1451,23 @@
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
       <div id="setacc-security-body" hidden>
-      <p id="pin-status" class="muted small"></p>
+      <!-- Compilación 92 (punto 7): el cambio de PIN vive tras
+           su fila: la fila enseña el estado y abre el formulario
+           de siempre (mismos ids, la misma validación). -->
+      <button type="button" class="set92-navrow" id="set92-pin-row" aria-expanded="false" aria-controls="pin-form">
+        <span data-i18n="c92_pin_row">Cambiar PIN</span>
+        <span class="set92-navrow-sum muted small" id="pin-status"></span>
+        <span class="set92-navrow-chev" aria-hidden="true">›</span>
+      </button>
       <!-- novalidate (Compilación 57): como en la bienvenida, la
          validación del PIN la reporta el JS con su mensaje específico
          (4 a 6 números), no el mensaje genérico del WebView. -->
-    <form id="pin-form" autocomplete="off" novalidate>
+    <form id="pin-form" autocomplete="off" novalidate hidden>
         <label for="pin-current" data-i18n="pin_current_label">PIN actual (si ya tienes uno)</label>
         <input id="pin-current" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
         <label for="pin-new" data-i18n="pin_new_label">PIN nuevo (vacío = quitar el PIN)</label>
         <input id="pin-new" type="password" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6">
-        <p class="muted small" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
+        <p class="muted small set92-oneline" data-i18n="pin_warn">Si lo olvidas, no hay forma de recuperarlo: apúntalo en un lugar seguro.</p>
         <p id="pin-error" class="error" role="alert" hidden></p>
         <button type="submit" class="btn btn-secondary" data-i18n="pin_update">Actualizar PIN</button>
       </form>
@@ -1461,7 +1496,7 @@
               <span class="sections-chevron" aria-hidden="true">▸</span>
             </div>
             <div id="setacc-privacy-body" hidden>
-            <p class="muted small" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
+            <p class="muted small set92-oneline" data-i18n="priv_text">Tus datos viven en tu teléfono. La nube es opcional y solo se enciende si tú creas tu cuenta. No vendemos tus datos, nunca.</p>
             <div class="form-actions">
               <button id="btn-privacy-policy" type="button" class="btn btn-secondary" data-i18n="priv_btn">Leer la política completa</button>
             </div>
@@ -1474,7 +1509,15 @@
               <span class="sections-chevron" aria-hidden="true">▸</span>
             </div>
             <div id="setacc-data-body" hidden>
-            <p class="muted small" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
+            <p class="muted small set92-oneline" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
+            <!-- Compilación 92 (punto 8): las copias viven tras
+                 su fila «Copias de seguridad ›»: exportar,
+                 importar, la cifrada y el CSV, con sus estados. -->
+            <button type="button" class="set92-navrow" id="set92-backup-row" aria-expanded="false" aria-controls="set92-backup-body">
+              <span data-i18n="c92_backup_row">Copias de seguridad</span>
+              <span class="set92-navrow-chev" aria-hidden="true">›</span>
+            </button>
+            <div id="set92-backup-body" hidden>
             <div class="form-actions">
               <button id="btn-export" type="button" class="btn btn-secondary" data-i18n="data_export">Guardar copia de seguridad</button>
               <label class="btn btn-ghost file-label"><span data-i18n="data_import">Importar copia</span>
@@ -1491,12 +1534,10 @@
               <button id="btn-export-csv" type="button" class="btn btn-secondary" data-i18n="data_export_csv">Exportar movimientos (CSV)</button>
             </div>
             <p id="csv-export-status" class="muted small" aria-live="polite"></p>
-            <p class="muted small" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
-            <hr>
-            <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
-            <div class="form-actions">
-              <button id="set-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">Ver una demo</button>
+            <p class="muted small set92-oneline" data-i18n="backup_help">La copia cifrada se abre solo con tu contraseña. Sin ella no se puede recuperar: guárdala bien. Para importar una copia cifrada, escribe aquí su contraseña antes de elegir el archivo.</p>
             </div>
+            <!-- Compilación 92 (punto 9): la demo SALE de
+                 «Tus datos»; su entrada queda en la bienvenida. -->
             <hr>
             <button id="btn-reset" type="button" class="btn btn-danger" data-i18n="data_reset">Borrar todos los datos</button>
             </div>
@@ -1512,7 +1553,7 @@
         <span class="sections-chevron" aria-hidden="true">▸</span>
       </div>
       <div id="sections-body" hidden>
-        <p class="muted small" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
+        <p class="muted small set92-oneline" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
         <div class="form-actions">
           <button id="set-mode-essential" type="button" class="btn btn-secondary" data-i18n="set_mode_essential_btn">Modo Lo esencial</button>
           <button id="set-mode-all" type="button" class="btn btn-ghost" data-i18n="set_mode_all_btn">Mostrar todo</button>
@@ -1557,9 +1598,10 @@
       </ul>
       </div>
     </section>
-    <div class="form-actions">
-      <button id="btn-exit-app" type="button" class="btn btn-secondary" data-i18n="exit_btn">Salir</button>
-    </div>
+    <!-- Compilación 92 (punto 11): el botón gigante «Salir» se
+         va de Ajustes; cerrar/bloquear lo manda el bloqueo (PIN y
+         huella, con su fila de bloquear). El pie de Ajustes lleva
+         la compilación UNA sola vez (punto 12). -->
     <p class="muted small build-label" id="settings-build-label">Compilación 57</p>
   </main>
 
