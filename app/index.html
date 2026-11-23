@@ -1360,6 +1360,11 @@
       <p id="shared-error" class="error" role="alert" hidden></p>
       </div>
     </section>
+<!-- Compilación 86 · Añadido 10: la misma lista de permisos vive en Ajustes. -->
+    <section class="card form-card" id="perms-card">
+      <h3>🔐 <span data-i18n="perm10_settings_title">Permisos</span></h3>
+      <div id="perm-rows-settings"></div>
+    </section>
 
       </div>
     </section>
@@ -1631,7 +1636,30 @@
     <button id="fab-main" class="fab fab-main" type="button" aria-label="Más acciones">+</button>
   </div>
 
-  <div id="quick-chooser" class="chooser" hidden>
+  <!-- Compilación 86 · Añadido 10: pantalla de permisos de primer uso. -->
+<section id="view-perms" class="view perms-view" hidden>
+  <header class="chat-head">
+    <h2 data-i18n="perm10_title">Antes de empezar</h2>
+  </header>
+  <div class="perms-body">
+    <p class="perms-intro" data-i18n="perm10_intro"></p>
+    <div id="perm-rows-welcome"></div>
+  </div>
+  <footer class="perms-foot">
+    <button type="button" id="perm-skip" class="btn" data-i18n="perm10_skip">Omitir</button>
+    <button type="button" id="perm-continue" class="btn primary" data-i18n="perm10_continue">Continuar</button>
+  </footer>
+</section>
+<!-- Compilación 86 · Añadido 10: explicación cuando un permiso está denegado. -->
+<div id="perm-explain-modal" class="chooser" hidden role="dialog" aria-modal="true">
+  <div class="chooser-card">
+    <h3 id="perm-explain-title"></h3>
+    <p id="perm-explain-text"></p>
+    <button type="button" id="perm-explain-open" class="btn primary" data-i18n="perm10_open_settings">Abrir ajustes del sistema</button>
+    <button type="button" id="perm-explain-close" class="btn" data-i18n="perm10_not_now">Ahora no</button>
+  </div>
+</div>
+<div id="quick-chooser" class="chooser" hidden>
     <div class="chooser-card">
       <h3 data-i18n="quick_title">¿Qué quieres agregar?</h3>
       <button id="quick-expense" type="button" class="btn btn-primary btn-big" data-i18n="quick_expense">Gasto</button>
