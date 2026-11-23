@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 96';
-const BUILD_NUM = 96;
+const BUILD_LABEL = 'Compilación 97';
+const BUILD_NUM = 97;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1228,6 +1228,18 @@ const LANGS = ['es', 'en', 'it', 'pt', 'fr', 'de', 'zh', 'ja', 'ko', 'ru', 'hi',
 const LOCALES = { es: 'es', en: 'en-US', it: 'it-IT', pt: 'pt', fr: 'fr-FR', de: 'de-DE', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ru: 'ru-RU', hi: 'hi-IN', ar: 'ar-EG' };
 const I18N = {
 es: {
+  c97_debt_title: '🧭 Tu estrategia de deudas con IA',
+  c97_debt_note: 'La IA razona sobre tus deudas reales —saldos, intereses, pagos y las simulaciones que la app ya calculó— y te escribe una estrategia: qué pagar primero y por qué. Es un texto para ti: no cambia ningún pago ni guarda nada.',
+  c97_debt_btn: '✨ Crear mi estrategia',
+  c97_debt_working: 'Pensando tu estrategia…',
+  c97_debt_empty: 'Primero anota una deuda pendiente: la estrategia se arma con tus deudas reales.',
+  c97_debt_none: 'La IA no trajo estrategia esta vez. El plan de tu calculadora sigue arriba.',
+  c97_san_title: '🗂️ Tu san, organizado con IA',
+  c97_san_note: 'La IA resume tu san con los datos de la app: a quién le toca, quién ya pagó, quién falta y qué vigilar. Es solo un texto para ti dentro de la app: no se envía nada a nadie.',
+  c97_san_btn: '✨ Organizar mi san',
+  c97_san_working: 'Organizando tu san…',
+  c97_san_empty: 'Todavía no tienes un san: crea uno y la IA te lo organiza aquí.',
+  c97_san_none: 'La IA no trajo el resumen esta vez. El estado de tu san sigue arriba, como siempre.',
   c96_bud_ai_title: '🎯 Presupuesto con criterio IA',
   c96_bud_ai_note: 'La IA mira tu ingreso, tus pagos fijos y tu gasto real, y propone topes con criterio — no solo el promedio. Tú aceptas, editas o ignoras cada uno: nada se aplica solo.',
   c96_bud_ai_btn: '✨ Sugerir con IA',
@@ -1918,6 +1930,18 @@ es: {
   ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_pending_btn: '✓ Se abre al terminar', spend_ctx_below: 'Vas {amount} por debajo de tu ritmo del mes pasado', spend_ctx_above: 'Vas {amount} por encima de tu ritmo del mes pasado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Seguridad', sec_card_read: 'Conexión bancaria de solo lectura: nunca podemos mover tu dinero', sec_card_enc: 'Tus datos viajan y se guardan cifrados', sec_card_lock: 'Bloqueo con PIN y huella', sec_card_lock_faceid: 'Bloqueo con PIN y Face ID', sec_card_lock_generic: 'Bloqueo con PIN y datos biométricos', bud_per_semana: 'por semana', bud_per_quincena: 'por quincena', bud_per_mes: 'por mes', spend_left_periods: 'Te quedan {amount} entre todos tus períodos.', spend_x_periods: 'Cada categoría se reparte según su propio período:', spend_x_cat: '{cat} ({per}): quedan {left} ÷ {days} días = {daily} hoy', bud_period_aria: 'Período del límite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Presupuesto', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar con huella (si creo un PIN)', ob_bio_label_faceid: 'Entrar con Face ID (si creo un PIN)', ob_bio_label_generic: 'Entrar con datos biométricos (si creo un PIN)', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
+  c97_debt_title: '🧭 Your debt strategy with AI',
+  c97_debt_note: 'The AI reasons over your real debts — balances, interest, payments and the simulations the app already ran — and writes you a strategy: what to pay first and why. It is a text for you: it changes no payment and saves nothing.',
+  c97_debt_btn: '✨ Build my strategy',
+  c97_debt_working: 'Thinking about your strategy…',
+  c97_debt_empty: 'Add a pending debt first: the strategy is built from your real debts.',
+  c97_debt_none: 'The AI brought no strategy this time. Your calculator plan is still above.',
+  c97_san_title: '🗂️ Your san, organized with AI',
+  c97_san_note: 'The AI sums up your san (savings circle) with the app data: whose turn it is, who already paid, who is missing and what to watch. It is only a text for you inside the app: nothing is sent to anyone.',
+  c97_san_btn: '✨ Organize my san',
+  c97_san_working: 'Organizing your san…',
+  c97_san_empty: 'You have no san yet: create one and the AI will organize it here.',
+  c97_san_none: 'The AI brought no summary this time. Your san status is still above, as always.',
   c96_bud_ai_title: '🎯 Budget with AI judgment',
   c96_bud_ai_note: 'The AI looks at your income, your fixed payments and your real spending, and proposes limits with judgment — not just the average. You accept, edit or ignore each one: nothing is applied on its own.',
   c96_bud_ai_btn: '✨ Suggest with AI',
@@ -2608,6 +2632,18 @@ en: {
   ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_pending_btn: '✓ Opens when you finish', spend_ctx_below: 'You are {amount} below last month’s pace', spend_ctx_above: 'You are {amount} above last month’s pace', spend_ctx_bank: 'Bank connected', sec_card_title: 'Security', sec_card_read: 'Read-only bank connection: we can never move your money', sec_card_enc: 'Your data travels and is stored encrypted', sec_card_lock: 'PIN and fingerprint lock', sec_card_lock_faceid: 'PIN and Face ID lock', sec_card_lock_generic: 'PIN and biometric lock', bud_per_semana: 'per week', bud_per_quincena: 'per two weeks', bud_per_mes: 'per month', spend_left_periods: 'You have {amount} left across all your periods.', spend_x_periods: 'Each category is spread over its own period:', spend_x_cat: '{cat} ({per}): {left} left ÷ {days} days = {daily} today', bud_period_aria: 'Limit period for {cat}', nav_gastos: 'Expenses', nav_presupuesto: 'Budget', nav_ajustes: 'Settings', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', ob_bio_label_faceid: 'Get in with Face ID (if I create a PIN)', ob_bio_label_generic: 'Get in with biometrics (if I create a PIN)', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
+  c97_debt_title: '🧭 La tua strategia debiti con l’IA',
+  c97_debt_note: 'L’IA ragiona sui tuoi debiti reali — saldi, interessi, pagamenti e le simulazioni che l’app ha già calcolato — e ti scrive una strategia: cosa pagare prima e perché. È un testo per te: non cambia nessun pagamento e non salva nulla.',
+  c97_debt_btn: '✨ Crea la mia strategia',
+  c97_debt_working: 'Sto pensando alla tua strategia…',
+  c97_debt_empty: 'Prima annota un debito in sospeso: la strategia si costruisce con i tuoi debiti reali.',
+  c97_debt_none: 'L’IA non ha portato una strategia questa volta. Il piano della tua calcolatrice resta sopra.',
+  c97_san_title: '🗂️ Il tuo san, organizzato con l’IA',
+  c97_san_note: 'L’IA riassume il tuo san (circolo di risparmio) con i dati dell’app: a chi tocca, chi ha già pagato, chi manca e cosa tenere d’occhio. È solo un testo per te dentro l’app: non si invia nulla a nessuno.',
+  c97_san_btn: '✨ Organizza il mio san',
+  c97_san_working: 'Sto organizzando il tuo san…',
+  c97_san_empty: 'Non hai ancora un san: creane uno e l’IA te lo organizza qui.',
+  c97_san_none: 'L’IA non ha portato il riassunto questa volta. Lo stato del tuo san resta sopra, come sempre.',
   c96_bud_ai_title: '🎯 Budget con criterio IA',
   c96_bud_ai_note: 'L’IA guarda il tuo reddito, i tuoi pagamenti fissi e la tua spesa reale, e propone limiti con criterio — non solo la media. Accetti, modifichi o ignori ciascuno: nulla si applica da solo.',
   c96_bud_ai_btn: '✨ Suggerisci con l’IA',
@@ -3541,6 +3577,18 @@ it: {
   ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_pending_btn: '✓ Si apre alla fine', spend_ctx_below: 'Sei {amount} sotto il ritmo del mese scorso', spend_ctx_above: 'Sei {amount} sopra il ritmo del mese scorso', spend_ctx_bank: 'Banca collegata', sec_card_title: 'Sicurezza', sec_card_read: 'Connessione bancaria in sola lettura: non possiamo mai muovere i tuoi soldi', sec_card_enc: 'I tuoi dati viaggiano e sono salvati cifrati', sec_card_lock: 'Blocco con PIN e impronta', sec_card_lock_faceid: 'Blocco con PIN e Face ID', sec_card_lock_generic: 'Blocco con PIN e dati biometrici', bud_per_semana: 'a settimana', bud_per_quincena: 'ogni due settimane', bud_per_mes: 'al mese', spend_left_periods: 'Ti restano {amount} tra tutti i tuoi periodi.', spend_x_periods: 'Ogni categoria si distribuisce sul suo periodo:', spend_x_cat: '{cat} ({per}): restano {left} ÷ {days} giorni = {daily} oggi', bud_period_aria: 'Periodo del limite per {cat}', nav_gastos: 'Spese', nav_presupuesto: 'Budget', nav_ajustes: 'Impostazioni', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', ob_bio_label_faceid: 'Entra con Face ID (se creo un PIN)', ob_bio_label_generic: 'Entra con i dati biometrici (se creo un PIN)', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
+  c97_debt_title: '🧭 Sua estratégia de dívidas com IA',
+  c97_debt_note: 'A IA raciocina sobre suas dívidas reais — saldos, juros, pagamentos e as simulações que o app já calculou — e escreve uma estratégia para você: o que pagar primeiro e por quê. É um texto para você: não muda nenhum pagamento nem salva nada.',
+  c97_debt_btn: '✨ Criar minha estratégia',
+  c97_debt_working: 'Pensando na sua estratégia…',
+  c97_debt_empty: 'Primeiro anote uma dívida pendente: a estratégia é montada com suas dívidas reais.',
+  c97_debt_none: 'A IA não trouxe estratégia desta vez. O plano da sua calculadora continua acima.',
+  c97_san_title: '🗂️ Seu san, organizado com IA',
+  c97_san_note: 'A IA resume seu san (círculo de poupança) com os dados do app: de quem é a vez, quem já pagou, quem falta e o que vigiar. É só um texto para você dentro do app: nada é enviado a ninguém.',
+  c97_san_btn: '✨ Organizar meu san',
+  c97_san_working: 'Organizando seu san…',
+  c97_san_empty: 'Você ainda não tem um san: crie um e a IA organiza ele aqui.',
+  c97_san_none: 'A IA não trouxe o resumo desta vez. O estado do seu san continua acima, como sempre.',
   c96_bud_ai_title: '🎯 Orçamento com critério de IA',
   c96_bud_ai_note: 'A IA olha sua renda, seus pagamentos fixos e seu gasto real, e propõe limites com critério — não só a média. Você aceita, edita ou ignora cada um: nada se aplica sozinho.',
   c96_bud_ai_btn: '✨ Sugerir com IA',
@@ -4474,6 +4522,18 @@ pt: {
   ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_pending_btn: '✓ Abre ao terminar', spend_ctx_below: 'Você está {amount} abaixo do ritmo do mês passado', spend_ctx_above: 'Você está {amount} acima do ritmo do mês passado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Segurança', sec_card_read: 'Conexão bancária somente leitura: nunca podemos mover seu dinheiro', sec_card_enc: 'Seus dados viajam e são guardados criptografados', sec_card_lock: 'Bloqueio com PIN e impressão digital', sec_card_lock_faceid: 'Bloqueio com PIN e Face ID', sec_card_lock_generic: 'Bloqueio com PIN e dados biométricos', bud_per_semana: 'por semana', bud_per_quincena: 'por quinzena', bud_per_mes: 'por mês', spend_left_periods: 'Restam {amount} entre todos os seus períodos.', spend_x_periods: 'Cada categoria é dividida conforme seu próprio período:', spend_x_cat: '{cat} ({per}): restam {left} ÷ {days} dias = {daily} hoje', bud_period_aria: 'Período do limite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Orçamento', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', ob_bio_label_faceid: 'Entrar com Face ID (se eu criar um PIN)', ob_bio_label_generic: 'Entrar com dados biométricos (se eu criar um PIN)', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
+  c97_debt_title: '🧭 Ta stratégie de dettes avec l’IA',
+  c97_debt_note: 'L’IA raisonne sur tes dettes réelles — soldes, intérêts, paiements et les simulations que l’app a déjà calculées — et t’écrit une stratégie : quoi payer d’abord et pourquoi. C’est un texte pour toi : il ne change aucun paiement et n’enregistre rien.',
+  c97_debt_btn: '✨ Créer ma stratégie',
+  c97_debt_working: 'Je réfléchis à ta stratégie…',
+  c97_debt_empty: 'Note d’abord une dette en cours : la stratégie se construit avec tes dettes réelles.',
+  c97_debt_none: 'L’IA n’a pas apporté de stratégie cette fois. Le plan de ta calculatrice est toujours au-dessus.',
+  c97_san_title: '🗂️ Ton san, organisé avec l’IA',
+  c97_san_note: 'L’IA résume ton san (cercle d’épargne) avec les données de l’app : à qui le tour, qui a déjà payé, qui manque et quoi surveiller. C’est seulement un texte pour toi dans l’app : rien n’est envoyé à personne.',
+  c97_san_btn: '✨ Organiser mon san',
+  c97_san_working: 'J’organise ton san…',
+  c97_san_empty: 'Tu n’as pas encore de san : crée-en un et l’IA te l’organise ici.',
+  c97_san_none: 'L’IA n’a pas apporté le résumé cette fois. L’état de ton san est toujours au-dessus, comme toujours.',
   c96_bud_ai_title: '🎯 Budget avec le jugement de l’IA',
   c96_bud_ai_note: 'L’IA regarde vos revenus, vos paiements fixes et vos dépenses réelles, et propose des plafonds avec jugement — pas seulement la moyenne. Vous acceptez, modifiez ou ignorez chacun : rien ne s’applique tout seul.',
   c96_bud_ai_btn: '✨ Suggérer avec l’IA',
@@ -5407,6 +5467,18 @@ fr: {
   ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_pending_btn: '✓ S’ouvre à la fin', spend_ctx_below: 'Vous êtes {amount} sous le rythme du mois dernier', spend_ctx_above: 'Vous êtes {amount} au-dessus du rythme du mois dernier', spend_ctx_bank: 'Banque connectée', sec_card_title: 'Sécurité', sec_card_read: 'Connexion bancaire en lecture seule : nous ne pouvons jamais déplacer votre argent', sec_card_enc: 'Vos données voyagent et sont stockées chiffrées', sec_card_lock: 'Verrouillage par code PIN et empreinte', sec_card_lock_faceid: 'Verrouillage par code PIN et Face ID', sec_card_lock_generic: 'Verrouillage par code PIN et données biométriques', bud_per_semana: 'par semaine', bud_per_quincena: 'par quinzaine', bud_per_mes: 'par mois', spend_left_periods: 'Il vous reste {amount} sur toutes vos périodes.', spend_x_periods: 'Chaque catégorie se répartit sur sa propre période :', spend_x_cat: '{cat} ({per}) : {left} restants ÷ {days} jours = {daily} aujourd’hui', bud_period_aria: 'Période de la limite pour {cat}', nav_gastos: 'Dépenses', nav_presupuesto: 'Budget', nav_ajustes: 'Réglages', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', ob_bio_label_faceid: 'Entrer avec Face ID (si je crée un PIN)', ob_bio_label_generic: 'Entrer avec vos données biométriques (si je crée un PIN)', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
+  c97_debt_title: '🧭 Deine Schuldenstrategie mit KI',
+  c97_debt_note: 'Die KI denkt über deine echten Schulden nach — Salden, Zinsen, Zahlungen und die Simulationen, die die App schon berechnet hat — und schreibt dir eine Strategie: was zuerst zahlen und warum. Es ist ein Text für dich: Er ändert keine Zahlung und speichert nichts.',
+  c97_debt_btn: '✨ Meine Strategie erstellen',
+  c97_debt_working: 'Ich denke über deine Strategie nach…',
+  c97_debt_empty: 'Trage zuerst eine offene Schuld ein: Die Strategie entsteht aus deinen echten Schulden.',
+  c97_debt_none: 'Die KI hat diesmal keine Strategie gebracht. Der Plan deines Rechners steht weiterhin oben.',
+  c97_san_title: '🗂️ Dein San, mit KI organisiert',
+  c97_san_note: 'Die KI fasst deinen San (Sparkreis) mit den App-Daten zusammen: wer dran ist, wer schon gezahlt hat, wer fehlt und worauf zu achten ist. Es ist nur ein Text für dich in der App: Es wird nichts an jemanden gesendet.',
+  c97_san_btn: '✨ Meinen San organisieren',
+  c97_san_working: 'Ich organisiere deinen San…',
+  c97_san_empty: 'Du hast noch keinen San: Erstelle einen und die KI organisiert ihn hier.',
+  c97_san_none: 'Die KI hat diesmal keine Zusammenfassung gebracht. Der Stand deines San steht weiterhin oben.',
   c96_bud_ai_title: '🎯 Budget mit KI-Urteil',
   c96_bud_ai_note: 'Die KI sieht sich Ihr Einkommen, Ihre festen Zahlungen und Ihre echten Ausgaben an und schlägt Limits mit Urteil vor — nicht nur den Durchschnitt. Sie akzeptieren, bearbeiten oder ignorieren jedes: Nichts wird von allein angewendet.',
   c96_bud_ai_btn: '✨ Mit KI vorschlagen',
@@ -6340,6 +6412,18 @@ de: {
   ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_pending_btn: '✓ Öffnet sich am Ende', spend_ctx_below: 'Du liegst {amount} unter dem Tempo des Vormonats', spend_ctx_above: 'Du liegst {amount} über dem Tempo des Vormonats', spend_ctx_bank: 'Bank verbunden', sec_card_title: 'Sicherheit', sec_card_read: 'Bankverbindung nur lesend: Wir können Ihr Geld niemals bewegen', sec_card_enc: 'Ihre Daten werden verschlüsselt übertragen und gespeichert', sec_card_lock: 'Sperre mit PIN und Fingerabdruck', sec_card_lock_faceid: 'Sperre mit PIN und Face ID', sec_card_lock_generic: 'Sperre mit PIN und biometrischen Daten', bud_per_semana: 'pro Woche', bud_per_quincena: 'pro zwei Wochen', bud_per_mes: 'pro Monat', spend_left_periods: 'Dir bleiben {amount} über alle deine Zeiträume.', spend_x_periods: 'Jede Kategorie wird über ihren eigenen Zeitraum verteilt:', spend_x_cat: '{cat} ({per}): {left} übrig ÷ {days} Tage = {daily} heute', bud_period_aria: 'Zeitraum des Limits für {cat}', nav_gastos: 'Ausgaben', nav_presupuesto: 'Budget', nav_ajustes: 'Einstellungen', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', ob_bio_label_faceid: 'Mit Face ID anmelden (wenn ich eine PIN erstelle)', ob_bio_label_generic: 'Mit biometrischen Daten anmelden (wenn ich eine PIN erstelle)', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
+  c97_debt_title: '🧭 AI 为你制定还债策略',
+  c97_debt_note: 'AI 会根据你的真实债务——余额、利息、还款额，以及应用已经算好的模拟结果——为你写出一份策略：先还哪一笔、为什么。这只是一段给你的文字：不会改动任何还款，也不会保存任何东西。',
+  c97_debt_btn: '✨ 生成我的策略',
+  c97_debt_working: '正在思考你的策略…',
+  c97_debt_empty: '先记一笔未还清的债务：策略是用你的真实债务做出来的。',
+  c97_debt_none: '这次 AI 没有给出策略。你计算器的计划还在上面。',
+  c97_san_title: '🗂️ AI 帮你整理标会',
+  c97_san_note: 'AI 用应用里的数据总结你的标会：轮到谁、谁已经交了、谁还没交、要注意什么。这只是应用内给你看的文字：不会发送给任何人。',
+  c97_san_btn: '✨ 整理我的标会',
+  c97_san_working: '正在整理你的标会…',
+  c97_san_empty: '你还没有标会：创建一个，AI 会在这里帮你整理。',
+  c97_san_none: '这次 AI 没有给出总结。你的标会状态还在上面，和平时一样。',
   c96_bud_ai_title: '🎯 AI 智能预算',
   c96_bud_ai_note: 'AI 会查看您的收入、固定支出和真实消费，带着判断提出上限——不只是平均数。每一个都由您接受、修改或忽略：不会自动应用任何内容。',
   c96_bud_ai_btn: '✨ 用 AI 建议',
@@ -7273,6 +7357,18 @@ zh: {
   ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_pending_btn: '✓ 完成时打开', spend_ctx_below: '你比上个月的节奏少了 {amount}', spend_ctx_above: '你比上个月的节奏多了 {amount}', spend_ctx_bank: '银行已连接', sec_card_title: '安全', sec_card_read: '银行连接为只读:我们永远无法动用你的资金', sec_card_enc: '你的数据在传输和存储时均已加密', sec_card_lock: 'PIN 和指纹锁定', sec_card_lock_faceid: 'PIN 和 Face ID 锁定', sec_card_lock_generic: 'PIN 和生物识别锁定', bud_per_semana: '每周', bud_per_quincena: '每两周', bud_per_mes: '每月', spend_left_periods: '所有周期合计还剩 {amount}。', spend_x_periods: '每个类别按自己的周期分摊：', spend_x_cat: '{cat}（{per}）：剩 {left} ÷ {days} 天 = 今天 {daily}', bud_period_aria: '{cat} 的上限周期', nav_gastos: '支出', nav_presupuesto: '预算', nav_ajustes: '设置', ob_bio_label: '用指纹进入（如果我创建了 PIN）', ob_bio_label_faceid: '使用 Face ID 进入（如果我创建 PIN）', ob_bio_label_generic: '使用生物识别进入（如果我创建 PIN）', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
+  c97_debt_title: '🧭 AIとつくる返済戦略',
+  c97_debt_note: 'AIがあなたの実際の借入——残高、金利、支払額、そしてアプリがすでに計算したシミュレーション——をもとに考え、どれから返すかとその理由を戦略として書きます。あなた向けの文章です：支払いは何も変わらず、何も保存されません。',
+  c97_debt_btn: '✨ 戦略をつくる',
+  c97_debt_working: 'あなたの戦略を考えています…',
+  c97_debt_empty: 'まず未返済の借入を1件記録してください：戦略はあなたの実際の借入から作られます。',
+  c97_debt_none: '今回はAIから戦略が届きませんでした。計算機のプランは上にそのままあります。',
+  c97_san_title: '🗂️ AIが整理するあなたのサン',
+  c97_san_note: 'AIがアプリのデータであなたのサン（貯蓄サークル）をまとめます：誰の番か、誰が払ったか、誰がまだか、注意点。これはアプリ内であなただけが見る文章です：誰にも送信されません。',
+  c97_san_btn: '✨ サンを整理する',
+  c97_san_working: 'あなたのサンを整理しています…',
+  c97_san_empty: 'まだサンがありません：作ればAIがここで整理します。',
+  c97_san_none: '今回はAIからまとめが届きませんでした。サンの状態は上にそのままあります。',
   c96_bud_ai_title: '🎯 AI判断つき予算',
   c96_bud_ai_note: 'AIがあなたの収入、固定払い、実際の支出を見て、平均だけでなく判断をもって上限を提案します。各提案はあなたが承認、編集、無視できます。自動で適用されることはありません。',
   c96_bud_ai_btn: '✨ AIで提案',
@@ -8206,6 +8302,18 @@ ja: {
   ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_pending_btn: '✓ 終了時に開きます', spend_ctx_below: '先月のペースより {amount} 下回っています', spend_ctx_above: '先月のペースより {amount} 上回っています', spend_ctx_bank: '銀行が接続されています', sec_card_title: 'セキュリティ', sec_card_read: '銀行接続は読み取り専用:あなたの資金を動かすことは決してできません', sec_card_enc: 'データは暗号化されて送信・保存されます', sec_card_lock: 'PINと指紋によるロック', sec_card_lock_faceid: 'PINとFace IDによるロック', sec_card_lock_generic: 'PINと生体認証によるロック', bud_per_semana: '週ごと', bud_per_quincena: '2週間ごと', bud_per_mes: '月ごと', spend_left_periods: 'すべての期間を合わせて、残りは {amount} です。', spend_x_periods: '各カテゴリはそれぞれの期間で按分されます：', spend_x_cat: '{cat}（{per}）：残り {left} ÷ {days} 日 = 今日 {daily}', bud_period_aria: '{cat}の上限期間', nav_gastos: '支出', nav_presupuesto: '予算', nav_ajustes: '設定', ob_bio_label: '指紋で入る（PIN を作成した場合）', ob_bio_label_faceid: 'Face ID で入る（PIN を作成した場合）', ob_bio_label_generic: '生体認証で入る（PIN を作成した場合）', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
+  c97_debt_title: '🧭 AI와 만드는 빚 상환 전략',
+  c97_debt_note: 'AI가 당신의 실제 빚 — 잔액, 이자, 납부액, 그리고 앱이 이미 계산한 시뮬레이션 — 을 바탕으로 생각해 무엇부터 갚을지와 그 이유를 전략으로 써 줍니다. 당신을 위한 글입니다: 어떤 납부도 바꾸지 않고 아무것도 저장하지 않습니다.',
+  c97_debt_btn: '✨ 내 전략 만들기',
+  c97_debt_working: '당신의 전략을 생각하는 중…',
+  c97_debt_empty: '먼저 미상환 빚을 하나 기록하세요: 전략은 당신의 실제 빚으로 만들어집니다.',
+  c97_debt_none: '이번에는 AI가 전략을 가져오지 않았습니다. 계산기의 계획은 위에 그대로 있습니다.',
+  c97_san_title: '🗂️ AI가 정리하는 나의 계',
+  c97_san_note: 'AI가 앱 데이터로 당신의 계(산)를 요약합니다: 누구 차례인지, 누가 냈는지, 누가 남았는지, 무엇을 살펴야 하는지. 앱 안에서 당신만 보는 글입니다: 누구에게도 전송되지 않습니다.',
+  c97_san_btn: '✨ 내 계 정리하기',
+  c97_san_working: '당신의 계를 정리하는 중…',
+  c97_san_empty: '아직 계가 없습니다: 하나 만들면 AI가 여기서 정리해 줍니다.',
+  c97_san_none: '이번에는 AI가 요약을 가져오지 않았습니다. 계의 상태는 위에 그대로 있습니다.',
   c96_bud_ai_title: '🎯 AI 판단 예산',
   c96_bud_ai_note: 'AI가 수입, 고정 지출, 실제 소비를 보고 단순 평균이 아닌 판단을 담아 한도를 제안합니다. 각 제안은 수락, 편집 또는 무시할 수 있습니다. 자동으로 적용되는 것은 없습니다.',
   c96_bud_ai_btn: '✨ AI로 제안',
@@ -9139,6 +9247,18 @@ ko: {
   ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_pending_btn: '✓ 마칠 때 열립니다', spend_ctx_below: '지난달 페이스보다 {amount} 아래입니다', spend_ctx_above: '지난달 페이스보다 {amount} 위입니다', spend_ctx_bank: '은행 연결됨', sec_card_title: '보안', sec_card_read: '은행 연결은 읽기 전용: 자금을 절대 이동할 수 없습니다', sec_card_enc: '데이터는 암호화되어 전송되고 저장됩니다', sec_card_lock: 'PIN 및 지문 잠금', sec_card_lock_faceid: 'PIN 및 Face ID 잠금', sec_card_lock_generic: 'PIN 및 생체 인증 잠금', bud_per_semana: '주당', bud_per_quincena: '2주당', bud_per_mes: '월당', spend_left_periods: '모든 기간을 합쳐 {amount} 남았습니다.', spend_x_periods: '각 카테고리는 자신의 기간에 맞춰 나뉩니다:', spend_x_cat: '{cat} ({per}): {left} 남음 ÷ {days}일 = 오늘 {daily}', bud_period_aria: '{cat} 한도 기간', nav_gastos: '지출', nav_presupuesto: '예산', nav_ajustes: '설정', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', ob_bio_label_faceid: 'Face ID로 들어가기 (PIN을 만드는 경우)', ob_bio_label_generic: '생체 인증으로 들어가기 (PIN을 만드는 경우)', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
+  c97_debt_title: '🧭 Твоя стратегия долгов с ИИ',
+  c97_debt_note: 'ИИ рассуждает о твоих реальных долгах — остатках, процентах, платежах и симуляциях, которые приложение уже посчитало, — и пишет тебе стратегию: что гасить первым и почему. Это текст для тебя: он не меняет ни одного платежа и ничего не сохраняет.',
+  c97_debt_btn: '✨ Создать мою стратегию',
+  c97_debt_working: 'Думаю над твоей стратегией…',
+  c97_debt_empty: 'Сначала запиши один непогашенный долг: стратегия строится на твоих реальных долгах.',
+  c97_debt_none: 'В этот раз ИИ не принёс стратегию. План твоего калькулятора по-прежнему выше.',
+  c97_san_title: '🗂️ Твой сан, организованный ИИ',
+  c97_san_note: 'ИИ суммирует твой сан (сберегательный круг) по данным приложения: чья очередь, кто уже заплатил, кто остался и за чем следить. Это только текст для тебя внутри приложения: ничего никому не отправляется.',
+  c97_san_btn: '✨ Организовать мой сан',
+  c97_san_working: 'Организую твой сан…',
+  c97_san_empty: 'У тебя пока нет сана: создай один, и ИИ организует его здесь.',
+  c97_san_none: 'В этот раз ИИ не принёс сводку. Состояние твоего сана по-прежнему выше, как всегда.',
   c96_bud_ai_title: '🎯 Бюджет с суждением ИИ',
   c96_bud_ai_note: 'ИИ смотрит ваш доход, постоянные платежи и реальные траты и предлагает лимиты с суждением, а не просто среднее. Каждый вы принимаете, правите или игнорируете: само ничего не применяется.',
   c96_bud_ai_btn: '✨ Предложить с ИИ',
@@ -10072,6 +10192,18 @@ ru: {
   ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_pending_btn: '✓ Откроется в конце', spend_ctx_below: 'Вы на {amount} ниже темпа прошлого месяца', spend_ctx_above: 'Вы на {amount} выше темпа прошлого месяца', spend_ctx_bank: 'Банк подключён', sec_card_title: 'Безопасность', sec_card_read: 'Банковское подключение только для чтения: мы никогда не можем перемещать ваши деньги', sec_card_enc: 'Ваши данные передаются и хранятся в зашифрованном виде', sec_card_lock: 'Блокировка по PIN-коду и отпечатку', sec_card_lock_faceid: 'Блокировка по PIN-коду и Face ID', sec_card_lock_generic: 'Блокировка по PIN-коду и биометрии', bud_per_semana: 'в неделю', bud_per_quincena: 'за две недели', bud_per_mes: 'в месяц', spend_left_periods: 'По всем периодам у вас осталось {amount}.', spend_x_periods: 'Каждая категория распределяется по своему периоду:', spend_x_cat: '{cat} ({per}): осталось {left} ÷ {days} дн. = {daily} сегодня', bud_period_aria: 'Период лимита для {cat}', nav_gastos: 'Расходы', nav_presupuesto: 'Бюджет', nav_ajustes: 'Настройки', ob_bio_label: 'Вход по отпечатку (если создам PIN)', ob_bio_label_faceid: 'Вход по Face ID (если создам PIN)', ob_bio_label_generic: 'Вход по биометрии (если создам PIN)', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
+  c97_debt_title: '🧭 AI के साथ आपकी कर्ज़ रणनीति',
+  c97_debt_note: 'AI आपके असली कर्ज़ों पर सोचता है — बकाया, ब्याज, भुगतान और वे सिमुलेशन जो ऐप पहले ही निकाल चुका है — और आपके लिए एक रणनीति लिखता है: पहले क्या चुकाएँ और क्यों। यह आपके लिए एक पाठ है: यह कोई भुगतान नहीं बदलता और कुछ भी सहेजता नहीं।',
+  c97_debt_btn: '✨ मेरी रणनीति बनाएँ',
+  c97_debt_working: 'आपकी रणनीति सोच रहा हूँ…',
+  c97_debt_empty: 'पहले एक बकाया कर्ज़ दर्ज करें: रणनीति आपके असली कर्ज़ों से बनती है।',
+  c97_debt_none: 'इस बार AI रणनीति नहीं लाया। आपके कैलकुलेटर की योजना ऊपर वैसी ही है।',
+  c97_san_title: '🗂️ AI से व्यवस्थित आपका सान',
+  c97_san_note: 'AI ऐप के डेटा से आपके सान (बचत मंडली) का सार देता है: किसकी बारी है, किसने चुका दिया, कौन बाकी है और किस बात का ध्यान रखें। यह ऐप के अंदर सिर्फ़ आपके लिए एक पाठ है: किसी को कुछ नहीं भेजा जाता।',
+  c97_san_btn: '✨ मेरा सान व्यवस्थित करें',
+  c97_san_working: 'आपका सान व्यवस्थित कर रहा हूँ…',
+  c97_san_empty: 'आपके पास अभी कोई सान नहीं है: एक बनाएँ और AI उसे यहाँ व्यवस्थित करेगा।',
+  c97_san_none: 'इस बार AI सार नहीं लाया। आपके सान की स्थिति ऊपर वैसी ही है, हमेशा की तरह।',
   c96_bud_ai_title: '🎯 AI विवेक वाला बजट',
   c96_bud_ai_note: 'AI आपकी आय, आपके तय भुगतान और आपके असली खर्च को देखकर, सिर्फ़ औसत नहीं, विवेक के साथ सीमाएँ सुझाता है। हर एक को आप स्वीकार, बदल या अनदेखा करते हैं: कुछ भी अपने आप लागू नहीं होता।',
   c96_bud_ai_btn: '✨ AI से सुझाव लें',
@@ -11005,6 +11137,18 @@ hi: {
   ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_pending_btn: '✓ अंत में खुलेगा', spend_ctx_below: 'आप पिछले महीने की गति से {amount} नीचे हैं', spend_ctx_above: 'आप पिछले महीने की गति से {amount} ऊपर हैं', spend_ctx_bank: 'बैंक जुड़ा हुआ है', sec_card_title: 'सुरक्षा', sec_card_read: 'बैंक कनेक्शन केवल पढ़ने के लिए: हम आपका पैसा कभी नहीं हिला सकते', sec_card_enc: 'आपका डेटा एन्क्रिप्ट होकर जाता और सहेजा जाता है', sec_card_lock: 'PIN और फ़िंगरप्रिंट लॉक', sec_card_lock_faceid: 'PIN और Face ID लॉक', sec_card_lock_generic: 'PIN और बायोमेट्रिक्स लॉक', bud_per_semana: 'प्रति सप्ताह', bud_per_quincena: 'प्रति पखवाड़ा', bud_per_mes: 'प्रति माह', spend_left_periods: 'आपके सभी अवधियों में कुल {amount} बचे हैं।', spend_x_periods: 'हर श्रेणी अपनी अवधि के अनुसार बँटती है:', spend_x_cat: '{cat} ({per}): {left} बचे ÷ {days} दिन = आज {daily}', bud_period_aria: '{cat} के लिए सीमा अवधि', nav_gastos: 'खर्च', nav_presupuesto: 'बजट', nav_ajustes: 'सेटिंग्स', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', ob_bio_label_faceid: 'Face ID से प्रवेश (अगर मैं PIN बनाऊं)', ob_bio_label_generic: 'बायोमेट्रिक्स से प्रवेश (अगर मैं PIN बनाऊं)', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
+  c97_debt_title: '🧭 استراتيجية ديونك مع الذكاء الاصطناعي',
+  c97_debt_note: 'يفكّر الذكاء الاصطناعي في ديونك الحقيقية — الأرصدة والفوائد والمدفوعات والمحاكاة التي حسبها التطبيق من قبل — ويكتب لك استراتيجية: ماذا تسدّد أولًا ولماذا. هذا نص موجّه لك: لا يغيّر أي دفعة ولا يحفظ شيئًا.',
+  c97_debt_btn: '✨ أنشئ استراتيجيتي',
+  c97_debt_working: 'أفكّر في استراتيجيتك…',
+  c97_debt_empty: 'سجّل أولًا دينًا واحدًا قائمًا: الاستراتيجية تُبنى من ديونك الحقيقية.',
+  c97_debt_none: 'هذه المرة لم يجلب الذكاء الاصطناعي استراتيجية. خطة الآلة الحاسبة ما زالت في الأعلى.',
+  c97_san_title: '🗂️ السان الخاص بك، منظّم بالذكاء الاصطناعي',
+  c97_san_note: 'يلخّص الذكاء الاصطناعي السان الخاص بك (دائرة ادخار) ببيانات التطبيق: على من الدور، ومن دفع، ومن تبقّى، وما الذي يجب مراقبته. هذا نص لك داخل التطبيق فقط: لا يُرسل شيء إلى أي شخص.',
+  c97_san_btn: '✨ نظّم السان الخاص بي',
+  c97_san_working: 'أنظّم السان الخاص بك…',
+  c97_san_empty: 'ليس لديك سان بعد: أنشئ واحدًا وسيقوم الذكاء الاصطناعي بتنظيمه هنا.',
+  c97_san_none: 'هذه المرة لم يجلب الذكاء الاصطناعي الملخص. حالة السان الخاص بك ما زالت في الأعلى، كالعادة.',
   c96_bud_ai_title: '🎯 ميزانية بحكم الذكاء الاصطناعي',
   c96_bud_ai_note: 'ينظر الذكاء الاصطناعي إلى دخلك ومدفوعاتك الثابتة وإنفاقك الحقيقي، ويقترح حدودًا بحكمٍ لا بمجرد المتوسط. كل اقتراح تقبله أو تعدّله أو تتجاهله: لا يُطبَّق شيء من تلقاء نفسه.',
   c96_bud_ai_btn: '✨ اقترح بالذكاء الاصطناعي',
@@ -17960,6 +18104,103 @@ function orgRoundPaidCount(org, i) {
   if (!org.rounds[i]) return 0;
   return org.participants.filter((p) => org.rounds[i].paid[p]).length;
 }
+/* ---------------- Compilación 97 · Fase F (6) · Organizador del san con IA ----
+   El san manual de siempre gana su capa de IA Pro: la acción
+   'san-organizer' recibe los hechos YA calculados aquí — el san
+   personal (db.san) y el organizado (db.sanOrg) con los
+   participantes en orden de turno, el aporte, el periodo o la
+   ronda actual, quién recibe, quién ya pagó, quién falta y los
+   atrasos de periodos ya cerrados — y devuelve el resumen
+   redactado: estado del ciclo, a quién le toca, recordatorios
+   sugeridos y avisos de riesgo. Es SOLO un texto para la persona
+   dentro de la app: no se envía nada a nadie y no se marca ni se
+   mueve nada solo. */
+function sanFacts97() {
+  const lines = [];
+  const s = db.san;
+  if (s && Array.isArray(s.participants) && s.participants.length) {
+    const n = s.participants.length;
+    lines.push('San personal «' + s.name + '»: aporte de ' + fmt(s.aporteCents) +
+      ' por periodo (' + sanFreq(s) + '), ' + n + ' participantes. Bote por periodo: ' + fmt(n * s.aporteCents) + '.');
+    lines.push('Participantes en orden de turno: ' + s.participants.join(', ') + '.');
+    lines.push('Total aportado hasta ahora: ' + fmt(sanTotalReunido()) + '.');
+    if (sanFinished()) {
+      lines.push('Estado: el san ya terminó, todos los periodos se completaron.');
+    } else {
+      const w = s.weeks[s.currentWeek] || { paid: {} };
+      const pd = sanPeriodDate(s, s.currentWeek);
+      lines.push('Periodo actual: ' + (s.currentWeek + 1) + ' de ' + n +
+        (pd ? ' (fecha ' + prettyDate(pd) + ')' : '') + '. Recibe este periodo: ' +
+        s.participants[s.currentWeek] + '.');
+      const paid = s.participants.filter((p) => w.paid[p]);
+      const missing = s.participants.filter((p) => !w.paid[p]);
+      lines.push('Ya pagaron este periodo: ' + (paid.length ? paid.join(', ') : 'nadie') + '.');
+      lines.push('Faltan este periodo: ' + (missing.length ? missing.join(', ') : 'nadie') + '.');
+      const late = [];
+      for (let i = 0; i < s.currentWeek && i < s.weeks.length; i++) {
+        for (const p of s.participants) {
+          if (!s.weeks[i].paid[p]) late.push(p + ' (periodo ' + (i + 1) + ')');
+        }
+      }
+      if (late.length) lines.push('Atrasos en periodos ya cerrados: ' + late.join(', ') + '.');
+    }
+  }
+  const org = db.sanOrg;
+  if (org && Array.isArray(org.participants) && org.participants.length) {
+    const n = org.participants.length;
+    const cur = orgCurrentRound(org);
+    lines.push('San organizado «' + (org.name || '') + '»: aporte de ' + fmt(org.aporteCents) +
+      ' por ronda, ' + n + ' participantes. Bote por ronda: ' + fmt(n * org.aporteCents) + '.');
+    lines.push('Participantes en orden de turno: ' + org.participants.join(', ') + '.');
+    lines.push('Total reunido hasta ahora: ' + fmt(orgTotalReunido()) + '.');
+    if (cur >= n) {
+      lines.push('Estado: todas las rondas del san organizado están completas.');
+    } else {
+      lines.push('Ronda actual: ' + (cur + 1) + ' de ' + n + '. Recibe esta ronda: ' + org.participants[cur] + '.');
+      const conf = [];
+      const rep = [];
+      const pend = [];
+      for (const p of org.participants) {
+        const st = orgPayStatus(org, cur, p);
+        if (st === 'confirmed') conf.push(p);
+        else if (st === 'reported') rep.push(p);
+        else pend.push(p);
+      }
+      lines.push('Ya pagaron en esta ronda (confirmado): ' + (conf.length ? conf.join(', ') : 'nadie') + '.');
+      if (rep.length) lines.push('Reportaron su pago, sin confirmar: ' + rep.join(', ') + '.');
+      lines.push('Faltan en esta ronda: ' + (pend.length ? pend.join(', ') : 'nadie') + '.');
+    }
+  }
+  return lines.join('\n').slice(0, 4900);
+}
+let sanAi97Text = '';
+async function onSanAi97() {
+  if (!requirePro()) return;
+  const status = document.getElementById('san-ai97-status');
+  const facts = sanFacts97();
+  if (!facts) { if (status) status.textContent = t('c97_san_empty'); return; }
+  if (status) status.textContent = t('c97_san_working');
+  try {
+    const r = await aiFn('san-organizer', { facts: facts, lang: lang() });
+    sanAi97Text = (r && r.text) ? r.text : '';
+    if (status) status.textContent = sanAi97Text ? '' : t('c97_san_none');
+    renderSanAi97();
+  } catch (e) {
+    aiGatePaywall(e);
+    if (status) status.textContent = aiErrorText(e);
+  }
+}
+function renderSanAi97() {
+  const box = document.getElementById('san-ai97-results');
+  if (!box) return;
+  clearNode(box);
+  if (!sanAi97Text) return;
+  for (const para of sanAi97Text.split('\n')) {
+    const line = para.trim();
+    if (line) box.appendChild(el('p', null, line));
+  }
+}
+
 function orgCurrentRound(org) {
   for (let i = 0; i < org.participants.length; i++) {
     if (orgRoundPaidCount(org, i) < org.participants.length) return i;
@@ -26910,6 +27151,84 @@ function renderCalc() {
   }
 }
 
+/* ---------------- Compilación 97 · Fase F (5) · Estratega de deudas vivo ----
+   El plan simple de siempre (la calculadora con avalancha y bola
+   de nieve) gana su capa de IA Pro: la acción 'debt-strategy'
+   recibe los hechos YA calculados aquí — cada deuda con su saldo,
+   APR, mínimo y pago planeado, su salida según debtPayoffInfo y
+   las DOS simulaciones de simulatePayoff con el pago total
+   actual — y devuelve la estrategia redactada (orden con el
+   porqué, qué pagar primero y qué hacer si cambia el ingreso).
+   Las CIFRAS y el plan numérico los sigue calculando la app; la
+   IA solo razona y redacta. La estrategia vive solo en memoria
+   de la pantalla: nada se aplica ni se guarda solo, nunca. */
+function debtFacts97() {
+  const pending = (db.debts || []).filter((d) => d.status === 'pendiente' && d.amountCents > 0);
+  if (!pending.length) return '';
+  const lines = [];
+  const totalDebt = pending.reduce((s, d) => s + d.amountCents, 0);
+  let totalMin = 0;
+  let totalPay = 0;
+  lines.push('Deudas pendientes: ' + pending.length + ' · Saldo total: ' + fmt(totalDebt) + '.');
+  lines.push('Por deuda (saldo · interés anual · pago mínimo · pago planeado · salida con su pago):');
+  for (const d of pending) {
+    totalMin += d.pagoMinCents || 0;
+    const info = debtPayoffInfo(d);
+    totalPay += info ? info.pay : (d.pagoMinCents || 0);
+    let line = '- ' + d.name + ': saldo ' + fmt(d.amountCents) +
+      ' · APR ' + (d.interesPct || 0) + '%' +
+      ' · mínimo ' + fmt(d.pagoMinCents || 0) +
+      ' · planeado ' + fmt(d.pagoPlanCents || 0);
+    if (!info) line += ' · sin pago anotado: no se puede calcular su salida';
+    else if (info.blocked) line += ' · con su pago de ' + fmt(info.pay) + ' NO baja: no cubre el interés del mes';
+    else line += ' · saldada en ' + info.months + ' meses (' + debtPayoffWhen(info.months) + ') pagando ' + fmt(info.pay) + ' al mes';
+    lines.push(line + '.');
+  }
+  lines.push('Suma de pagos mínimos al mes: ' + fmt(totalMin) +
+    '. Suma de pagos efectivos (el planeado o, si no hay, el mínimo): ' + fmt(totalPay) + '.');
+  if (totalPay > 0) {
+    const av = simulatePayoff(db.debts, totalPay, 'avalancha');
+    const sn = simulatePayoff(db.debts, totalPay, 'nieve');
+    lines.push('Simulaciones locales pagando en total ' + fmt(totalPay) + ' al mes:');
+    lines.push('- Avalancha (mayor interés primero): ' + (av.ok
+      ? 'libre de deudas en ' + av.months + ' meses, interés total ' + fmt(av.totalInterestCents) + ', orden de salida: ' + av.order.join(' → ')
+      : 'con ese pago total el saldo NO baja') + '.');
+    lines.push('- Bola de nieve (menor saldo primero): ' + (sn.ok
+      ? 'libre de deudas en ' + sn.months + ' meses, interés total ' + fmt(sn.totalInterestCents) + ', orden de salida: ' + sn.order.join(' → ')
+      : 'con ese pago total el saldo NO baja') + '.');
+  }
+  const inc = sumCents(monthCountedIncomes(currentMonthKey()));
+  if (inc > 0) lines.push('Ingresos contados este mes: ' + fmt(inc) + '.');
+  return lines.join('\n').slice(0, 4900);
+}
+let debtAi97Text = '';
+async function onDebtAi97() {
+  if (!requirePro()) return;
+  const status = document.getElementById('debt-ai97-status');
+  const facts = debtFacts97();
+  if (!facts) { if (status) status.textContent = t('c97_debt_empty'); return; }
+  if (status) status.textContent = t('c97_debt_working');
+  try {
+    const r = await aiFn('debt-strategy', { facts: facts, lang: lang() });
+    debtAi97Text = (r && r.text) ? r.text : '';
+    if (status) status.textContent = debtAi97Text ? '' : t('c97_debt_none');
+    renderDebtAi97();
+  } catch (e) {
+    aiGatePaywall(e);
+    if (status) status.textContent = aiErrorText(e);
+  }
+}
+function renderDebtAi97() {
+  const box = document.getElementById('debt-ai97-results');
+  if (!box) return;
+  clearNode(box);
+  if (!debtAi97Text) return;
+  for (const para of debtAi97Text.split('\n')) {
+    const line = para.trim();
+    if (line) box.appendChild(el('p', null, line));
+  }
+}
+
 /* ---------------- Foto de recibo ----------------
    La foto se comprime en el teléfono (lienzo, máx. 1200px, JPEG 0.8) y
    se guarda como dataURL junto al gasto; viaja también en la copia JSON.
@@ -28095,6 +28414,11 @@ function wireEvents() {
   if (mrNarrBtn96) mrNarrBtn96.addEventListener('click', onMonthNarrate96);
   const budAiBtn96 = document.getElementById('bud-ai96-btn');
   if (budAiBtn96) budAiBtn96.addEventListener('click', onBudgetAi96);
+  /* Compilación 97: estratega de deudas y organizador del san con IA. */
+  const debtAiBtn97 = document.getElementById('debt-ai97-btn');
+  if (debtAiBtn97) debtAiBtn97.addEventListener('click', onDebtAi97);
+  const sanAiBtn97 = document.getElementById('san-ai97-btn');
+  if (sanAiBtn97) sanAiBtn97.addEventListener('click', onSanAi97);
   /* Compilación 76: botón Salir de Ajustes, atajos de la tarjeta
      PETO Pro, botones del asistente de primer uso y de la tarjeta
      de cuenta de Inicio, y el vaivén de campos del cobro. */

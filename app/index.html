@@ -889,6 +889,20 @@
       <p id="calc-note" class="muted small" hidden></p>
       <div id="calc-results"></div>
     </section>
+
+    <!-- Compilación 97 (Fase F · 5): estratega de deudas con IA.
+         La IA razona sobre los hechos que la app ya calculó
+         (saldos, APR, pagos y las dos simulaciones) y escribe la
+         estrategia; no cambia ningún pago ni guarda nada. -->
+    <section id="debt-ai97-card" class="card form-card">
+      <h3 data-i18n="c97_debt_title">🧭 Tu estrategia de deudas con IA</h3>
+      <p class="muted small" data-i18n="c97_debt_note">La IA razona sobre tus deudas reales —saldos, intereses, pagos y las simulaciones que la app ya calculó— y te escribe una estrategia: qué pagar primero y por qué. Es un texto para ti: no cambia ningún pago ni guarda nada.</p>
+      <div class="form-actions">
+        <button id="debt-ai97-btn" type="button" class="btn btn-secondary" data-i18n="c97_debt_btn">✨ Crear mi estrategia</button>
+      </div>
+      <p id="debt-ai97-status" class="muted small" aria-live="polite"></p>
+      <div id="debt-ai97-results"></div>
+    </section>
   </main>
 
   <!-- ======= MI SAN ======= -->
@@ -1158,6 +1172,20 @@
         </div>
       </div>
       </div>
+    </section>
+
+    <!-- Compilación 97 (Fase F · 6): organizador del san con IA.
+         La IA resume el san con los datos de la app (turnos,
+         pagos y atrasos) y escribe el resumen; el texto es solo
+         para la persona dentro de la app: no se envía nada. -->
+    <section id="san-ai97-card" class="card form-card">
+      <h3 data-i18n="c97_san_title">🗂️ Tu san, organizado con IA</h3>
+      <p class="muted small" data-i18n="c97_san_note">La IA resume tu san con los datos de la app: a quién le toca, quién ya pagó, quién falta y qué vigilar. Es solo un texto para ti dentro de la app: no se envía nada a nadie.</p>
+      <div class="form-actions">
+        <button id="san-ai97-btn" type="button" class="btn btn-secondary" data-i18n="c97_san_btn">✨ Organizar mi san</button>
+      </div>
+      <p id="san-ai97-status" class="muted small" aria-live="polite"></p>
+      <div id="san-ai97-results"></div>
     </section>
   </main>
 
