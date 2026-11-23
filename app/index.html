@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#00421C">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
@@ -53,9 +53,15 @@
   <p id="ai-chat-status" class="muted small" aria-live="polite"></p>
   <form id="ai-chat-form" class="chat-form" autocomplete="off">
     <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
-    <button id="ai-chat-voice" class="btn btn-secondary" type="button" data-i18n="ai3_voice_btn">🎤 Dictar</button>
-    <button class="btn btn-primary" type="submit" data-i18n="ai2_chat_send">Preguntar</button>
+    <button id="ai-chat-voice" class="btn btn-secondary chat-voice-btn" type="button" data-i18n-aria="ai3_voice_btn" aria-label="🎤 Dictar"><span class="chat-voice-icon" aria-hidden="true">🎤</span><span class="chat-voice-label" data-i18n="ai3_voice_word">Dictar</span></button>
+    <button class="btn btn-primary chat-send-btn" type="submit" data-i18n="ai2_chat_send">Preguntar</button>
   </form>
+  <div id="ai-reward-box" hidden>
+    <div class="form-actions">
+      <button id="ai-reward-btn" class="btn btn-secondary" type="button" data-i18n="ai4_reward_btn">Ver un anuncio y gana una consulta extra</button>
+    </div>
+    <p id="ai-reward-status" class="muted small" aria-live="polite"></p>
+  </div>
 </section>
 
 <!-- ============ BIENVENIDA / PRIMER USO ============ -->
@@ -1313,6 +1319,10 @@
       <div class="form-actions">
         <button id="btn-pro-open" type="button" class="btn btn-secondary" data-i18n="pro_btn_see">Ver PETO Pro</button>
       </div>
+      <div class="form-actions">
+        <button id="btn-pro-cancel" type="button" class="btn btn-ghost" data-i18n="ai4_cancel_btn" hidden>Cancelar Pro</button>
+      </div>
+      <p id="pro-cancel-note" class="muted small" hidden></p>
       <div class="form-actions">
         <button id="btn-pro-adv" type="button" class="btn btn-ghost" data-i18n="pro_open_adv">Abrir el informe avanzado</button>
         <button id="btn-pro-org" type="button" class="btn btn-ghost" data-i18n="pro_open_org">Abrir el modo organizador de san</button>

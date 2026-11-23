@@ -30,6 +30,7 @@ body{
   color:var(--ink);
   line-height:1.45;
   -webkit-text-size-adjust:100%;
+  max-width:100%;overflow-x:hidden;
 }
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 [hidden]{display:none !important}
@@ -75,7 +76,7 @@ h3{font-size:1.1rem}
 
 /* ---------- Resumen ---------- */
 .summary-strip{
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin:.75rem 0 1rem;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:.75rem 0 1rem;
 }
 .summary-item{
   position:relative;
@@ -773,6 +774,9 @@ h3{font-weight:700}
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
 select:not([multiple]), textarea{
   border-radius:12px;
+  /* Compilación 86 (arreglo 6): NINGÚN campo bajo 16px — iOS hace
+     zoom automático al enfocar campos menores y no regresa. */
+  font-size:16px;max-width:100%;
 }
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
 select:focus, textarea:focus{
@@ -1034,7 +1038,7 @@ body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px)}
    lenguaje visual que el campo, con ancho propio para que la fila
    siga saltando de línea en pantallas estrechas sin romperse. */
 .budget-period-select{
-  flex:0 1 auto;min-width:0;min-height:48px;padding:.5rem .45rem;font-size:.95rem;
+  flex:0 1 auto;min-width:0;min-height:48px;padding:.5rem .45rem;font-size:1rem;
   border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
 }
 
@@ -1518,3 +1522,49 @@ html.ios body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px +
 .fab-menu .fab-label{font-size:.95rem}
 .fab-menu .fab-main{transition:transform .18s ease}
 .fab-menu.open .fab-main{transform:rotate(45deg)}
+
+/* ================= Compilación 86 (arreglos 6 y 7) =================
+   PETO-C86-ZOOM-FIX · «La app hace zoom extraño» (capturas de Sterlin
+   en iPhone, build de TestFlight) + fila de escribir del chat
+   desproporcionada y cortada por abajo.
+   CAUSA RAÍZ (verificada en el código, no supuesta):
+   (a) PRINCIPAL — la regla global de campos solo fijaba el radio de
+       borde: los campos FUERA de .form-card/.onboarding-card (el del
+       chat #ai-chat-input, el buscador #search-text/#search-ai-input
+       y el registro por texto #ai-text-input) NO tenían font-size y
+       heredaban el tamaño por defecto del WebView (<16px). iOS hace
+       zoom automático al enfocar un campo <16px y NO regresa al
+       cerrar el teclado: la vista quedaba ampliada y desbordada
+       (captura 1) y la barra del chat se salía por la derecha
+       (captura 2). openAiChat() enfoca el campo al abrir el chat,
+       así que el zoom saltaba solo. La regla global ya fija 16px
+       (arriba) y .budget-period-select sube de .95rem a 1rem.
+   (c) El viewport permitía el zoom (sin maximum-scale): el meta de
+       las 4 copias queda maximum-scale=1, user-scalable=no, como
+       corresponde a una app nativa en WebView.
+   (b) SECUNDARIO — sin ningún elemento fijo más ancho que la
+       pantalla en Inicio (la tira de resumen pasa a minmax(0,1fr)
+       y body gana overflow-x:hidden de red), el desborde real era
+       la fila del chat: su input era flex:1 SIN min-width:0 (un
+       flex item no encoge bajo su contenido) junto a dos botones
+       .btn sin encoger: la fila no cabía y el «Ask» se cortaba.
+   ARREGLO 7 — fila de composición proporcionada: el campo ocupa el
+   ancho disponible (flex:1 1 auto + min-width:0), campo, micrófono
+   y «Ask» comparten 48px de alto y van alineados; el micrófono es
+   compacto (icono + etiqueta, y bajo 430px solo el icono en un
+   botón de 48px) y «Ask» va compacto, sin cortarse, con el área
+   segura inferior de la vista (arreglo 3 de la 85 intacto). Con el
+   teclado abierto, app.js (petoChatKbSync86, visualViewport) acorta
+   #view-chat a la ventana visible y la barra queda pegada ENCIMA
+   del teclado en iOS y en Android (Android suma adjustResize en el
+   manifiesto); al cerrarlo, la vista vuelve a 100dvh con su inset. */
+.chat-form{align-items:stretch;width:100%;max-width:100%}
+.chat-form input{flex:1 1 auto;min-width:0;height:48px;min-height:48px;font-size:16px;padding:.55rem .8rem}
+.chat-form .btn{flex:0 0 auto;height:48px;min-height:48px;padding:.55rem .7rem;font-size:1rem;white-space:nowrap}
+.chat-form .chat-voice-btn{display:inline-flex;align-items:center;gap:.35rem}
+.chat-send-btn{min-width:64px}
+.chat-view.kb-open{padding-bottom:0}
+@media (max-width:430px){
+  .chat-voice-label{display:none}
+  .chat-form .chat-voice-btn{width:48px;padding:.55rem 0;justify-content:center}
+}
