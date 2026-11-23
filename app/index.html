@@ -596,6 +596,7 @@
         <div class="form-actions">
           <button id="mr-print" type="button" class="btn btn-secondary" data-i18n="mr_print">🖨️ Imprimir / guardar PDF</button>
           <button id="mr-csv" type="button" class="btn btn-secondary" data-i18n="mr_csv">⬇️ Descargar CSV</button>
+          <button id="mr-narrate96" type="button" class="btn btn-secondary" data-i18n="c96_mr_btn">✨ Contar mi mes con IA</button>
         </div>
         <div id="mr-actions" class="form-actions"></div>
         <p id="mr-status" class="muted small" aria-live="polite"></p>
@@ -656,6 +657,18 @@
     <!-- Compilación 76: modo base cero (opt-in). -->
     <section id="budget-zero" class="card"></section>
     <ul id="budget-list" class="item-list budget-grid"></ul>
+    <!-- Compilación 96 (Fase F · 2): presupuesto con criterio IA.
+         La IA propone topes con su razón; cada uno se aplica solo
+         si la persona toca su «Usar». Nada se aplica solo. -->
+    <section id="bud-ai96-card" class="card form-card">
+      <h3 data-i18n="c96_bud_ai_title">🎯 Presupuesto con criterio IA</h3>
+      <p class="muted small" data-i18n="c96_bud_ai_note">La IA mira tu ingreso, tus pagos fijos y tu gasto real, y propone topes con criterio — no solo el promedio. Tú aceptas, editas o ignoras cada uno: nada se aplica solo.</p>
+      <div class="form-actions">
+        <button id="bud-ai96-btn" type="button" class="btn btn-secondary" data-i18n="c96_bud_ai_btn">✨ Sugerir con IA</button>
+      </div>
+      <p id="bud-ai96-status" class="muted small" aria-live="polite"></p>
+      <ul id="bud-ai96-results" class="item-list"></ul>
+    </section>
 
     <!-- Compilación 90 (punto 7): «Categoría personalizada» pasa a
          ser el botón «+ Categoría»; el formulario nace plegado. -->
@@ -1443,6 +1456,7 @@
             </div>
             <div id="setacc-rules-body" hidden>
             <p class="muted small set92-oneline" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
+            <p class="muted small set92-oneline" data-i18n="c96_rules_learned_help">PETO Finanzas también aprende solo: cuando corriges la categoría de un gasto, guarda la regla y la aplica la próxima vez. Las reglas aprendidas se marcan como «aprendida sola».</p>
             <ul id="rules-list" class="item-list"></ul>
             <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
             <label for="rule-match" data-i18n="rules_match_label">Texto que contiene la nota o el comercio</label>
