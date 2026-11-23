@@ -1745,3 +1745,22 @@ html[data-theme="oscuro"] .chat-pill93{background:rgba(32,36,40,.30)}
 .set92-index-row{padding-right:5.25rem}
 .set93-index-sum{margin-left:auto;text-align:right}
 .set93-sec .sections-head{padding-right:5rem}
+
+/* PETO-C94 · Fase B: guiones del agente, comparador y quincena.
+   El guion se lee tal cual (saltos respetados); los formularios
+   de los modales imitan el acabado de .form-card; las listas de
+   pasos/consejos/avisos van sobrias, sin tarjetas anidadas. */
+.c94-script{white-space:pre-wrap;background:var(--accent-soft);border-radius:8px;
+  padding:.6rem .75rem;font-size:.95rem;line-height:1.45;margin:.4rem 0 .6rem;
+  max-height:38vh;overflow-y:auto;text-align:left}
+.c94-list{margin:.2rem 0 .6rem;padding-left:1.25rem;text-align:left}
+.c94-list li{margin:.25rem 0;line-height:1.4}
+.c94-form label{display:block;font-weight:600;margin:.75rem 0 .3rem;text-align:left}
+.c94-form input{width:100%;min-height:var(--tap);padding:.6rem .75rem;font-size:1rem;
+  border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.c94-form input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.c94-result{text-align:left;margin-top:.6rem}
+.c94-input{width:100%;min-height:var(--tap);padding:.55rem .7rem;font-size:1rem;
+  border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
+  margin:.3rem 0}
+.c94-input:focus{outline:2px solid var(--accent);outline-offset:1px}

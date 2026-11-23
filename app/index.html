@@ -926,6 +926,13 @@
 
     <ul id="remittance-list" class="item-list"></ul>
     <p id="remittance-empty" class="empty-state" hidden data-i18n="rem_empty">No tienes remesas registradas.</p>
+    <section class="card" id="remit94-card">
+      <h3 data-i18n="c94_remit_title">💸 El costo real de tu remesa</h3>
+      <p class="muted" data-i18n="c94_remit_help">Las cuentas se hacen en tu teléfono, con matemática exacta; la IA solo te las explica en palabras simples. Desde aquí no se envía dinero.</p>
+      <div class="form-actions">
+        <button id="remit94-open" type="button" class="btn btn-secondary" data-i18n="c94_remit_btn">💸 Costo real de tu remesa</button>
+      </div>
+    </section>
     <section id="rem-totals" class="card" hidden></section>
   </main>
 
@@ -1725,6 +1732,88 @@
     <button id="share-opt-year" type="button" class="btn btn-primary btn-big" data-i18n="year_share_btn">Compartir mi año como imagen</button>
     <button id="share-opt-dl" type="button" class="btn btn-primary btn-big" data-i18n="rep_download">Descargar imagen</button>
     <button id="share-opt-cancel" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+  </div>
+</div>
+
+<div id="bill94-modal" class="chooser" hidden role="dialog" aria-modal="true">
+  <div class="chooser-card">
+    <h3 data-i18n="c94_bill_title">📞 Tu guion para negociar</h3>
+    <p class="muted small" data-i18n="c94_bill_help">La IA escribe tu guion en inglés, listo para leer cuando llames a la compañía. PETO no llama por ti: tú haces la llamada.</p>
+    <form id="bill94-form" class="c94-form" autocomplete="off">
+      <label for="bill94-issuer" data-i18n="c94_issuer_label">Compañía (ej.: Spectrum, Con Edison)</label>
+      <input id="bill94-issuer" type="text" maxlength="120">
+      <label for="bill94-service" data-i18n="c94_service_label">Servicio (opcional)</label>
+      <input id="bill94-service" type="text" maxlength="80">
+      <label for="bill94-amount" data-i18n="c94_amount_label">Cuánto pagas al mes ($)</label>
+      <input id="bill94-amount" type="text" inputmode="decimal" placeholder="0.00">
+      <label for="bill94-tenure" data-i18n="c94_tenure_label">Meses como cliente (opcional)</label>
+      <input id="bill94-tenure" type="number" min="0" max="1200" inputmode="numeric">
+      <p id="bill94-status" class="muted small" aria-live="polite"></p>
+      <div id="bill94-result" class="c94-result" hidden></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="c94_make_script">Crear mi guion</button>
+        <button id="bill94-close" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="cancel94-modal" class="chooser" hidden role="dialog" aria-modal="true">
+  <div class="chooser-card">
+    <h3 data-i18n="c94_cancel_title">🚪 Tu guion para cancelar</h3>
+    <p class="muted small" data-i18n="c94_cancel_help">La IA escribe tu guion en inglés para cancelar sin rodeos. PETO no cancela por ti: tú haces la llamada o el chat con la compañía.</p>
+    <form id="cancel94-form" class="c94-form" autocomplete="off">
+      <label for="cancel94-merchant" data-i18n="c94_merchant_label">Servicio a cancelar</label>
+      <input id="cancel94-merchant" type="text" maxlength="120">
+      <label for="cancel94-amount" data-i18n="c94_amount_label">Cuánto pagas al mes ($)</label>
+      <input id="cancel94-amount" type="text" inputmode="decimal" placeholder="0.00">
+      <p id="cancel94-status" class="muted small" aria-live="polite"></p>
+      <div id="cancel94-result" class="c94-result" hidden></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="c94_make_script">Crear mi guion</button>
+        <button id="cancel94-close" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="remit94-modal" class="chooser" hidden role="dialog" aria-modal="true">
+  <div class="chooser-card">
+    <h3 data-i18n="c94_remit_title">💸 El costo real de tu remesa</h3>
+    <p class="muted small" data-i18n="c94_remit_help">Las cuentas se hacen en tu teléfono, con matemática exacta; la IA solo te las explica en palabras simples. Desde aquí no se envía dinero.</p>
+    <form id="remit94-form" class="c94-form" autocomplete="off">
+      <label for="remit94-amount" data-i18n="c94_remit_amount">Cantidad que envías ($)</label>
+      <input id="remit94-amount" type="text" inputmode="decimal" placeholder="100.00">
+      <label for="remit94-fee" data-i18n="c94_remit_fee">Comisión que te cobraron ($)</label>
+      <input id="remit94-fee" type="text" inputmode="decimal" placeholder="4.99">
+      <label for="remit94-rate" data-i18n="c94_remit_rate">Tipo de cambio que te dieron (por $1)</label>
+      <input id="remit94-rate" type="text" inputmode="decimal" placeholder="55.00">
+      <label for="remit94-market" data-i18n="c94_remit_market">Tipo de cambio de mercado (opcional)</label>
+      <input id="remit94-market" type="text" inputmode="decimal" placeholder="58.50">
+      <label for="remit94-alt-name" data-i18n="c94_remit_alt_name">Alternativa (opcional: nombre del otro servicio)</label>
+      <input id="remit94-alt-name" type="text" maxlength="80">
+      <label for="remit94-alt-fee" data-i18n="c94_remit_alt_fee">Su comisión ($)</label>
+      <input id="remit94-alt-fee" type="text" inputmode="decimal" placeholder="2.99">
+      <label for="remit94-alt-rate" data-i18n="c94_remit_alt_rate">Su tipo de cambio (por $1)</label>
+      <input id="remit94-alt-rate" type="text" inputmode="decimal" placeholder="57.00">
+      <p id="remit94-status" class="muted small" aria-live="polite"></p>
+      <div id="remit94-result" class="c94-result" hidden></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="c94_remit_calc">Calcular y explicar</button>
+        <button id="remit94-close" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="quin94-modal" class="chooser" hidden role="dialog" aria-modal="true">
+  <div class="chooser-card">
+    <h3 data-i18n="c94_quin_title">🗓️ Tu quincena con IA</h3>
+    <div id="quin94-body"></div>
+    <p id="quin94-status" class="muted small" aria-live="polite"></p>
+    <div class="form-actions">
+      <button id="quin94-close" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+    </div>
   </div>
 </div>
 

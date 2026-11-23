@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 93';
-const BUILD_NUM = 93;
+const BUILD_LABEL = 'Compilación 94';
+const BUILD_NUM = 94;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1222,6 +1222,48 @@ const LANGS = ['es', 'en', 'it', 'pt', 'fr', 'de', 'zh', 'ja', 'ko', 'ru', 'hi',
 const LOCALES = { es: 'es', en: 'en-US', it: 'it-IT', pt: 'pt', fr: 'fr-FR', de: 'de-DE', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ru: 'ru-RU', hi: 'hi-IN', ar: 'ar-EG' };
 const I18N = {
 es: {
+  c94_soon: 'Esta función Pro se está activando: vuelve en unos minutos.',
+  c94_bill_btn: '📞 Negociar esta factura',
+  c94_bill_title: '📞 Tu guion para negociar',
+  c94_bill_help: 'La IA escribe tu guion en inglés, listo para leer cuando llames a la compañía. PETO Finanzas no llama por ti: tú haces la llamada.',
+  c94_issuer_label: 'Compañía (ej.: Spectrum, Con Edison)',
+  c94_service_label: 'Servicio (opcional)',
+  c94_amount_label: 'Cuánto pagas al mes ($)',
+  c94_tenure_label: 'Meses como cliente (opcional)',
+  c94_make_script: 'Crear mi guion',
+  c94_working: 'Escribiendo tu guion…',
+  c94_script_title: 'Guion para leer en la llamada (en inglés)',
+  c94_steps_title: 'Pasos',
+  c94_tips_title: 'Consejos',
+  c94_warnings_title: 'Ojo con esto',
+  c94_copy: 'Copiar el guion',
+  c94_copied: '✅ Guion copiado',
+  c94_cancel_btn: '🚪 Guion para cancelar',
+  c94_cancel_title: '🚪 Tu guion para cancelar',
+  c94_cancel_help: 'La IA escribe tu guion en inglés para cancelar sin rodeos. PETO Finanzas no cancela por ti: tú haces la llamada o el chat con la compañía.',
+  c94_merchant_label: 'Servicio a cancelar',
+  c94_remit_btn: '💸 Costo real de tu remesa',
+  c94_remit_title: '💸 El costo real de tu remesa',
+  c94_remit_help: 'Las cuentas se hacen en tu teléfono, con matemática exacta; la IA solo te las explica en palabras simples. Desde aquí no se envía dinero.',
+  c94_remit_amount: 'Cantidad que envías ($)',
+  c94_remit_fee: 'Comisión que te cobraron ($)',
+  c94_remit_rate: 'Tipo de cambio que te dieron (por $1)',
+  c94_remit_market: 'Tipo de cambio de mercado (opcional)',
+  c94_remit_alt_name: 'Alternativa (opcional: nombre del otro servicio)',
+  c94_remit_alt_fee: 'Su comisión ($)',
+  c94_remit_alt_rate: 'Su tipo de cambio (por $1)',
+  c94_remit_calc: 'Calcular y explicar',
+  c94_remit_cost_line: 'Costo real: {cost} ({pct}% de lo enviado)',
+  c94_remit_alt_line: 'Con {name}: {cost} → te ahorras {save}',
+  c94_remit_err: 'Escribe la cantidad, la comisión y el tipo de cambio que te dieron.',
+  c94_quin_btn: '🗓️ Tu quincena con IA',
+  c94_quin_title: '🗓️ Tu quincena con IA',
+  c94_quin_working: 'Leyendo tu quincena…',
+  c94_chat_bill_intro: 'Te preparo el guion para negociar esa factura (Pro). Completa los datos:',
+  c94_chat_cancel_intro: 'Te preparo el guion para cancelarlo (Pro). Completa los datos:',
+  c94_chat_remit_intro: 'El comparador calcula el costo real de tu envío: la comisión más el margen escondido en el tipo de cambio.',
+  c94_chat_open_remit: 'Abrir el comparador de remesas',
+  c94_err_fields: 'Completa los datos para crear tu guion.',
   setup_title: 'Configura tu PETO Finanzas',
   setup_step_of: 'Paso {n} de 3',
   setup_step1_t: 'Crea tu cuenta',
@@ -1857,6 +1899,48 @@ es: {
   ob_signin_btn: 'Ya tengo cuenta · Iniciar sesión', ob_signin_help: 'Si ya usas PETO Finanzas en otro teléfono o en la web, entra con tu correo y tus datos bajan solos.', ob_signin_back: 'Volver', ob_exp_amount_ph: 'Cantidad (ej. 25.00)', ob_exp_add: 'Anotar mi primer gasto', ob_exp_done: '✓ ¡Anotado! Así de fácil es registrar un gasto.', ob_fix_title: 'Tus pagos fijos y tu presupuesto', ob_fix_text: 'Agrega los pagos que se repiten cada mes (renta, teléfono, suscripciones). Con ellos, PETO Finanzas arma tu presupuesto y calcula cuánto puedes gastar hoy. Puedes agregar más cuando quieras.', ob_fix_name_ph: 'Nombre (ej. Renta)', ob_fix_day_ph: 'Día (1-31)', ob_fix_add: '＋ Agregar pago fijo', ob_fix_added: '✓ Pago fijo agregado. Agrega otro o sigue.', ob_goal_title: 'Tu meta de ahorro', ob_goal_text: 'Ponle nombre y cantidad a tu primera meta (por ejemplo, tu fondo de emergencia). Ahorrar con una meta clara es mucho más fácil.', ob_goal_name_ph: 'Nombre (ej. Fondo de emergencia)', ob_goal_target_ph: 'Cantidad meta (ej. 1,000)', ob_goal_add: 'Crear mi meta', ob_goal_added: '✓ ¡Meta creada! La verás en Ahorros.', ob_san_title: 'El san: ahorra en grupo', ob_san_text: 'El san (tanda, cundina, susu) es el círculo de ahorro en grupo de toda la vida: todos aportan cada semana y cada uno recibe el pote en su turno. PETO Finanzas lleva el orden, los turnos y los recibos sin cuadernos.', ob_san_btn: 'Crear mi san al terminar', ob_bank_title: 'Conecta tu banco', ob_bank_text: 'Si quieres, conecta tu banco para que tus movimientos entren solos y tus saldos estén siempre al día. Es opcional: puedes hacerlo al terminar la bienvenida o más tarde en Ajustes.', ob_bank_btn: 'Quiero conectar mi banco', ob_pod_title: 'Aprende con el podcast', ob_pod_text: '«Finanzas Personales», el podcast de PETO Finanzas: episodios en español con Lucía y Marco, con ejemplos y pasos concretos para tu dinero. Escúchalo dentro de la app.', ob_pod_btn: 'Ver el podcast al terminar', ob_bell_title: 'Activa tus recordatorios', ob_bell_text: 'Recibe avisos cuando un pago fijo esté por vencer y tu resumen del día. Así nada se te pasa.', ob_bell_btn: 'Activar recordatorios', ob_bell_done: '✓ Recordatorios activados.', ob_cloud_btn: 'Crear mi cuenta al terminar', ob_pending_ok: '✓ ¡Listo! Al terminar la bienvenida te llevo directo ahí.', ob_pending_btn: '✓ Se abre al terminar', spend_ctx_below: 'Vas {amount} por debajo de tu ritmo del mes pasado', spend_ctx_above: 'Vas {amount} por encima de tu ritmo del mes pasado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Seguridad', sec_card_read: 'Conexión bancaria de solo lectura: nunca podemos mover tu dinero', sec_card_enc: 'Tus datos viajan y se guardan cifrados', sec_card_lock: 'Bloqueo con PIN y huella', sec_card_lock_faceid: 'Bloqueo con PIN y Face ID', sec_card_lock_generic: 'Bloqueo con PIN y datos biométricos', bud_per_semana: 'por semana', bud_per_quincena: 'por quincena', bud_per_mes: 'por mes', spend_left_periods: 'Te quedan {amount} entre todos tus períodos.', spend_x_periods: 'Cada categoría se reparte según su propio período:', spend_x_cat: '{cat} ({per}): quedan {left} ÷ {days} días = {daily} hoy', bud_period_aria: 'Período del límite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Presupuesto', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar con huella (si creo un PIN)', ob_bio_label_faceid: 'Entrar con Face ID (si creo un PIN)', ob_bio_label_generic: 'Entrar con datos biométricos (si creo un PIN)', panel_vs_title: '📊 Este mes vs. el mes pasado', panel_vs_empty: 'Aún no hay datos del mes pasado para comparar.', panel_vs_cur: 'Este mes', panel_vs_prev: 'Mes pasado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Llevas {amount} más que en el mismo tramo del mes pasado ({pct}%)', panel_vs_down: '⬇ Llevas {amount} menos que en el mismo tramo del mes pasado ({pct}%)', panel_vs_same: 'Vas igual que en el mismo tramo del mes pasado.', panel_top_title: '🏆 Categorías con más gasto del mes', panel_top_empty: 'Este mes todavía no hay gastos.', panel_flow_title: '💵 Flujo de caja', panel_flow_empty: 'Cuando tengas movimientos de varios meses, aquí verás cómo entra y sale tu dinero.', panel_flow_in: 'Ingresos', panel_flow_out: 'Gastos', panel_flow_net: 'Neto: {amount}', panel_bc_title: '🎯 Avance de tus topes', panel_bc_budget: 'Presupuesto', panel_bc_spent: 'Gastado', panel_bc_left: 'Queda', panel_bc_empty: 'Aún no tienes topes por categoría: escribe uno en la lista y aquí verás su avance.'
 },
 en: {
+  c94_soon: 'This Pro feature is being activated: check back in a few minutes.',
+  c94_bill_btn: '📞 Negotiate this bill',
+  c94_bill_title: '📞 Your negotiation script',
+  c94_bill_help: 'The AI writes your script in English, ready to read when you call the company. PETO Finanzas does not call for you: you make the call.',
+  c94_issuer_label: 'Company (e.g.: Spectrum, Con Edison)',
+  c94_service_label: 'Service (optional)',
+  c94_amount_label: 'What you pay per month ($)',
+  c94_tenure_label: 'Months as a customer (optional)',
+  c94_make_script: 'Create my script',
+  c94_working: 'Writing your script…',
+  c94_script_title: 'Script to read on the call (in English)',
+  c94_steps_title: 'Steps',
+  c94_tips_title: 'Tips',
+  c94_warnings_title: 'Watch out',
+  c94_copy: 'Copy the script',
+  c94_copied: '✅ Script copied',
+  c94_cancel_btn: '🚪 Cancellation script',
+  c94_cancel_title: '🚪 Your cancellation script',
+  c94_cancel_help: 'The AI writes your script in English to cancel without detours. PETO Finanzas does not cancel for you: you make the call or chat with the company.',
+  c94_merchant_label: 'Service to cancel',
+  c94_remit_btn: '💸 Real cost of your remittance',
+  c94_remit_title: '💸 The real cost of your remittance',
+  c94_remit_help: 'The math is done on your phone, exactly; the AI only explains it in simple words. No money is sent from here.',
+  c94_remit_amount: 'Amount you send ($)',
+  c94_remit_fee: 'Fee you were charged ($)',
+  c94_remit_rate: 'Exchange rate you got (per $1)',
+  c94_remit_market: 'Market exchange rate (optional)',
+  c94_remit_alt_name: 'Alternative (optional: name of the other service)',
+  c94_remit_alt_fee: 'Its fee ($)',
+  c94_remit_alt_rate: 'Its exchange rate (per $1)',
+  c94_remit_calc: 'Calculate and explain',
+  c94_remit_cost_line: 'Real cost: {cost} ({pct}% of what you sent)',
+  c94_remit_alt_line: 'With {name}: {cost} → you save {save}',
+  c94_remit_err: 'Enter the amount, the fee and the exchange rate you got.',
+  c94_quin_btn: '🗓️ Your pay period with AI',
+  c94_quin_title: '🗓️ Your pay period with AI',
+  c94_quin_working: 'Reading your pay period…',
+  c94_chat_bill_intro: 'I’ll prepare the script to negotiate that bill (Pro). Fill in the details:',
+  c94_chat_cancel_intro: 'I’ll prepare the script to cancel it (Pro). Fill in the details:',
+  c94_chat_remit_intro: 'The comparator works out the real cost of your transfer: the fee plus the margin hidden in the exchange rate.',
+  c94_chat_open_remit: 'Open the remittance comparator',
+  c94_err_fields: 'Fill in the details to create your script.',
   setup_title: 'Set up your PETO Finanzas',
   setup_step_of: 'Step {n} of 3',
   setup_step1_t: 'Create your account',
@@ -2492,6 +2576,48 @@ en: {
   ob_signin_btn: 'I already have an account · Sign in', ob_signin_help: 'Already using PETO Finanzas on another phone or on the web? Sign in with your email and your data comes down on its own.', ob_signin_back: 'Back', ob_exp_amount_ph: 'Amount (e.g. 25.00)', ob_exp_add: 'Log my first expense', ob_exp_done: '✓ Logged! That is how easy it is to record an expense.', ob_fix_title: 'Your fixed payments and your budget', ob_fix_text: 'Add the payments that repeat every month (rent, phone, subscriptions). With them, PETO Finanzas builds your budget and works out how much you can spend today. You can add more any time.', ob_fix_name_ph: 'Name (e.g. Rent)', ob_fix_day_ph: 'Day (1-31)', ob_fix_add: '＋ Add fixed payment', ob_fix_added: '✓ Fixed payment added. Add another or keep going.', ob_goal_title: 'Your savings goal', ob_goal_text: 'Give your first goal a name and an amount (for example, your emergency fund). Saving toward a clear goal is much easier.', ob_goal_name_ph: 'Name (e.g. Emergency fund)', ob_goal_target_ph: 'Goal amount (e.g. 1,000)', ob_goal_add: 'Create my goal', ob_goal_added: '✓ Goal created! You will find it under Savings.', ob_san_title: 'The san: save as a group', ob_san_text: 'The san (tanda, cundina, susu) is the classic group savings circle: everyone chips in every week and each person takes the pot on their turn. PETO Finanzas keeps the order, the turns and the receipts with no notebooks.', ob_san_btn: 'Create my san when I finish', ob_bank_title: 'Connect your bank', ob_bank_text: 'If you like, connect your bank so your transactions come in on their own and your balances are always up to date. It is optional: do it when you finish the welcome, or later in Settings.', ob_bank_btn: 'I want to connect my bank', ob_pod_title: 'Learn with the podcast', ob_pod_text: '“Personal Finance”, the PETO Finanzas podcast: episodes in Spanish with Lucía and Marco, with examples and concrete steps for your money. Listen inside the app.', ob_pod_btn: 'See the podcast when I finish', ob_bell_title: 'Turn on your reminders', ob_bell_text: 'Get a heads-up when a fixed payment is about to be due, plus your daily summary. Nothing slips by.', ob_bell_btn: 'Turn on reminders', ob_bell_done: '✓ Reminders turned on.', ob_cloud_btn: 'Create my account when I finish', ob_pending_ok: '✓ Done! When you finish the welcome, I will take you straight there.', ob_pending_btn: '✓ Opens when you finish', spend_ctx_below: 'You are {amount} below last month’s pace', spend_ctx_above: 'You are {amount} above last month’s pace', spend_ctx_bank: 'Bank connected', sec_card_title: 'Security', sec_card_read: 'Read-only bank connection: we can never move your money', sec_card_enc: 'Your data travels and is stored encrypted', sec_card_lock: 'PIN and fingerprint lock', sec_card_lock_faceid: 'PIN and Face ID lock', sec_card_lock_generic: 'PIN and biometric lock', bud_per_semana: 'per week', bud_per_quincena: 'per two weeks', bud_per_mes: 'per month', spend_left_periods: 'You have {amount} left across all your periods.', spend_x_periods: 'Each category is spread over its own period:', spend_x_cat: '{cat} ({per}): {left} left ÷ {days} days = {daily} today', bud_period_aria: 'Limit period for {cat}', nav_gastos: 'Expenses', nav_presupuesto: 'Budget', nav_ajustes: 'Settings', ob_bio_label: 'Unlock with fingerprint (if I create a PIN)', ob_bio_label_faceid: 'Get in with Face ID (if I create a PIN)', ob_bio_label_generic: 'Get in with biometrics (if I create a PIN)', panel_vs_title: '📊 This month vs. last month', panel_vs_empty: 'There is no data from last month to compare yet.', panel_vs_cur: 'This month', panel_vs_prev: 'Last month', panel_week: 'Wk {n}', panel_vs_up: '⬆ You are {amount} above the same stretch of last month ({pct}%)', panel_vs_down: '⬇ You are {amount} below the same stretch of last month ({pct}%)', panel_vs_same: 'You are even with the same stretch of last month.', panel_top_title: '🏆 Top spending categories this month', panel_top_empty: 'No expenses yet this month.', panel_flow_title: '💵 Cash flow', panel_flow_empty: 'Once you have transactions across several months, here you will see how your money comes and goes.', panel_flow_in: 'Income', panel_flow_out: 'Expenses', panel_flow_net: 'Net: {amount}', panel_bc_title: '🎯 Your limits at a glance', panel_bc_budget: 'Budget', panel_bc_spent: 'Spent', panel_bc_left: 'Left', panel_bc_empty: 'You have no per-category limits yet: set one in the list and its progress will show here.'
 },
 it: {
+  c94_soon: 'Questa funzione Pro si sta attivando: riprova tra qualche minuto.',
+  c94_bill_btn: '📞 Negozia questa bolletta',
+  c94_bill_title: '📞 Il tuo copione per negoziare',
+  c94_bill_help: 'L’IA scrive il tuo copione in inglese, pronto da leggere quando chiami l’azienda. PETO Finanzas non chiama per te: la chiamata la fai tu.',
+  c94_issuer_label: 'Azienda (es.: Spectrum, Con Edison)',
+  c94_service_label: 'Servizio (facoltativo)',
+  c94_amount_label: 'Quanto paghi al mese ($)',
+  c94_tenure_label: 'Mesi da cliente (facoltativo)',
+  c94_make_script: 'Crea il mio copione',
+  c94_working: 'Sto scrivendo il tuo copione…',
+  c94_script_title: 'Copione da leggere durante la chiamata (in inglese)',
+  c94_steps_title: 'Passi',
+  c94_tips_title: 'Consigli',
+  c94_warnings_title: 'Attenzione',
+  c94_copy: 'Copia il copione',
+  c94_copied: '✅ Copione copiato',
+  c94_cancel_btn: '🚪 Copione per cancellare',
+  c94_cancel_title: '🚪 Il tuo copione per cancellare',
+  c94_cancel_help: 'L’IA scrive il tuo copione in inglese per cancellare senza giri di parole. PETO Finanzas non cancella per te: la chiamata o la chat la fai tu.',
+  c94_merchant_label: 'Servizio da cancellare',
+  c94_remit_btn: '💸 Costo reale della tua rimessa',
+  c94_remit_title: '💸 Il costo reale della tua rimessa',
+  c94_remit_help: 'I conti si fanno sul tuo telefono, con matematica esatta; l’IA te li spiega solo con parole semplici. Da qui non si invia denaro.',
+  c94_remit_amount: 'Importo che invii ($)',
+  c94_remit_fee: 'Commissione che ti hanno addebitato ($)',
+  c94_remit_rate: 'Tasso di cambio che ti hanno dato (per $1)',
+  c94_remit_market: 'Tasso di cambio di mercato (facoltativo)',
+  c94_remit_alt_name: 'Alternativa (facoltativo: nome dell’altro servizio)',
+  c94_remit_alt_fee: 'La sua commissione ($)',
+  c94_remit_alt_rate: 'Il suo tasso di cambio (per $1)',
+  c94_remit_calc: 'Calcola e spiega',
+  c94_remit_cost_line: 'Costo reale: {cost} ({pct}% di quanto inviato)',
+  c94_remit_alt_line: 'Con {name}: {cost} → risparmi {save}',
+  c94_remit_err: 'Scrivi l’importo, la commissione e il tasso di cambio che ti hanno dato.',
+  c94_quin_btn: '🗓️ Il tuo periodo di paga con IA',
+  c94_quin_title: '🗓️ Il tuo periodo di paga con IA',
+  c94_quin_working: 'Sto leggendo il tuo periodo di paga…',
+  c94_chat_bill_intro: 'Ti preparo il copione per negoziare quella bolletta (Pro). Completa i dati:',
+  c94_chat_cancel_intro: 'Ti preparo il copione per cancellarlo (Pro). Completa i dati:',
+  c94_chat_remit_intro: 'Il comparatore calcola il costo reale del tuo invio: la commissione più il margine nascosto nel tasso di cambio.',
+  c94_chat_open_remit: 'Apri il comparatore di rimesse',
+  c94_err_fields: 'Completa i dati per creare il tuo copione.',
   setup_title: 'Configura il tuo PETO Finanzas',
   setup_step_of: 'Passo {n} di 3',
   setup_step1_t: 'Crea il tuo account',
@@ -3370,6 +3496,48 @@ it: {
   ob_signin_btn: 'Ho già un account · Accedi', ob_signin_help: 'Usi già PETO Finanzas su un altro telefono o sul web? Accedi con la tua email e i tuoi dati scendono da soli.', ob_signin_back: 'Indietro', ob_exp_amount_ph: 'Importo (es. 25,00)', ob_exp_add: 'Registra la mia prima spesa', ob_exp_done: '✓ Registrata! Registrare una spesa è così facile.', ob_fix_title: 'I tuoi pagamenti fissi e il tuo budget', ob_fix_text: 'Aggiungi i pagamenti che si ripetono ogni mese (affitto, telefono, abbonamenti). Con essi, PETO Finanzas crea il tuo budget e calcola quanto puoi spendere oggi. Puoi aggiungerne altri quando vuoi.', ob_fix_name_ph: 'Nome (es. Affitto)', ob_fix_day_ph: 'Giorno (1-31)', ob_fix_add: '＋ Aggiungi pagamento fisso', ob_fix_added: '✓ Pagamento fisso aggiunto. Aggiungine un altro o continua.', ob_goal_title: 'Il tuo obiettivo di risparmio', ob_goal_text: 'Dai un nome e un importo al tuo primo obiettivo (per esempio, il tuo fondo di emergenza). Risparmiare con un obiettivo chiaro è molto più facile.', ob_goal_name_ph: 'Nome (es. Fondo di emergenza)', ob_goal_target_ph: 'Importo obiettivo (es. 1.000)', ob_goal_add: 'Crea il mio obiettivo', ob_goal_added: '✓ Obiettivo creato! Lo trovi in Risparmi.', ob_san_title: 'Il san: risparmia in gruppo', ob_san_text: 'Il san (tanda, cundina, susu) è il classico cerchio di risparmio di gruppo: tutti contribuiscono ogni settimana e ognuno riceve il fondo al suo turno. PETO Finanzas gestisce ordine, turni e ricevute senza quaderni.', ob_san_btn: 'Crea il mio san alla fine', ob_bank_title: 'Collega la tua banca', ob_bank_text: 'Se vuoi, collega la tua banca così i movimenti entrano da soli e i saldi sono sempre aggiornati. È facoltativo: fallo alla fine del benvenuto o più tardi in Impostazioni.', ob_bank_btn: 'Voglio collegare la mia banca', ob_pod_title: 'Impara con il podcast', ob_pod_text: '«Finanze Personali», il podcast di PETO Finanzas: episodi in spagnolo con Lucía e Marco, con esempi e passi concreti per i tuoi soldi. Ascoltalo dentro l’app.', ob_pod_btn: 'Vedi il podcast alla fine', ob_bell_title: 'Attiva i promemoria', ob_bell_text: 'Ricevi un avviso quando un pagamento fisso sta per scadere e il riepilogo della giornata. Così non ti sfugge nulla.', ob_bell_btn: 'Attiva i promemoria', ob_bell_done: '✓ Promemoria attivati.', ob_cloud_btn: 'Crea il mio account alla fine', ob_pending_ok: '✓ Fatto! Alla fine del benvenuto ti porto subito lì.', ob_pending_btn: '✓ Si apre alla fine', spend_ctx_below: 'Sei {amount} sotto il ritmo del mese scorso', spend_ctx_above: 'Sei {amount} sopra il ritmo del mese scorso', spend_ctx_bank: 'Banca collegata', sec_card_title: 'Sicurezza', sec_card_read: 'Connessione bancaria in sola lettura: non possiamo mai muovere i tuoi soldi', sec_card_enc: 'I tuoi dati viaggiano e sono salvati cifrati', sec_card_lock: 'Blocco con PIN e impronta', sec_card_lock_faceid: 'Blocco con PIN e Face ID', sec_card_lock_generic: 'Blocco con PIN e dati biometrici', bud_per_semana: 'a settimana', bud_per_quincena: 'ogni due settimane', bud_per_mes: 'al mese', spend_left_periods: 'Ti restano {amount} tra tutti i tuoi periodi.', spend_x_periods: 'Ogni categoria si distribuisce sul suo periodo:', spend_x_cat: '{cat} ({per}): restano {left} ÷ {days} giorni = {daily} oggi', bud_period_aria: 'Periodo del limite per {cat}', nav_gastos: 'Spese', nav_presupuesto: 'Budget', nav_ajustes: 'Impostazioni', ob_bio_label: 'Accedi con l’impronta (se creo un PIN)', ob_bio_label_faceid: 'Entra con Face ID (se creo un PIN)', ob_bio_label_generic: 'Entra con i dati biometrici (se creo un PIN)', panel_vs_title: '📊 Questo mese vs. il mese scorso', panel_vs_empty: 'Non ci sono ancora dati del mese scorso da confrontare.', panel_vs_cur: 'Questo mese', panel_vs_prev: 'Mese scorso', panel_week: 'Sett. {n}', panel_vs_up: '⬆ Sei {amount} sopra lo stesso tratto del mese scorso ({pct}%)', panel_vs_down: '⬇ Sei {amount} sotto lo stesso tratto del mese scorso ({pct}%)', panel_vs_same: 'Sei in pari con lo stesso tratto del mese scorso.', panel_top_title: '🏆 Categorie con più spese del mese', panel_top_empty: 'Questo mese non ci sono ancora spese.', panel_flow_title: '💵 Flusso di cassa', panel_flow_empty: 'Quando avrai movimenti di più mesi, qui vedrai come entra ed esce il tuo denaro.', panel_flow_in: 'Entrate', panel_flow_out: 'Spese', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Avanzamento dei tuoi tetti', panel_bc_budget: 'Budget', panel_bc_spent: 'Speso', panel_bc_left: 'Resta', panel_bc_empty: 'Non hai ancora tetti per categoria: scrivine uno nella lista e qui vedrai il suo avanzamento.'
 },
 pt: {
+  c94_soon: 'Este recurso Pro está sendo ativado: volte em alguns minutos.',
+  c94_bill_btn: '📞 Negociar esta fatura',
+  c94_bill_title: '📞 Seu roteiro para negociar',
+  c94_bill_help: 'A IA escreve seu roteiro em inglês, pronto para ler quando você ligar para a empresa. A PETO Finanzas não liga por você: a ligação é sua.',
+  c94_issuer_label: 'Empresa (ex.: Spectrum, Con Edison)',
+  c94_service_label: 'Serviço (opcional)',
+  c94_amount_label: 'Quanto você paga por mês ($)',
+  c94_tenure_label: 'Meses como cliente (opcional)',
+  c94_make_script: 'Criar meu roteiro',
+  c94_working: 'Escrevendo seu roteiro…',
+  c94_script_title: 'Roteiro para ler na ligação (em inglês)',
+  c94_steps_title: 'Passos',
+  c94_tips_title: 'Dicas',
+  c94_warnings_title: 'Fique atento',
+  c94_copy: 'Copiar o roteiro',
+  c94_copied: '✅ Roteiro copiado',
+  c94_cancel_btn: '🚪 Roteiro para cancelar',
+  c94_cancel_title: '🚪 Seu roteiro para cancelar',
+  c94_cancel_help: 'A IA escreve seu roteiro em inglês para cancelar sem rodeios. A PETO Finanzas não cancela por você: a ligação ou o chat é seu.',
+  c94_merchant_label: 'Serviço a cancelar',
+  c94_remit_btn: '💸 Custo real da sua remessa',
+  c94_remit_title: '💸 O custo real da sua remessa',
+  c94_remit_help: 'As contas são feitas no seu telefone, com matemática exata; a IA só as explica em palavras simples. Daqui não se envia dinheiro.',
+  c94_remit_amount: 'Valor que você envia ($)',
+  c94_remit_fee: 'Taxa que cobraram de você ($)',
+  c94_remit_rate: 'Câmbio que te deram (por $1)',
+  c94_remit_market: 'Câmbio de mercado (opcional)',
+  c94_remit_alt_name: 'Alternativa (opcional: nome do outro serviço)',
+  c94_remit_alt_fee: 'A taxa dele ($)',
+  c94_remit_alt_rate: 'O câmbio dele (por $1)',
+  c94_remit_calc: 'Calcular e explicar',
+  c94_remit_cost_line: 'Custo real: {cost} ({pct}% do enviado)',
+  c94_remit_alt_line: 'Com {name}: {cost} → você economiza {save}',
+  c94_remit_err: 'Escreva o valor, a taxa cobrada e o câmbio que te deram.',
+  c94_quin_btn: '🗓️ Seu período de pagamento com IA',
+  c94_quin_title: '🗓️ Seu período de pagamento com IA',
+  c94_quin_working: 'Lendo seu período de pagamento…',
+  c94_chat_bill_intro: 'Preparo o roteiro para negociar essa fatura (Pro). Complete os dados:',
+  c94_chat_cancel_intro: 'Preparo o roteiro para cancelá-lo (Pro). Complete os dados:',
+  c94_chat_remit_intro: 'O comparador calcula o custo real do seu envio: a taxa mais a margem escondida no câmbio.',
+  c94_chat_open_remit: 'Abrir o comparador de remessas',
+  c94_err_fields: 'Complete os dados para criar seu roteiro.',
   setup_title: 'Configure o seu PETO Finanzas',
   setup_step_of: 'Passo {n} de 3',
   setup_step1_t: 'Crie a sua conta',
@@ -4248,6 +4416,48 @@ pt: {
   ob_signin_btn: 'Já tenho conta · Entrar', ob_signin_help: 'Já usa o PETO Finanzas em outro telefone ou na web? Entre com seu e-mail e seus dados baixam sozinhos.', ob_signin_back: 'Voltar', ob_exp_amount_ph: 'Valor (ex. 25,00)', ob_exp_add: 'Registrar minha primeira despesa', ob_exp_done: '✓ Registrado! É assim de fácil registrar uma despesa.', ob_fix_title: 'Seus pagamentos fixos e seu orçamento', ob_fix_text: 'Adicione os pagamentos que se repetem todo mês (aluguel, telefone, assinaturas). Com eles, o PETO Finanzas monta seu orçamento e calcula quanto você pode gastar hoje. Você pode adicionar mais quando quiser.', ob_fix_name_ph: 'Nome (ex. Aluguel)', ob_fix_day_ph: 'Dia (1-31)', ob_fix_add: '＋ Adicionar pagamento fixo', ob_fix_added: '✓ Pagamento fixo adicionado. Adicione outro ou continue.', ob_goal_title: 'Sua meta de economia', ob_goal_text: 'Dê um nome e um valor à sua primeira meta (por exemplo, sua reserva de emergência). Economizar com uma meta clara é muito mais fácil.', ob_goal_name_ph: 'Nome (ex. Reserva de emergência)', ob_goal_target_ph: 'Valor da meta (ex. 1.000)', ob_goal_add: 'Criar minha meta', ob_goal_added: '✓ Meta criada! Você a verá em Economias.', ob_san_title: 'O san: economize em grupo', ob_san_text: 'O san (tanda, cundina, susu) é o círculo de economia em grupo de sempre: todos contribuem toda semana e cada um recebe o pote na sua vez. O PETO Finanzas cuida da ordem, das vezes e dos recibos, sem cadernos.', ob_san_btn: 'Criar meu san ao terminar', ob_bank_title: 'Conecte seu banco', ob_bank_text: 'Se quiser, conecte seu banco para que suas movimentações entrem sozinhas e seus saldos estejam sempre atualizados. É opcional: faça ao terminar as boas-vindas ou depois em Ajustes.', ob_bank_btn: 'Quero conectar meu banco', ob_pod_title: 'Aprenda com o podcast', ob_pod_text: '«Finanças Pessoais», o podcast do PETO Finanzas: episódios em espanhol com Lucía e Marco, com exemplos e passos concretos para o seu dinheiro. Ouça dentro do app.', ob_pod_btn: 'Ver o podcast ao terminar', ob_bell_title: 'Ative seus lembretes', ob_bell_text: 'Receba avisos quando um pagamento fixo estiver para vencer e o resumo do seu dia. Assim nada passa batido.', ob_bell_btn: 'Ativar lembretes', ob_bell_done: '✓ Lembretes ativados.', ob_cloud_btn: 'Criar minha conta ao terminar', ob_pending_ok: '✓ Pronto! Ao terminar as boas-vindas, levo você direto para lá.', ob_pending_btn: '✓ Abre ao terminar', spend_ctx_below: 'Você está {amount} abaixo do ritmo do mês passado', spend_ctx_above: 'Você está {amount} acima do ritmo do mês passado', spend_ctx_bank: 'Banco conectado', sec_card_title: 'Segurança', sec_card_read: 'Conexão bancária somente leitura: nunca podemos mover seu dinheiro', sec_card_enc: 'Seus dados viajam e são guardados criptografados', sec_card_lock: 'Bloqueio com PIN e impressão digital', sec_card_lock_faceid: 'Bloqueio com PIN e Face ID', sec_card_lock_generic: 'Bloqueio com PIN e dados biométricos', bud_per_semana: 'por semana', bud_per_quincena: 'por quinzena', bud_per_mes: 'por mês', spend_left_periods: 'Restam {amount} entre todos os seus períodos.', spend_x_periods: 'Cada categoria é dividida conforme seu próprio período:', spend_x_cat: '{cat} ({per}): restam {left} ÷ {days} dias = {daily} hoje', bud_period_aria: 'Período do limite de {cat}', nav_gastos: 'Gastos', nav_presupuesto: 'Orçamento', nav_ajustes: 'Ajustes', ob_bio_label: 'Entrar com digital (se eu criar um PIN)', ob_bio_label_faceid: 'Entrar com Face ID (se eu criar um PIN)', ob_bio_label_generic: 'Entrar com dados biométricos (se eu criar um PIN)', panel_vs_title: '📊 Este mês vs. o mês passado', panel_vs_empty: 'Ainda não há dados do mês passado para comparar.', panel_vs_cur: 'Este mês', panel_vs_prev: 'Mês passado', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Você está {amount} acima do mesmo trecho do mês passado ({pct}%)', panel_vs_down: '⬇ Você está {amount} abaixo do mesmo trecho do mês passado ({pct}%)', panel_vs_same: 'Você está igual ao mesmo trecho do mês passado.', panel_top_title: '🏆 Categorias com mais gastos do mês', panel_top_empty: 'Este mês ainda não há gastos.', panel_flow_title: '💵 Fluxo de caixa', panel_flow_empty: 'Quando você tiver movimentações de vários meses, aqui verá como seu dinheiro entra e sai.', panel_flow_in: 'Receitas', panel_flow_out: 'Gastos', panel_flow_net: 'Líquido: {amount}', panel_bc_title: '🎯 Progresso dos seus limites', panel_bc_budget: 'Orçamento', panel_bc_spent: 'Gasto', panel_bc_left: 'Resta', panel_bc_empty: 'Você ainda não tem limites por categoria: defina um na lista e o progresso aparecerá aqui.'
 },
 fr: {
+  c94_soon: 'Cette fonction Pro est en cours d’activation : revenez dans quelques minutes.',
+  c94_bill_btn: '📞 Négocier cette facture',
+  c94_bill_title: '📞 Votre script pour négocier',
+  c94_bill_help: 'L’IA écrit votre script en anglais, prêt à lire quand vous appelez l’entreprise. PETO Finanzas n’appelle pas pour vous : l’appel, c’est vous qui le passez.',
+  c94_issuer_label: 'Entreprise (ex. : Spectrum, Con Edison)',
+  c94_service_label: 'Service (facultatif)',
+  c94_amount_label: 'Ce que vous payez par mois ($)',
+  c94_tenure_label: 'Mois comme client (facultatif)',
+  c94_make_script: 'Créer mon script',
+  c94_working: 'J’écris votre script…',
+  c94_script_title: 'Script à lire pendant l’appel (en anglais)',
+  c94_steps_title: 'Étapes',
+  c94_tips_title: 'Conseils',
+  c94_warnings_title: 'À surveiller',
+  c94_copy: 'Copier le script',
+  c94_copied: '✅ Script copié',
+  c94_cancel_btn: '🚪 Script pour résilier',
+  c94_cancel_title: '🚪 Votre script pour résilier',
+  c94_cancel_help: 'L’IA écrit votre script en anglais pour résilier sans détour. PETO Finanzas ne résilie pas pour vous : l’appel ou le chat, c’est vous qui le faites.',
+  c94_merchant_label: 'Service à résilier',
+  c94_remit_btn: '💸 Coût réel de votre envoi',
+  c94_remit_title: '💸 Le coût réel de votre envoi d’argent',
+  c94_remit_help: 'Les calculs se font sur votre téléphone, avec des maths exactes ; l’IA vous les explique seulement en mots simples. Aucun argent n’est envoyé d’ici.',
+  c94_remit_amount: 'Montant que vous envoyez ($)',
+  c94_remit_fee: 'Frais qu’on vous a facturés ($)',
+  c94_remit_rate: 'Taux de change qu’on vous a donné (pour 1 $)',
+  c94_remit_market: 'Taux de change du marché (facultatif)',
+  c94_remit_alt_name: 'Alternative (facultatif : nom de l’autre service)',
+  c94_remit_alt_fee: 'Ses frais ($)',
+  c94_remit_alt_rate: 'Son taux de change (pour 1 $)',
+  c94_remit_calc: 'Calculer et expliquer',
+  c94_remit_cost_line: 'Coût réel : {cost} ({pct}% de l’envoi)',
+  c94_remit_alt_line: 'Avec {name} : {cost} → vous économisez {save}',
+  c94_remit_err: 'Écrivez le montant, les frais et le taux de change qu’on vous a donné.',
+  c94_quin_btn: '🗓️ Votre période de paie avec l’IA',
+  c94_quin_title: '🗓️ Votre période de paie avec l’IA',
+  c94_quin_working: 'Je lis votre période de paie…',
+  c94_chat_bill_intro: 'Je vous prépare le script pour négocier cette facture (Pro). Complétez les données :',
+  c94_chat_cancel_intro: 'Je vous prépare le script pour le résilier (Pro). Complétez les données :',
+  c94_chat_remit_intro: 'Le comparateur calcule le coût réel de votre envoi : les frais plus la marge cachée dans le taux de change.',
+  c94_chat_open_remit: 'Ouvrir le comparateur d’envois',
+  c94_err_fields: 'Complétez les données pour créer votre script.',
   setup_title: 'Configurez votre PETO Finanzas',
   setup_step_of: 'Étape {n} sur 3',
   setup_step1_t: 'Créez votre compte',
@@ -5126,6 +5336,48 @@ fr: {
   ob_signin_btn: 'J’ai déjà un compte · Se connecter', ob_signin_help: 'Vous utilisez déjà PETO Finanzas sur un autre téléphone ou sur le web ? Connectez-vous avec votre e-mail et vos données arrivent toutes seules.', ob_signin_back: 'Retour', ob_exp_amount_ph: 'Montant (ex. 25,00)', ob_exp_add: 'Noter ma première dépense', ob_exp_done: '✓ Notée ! Enregistrer une dépense, c’est aussi simple que ça.', ob_fix_title: 'Vos paiements fixes et votre budget', ob_fix_text: 'Ajoutez les paiements qui se répètent chaque mois (loyer, téléphone, abonnements). Avec eux, PETO Finanzas construit votre budget et calcule ce que vous pouvez dépenser aujourd’hui. Vous pourrez en ajouter d’autres quand vous voulez.', ob_fix_name_ph: 'Nom (ex. Loyer)', ob_fix_day_ph: 'Jour (1-31)', ob_fix_add: '＋ Ajouter un paiement fixe', ob_fix_added: '✓ Paiement fixe ajouté. Ajoutez-en un autre ou continuez.', ob_goal_title: 'Votre objectif d’épargne', ob_goal_text: 'Donnez un nom et un montant à votre premier objectif (par exemple, votre fonds d’urgence). Épargner avec un objectif clair est bien plus facile.', ob_goal_name_ph: 'Nom (ex. Fonds d’urgence)', ob_goal_target_ph: 'Montant visé (ex. 1 000)', ob_goal_add: 'Créer mon objectif', ob_goal_added: '✓ Objectif créé ! Vous le trouverez dans Épargne.', ob_san_title: 'Le san : épargner en groupe', ob_san_text: 'Le san (tanda, cundina, susu) est le cercle d’épargne en groupe de toujours : tout le monde cotise chaque semaine et chacun reçoit le pot à son tour. PETO Finanzas garde l’ordre, les tours et les reçus sans cahiers.', ob_san_btn: 'Créer mon san à la fin', ob_bank_title: 'Connectez votre banque', ob_bank_text: 'Si vous voulez, connectez votre banque pour que vos opérations arrivent toutes seules et que vos soldes soient toujours à jour. C’est facultatif : à la fin de l’accueil ou plus tard dans Réglages.', ob_bank_btn: 'Je veux connecter ma banque', ob_pod_title: 'Apprenez avec le podcast', ob_pod_text: '« Finances personnelles », le podcast de PETO Finanzas : des épisodes en espagnol avec Lucía et Marco, des exemples et des étapes concrètes pour votre argent. Écoutez-le dans l’app.', ob_pod_btn: 'Voir le podcast à la fin', ob_bell_title: 'Activez vos rappels', ob_bell_text: 'Recevez un avis quand un paiement fixe approche de son échéance, plus votre résumé du jour. Rien ne vous échappe.', ob_bell_btn: 'Activer les rappels', ob_bell_done: '✓ Rappels activés.', ob_cloud_btn: 'Créer mon compte à la fin', ob_pending_ok: '✓ C’est noté ! À la fin de l’accueil, je vous y emmène directement.', ob_pending_btn: '✓ S’ouvre à la fin', spend_ctx_below: 'Vous êtes {amount} sous le rythme du mois dernier', spend_ctx_above: 'Vous êtes {amount} au-dessus du rythme du mois dernier', spend_ctx_bank: 'Banque connectée', sec_card_title: 'Sécurité', sec_card_read: 'Connexion bancaire en lecture seule : nous ne pouvons jamais déplacer votre argent', sec_card_enc: 'Vos données voyagent et sont stockées chiffrées', sec_card_lock: 'Verrouillage par code PIN et empreinte', sec_card_lock_faceid: 'Verrouillage par code PIN et Face ID', sec_card_lock_generic: 'Verrouillage par code PIN et données biométriques', bud_per_semana: 'par semaine', bud_per_quincena: 'par quinzaine', bud_per_mes: 'par mois', spend_left_periods: 'Il vous reste {amount} sur toutes vos périodes.', spend_x_periods: 'Chaque catégorie se répartit sur sa propre période :', spend_x_cat: '{cat} ({per}) : {left} restants ÷ {days} jours = {daily} aujourd’hui', bud_period_aria: 'Période de la limite pour {cat}', nav_gastos: 'Dépenses', nav_presupuesto: 'Budget', nav_ajustes: 'Réglages', ob_bio_label: 'Entrer par empreinte (si je crée un PIN)', ob_bio_label_faceid: 'Entrer avec Face ID (si je crée un PIN)', ob_bio_label_generic: 'Entrer avec vos données biométriques (si je crée un PIN)', panel_vs_title: '📊 Ce mois-ci vs le mois dernier', panel_vs_empty: 'Il n’y a pas encore de données du mois dernier à comparer.', panel_vs_cur: 'Ce mois-ci', panel_vs_prev: 'Mois dernier', panel_week: 'Sem. {n}', panel_vs_up: '⬆ Vous êtes {amount} au-dessus de la même période du mois dernier ({pct}%)', panel_vs_down: '⬇ Vous êtes {amount} au-dessous de la même période du mois dernier ({pct}%)', panel_vs_same: 'Vous êtes au même niveau que la même période du mois dernier.', panel_top_title: '🏆 Catégories les plus dépensières du mois', panel_top_empty: 'Aucune dépense ce mois-ci pour le moment.', panel_flow_title: '💵 Flux de trésorerie', panel_flow_empty: 'Quand vous aurez des mouvements sur plusieurs mois, vous verrez ici comment votre argent entre et sort.', panel_flow_in: 'Revenus', panel_flow_out: 'Dépenses', panel_flow_net: 'Net : {amount}', panel_bc_title: '🎯 Avancement de vos plafonds', panel_bc_budget: 'Budget', panel_bc_spent: 'Dépensé', panel_bc_left: 'Reste', panel_bc_empty: 'Vous n’avez pas encore de plafond par catégorie : définissez-en un dans la liste et son avancement s’affichera ici.'
 },
 de: {
+  c94_soon: 'Diese Pro-Funktion wird gerade aktiviert: Schau in ein paar Minuten wieder vorbei.',
+  c94_bill_btn: '📞 Diese Rechnung verhandeln',
+  c94_bill_title: '📞 Dein Skript zum Verhandeln',
+  c94_bill_help: 'Die KI schreibt dein Skript auf Englisch, bereit zum Vorlesen, wenn du bei der Firma anrufst. PETO Finanzas ruft nicht für dich an: Den Anruf machst du.',
+  c94_issuer_label: 'Firma (z. B.: Spectrum, Con Edison)',
+  c94_service_label: 'Dienst (optional)',
+  c94_amount_label: 'Was du pro Monat zahlst ($)',
+  c94_tenure_label: 'Monate als Kunde (optional)',
+  c94_make_script: 'Mein Skript erstellen',
+  c94_working: 'Ich schreibe dein Skript…',
+  c94_script_title: 'Skript zum Vorlesen im Anruf (auf Englisch)',
+  c94_steps_title: 'Schritte',
+  c94_tips_title: 'Tipps',
+  c94_warnings_title: 'Achtung',
+  c94_copy: 'Skript kopieren',
+  c94_copied: '✅ Skript kopiert',
+  c94_cancel_btn: '🚪 Skript zum Kündigen',
+  c94_cancel_title: '🚪 Dein Skript zum Kündigen',
+  c94_cancel_help: 'Die KI schreibt dein Skript auf Englisch, um ohne Umwege zu kündigen. PETO Finanzas kündigt nicht für dich: Den Anruf oder Chat machst du.',
+  c94_merchant_label: 'Zu kündigender Dienst',
+  c94_remit_btn: '💸 Echte Kosten deiner Überweisung',
+  c94_remit_title: '💸 Die echten Kosten deiner Überweisung',
+  c94_remit_help: 'Gerechnet wird auf deinem Handy, mit exakter Mathematik; die KI erklärt es dir nur in einfachen Worten. Von hier wird kein Geld gesendet.',
+  c94_remit_amount: 'Betrag, den du sendest ($)',
+  c94_remit_fee: 'Gebühr, die dir berechnet wurde ($)',
+  c94_remit_rate: 'Wechselkurs, den du bekommen hast (pro $1)',
+  c94_remit_market: 'Marktwechselkurs (optional)',
+  c94_remit_alt_name: 'Alternative (optional: Name des anderen Dienstes)',
+  c94_remit_alt_fee: 'Seine Gebühr ($)',
+  c94_remit_alt_rate: 'Sein Wechselkurs (pro $1)',
+  c94_remit_calc: 'Berechnen und erklären',
+  c94_remit_cost_line: 'Echte Kosten: {cost} ({pct}% des Gesendeten)',
+  c94_remit_alt_line: 'Mit {name}: {cost} → du sparst {save}',
+  c94_remit_err: 'Schreibe den Betrag, die Gebühr und den Wechselkurs, den du bekommen hast.',
+  c94_quin_btn: '🗓️ Deine Lohnperiode mit KI',
+  c94_quin_title: '🗓️ Deine Lohnperiode mit KI',
+  c94_quin_working: 'Ich lese deine Lohnperiode…',
+  c94_chat_bill_intro: 'Ich bereite das Skript vor, um diese Rechnung zu verhandeln (Pro). Vervollständige die Daten:',
+  c94_chat_cancel_intro: 'Ich bereite das Skript vor, um ihn zu kündigen (Pro). Vervollständige die Daten:',
+  c94_chat_remit_intro: 'Der Vergleicher berechnet die echten Kosten deiner Sendung: die Gebühr plus die im Wechselkurs versteckte Marge.',
+  c94_chat_open_remit: 'Überweisungsvergleich öffnen',
+  c94_err_fields: 'Vervollständige die Daten, um dein Skript zu erstellen.',
   setup_title: 'Richte dein PETO Finanzas ein',
   setup_step_of: 'Schritt {n} von 3',
   setup_step1_t: 'Erstelle dein Konto',
@@ -6004,6 +6256,48 @@ de: {
   ob_signin_btn: 'Ich habe schon ein Konto · Anmelden', ob_signin_help: 'Du nutzt PETO Finanzas schon auf einem anderen Handy oder im Web? Melde dich mit deiner E-Mail an und deine Daten laden sich von selbst.', ob_signin_back: 'Zurück', ob_exp_amount_ph: 'Betrag (z. B. 25,00)', ob_exp_add: 'Meine erste Ausgabe eintragen', ob_exp_done: '✓ Eingetragen! So einfach geht eine Ausgabe.', ob_fix_title: 'Deine Fixkosten und dein Budget', ob_fix_text: 'Füge die Zahlungen hinzu, die sich jeden Monat wiederholen (Miete, Telefon, Abos). Daraus baut PETO Finanzas dein Budget und berechnet, wie viel du heute ausgeben kannst. Mehr geht jederzeit später.', ob_fix_name_ph: 'Name (z. B. Miete)', ob_fix_day_ph: 'Tag (1-31)', ob_fix_add: '＋ Fixkosten hinzufügen', ob_fix_added: '✓ Fixkosten hinzugefügt. Weitere hinzufügen oder weiter.', ob_goal_title: 'Dein Sparziel', ob_goal_text: 'Gib deinem ersten Ziel einen Namen und einen Betrag (zum Beispiel deinen Notgroschen). Mit einem klaren Ziel spart es sich viel leichter.', ob_goal_name_ph: 'Name (z. B. Notgroschen)', ob_goal_target_ph: 'Zielbetrag (z. B. 1.000)', ob_goal_add: 'Mein Ziel erstellen', ob_goal_added: '✓ Ziel erstellt! Du findest es unter Sparen.', ob_san_title: 'Der San: gemeinsam sparen', ob_san_text: 'Der San (Tanda, Cundina, Susu) ist der klassische Spar-Kreis: Alle zahlen jede Woche ein, und jeder bekommt der Reihe nach den Topf. PETO Finanzas führt Reihenfolge, Runden und Belege ganz ohne Notizbuch.', ob_san_btn: 'Meinen San am Ende erstellen', ob_bank_title: 'Verbinde deine Bank', ob_bank_text: 'Wenn du magst, verbinde deine Bank, damit deine Umsätze von selbst eintreffen und deine Salden immer aktuell sind. Ganz optional: am Ende der Begrüßung oder später in den Einstellungen.', ob_bank_btn: 'Ich möchte meine Bank verbinden', ob_pod_title: 'Lerne mit dem Podcast', ob_pod_text: '„Persönliche Finanzen“, der Podcast von PETO Finanzas: Folgen auf Spanisch mit Lucía und Marco, mit Beispielen und konkreten Schritten für dein Geld. Direkt in der App anhören.', ob_pod_btn: 'Den Podcast am Ende ansehen', ob_bell_title: 'Aktiviere deine Erinnerungen', ob_bell_text: 'Erhalte einen Hinweis, wenn eine Fixzahlung bald fällig ist, plus deine Tagesübersicht. So geht nichts unter.', ob_bell_btn: 'Erinnerungen aktivieren', ob_bell_done: '✓ Erinnerungen aktiviert.', ob_cloud_btn: 'Mein Konto am Ende erstellen', ob_pending_ok: '✓ Erledigt! Am Ende der Begrüßung bringe ich dich direkt dorthin.', ob_pending_btn: '✓ Öffnet sich am Ende', spend_ctx_below: 'Du liegst {amount} unter dem Tempo des Vormonats', spend_ctx_above: 'Du liegst {amount} über dem Tempo des Vormonats', spend_ctx_bank: 'Bank verbunden', sec_card_title: 'Sicherheit', sec_card_read: 'Bankverbindung nur lesend: Wir können Ihr Geld niemals bewegen', sec_card_enc: 'Ihre Daten werden verschlüsselt übertragen und gespeichert', sec_card_lock: 'Sperre mit PIN und Fingerabdruck', sec_card_lock_faceid: 'Sperre mit PIN und Face ID', sec_card_lock_generic: 'Sperre mit PIN und biometrischen Daten', bud_per_semana: 'pro Woche', bud_per_quincena: 'pro zwei Wochen', bud_per_mes: 'pro Monat', spend_left_periods: 'Dir bleiben {amount} über alle deine Zeiträume.', spend_x_periods: 'Jede Kategorie wird über ihren eigenen Zeitraum verteilt:', spend_x_cat: '{cat} ({per}): {left} übrig ÷ {days} Tage = {daily} heute', bud_period_aria: 'Zeitraum des Limits für {cat}', nav_gastos: 'Ausgaben', nav_presupuesto: 'Budget', nav_ajustes: 'Einstellungen', ob_bio_label: 'Mit Fingerabdruck öffnen (falls ich eine PIN erstelle)', ob_bio_label_faceid: 'Mit Face ID anmelden (wenn ich eine PIN erstelle)', ob_bio_label_generic: 'Mit biometrischen Daten anmelden (wenn ich eine PIN erstelle)', panel_vs_title: '📊 Dieser Monat vs. letzter Monat', panel_vs_empty: 'Es gibt noch keine Daten vom letzten Monat zum Vergleichen.', panel_vs_cur: 'Dieser Monat', panel_vs_prev: 'Letzter Monat', panel_week: 'Wo. {n}', panel_vs_up: '⬆ Du liegst {amount} über dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_down: '⬇ Du liegst {amount} unter dem gleichen Abschnitt des letzten Monats ({pct}%)', panel_vs_same: 'Du liegst gleichauf mit dem gleichen Abschnitt des letzten Monats.', panel_top_title: '🏆 Kategorien mit den höchsten Ausgaben des Monats', panel_top_empty: 'Diesen Monat noch keine Ausgaben.', panel_flow_title: '💵 Cashflow', panel_flow_empty: 'Sobald du Bewegungen aus mehreren Monaten hast, siehst du hier, wie dein Geld kommt und geht.', panel_flow_in: 'Einnahmen', panel_flow_out: 'Ausgaben', panel_flow_net: 'Netto: {amount}', panel_bc_title: '🎯 Fortschritt deiner Limits', panel_bc_budget: 'Budget', panel_bc_spent: 'Ausgegeben', panel_bc_left: 'Übrig', panel_bc_empty: 'Du hast noch keine Limits pro Kategorie: Lege eines in der Liste fest und der Fortschritt erscheint hier.'
 },
 zh: {
+  c94_soon: '此 Pro 功能正在激活中:请几分钟后再来。',
+  c94_bill_btn: '📞 谈判这张账单',
+  c94_bill_title: '📞 你的谈判话术',
+  c94_bill_help: 'AI 用英文写好你的话术,你打电话给公司时照着念即可。PETO Finanzas 不会替你打电话:电话由你来打。',
+  c94_issuer_label: '公司(例如:Spectrum、Con Edison)',
+  c94_service_label: '服务(可选)',
+  c94_amount_label: '你每月支付 ($)',
+  c94_tenure_label: '作为客户的月数(可选)',
+  c94_make_script: '生成我的话术',
+  c94_working: '正在写你的话术…',
+  c94_script_title: '通话时照读的话术(英文)',
+  c94_steps_title: '步骤',
+  c94_tips_title: '建议',
+  c94_warnings_title: '注意事项',
+  c94_copy: '复制话术',
+  c94_copied: '✅ 话术已复制',
+  c94_cancel_btn: '🚪 取消服务话术',
+  c94_cancel_title: '🚪 你的取消话术',
+  c94_cancel_help: 'AI 用英文写好你的话术,让你干脆地取消。PETO Finanzas 不会替你取消:电话或在线聊天由你来完成。',
+  c94_merchant_label: '要取消的服务',
+  c94_remit_btn: '💸 汇款的真实成本',
+  c94_remit_title: '💸 你汇款的真实成本',
+  c94_remit_help: '计算在你的手机上精确完成;AI 只是用简单的话向你解释。这里不会发送任何钱款。',
+  c94_remit_amount: '你发送的金额 ($)',
+  c94_remit_fee: '向你收取的费用 ($)',
+  c94_remit_rate: '给你的汇率(每 $1)',
+  c94_remit_market: '市场汇率(可选)',
+  c94_remit_alt_name: '备选(可选:另一个服务的名称)',
+  c94_remit_alt_fee: '它的费用 ($)',
+  c94_remit_alt_rate: '它的汇率(每 $1)',
+  c94_remit_calc: '计算并解释',
+  c94_remit_cost_line: '真实成本:{cost}(占发送金额的 {pct}%)',
+  c94_remit_alt_line: '用 {name}:{cost} → 你省下 {save}',
+  c94_remit_err: '请输入金额、收取的费用和给你的汇率。',
+  c94_quin_btn: '🗓️ AI 解读你的发薪周期',
+  c94_quin_title: '🗓️ AI 解读你的发薪周期',
+  c94_quin_working: '正在解读你的发薪周期…',
+  c94_chat_bill_intro: '我来为你准备谈判这张账单的话术(Pro)。请填写信息:',
+  c94_chat_cancel_intro: '我来为你准备取消它的话术(Pro)。请填写信息:',
+  c94_chat_remit_intro: '比较器会算出你这笔汇款的真实成本:费用加上隐藏在汇率里的差价。',
+  c94_chat_open_remit: '打开汇款比较器',
+  c94_err_fields: '请填写信息以生成你的话术。',
   setup_title: '设置你的 PETO Finanzas',
   setup_step_of: '第 {n} 步，共 3 步',
   setup_step1_t: '创建你的账户',
@@ -6882,6 +7176,48 @@ zh: {
   ob_signin_btn: '我已有账户 · 登录', ob_signin_help: '已在其他手机或网页版使用 PETO Finanzas？用邮箱登录，数据会自动下载。', ob_signin_back: '返回', ob_exp_amount_ph: '金额（例如 25.00）', ob_exp_add: '记下我的第一笔支出', ob_exp_done: '✓ 已记下！记一笔支出就是这么简单。', ob_fix_title: '你的固定支出与预算', ob_fix_text: '添加每月重复的支出（房租、电话费、订阅）。PETO Finanzas 会据此制定你的预算，并算出你今天可以花多少。以后随时可以再添加。', ob_fix_name_ph: '名称（例如 房租）', ob_fix_day_ph: '日期（1-31）', ob_fix_add: '＋ 添加固定支出', ob_fix_added: '✓ 已添加固定支出。可以再加一笔或继续。', ob_goal_title: '你的储蓄目标', ob_goal_text: '给你的第一个目标起个名字并设定金额（例如应急基金）。有了明确的目标，存钱会容易得多。', ob_goal_name_ph: '名称（例如 应急基金）', ob_goal_target_ph: '目标金额（例如 1,000）', ob_goal_add: '创建我的目标', ob_goal_added: '✓ 目标已创建！可以在“储蓄”中查看。', ob_san_title: 'San：大家一起存钱', ob_san_text: 'San（tanda、cundina、susu）是经典的集体储蓄圈：每个人每周出资，轮流领取整笔钱。PETO Finanzas 帮你管理顺序、轮次和收据，不用记账本。', ob_san_btn: '结束时创建我的 san', ob_bank_title: '连接你的银行', ob_bank_text: '如果你愿意，可以连接银行，让交易自动导入、余额随时更新。这完全自愿：可以在欢迎流程结束时连接，也可以以后在“设置”中连接。', ob_bank_btn: '我想连接我的银行', ob_pod_title: '听播客学理财', ob_pod_text: '《个人理财》是 PETO Finanzas 的播客：Lucía 和 Marco 用西班牙语讲真实案例和具体步骤。可以在应用内收听。', ob_pod_btn: '结束时查看播客', ob_bell_title: '打开你的提醒', ob_bell_text: '固定支出快到期时提醒你，还有每日摘要。这样什么都不会错过。', ob_bell_btn: '打开提醒', ob_bell_done: '✓ 提醒已打开。', ob_cloud_btn: '结束时创建我的账户', ob_pending_ok: '✓ 好的！欢迎流程结束后，我直接带你去那里。', ob_pending_btn: '✓ 完成时打开', spend_ctx_below: '你比上个月的节奏少了 {amount}', spend_ctx_above: '你比上个月的节奏多了 {amount}', spend_ctx_bank: '银行已连接', sec_card_title: '安全', sec_card_read: '银行连接为只读:我们永远无法动用你的资金', sec_card_enc: '你的数据在传输和存储时均已加密', sec_card_lock: 'PIN 和指纹锁定', sec_card_lock_faceid: 'PIN 和 Face ID 锁定', sec_card_lock_generic: 'PIN 和生物识别锁定', bud_per_semana: '每周', bud_per_quincena: '每两周', bud_per_mes: '每月', spend_left_periods: '所有周期合计还剩 {amount}。', spend_x_periods: '每个类别按自己的周期分摊：', spend_x_cat: '{cat}（{per}）：剩 {left} ÷ {days} 天 = 今天 {daily}', bud_period_aria: '{cat} 的上限周期', nav_gastos: '支出', nav_presupuesto: '预算', nav_ajustes: '设置', ob_bio_label: '用指纹进入（如果我创建了 PIN）', ob_bio_label_faceid: '使用 Face ID 进入（如果我创建 PIN）', ob_bio_label_generic: '使用生物识别进入（如果我创建 PIN）', panel_vs_title: '📊 本月 vs 上月', panel_vs_empty: '目前还没有上月的数据可供比较。', panel_vs_cur: '本月', panel_vs_prev: '上月', panel_week: '第{n}周', panel_vs_up: '⬆ 您比上月同期多花了 {amount}（{pct}%）', panel_vs_down: '⬇ 您比上月同期少花了 {amount}（{pct}%）', panel_vs_same: '您与上月同期持平。', panel_top_title: '🏆 本月支出最多的类别', panel_top_empty: '本月还没有支出。', panel_flow_title: '💵 现金流', panel_flow_empty: '当您有多个月的记录时，这里会显示资金的进出情况。', panel_flow_in: '收入', panel_flow_out: '支出', panel_flow_net: '净额：{amount}', panel_bc_title: '🎯 您的上限进度', panel_bc_budget: '预算', panel_bc_spent: '已花', panel_bc_left: '剩余', panel_bc_empty: '您还没有按类别设置上限：在列表中设置一个，进度会显示在这里。'
 },
 ja: {
+  c94_soon: 'この Pro 機能は有効化中です。数分後にまたお試しください。',
+  c94_bill_btn: '📞 この請求を交渉する',
+  c94_bill_title: '📞 交渉用スクリプト',
+  c94_bill_help: 'AI が英語のスクリプトを作成します。会社に電話するときにそのまま読めます。PETO Finanzas が代わりに電話することはありません。電話はあなたがかけます。',
+  c94_issuer_label: '会社(例:Spectrum、Con Edison)',
+  c94_service_label: 'サービス(任意)',
+  c94_amount_label: '毎月の支払額 ($)',
+  c94_tenure_label: '利用月数(任意)',
+  c94_make_script: 'スクリプトを作成',
+  c94_working: 'スクリプトを作成中…',
+  c94_script_title: '通話で読むスクリプト(英語)',
+  c94_steps_title: '手順',
+  c94_tips_title: 'コツ',
+  c94_warnings_title: '注意点',
+  c94_copy: 'スクリプトをコピー',
+  c94_copied: '✅ スクリプトをコピーしました',
+  c94_cancel_btn: '🚪 解約用スクリプト',
+  c94_cancel_title: '🚪 解約用スクリプト',
+  c94_cancel_help: 'AI が英語のスクリプトを作成し、遠回しなしに解約できます。PETO Finanzas が代わりに解約することはありません。電話やチャットはあなたが行います。',
+  c94_merchant_label: '解約するサービス',
+  c94_remit_btn: '💸 送金の本当のコスト',
+  c94_remit_title: '💸 送金の本当のコスト',
+  c94_remit_help: '計算はあなたのスマホで正確に行われます。AI はそれを簡単な言葉で説明するだけです。ここから送金はされません。',
+  c94_remit_amount: '送る金額 ($)',
+  c94_remit_fee: '請求された手数料 ($)',
+  c94_remit_rate: '適用された為替レート($1 あたり)',
+  c94_remit_market: '市場の為替レート(任意)',
+  c94_remit_alt_name: '代替案(任意:別のサービスの名前)',
+  c94_remit_alt_fee: 'その手数料 ($)',
+  c94_remit_alt_rate: 'その為替レート($1 あたり)',
+  c94_remit_calc: '計算して説明',
+  c94_remit_cost_line: '実際のコスト:{cost}(送金額の {pct}%)',
+  c94_remit_alt_line: '{name} なら:{cost} → {save} 節約',
+  c94_remit_err: '金額、手数料、適用された為替レートを入力してください。',
+  c94_quin_btn: '🗓️ AI で読む給料期間',
+  c94_quin_title: '🗓️ AI で読む給料期間',
+  c94_quin_working: '給料期間を読み取り中…',
+  c94_chat_bill_intro: 'その請求を交渉するスクリプトを準備します(Pro)。情報を入力してください:',
+  c94_chat_cancel_intro: 'それを解約するスクリプトを準備します(Pro)。情報を入力してください:',
+  c94_chat_remit_intro: '比較ツールが送金の実際のコストを計算します:手数料と為替レートに隠れたマージンです。',
+  c94_chat_open_remit: '送金比較ツールを開く',
+  c94_err_fields: 'スクリプトを作成するために情報を入力してください。',
   setup_title: 'PETO Finanzas を設定',
   setup_step_of: 'ステップ {n} / 3',
   setup_step1_t: 'アカウントを作成',
@@ -7760,6 +8096,48 @@ ja: {
   ob_signin_btn: 'アカウントを持っている · ログイン', ob_signin_help: '別のスマホやウェブで PETO Finanzas を使っていますか？メールでログインすればデータが自動でダウンロードされます。', ob_signin_back: '戻る', ob_exp_amount_ph: '金額（例：25.00）', ob_exp_add: '最初の支出を記録', ob_exp_done: '✓ 記録しました！支出の記録はこれだけ簡単です。', ob_fix_title: '固定費と予算', ob_fix_text: '毎月繰り返す支払い（家賃、電話、サブスク）を追加してください。それをもとに PETO Finanzas が予算を作り、今日使える金額を計算します。あとからいつでも追加できます。', ob_fix_name_ph: '名前（例：家賃）', ob_fix_day_ph: '日（1-31）', ob_fix_add: '＋ 固定費を追加', ob_fix_added: '✓ 固定費を追加しました。もう一つ追加するか、そのまま進んでください。', ob_goal_title: '貯蓄の目標', ob_goal_text: '最初の目標に名前と金額をつけてください（例：緊急用資金）。明確な目標があると、貯蓄はずっと簡単になります。', ob_goal_name_ph: '名前（例：緊急用資金）', ob_goal_target_ph: '目標金額（例：1,000）', ob_goal_add: '目標を作成', ob_goal_added: '✓ 目標を作成しました！「貯蓄」で確認できます。', ob_san_title: 'San：みんなで貯める', ob_san_text: 'San（タンダ、クンディナ、スス）は昔ながらのグループ貯蓄サークルです。全員が毎週出し合い、順番にまとまったお金を受け取ります。PETO Finanzas が順番や記録をノートなしで管理します。', ob_san_btn: '終了時に san を作成', ob_bank_title: '銀行を連携', ob_bank_text: 'よければ銀行を連携すると、取引が自動で入り、残高が常に最新になります。任意です：ウェルカムの最後でも、後で設定からでもできます。', ob_bank_btn: '銀行を連携したい', ob_pod_title: 'ポッドキャストで学ぶ', ob_pod_text: 'PETO Finanzas のポッドキャスト「個人ファイナンス」：Lucía と Marco がスペイン語で、実例と具体的なステップをお届けします。アプリ内で聴けます。', ob_pod_btn: '終了時にポッドキャストを見る', ob_bell_title: 'リマインダーをオン', ob_bell_text: '固定費の期限が近づいたらお知らせし、その日のまとめも届きます。うっかりを防げます。', ob_bell_btn: 'リマインダーをオンにする', ob_bell_done: '✓ リマインダーをオンにしました。', ob_cloud_btn: '終了時にアカウントを作成', ob_pending_ok: '✓ 了解です！ウェルカムの終了時に、そのままご案内します。', ob_pending_btn: '✓ 終了時に開きます', spend_ctx_below: '先月のペースより {amount} 下回っています', spend_ctx_above: '先月のペースより {amount} 上回っています', spend_ctx_bank: '銀行が接続されています', sec_card_title: 'セキュリティ', sec_card_read: '銀行接続は読み取り専用:あなたの資金を動かすことは決してできません', sec_card_enc: 'データは暗号化されて送信・保存されます', sec_card_lock: 'PINと指紋によるロック', sec_card_lock_faceid: 'PINとFace IDによるロック', sec_card_lock_generic: 'PINと生体認証によるロック', bud_per_semana: '週ごと', bud_per_quincena: '2週間ごと', bud_per_mes: '月ごと', spend_left_periods: 'すべての期間を合わせて、残りは {amount} です。', spend_x_periods: '各カテゴリはそれぞれの期間で按分されます：', spend_x_cat: '{cat}（{per}）：残り {left} ÷ {days} 日 = 今日 {daily}', bud_period_aria: '{cat}の上限期間', nav_gastos: '支出', nav_presupuesto: '予算', nav_ajustes: '設定', ob_bio_label: '指紋で入る（PIN を作成した場合）', ob_bio_label_faceid: 'Face ID で入る（PIN を作成した場合）', ob_bio_label_generic: '生体認証で入る（PIN を作成した場合）', panel_vs_title: '📊 今月 vs 先月', panel_vs_empty: '比較できる先月のデータがまだありません。', panel_vs_cur: '今月', panel_vs_prev: '先月', panel_week: '{n}週目', panel_vs_up: '⬆ 先月の同時期より {amount} 多いです（{pct}%）', panel_vs_down: '⬇ 先月の同時期より {amount} 少ないです（{pct}%）', panel_vs_same: '先月の同時期と同じです。', panel_top_title: '🏆 今月の支出が多いカテゴリ', panel_top_empty: '今月はまだ支出がありません。', panel_flow_title: '💵 キャッシュフロー', panel_flow_empty: '複数月の動きがたまると、ここでお金の出入りが見られます。', panel_flow_in: '収入', panel_flow_out: '支出', panel_flow_net: '純額：{amount}', panel_bc_title: '🎯 上限の進み具合', panel_bc_budget: '予算', panel_bc_spent: '支出済み', panel_bc_left: '残り', panel_bc_empty: 'カテゴリごとの上限がまだありません：リストで設定すると、ここに進み具合が表示されます。'
 },
 ko: {
+  c94_soon: '이 Pro 기능이 활성화되는 중입니다. 몇 분 뒤에 다시 확인하세요.',
+  c94_bill_btn: '📞 이 청구서 협상하기',
+  c94_bill_title: '📞 협상 대본',
+  c94_bill_help: 'AI가 영어로 대본을 써 드립니다. 회사에 전화할 때 그대로 읽으면 됩니다. PETO Finanzas가 대신 전화하지 않습니다. 전화는 직접 거셔야 합니다.',
+  c94_issuer_label: '회사 (예: Spectrum, Con Edison)',
+  c94_service_label: '서비스 (선택)',
+  c94_amount_label: '매달 내는 금액 ($)',
+  c94_tenure_label: '고객으로 지낸 개월 수 (선택)',
+  c94_make_script: '내 대본 만들기',
+  c94_working: '대본을 쓰는 중…',
+  c94_script_title: '통화에서 읽을 대본 (영어)',
+  c94_steps_title: '단계',
+  c94_tips_title: '팁',
+  c94_warnings_title: '주의할 점',
+  c94_copy: '대본 복사',
+  c94_copied: '✅ 대본이 복사됐습니다',
+  c94_cancel_btn: '🚪 해지 대본',
+  c94_cancel_title: '🚪 해지 대본',
+  c94_cancel_help: 'AI가 영어로 대본을 써 드려 군더더기 없이 해지할 수 있습니다. PETO Finanzas가 대신 해지하지 않습니다. 전화나 채팅은 직접 하셔야 합니다.',
+  c94_merchant_label: '해지할 서비스',
+  c94_remit_btn: '💸 송금의 실제 비용',
+  c94_remit_title: '💸 송금의 실제 비용',
+  c94_remit_help: '계산은 휴대폰에서 정확히 이루어집니다. AI는 쉬운 말로 설명만 합니다. 여기서는 돈이 전송되지 않습니다.',
+  c94_remit_amount: '보내는 금액 ($)',
+  c94_remit_fee: '청구된 수수료 ($)',
+  c94_remit_rate: '적용된 환율 ($1당)',
+  c94_remit_market: '시장 환율 (선택)',
+  c94_remit_alt_name: '대안 (선택: 다른 서비스 이름)',
+  c94_remit_alt_fee: '그 수수료 ($)',
+  c94_remit_alt_rate: '그 환율 ($1당)',
+  c94_remit_calc: '계산하고 설명받기',
+  c94_remit_cost_line: '실제 비용: {cost} (보낸 금액의 {pct}%)',
+  c94_remit_alt_line: '{name} 이용 시: {cost} → {save} 절약',
+  c94_remit_err: '금액, 수수료, 적용된 환율을 입력하세요.',
+  c94_quin_btn: '🗓️ AI로 보는 급여 기간',
+  c94_quin_title: '🗓️ AI로 보는 급여 기간',
+  c94_quin_working: '급여 기간을 읽는 중…',
+  c94_chat_bill_intro: '그 청구서를 협상할 대본을 준비합니다 (Pro). 정보를 입력하세요:',
+  c94_chat_cancel_intro: '그것을 해지할 대본을 준비합니다 (Pro). 정보를 입력하세요:',
+  c94_chat_remit_intro: '비교 도구가 송금의 실제 비용을 계산합니다: 수수료와 환율에 숨은 마진입니다.',
+  c94_chat_open_remit: '송금 비교 도구 열기',
+  c94_err_fields: '대본을 만들려면 정보를 입력하세요.',
   setup_title: 'PETO Finanzas 설정하기',
   setup_step_of: '3단계 중 {n}단계',
   setup_step1_t: '계정 만들기',
@@ -8638,6 +9016,48 @@ ko: {
   ob_signin_btn: '이미 계정이 있어요 · 로그인', ob_signin_help: '다른 휴대폰이나 웹에서 PETO Finanzas를 이미 사용 중인가요? 이메일로 로그인하면 데이터가 자동으로 내려옵니다.', ob_signin_back: '뒤로', ob_exp_amount_ph: '금액 (예: 25.00)', ob_exp_add: '첫 지출 기록하기', ob_exp_done: '✓ 기록했어요! 지출 기록은 이렇게 간단합니다.', ob_fix_title: '고정 지출과 예산', ob_fix_text: '매달 반복되는 지출(월세, 전화, 구독)을 추가하세요. PETO Finanzas가 그것으로 예산을 만들고 오늘 쓸 수 있는 금액을 계산합니다. 나중에 언제든 더 추가할 수 있어요.', ob_fix_name_ph: '이름 (예: 월세)', ob_fix_day_ph: '날짜 (1-31)', ob_fix_add: '＋ 고정 지출 추가', ob_fix_added: '✓ 고정 지출을 추가했습니다. 더 추가하거나 계속하세요.', ob_goal_title: '저축 목표', ob_goal_text: '첫 목표에 이름과 금액을 정해 보세요(예: 비상금). 명확한 목표가 있으면 저축이 훨씬 쉬워집니다.', ob_goal_name_ph: '이름 (예: 비상금)', ob_goal_target_ph: '목표 금액 (예: 1,000)', ob_goal_add: '내 목표 만들기', ob_goal_added: '✓ 목표를 만들었습니다! ‘저축’에서 확인할 수 있어요.', ob_san_title: 'San: 함께 모으기', ob_san_text: 'San(탄다, 쿤디나, 수수)은 전통적인 그룹 저축 모임입니다. 모두가 매주 내고, 차례대로 목돈을 받습니다. PETO Finanzas가 순서와 차례, 영수증을 공책 없이 관리합니다.', ob_san_btn: '마칠 때 내 san 만들기', ob_bank_title: '은행 연결하기', ob_bank_text: '원하시면 은행을 연결해 거래가 자동으로 들어오고 잔액이 항상 최신으로 유지됩니다. 선택 사항입니다: 환영 절차를 마칠 때 하거나, 나중에 설정에서 할 수 있어요.', ob_bank_btn: '은행을 연결하고 싶어요', ob_pod_title: '팟캐스트로 배우기', ob_pod_text: 'PETO Finanzas의 팟캐스트 «개인 금융»: Lucía와 Marco가 스페인어로 실제 예시와 구체적인 단계를 전합니다. 앱 안에서 들을 수 있어요.', ob_pod_btn: '마칠 때 팟캐스트 보기', ob_bell_title: '알림 켜기', ob_bell_text: '고정 지출 기한이 가까워지면 알려 주고, 하루 요약도 보내 드립니다. 놓치는 일이 없어요.', ob_bell_btn: '알림 켜기', ob_bell_done: '✓ 알림을 켰습니다.', ob_cloud_btn: '마칠 때 내 계정 만들기', ob_pending_ok: '✓ 좋아요! 환영 절차를 마치면 바로 그곳으로 안내합니다.', ob_pending_btn: '✓ 마칠 때 열립니다', spend_ctx_below: '지난달 페이스보다 {amount} 아래입니다', spend_ctx_above: '지난달 페이스보다 {amount} 위입니다', spend_ctx_bank: '은행 연결됨', sec_card_title: '보안', sec_card_read: '은행 연결은 읽기 전용: 자금을 절대 이동할 수 없습니다', sec_card_enc: '데이터는 암호화되어 전송되고 저장됩니다', sec_card_lock: 'PIN 및 지문 잠금', sec_card_lock_faceid: 'PIN 및 Face ID 잠금', sec_card_lock_generic: 'PIN 및 생체 인증 잠금', bud_per_semana: '주당', bud_per_quincena: '2주당', bud_per_mes: '월당', spend_left_periods: '모든 기간을 합쳐 {amount} 남았습니다.', spend_x_periods: '각 카테고리는 자신의 기간에 맞춰 나뉩니다:', spend_x_cat: '{cat} ({per}): {left} 남음 ÷ {days}일 = 오늘 {daily}', bud_period_aria: '{cat} 한도 기간', nav_gastos: '지출', nav_presupuesto: '예산', nav_ajustes: '설정', ob_bio_label: '지문으로 들어가기 (PIN을 만드는 경우)', ob_bio_label_faceid: 'Face ID로 들어가기 (PIN을 만드는 경우)', ob_bio_label_generic: '생체 인증으로 들어가기 (PIN을 만드는 경우)', panel_vs_title: '📊 이번 달 vs 지난 달', panel_vs_empty: '비교할 지난 달 데이터가 아직 없습니다.', panel_vs_cur: '이번 달', panel_vs_prev: '지난 달', panel_week: '{n}주차', panel_vs_up: '⬆ 지난 달 같은 기간보다 {amount} 더 썼습니다 ({pct}%)', panel_vs_down: '⬇ 지난 달 같은 기간보다 {amount} 덜 썼습니다 ({pct}%)', panel_vs_same: '지난 달 같은 기간과 같습니다.', panel_top_title: '🏆 이번 달 지출이 많은 카테고리', panel_top_empty: '이번 달은 아직 지출이 없습니다.', panel_flow_title: '💵 현금 흐름', panel_flow_empty: '여러 달의 내역이 쌓이면 여기서 돈의 출입을 볼 수 있습니다.', panel_flow_in: '수입', panel_flow_out: '지출', panel_flow_net: '순액: {amount}', panel_bc_title: '🎯 한도 진행 상황', panel_bc_budget: '예산', panel_bc_spent: '지출', panel_bc_left: '남음', panel_bc_empty: '아직 카테고리별 한도가 없습니다: 목록에서 설정하면 진행 상황이 여기에 표시됩니다.'
 },
 ru: {
+  c94_soon: 'Эта функция Pro активируется: загляните через несколько минут.',
+  c94_bill_btn: '📞 Обсудить этот счёт',
+  c94_bill_title: '📞 Ваш скрипт для переговоров',
+  c94_bill_help: 'ИИ пишет ваш скрипт на английском, готовый к чтению, когда вы позвоните в компанию. PETO Finanzas не звонит за вас: звонок делаете вы.',
+  c94_issuer_label: 'Компания (напр.: Spectrum, Con Edison)',
+  c94_service_label: 'Услуга (необязательно)',
+  c94_amount_label: 'Сколько вы платите в месяц ($)',
+  c94_tenure_label: 'Месяцев как клиент (необязательно)',
+  c94_make_script: 'Создать мой скрипт',
+  c94_working: 'Пишу ваш скрипт…',
+  c94_script_title: 'Скрипт для чтения во время звонка (на английском)',
+  c94_steps_title: 'Шаги',
+  c94_tips_title: 'Советы',
+  c94_warnings_title: 'Осторожно',
+  c94_copy: 'Копировать скрипт',
+  c94_copied: '✅ Скрипт скопирован',
+  c94_cancel_btn: '🚪 Скрипт для отмены',
+  c94_cancel_title: '🚪 Ваш скрипт для отмены',
+  c94_cancel_help: 'ИИ пишет ваш скрипт на английском, чтобы отменить без лишних слов. PETO Finanzas не отменяет за вас: звонок или чат делаете вы.',
+  c94_merchant_label: 'Услуга для отмены',
+  c94_remit_btn: '💸 Реальная стоимость перевода',
+  c94_remit_title: '💸 Реальная стоимость вашего перевода',
+  c94_remit_help: 'Расчёты делаются на вашем телефоне, с точной математикой; ИИ только объясняет их простыми словами. Отсюда деньги не отправляются.',
+  c94_remit_amount: 'Сумма, которую вы отправляете ($)',
+  c94_remit_fee: 'Комиссия, которую с вас взяли ($)',
+  c94_remit_rate: 'Курс, который вам дали (за $1)',
+  c94_remit_market: 'Рыночный курс (необязательно)',
+  c94_remit_alt_name: 'Альтернатива (необязательно: название другого сервиса)',
+  c94_remit_alt_fee: 'Его комиссия ($)',
+  c94_remit_alt_rate: 'Его курс (за $1)',
+  c94_remit_calc: 'Рассчитать и объяснить',
+  c94_remit_cost_line: 'Реальная стоимость: {cost} ({pct}% от отправленного)',
+  c94_remit_alt_line: 'С {name}: {cost} → вы экономите {save}',
+  c94_remit_err: 'Укажите сумму, комиссию и курс, который вам дали.',
+  c94_quin_btn: '🗓️ Ваш период до зарплаты с ИИ',
+  c94_quin_title: '🗓️ Ваш период до зарплаты с ИИ',
+  c94_quin_working: 'Читаю ваш период до зарплаты…',
+  c94_chat_bill_intro: 'Подготовлю скрипт для переговоров по этому счёту (Pro). Заполните данные:',
+  c94_chat_cancel_intro: 'Подготовлю скрипт для его отмены (Pro). Заполните данные:',
+  c94_chat_remit_intro: 'Сравниватель считает реальную стоимость вашего перевода: комиссия плюс маржа, спрятанная в курсе обмена.',
+  c94_chat_open_remit: 'Открыть сравниватель переводов',
+  c94_err_fields: 'Заполните данные, чтобы создать ваш скрипт.',
   setup_title: 'Настройте ваш PETO Finanzas',
   setup_step_of: 'Шаг {n} из 3',
   setup_step1_t: 'Создайте аккаунт',
@@ -9516,6 +9936,48 @@ ru: {
   ob_signin_btn: 'У меня уже есть аккаунт · Войти', ob_signin_help: 'Уже пользуетесь PETO Finanzas на другом телефоне или в вебе? Войдите по почте — и ваши данные загрузятся сами.', ob_signin_back: 'Назад', ob_exp_amount_ph: 'Сумма (напр. 25.00)', ob_exp_add: 'Записать мой первый расход', ob_exp_done: '✓ Записано! Записывать расходы — вот так просто.', ob_fix_title: 'Ваши постоянные платежи и бюджет', ob_fix_text: 'Добавьте платежи, которые повторяются каждый месяц (аренда, телефон, подписки). Из них PETO Finanzas составит ваш бюджет и посчитает, сколько можно потратить сегодня. Добавить ещё можно в любой момент.', ob_fix_name_ph: 'Название (напр. Аренда)', ob_fix_day_ph: 'День (1-31)', ob_fix_add: '＋ Добавить постоянный платёж', ob_fix_added: '✓ Постоянный платёж добавлен. Добавьте ещё или продолжайте.', ob_goal_title: 'Ваша цель накоплений', ob_goal_text: 'Дайте первой цели имя и сумму (например, подушка безопасности). С понятной целью копить намного легче.', ob_goal_name_ph: 'Название (напр. Подушка безопасности)', ob_goal_target_ph: 'Сумма цели (напр. 1 000)', ob_goal_add: 'Создать мою цель', ob_goal_added: '✓ Цель создана! Вы найдёте её в разделе «Накопления».', ob_san_title: 'Сан: копить вместе', ob_san_text: 'Сан (танда, кундина, сусу) — классический кружок совместных накоплений: все скидываются каждую неделю, и каждый по очереди получает общий котёл. PETO Finanzas ведёт порядок, очередь и квитанции без тетрадей.', ob_san_btn: 'Создать мой сан в конце', ob_bank_title: 'Подключите свой банк', ob_bank_text: 'Если хотите, подключите банк, чтобы операции поступали сами, а остатки всегда были актуальны. Это необязательно: в конце приветствия или позже в «Настройках».', ob_bank_btn: 'Хочу подключить банк', ob_pod_title: 'Учитесь с подкастом', ob_pod_text: '«Личные финансы» — подкаст PETO Finanzas: выпуски на испанском с Лусией и Марко, с примерами и конкретными шагами для ваших денег. Слушайте прямо в приложении.', ob_pod_btn: 'Посмотреть подкаст в конце', ob_bell_title: 'Включите напоминания', ob_bell_text: 'Получайте напоминание, когда срок постоянного платежа приближается, и сводку вашего дня. Так ничего не ускользнёт.', ob_bell_btn: 'Включить напоминания', ob_bell_done: '✓ Напоминания включены.', ob_cloud_btn: 'Создать мой аккаунт в конце', ob_pending_ok: '✓ Готово! В конце приветствия я отведу вас прямо туда.', ob_pending_btn: '✓ Откроется в конце', spend_ctx_below: 'Вы на {amount} ниже темпа прошлого месяца', spend_ctx_above: 'Вы на {amount} выше темпа прошлого месяца', spend_ctx_bank: 'Банк подключён', sec_card_title: 'Безопасность', sec_card_read: 'Банковское подключение только для чтения: мы никогда не можем перемещать ваши деньги', sec_card_enc: 'Ваши данные передаются и хранятся в зашифрованном виде', sec_card_lock: 'Блокировка по PIN-коду и отпечатку', sec_card_lock_faceid: 'Блокировка по PIN-коду и Face ID', sec_card_lock_generic: 'Блокировка по PIN-коду и биометрии', bud_per_semana: 'в неделю', bud_per_quincena: 'за две недели', bud_per_mes: 'в месяц', spend_left_periods: 'По всем периодам у вас осталось {amount}.', spend_x_periods: 'Каждая категория распределяется по своему периоду:', spend_x_cat: '{cat} ({per}): осталось {left} ÷ {days} дн. = {daily} сегодня', bud_period_aria: 'Период лимита для {cat}', nav_gastos: 'Расходы', nav_presupuesto: 'Бюджет', nav_ajustes: 'Настройки', ob_bio_label: 'Вход по отпечатку (если создам PIN)', ob_bio_label_faceid: 'Вход по Face ID (если создам PIN)', ob_bio_label_generic: 'Вход по биометрии (если создам PIN)', panel_vs_title: '📊 Этот месяц против прошлого', panel_vs_empty: 'Данных за прошлый месяц для сравнения пока нет.', panel_vs_cur: 'Этот месяц', panel_vs_prev: 'Прошлый месяц', panel_week: 'Нед. {n}', panel_vs_up: '⬆ Вы на {amount} выше того же отрезка прошлого месяца ({pct}%)', panel_vs_down: '⬇ Вы на {amount} ниже того же отрезка прошлого месяца ({pct}%)', panel_vs_same: 'Вы идёте вровень с тем же отрезком прошлого месяца.', panel_top_title: '🏆 Категории с самыми большими тратами месяца', panel_top_empty: 'В этом месяце трат пока нет.', panel_flow_title: '💵 Денежный поток', panel_flow_empty: 'Когда появятся операции за несколько месяцев, здесь будет видно, как деньги приходят и уходят.', panel_flow_in: 'Доходы', panel_flow_out: 'Расходы', panel_flow_net: 'Чистый итог: {amount}', panel_bc_title: '🎯 Прогресс ваших лимитов', panel_bc_budget: 'Бюджет', panel_bc_spent: 'Потрачено', panel_bc_left: 'Осталось', panel_bc_empty: 'Лимитов по категориям пока нет: задайте один в списке, и его прогресс появится здесь.'
 },
 hi: {
+  c94_soon: 'यह Pro सुविधा सक्रिय हो रही है: कुछ मिनट बाद फिर देखें।',
+  c94_bill_btn: '📞 इस बिल पर बातचीत करें',
+  c94_bill_title: '📞 बातचीत के लिए आपकी स्क्रिप्ट',
+  c94_bill_help: 'AI आपकी स्क्रिप्ट अंग्रेज़ी में लिखता है, कंपनी को कॉल करते समय पढ़ने के लिए तैयार। PETO Finanzas आपकी ओर से कॉल नहीं करता: कॉल आपको करनी है।',
+  c94_issuer_label: 'कंपनी (उदा.: Spectrum, Con Edison)',
+  c94_service_label: 'सेवा (वैकल्पिक)',
+  c94_amount_label: 'आप हर महीने कितना देते हैं ($)',
+  c94_tenure_label: 'ग्राहक के रूप में महीने (वैकल्पिक)',
+  c94_make_script: 'मेरी स्क्रिप्ट बनाएँ',
+  c94_working: 'आपकी स्क्रिप्ट लिखी जा रही है…',
+  c94_script_title: 'कॉल पर पढ़ने की स्क्रिप्ट (अंग्रेज़ी में)',
+  c94_steps_title: 'चरण',
+  c94_tips_title: 'सुझाव',
+  c94_warnings_title: 'ध्यान दें',
+  c94_copy: 'स्क्रिप्ट कॉपी करें',
+  c94_copied: '✅ स्क्रिप्ट कॉपी हो गई',
+  c94_cancel_btn: '🚪 रद्द करने की स्क्रिप्ट',
+  c94_cancel_title: '🚪 रद्द करने की आपकी स्क्रिप्ट',
+  c94_cancel_help: 'AI आपकी स्क्रिप्ट अंग्रेज़ी में लिखता है ताकि आप बिना घुमाए-फिराए रद्द कर सकें। PETO Finanzas आपकी ओर से रद्द नहीं करता: कॉल या चैट आपको करनी है।',
+  c94_merchant_label: 'रद्द करने वाली सेवा',
+  c94_remit_btn: '💸 आपके पैसे भेजने की असली लागत',
+  c94_remit_title: '💸 आपके पैसे भेजने की असली लागत',
+  c94_remit_help: 'हिसाब आपके फ़ोन पर सटीक गणित से होता है; AI उसे सिर्फ़ आसान शब्दों में समझाता है। यहाँ से पैसे नहीं भेजे जाते।',
+  c94_remit_amount: 'आप जो राशि भेजते हैं ($)',
+  c94_remit_fee: 'आपसे लिया गया शुल्क ($)',
+  c94_remit_rate: 'आपको दिया गया विनिमय दर (प्रति $1)',
+  c94_remit_market: 'बाज़ार विनिमय दर (वैकल्पिक)',
+  c94_remit_alt_name: 'विकल्प (वैकल्पिक: दूसरी सेवा का नाम)',
+  c94_remit_alt_fee: 'उसका शुल्क ($)',
+  c94_remit_alt_rate: 'उसकी विनिमय दर (प्रति $1)',
+  c94_remit_calc: 'गणना करें और समझाएँ',
+  c94_remit_cost_line: 'असली लागत: {cost} (भेजी गई राशि का {pct}%)',
+  c94_remit_alt_line: '{name} के साथ: {cost} → आप बचाते हैं {save}',
+  c94_remit_err: 'राशि, लिया गया शुल्क और आपको दिया गया विनिमय दर लिखें।',
+  c94_quin_btn: '🗓️ AI के साथ आपकी वेतन अवधि',
+  c94_quin_title: '🗓️ AI के साथ आपकी वेतन अवधि',
+  c94_quin_working: 'आपकी वेतन अवधि पढ़ी जा रही है…',
+  c94_chat_bill_intro: 'मैं उस बिल पर बातचीत की स्क्रिप्ट तैयार करता हूँ (Pro)। जानकारी भरें:',
+  c94_chat_cancel_intro: 'मैं उसे रद्द करने की स्क्रिप्ट तैयार करता हूँ (Pro)। जानकारी भरें:',
+  c94_chat_remit_intro: 'तुलनाकर्ता आपके भेजने की असली लागत निकालता है: शुल्क और विनिमय दर में छिपा अंतर।',
+  c94_chat_open_remit: 'रेमिटेंस तुलनाकर्ता खोलें',
+  c94_err_fields: 'अपनी स्क्रिप्ट बनाने के लिए जानकारी भरें।',
   setup_title: 'अपना PETO Finanzas सेट करें',
   setup_step_of: 'चरण {n} / 3',
   setup_step1_t: 'अपना खाता बनाएं',
@@ -10394,6 +10856,48 @@ hi: {
   ob_signin_btn: 'मेरा खाता पहले से है · साइन इन', ob_signin_help: 'क्या आप किसी अन्य फ़ोन या वेब पर पहले से PETO Finanzas उपयोग कर रहे हैं? अपने ईमेल से साइन इन करें और आपका डेटा अपने आप डाउनलोड हो जाएगा।', ob_signin_back: 'वापस', ob_exp_amount_ph: 'राशि (उदा. 25.00)', ob_exp_add: 'मेरा पहला खर्च दर्ज करें', ob_exp_done: '✓ दर्ज हो गया! खर्च दर्ज करना इतना ही आसान है।', ob_fix_title: 'आपके तय भुगतान और आपका बजट', ob_fix_text: 'वे भुगतान जोड़ें जो हर महीने दोहराए जाते हैं (किराया, फोन, सब्सक्रिप्शन)। इन्हीं से PETO Finanzas आपका बजट बनाता है और हिसाब लगाता है कि आज आप कितना खर्च कर सकते हैं। बाद में कभी भी और जोड़ सकते हैं।', ob_fix_name_ph: 'नाम (उदा. किराया)', ob_fix_day_ph: 'दिन (1-31)', ob_fix_add: '＋ तय भुगतान जोड़ें', ob_fix_added: '✓ तय भुगतान जुड़ गया। एक और जोड़ें या आगे बढ़ें।', ob_goal_title: 'आपका बचत लक्ष्य', ob_goal_text: 'अपने पहले लक्ष्य को नाम और राशि दें (उदाहरण के लिए, आपका आपातकालीन फंड)। साफ़ लक्ष्य हो तो बचत बहुत आसान हो जाती है।', ob_goal_name_ph: 'नाम (उदा. आपातकालीन फंड)', ob_goal_target_ph: 'लक्ष्य राशि (उदा. 1,000)', ob_goal_add: 'मेरा लक्ष्य बनाएं', ob_goal_added: '✓ लक्ष्य बन गया! यह आपको बचत में दिखेगा।', ob_san_title: 'सन: समूह में बचत', ob_san_text: 'सन (टांडा, कुंडीना, सुसु) बचत का पुराना समूह-घेरा है: हर कोई हर हफ़्ते योगदान करता है और हर किसी को अपनी बारी पर पूरा फंड मिलता है। PETO Finanzas क्रम, बारी और रसीदें बिना कॉपी के संभालता है।', ob_san_btn: 'अंत में मेरा सन बनाएं', ob_bank_title: 'अपना बैंक जोड़ें', ob_bank_text: 'चाहें तो अपना बैंक जोड़ें ताकि आपके लेन-देन खुद आ जाएं और बैलेंस हमेशा ताज़ा रहें। यह वैकल्पिक है: स्वागत के अंत में या बाद में सेटिंग्स में करें।', ob_bank_btn: 'मैं अपना बैंक जोड़ना चाहता/चाहती हूं', ob_pod_title: 'पॉडकास्ट से सीखें', ob_pod_text: '«व्यक्तिगत वित्त», PETO Finanzas का पॉडकास्ट: लूसिया और मार्को के साथ स्पेनिश में एपिसोड, उदाहरणों और आपके पैसों के लिए ठोस कदमों के साथ। ऐप के अंदर ही सुनें।', ob_pod_btn: 'अंत में पॉडकास्ट देखें', ob_bell_title: 'अपने रिमाइंडर चालू करें', ob_bell_text: 'जब कोई तय भुगतान जल्द देय हो तो सूचना पाएं, साथ ही अपने दिन का सारांश भी। फिर कुछ नहीं छूटेगा।', ob_bell_btn: 'रिमाइंडर चालू करें', ob_bell_done: '✓ रिमाइंडर चालू हो गए।', ob_cloud_btn: 'अंत में मेरा खाता बनाएं', ob_pending_ok: '✓ हो गया! स्वागत के अंत में मैं आपको सीधे वहीं ले जाऊंगा।', ob_pending_btn: '✓ अंत में खुलेगा', spend_ctx_below: 'आप पिछले महीने की गति से {amount} नीचे हैं', spend_ctx_above: 'आप पिछले महीने की गति से {amount} ऊपर हैं', spend_ctx_bank: 'बैंक जुड़ा हुआ है', sec_card_title: 'सुरक्षा', sec_card_read: 'बैंक कनेक्शन केवल पढ़ने के लिए: हम आपका पैसा कभी नहीं हिला सकते', sec_card_enc: 'आपका डेटा एन्क्रिप्ट होकर जाता और सहेजा जाता है', sec_card_lock: 'PIN और फ़िंगरप्रिंट लॉक', sec_card_lock_faceid: 'PIN और Face ID लॉक', sec_card_lock_generic: 'PIN और बायोमेट्रिक्स लॉक', bud_per_semana: 'प्रति सप्ताह', bud_per_quincena: 'प्रति पखवाड़ा', bud_per_mes: 'प्रति माह', spend_left_periods: 'आपके सभी अवधियों में कुल {amount} बचे हैं।', spend_x_periods: 'हर श्रेणी अपनी अवधि के अनुसार बँटती है:', spend_x_cat: '{cat} ({per}): {left} बचे ÷ {days} दिन = आज {daily}', bud_period_aria: '{cat} के लिए सीमा अवधि', nav_gastos: 'खर्च', nav_presupuesto: 'बजट', nav_ajustes: 'सेटिंग्स', ob_bio_label: 'फिंगरप्रिंट से प्रवेश (अगर मैं PIN बनाऊं)', ob_bio_label_faceid: 'Face ID से प्रवेश (अगर मैं PIN बनाऊं)', ob_bio_label_generic: 'बायोमेट्रिक्स से प्रवेश (अगर मैं PIN बनाऊं)', panel_vs_title: '📊 इस महीना बनाम पिछला महीना', panel_vs_empty: 'तुलना के लिए पिछले महीने का डेटा अभी नहीं है।', panel_vs_cur: 'इस महीना', panel_vs_prev: 'पिछला महीना', panel_week: 'सप्ताह {n}', panel_vs_up: '⬆ आप पिछले महीने की इसी अवधि से {amount} ऊपर हैं ({pct}%)', panel_vs_down: '⬇ आप पिछले महीने की इसी अवधि से {amount} नीचे हैं ({pct}%)', panel_vs_same: 'आप पिछले महीने की इसी अवधि के बराबर हैं।', panel_top_title: '🏆 इस महीने की सबसे ज़्यादा खर्च वाली श्रेणियाँ', panel_top_empty: 'इस महीने अभी कोई खर्च नहीं है।', panel_flow_title: '💵 कैश फ़्लो', panel_flow_empty: 'जब कई महीनों के लेन-देन होंगे, तो यहाँ दिखेगा कि आपका पैसा कैसे आता-जाता है।', panel_flow_in: 'आय', panel_flow_out: 'खर्च', panel_flow_net: 'शुद्ध: {amount}', panel_bc_title: '🎯 आपकी सीमाओं की प्रगति', panel_bc_budget: 'बजट', panel_bc_spent: 'खर्च हुआ', panel_bc_left: 'बचा', panel_bc_empty: 'अभी श्रेणी के अनुसार कोई सीमा नहीं है: सूची में एक सीमा तय करें और उसकी प्रगति यहाँ दिखेगी।'
 },
 ar: {
+  c94_soon: 'جارٍ تفعيل ميزة Pro هذه: عُد بعد بضع دقائق.',
+  c94_bill_btn: '📞 تفاوض على هذه الفاتورة',
+  c94_bill_title: '📞 نصك للتفاوض',
+  c94_bill_help: 'يكتب الذكاء الاصطناعي نصك بالإنجليزية، جاهزًا للقراءة عندما تتصل بالشركة. لا يتصل PETO Finanzas نيابة عنك: المكالمة تقوم بها أنت.',
+  c94_issuer_label: 'الشركة (مثال: Spectrum، Con Edison)',
+  c94_service_label: 'الخدمة (اختياري)',
+  c94_amount_label: 'كم تدفع شهريًا ($)',
+  c94_tenure_label: 'أشهر كعميل (اختياري)',
+  c94_make_script: 'أنشئ نصي',
+  c94_working: 'جارٍ كتابة نصك…',
+  c94_script_title: 'النص لقراءته في المكالمة (بالإنجليزية)',
+  c94_steps_title: 'الخطوات',
+  c94_tips_title: 'نصائح',
+  c94_warnings_title: 'انتبه',
+  c94_copy: 'نسخ النص',
+  c94_copied: '✅ تم نسخ النص',
+  c94_cancel_btn: '🚪 نص للإلغاء',
+  c94_cancel_title: '🚪 نصك للإلغاء',
+  c94_cancel_help: 'يكتب الذكاء الاصطناعي نصك بالإنجليزية للإلغاء دون لف ودوران. لا يلغي PETO Finanzas نيابة عنك: المكالمة أو المحادثة تقوم بها أنت.',
+  c94_merchant_label: 'الخدمة المراد إلغاؤها',
+  c94_remit_btn: '💸 التكلفة الحقيقية لتحويلك',
+  c94_remit_title: '💸 التكلفة الحقيقية لتحويلك',
+  c94_remit_help: 'تُحسب الأرقام على هاتفك بحساب دقيق؛ والذكاء الاصطناعي يشرحها لك فقط بكلمات بسيطة. لا يُرسل مال من هنا.',
+  c94_remit_amount: 'المبلغ الذي ترسله ($)',
+  c94_remit_fee: 'الرسوم التي أخذوها منك ($)',
+  c94_remit_rate: 'سعر الصرف الذي أعطوك إياه (لكل $1)',
+  c94_remit_market: 'سعر صرف السوق (اختياري)',
+  c94_remit_alt_name: 'بديل (اختياري: اسم الخدمة الأخرى)',
+  c94_remit_alt_fee: 'رسومها ($)',
+  c94_remit_alt_rate: 'سعر صرفها (لكل $1)',
+  c94_remit_calc: 'احسب واشرح',
+  c94_remit_cost_line: 'التكلفة الحقيقية: {cost} ({pct}% مما أرسلته)',
+  c94_remit_alt_line: 'مع {name}: {cost} ← توفر {save}',
+  c94_remit_err: 'اكتب المبلغ والرسوم وسعر الصرف الذي أعطوك إياه.',
+  c94_quin_btn: '🗓️ فترة راتبك مع الذكاء الاصطناعي',
+  c94_quin_title: '🗓️ فترة راتبك مع الذكاء الاصطناعي',
+  c94_quin_working: 'جارٍ قراءة فترة راتبك…',
+  c94_chat_bill_intro: 'أجهز لك النص للتفاوض على تلك الفاتورة (Pro). أكمل البيانات:',
+  c94_chat_cancel_intro: 'أجهز لك النص لإلغائه (Pro). أكمل البيانات:',
+  c94_chat_remit_intro: 'يحسب المقارن التكلفة الحقيقية لإرسالك: الرسوم زائد الهامش المخفي في سعر الصرف.',
+  c94_chat_open_remit: 'افتح مقارن التحويلات',
+  c94_err_fields: 'أكمل البيانات لإنشاء نصك.',
   setup_title: 'إعداد PETO Finanzas الخاص بك',
   setup_step_of: 'الخطوة {n} من 3',
   setup_step1_t: 'أنشئ حسابك',
@@ -11651,7 +12155,7 @@ function syncAds(navVisible) {
    plugin ni banner ni contenedor de anuncio (Compilación 74), así
    que la misma ruta corre sin efecto y el modal web jamás tiene
    anuncio encima. */
-const MODAL_OVERLAY_IDS = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'menu-drawer-wrap', 'view-chat', 'perm-explain-modal', 'home87-week-modal', 'share-chooser91'];
+const MODAL_OVERLAY_IDS = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'bill94-modal', 'cancel94-modal', 'remit94-modal', 'quin94-modal', 'menu-drawer-wrap', 'view-chat', 'perm-explain-modal', 'home87-week-modal', 'share-chooser91'];
 let adsModalHeld = false;
 function anyModalOpen() {
   return MODAL_OVERLAY_IDS.some((id) => {
@@ -14734,6 +15238,11 @@ function renderFlowCard() {
   }
   if (!proj.rows.length) body.appendChild(el('p', 'item-sub', t('flow_no_events')));
   body.appendChild(ul);
+  /* Compilación 94 (Fase B): «Tu quincena con IA» — estos mismos
+     hitos, narrados por la IA con el patrón de cobro detectado. */
+  const qActs94 = el('div', 'form-actions');
+  qActs94.appendChild(actionButton(t('c94_quin_btn'), 'btn-secondary', () => { openQuin94(); }));
+  body.appendChild(qActs94);
 }
 /* ---------------- Compilación 76 · Gastos hormiga ------------------
    Compras pequeñas y frecuentes: las de hasta el tope elegido en
@@ -15882,6 +16391,11 @@ function renderFixed() {
       db.fixed = db.fixed.filter((x) => x.id !== item.id);
       save(); resetFixedForm(); renderFixed(); showUndoToast();
     }));
+    /* Compilación 94 (Fase B): negociar esta factura con un
+       guion de IA (Pro), prellenado con este pago fijo. */
+    acts.appendChild(actionButton(t('c94_bill_btn'), 'btn-ghost', () => {
+      openBill94({ issuer: item.name, amountCents: item.amountCents });
+    }));
     li.appendChild(acts);
     ul.appendChild(li);
   }
@@ -16109,6 +16623,13 @@ function renderRecurring() {
       }
       main.appendChild(pwBox);
     }
+    /* Compilación 94 (Fase B): guion de cancelación con IA
+       (Pro) para este cargo recurrente. */
+    const cActs94 = el('div', 'item-actions');
+    cActs94.appendChild(actionButton(t('c94_cancel_btn'), 'btn-secondary btn-small', () => {
+      openCancel94({ merchant: r.name, amountCents: r.amount });
+    }));
+    main.appendChild(cActs94);
     if (ana76 && ana76.dupCharge) main.appendChild(el('div', 'item-sub', t('subs_dup')));
     if (ana76 && ana76.inFixed) main.appendChild(el('div', 'item-sub', t('subs_in_fixed')));
     li.appendChild(main);
@@ -16130,6 +16651,13 @@ function renderRecurring() {
     const main = el('div', 'item-main');
     main.appendChild(el('div', 'item-title', f.name));
     main.appendChild(el('div', 'item-sub', t('subs_in_fixed') + ' · ' + fmt(f.monthlyCents) + ' ' + t('subs_per_month')));
+    /* Compilación 94 (Fase B): también las que ya son pago
+       fijo llevan su guion de cancelación. */
+    const fcActs94 = el('div', 'item-actions');
+    fcActs94.appendChild(actionButton(t('c94_cancel_btn'), 'btn-secondary btn-small', () => {
+      openCancel94({ merchant: f.name, amountCents: f.monthlyCents });
+    }));
+    main.appendChild(fcActs94);
     li.appendChild(main);
     li.appendChild(el('span', 'item-amount', fmt(f.monthlyCents)));
     fixedUl.appendChild(li);
@@ -21445,6 +21973,10 @@ async function aiFn(action, payload) {
   if (out && out.error === 'ai_not_configured') throw new Error('ai_not_configured');
   if (out && out.error === 'ai_limit') throw new Error('ai_limit');
   if (out && out.error === 'ai_pro_required') throw new Error('ai_pro_required');
+  /* Compilación 94: si el servidor aún no conoce una acción
+     nueva (su despliegue va después que la app), la UI lo
+     dice con calma en vez de un error feo. */
+  if (out && out.error === 'bad_action') throw new Error('ai_bad_action');
   if (res.status === 401 || (out && out.error === 'unauthorized')) throw new Error('ai_login');
   if (!res.ok || !out || out.ok !== true) throw new Error('ai_generic');
   aiBumpUsage(action);
@@ -21494,6 +22026,7 @@ function aiErrorText(e) {
   if (code === 'ai_not_configured') return t('ai_not_configured');
   if (code === 'ai_limit') return isPro() ? t('ai_limit') : t('ai3_limit_free');
   if (code === 'ai_pro_required') return t('ai3_pro_required');
+  if (code === 'ai_bad_action') return t('c94_soon');
   if (code === 'ai_login') return t('ai_login');
   return t('ai_error');
 }
@@ -21791,6 +22324,44 @@ function chat88RenderKind(box, m) {
     acts.appendChild(actionButton(t('chat88_opt_search'), 'btn-secondary btn-small', () => { chat88RouteSearch(m.q); }));
     acts.appendChild(actionButton(t('chat88_opt_ask'), 'btn-secondary btn-small', () => { chat88AskAi(m.q); }));
     card.appendChild(acts);
+  } else if (m.kind === 'tool94') {
+    const d94 = m.data || {};
+    if (d94.tool === 'remit') {
+      card.appendChild(el('div', 'chat88-title', t('c94_remit_title')));
+      card.appendChild(el('div', 'chat88-line', t('c94_chat_remit_intro')));
+      const actsR = el('div', 'form-actions');
+      actsR.appendChild(actionButton(t('c94_chat_open_remit'), 'btn-primary btn-small', () => { openRemit94(); }));
+      card.appendChild(actsR);
+    } else {
+      const isBill = d94.tool === 'bill';
+      card.appendChild(el('div', 'chat88-title', t(isBill ? 'c94_bill_title' : 'c94_cancel_title')));
+      card.appendChild(el('div', 'chat88-line', t(isBill ? 'c94_chat_bill_intro' : 'c94_chat_cancel_intro')));
+      const nameIn = el('input', 'c94-input');
+      nameIn.type = 'text'; nameIn.maxLength = 120;
+      nameIn.placeholder = t(isBill ? 'c94_issuer_label' : 'c94_merchant_label');
+      nameIn.value = d94.name || '';
+      nameIn.addEventListener('input', () => { d94.name = nameIn.value; });
+      card.appendChild(nameIn);
+      const amtIn = el('input', 'c94-input');
+      amtIn.type = 'text'; amtIn.inputMode = 'decimal';
+      amtIn.placeholder = t('c94_amount_label');
+      amtIn.value = d94.amount || '';
+      amtIn.addEventListener('input', () => { d94.amount = amtIn.value; });
+      card.appendChild(amtIn);
+      if (d94.status) card.appendChild(el('div', 'chat88-line', d94.status));
+      const acts = el('div', 'form-actions');
+      if (m.state === 'done94') {
+        acts.appendChild(el('span', 'chat88-line', t('c94_copied')));
+      } else {
+        acts.appendChild(actionButton(t('c94_make_script'), 'btn-primary btn-small', () => { chat94SubmitTool(m); }));
+      }
+      card.appendChild(acts);
+    }
+  } else if (m.kind === 'script94') {
+    const d94 = m.data || {};
+    const r94 = d94.result || {};
+    card.appendChild(el('div', 'chat88-title', t(d94.tool === 'bill' ? 'c94_bill_title' : 'c94_cancel_title')));
+    ai94RenderScriptInto(card, r94, d94.tool === 'bill' ? 'tips' : 'warnings');
   } else if (m.kind === 'fallback88') {
     card.appendChild(el('div', 'chat88-line', t('chat88_fallback')));
     const acts = el('div', 'form-actions');
@@ -21826,6 +22397,14 @@ function chat88Classify(text) {
   const q = chat88Norm(raw).trim();
   if (!q) return 'unknown';
   if (/^(busca|buscar|encuentra|muestrame|muestra|search|find|look for)\b/.test(q)) return 'search';
+  /* Compilación 94 (Fase B): el agente Pro se detecta ANTES que
+     registrar o preguntar: cancelar un servicio, negociar una
+     factura y el costo real de una remesa tienen su herramienta. */
+  if (/(cancelar|cancela|cancel|dar de baja|unsubscribe)/.test(q)) return 'cancel94';
+  if (/(negociar|bajar|rebajar|reducir|descuento|lower|negotiate|reduce|discount)/.test(q) &&
+      /(factura|bill|recibo|pago)/.test(q)) return 'bill94';
+  if (/(remesa|remittance|enviar dinero|send money|giro)/.test(q) ||
+      /(costo real|cuanto me cuesta|cuesta enviar|sale enviar|me cobran por enviar)/.test(q)) return 'remit94';
   const hasAmount = /\d/.test(q);
   const regVerb = /(gaste|gastar|pague|pagar|compre|comprar|cobre|recibi|ingrese|gane|me pagaron|spent|paid|bought|purchased|received|earned|got paid)/.test(q);
   if (hasAmount && regVerb) return 'register';
@@ -22006,6 +22585,9 @@ async function onAiChatSubmit(ev) {
   if (intent === 'register') { await chat88RouteRegister(q); return; }
   if (intent === 'search') { chat88RouteSearch(q); return; }
   if (intent === 'place') { chat88Push('places88', chat88FindPlaces(q), q); return; }
+  if (intent === 'bill94') { chat94RouteBill(q); return; }
+  if (intent === 'cancel94') { chat94RouteCancel(q); return; }
+  if (intent === 'remit94') { chat94RouteRemit(q); return; }
   if (intent === 'question') {
     if (chat88Offline()) { chat88Push('fallback88', null, q); return; }
     await chat88AskAi(q);
@@ -22292,10 +22874,18 @@ function renderAiFlowCard() {
     t('ai2_flow_short_line', { amount: fmt(p.minCents), date: recurringDateLabel(p.minDate) })));
   if (aiFlowState && aiFlowState.sig === ai2FlowSig(p)) {
     body.appendChild(el('p', 'ai-flow-alert', aiFlowState.alert));
+    /* Compilación 94: la quincena completa queda a un toque
+       también con la alerta ya redactada. */
+    const qActs94b = el('div', 'form-actions');
+    qActs94b.appendChild(actionButton(t('c94_quin_btn'), 'btn-secondary', () => { openQuin94(); }));
+    body.appendChild(qActs94b);
     return;
   }
   const acts = el('div', 'form-actions');
   acts.appendChild(actionButton(t('ai2_flow_btn'), 'btn-secondary', () => { onAiFlowExplain(); }));
+  /* Compilación 94 (Fase B): «Tu quincena con IA» junto a la
+     alerta: hitos locales + narrativa con patrón de cobro. */
+  acts.appendChild(actionButton(t('c94_quin_btn'), 'btn-secondary', () => { openQuin94(); }));
   body.appendChild(acts);
   const status = el('p', 'muted small');
   status.id = 'ai2-flow-status';
@@ -22324,6 +22914,342 @@ async function onAiFlowExplain() {
   }
   renderAiFlowCard();
 }
+
+/* ---------------- Compilación 94 · Fase B (PETO-C94) ----------
+   El agente de finanzas Pro, sobre la misma Edge Function «ai»:
+   - Chat Pro sin tope visible: el servidor subió su límite a
+     5000/mes (techo de seguridad invisible); el contador de uso
+     nunca se pinta para Pro (así era ya desde la Comp. 85).
+   - Guiones con IA (acciones bill-script y cancel-script): la app
+     entrega un guion EN INGLÉS listo para leer, los pasos en
+     español y consejos o avisos. NADA se llama ni se envía en
+     nombre de la persona: ella hace la llamada o el chat.
+   - Comparador de remesas (acción remit-compare): las CUENTAS se
+     hacen aquí, con matemática local exacta (remitCost94) y casos
+     fijos en la suite; la IA solo narra el resultado.
+   - «Tu quincena con IA»: los hitos locales del motor único
+     (computeFlowProjection) + la narrativa de cashflow, que ahora
+     detecta el patrón de cobro desde el historial de ingresos.
+   Todo tras requirePro; si el servidor aún no conoce las acciones
+   nuevas (bad_action, su despliegue va después), la UI muestra
+   «disponible en unos minutos» en vez de un error feo. */
+
+/* Matemática EXACTA del costo real de una remesa, en centavos:
+   costo = comisión + margen del tipo de cambio, donde el margen
+   es lo que se pierde por recibir menos unidades por $1 que el
+   tipo de mercado: monto × (mercado − recibido) / mercado.
+   Sin tipo de mercado no hay margen calculable (0). La
+   alternativa repite la cuenta con su comisión y su tipo. */
+function remitCost94(amountCents, feeCents, rateReceived, rateMarket, altFeeCents, altRate) {
+  const marginOf = (got) => (rateMarket && rateMarket > 0 && got && got > 0)
+    ? Math.max(0, Math.round(amountCents * (rateMarket - got) / rateMarket)) : 0;
+  const marginCents = marginOf(rateReceived);
+  const costCents = (feeCents || 0) + marginCents;
+  const costPct = amountCents > 0 ? Math.round(costCents / amountCents * 10000) / 100 : 0;
+  let altMarginCents = null, altCostCents = null, savingsCents = null;
+  if (altFeeCents !== null && altFeeCents !== undefined && altRate) {
+    altMarginCents = marginOf(altRate);
+    altCostCents = altFeeCents + altMarginCents;
+    savingsCents = costCents - altCostCents;
+  }
+  return {
+    marginCents: marginCents, costCents: costCents, costPct: costPct,
+    altMarginCents: altMarginCents, altCostCents: altCostCents,
+    savingsCents: savingsCents
+  };
+}
+
+/* Copia un texto (el guion) con confirmación en el propio botón;
+   sin portapapeles disponible, cae a compartir. */
+function ai94CopyText(text, btn) {
+  const done = () => {
+    if (!btn) return;
+    const old = btn.textContent;
+    btn.textContent = t('c94_copied');
+    setTimeout(() => { btn.textContent = old; }, 1800);
+  };
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => { shareText('', text); });
+  } else { shareText('', text); }
+}
+function ai94ListInto(parent, titleKey, items) {
+  if (!items || !items.length) return;
+  parent.appendChild(el('div', 'chat88-title', t(titleKey)));
+  const ul = el('ul', 'c94-list');
+  for (const it of items) ul.appendChild(el('li', null, it));
+  parent.appendChild(ul);
+}
+/* Pinta un guion (bill o cancel) en cualquier contenedor: el
+   guion en inglés, los pasos y los consejos (tips) o avisos
+   (warnings), con su botón de copiar (type=button: vive también
+   dentro de los formularios de los modales). */
+function ai94RenderScriptInto(parent, r, extraKey) {
+  if (!r) return;
+  if (r.script_en) {
+    parent.appendChild(el('div', 'chat88-title', t('c94_script_title')));
+    parent.appendChild(el('div', 'c94-script', r.script_en));
+  }
+  ai94ListInto(parent, 'c94_steps_title', r.steps_es);
+  ai94ListInto(parent, extraKey === 'tips' ? 'c94_tips_title' : 'c94_warnings_title', r[extraKey]);
+  if (r.script_en) {
+    const acts = el('div', 'form-actions');
+    const btn = el('button', 'btn btn-small btn-secondary', t('c94_copy'));
+    btn.type = 'button';
+    btn.addEventListener('click', () => { ai94CopyText(r.script_en, btn); });
+    acts.appendChild(btn);
+    parent.appendChild(acts);
+  }
+}
+
+/* Nombre probable («Netflix», «Spectrum») sacado del texto del
+   chat quitando verbos y conectores de la intención: prellena el
+   mini-formulario y la persona lo corrige si hace falta. */
+function chat94GuessName(q) {
+  const stop = new Set(['quiero', 'necesito', 'puedes', 'puede', 'por', 'favor',
+    'cancelar', 'cancela', 'cancel', 'dar', 'de', 'baja', 'negociar', 'bajar',
+    'rebajar', 'reducir', 'descuento', 'mi', 'la', 'el', 'los', 'las', 'una',
+    'un', 'factura', 'bill', 'recibo', 'suscripcion', 'suscripciones',
+    'servicio', 'cuenta', 'plan', 'membresia', 'subscription', 'service',
+    'account', 'the', 'my', 'please', 'como', 'cuanto', 'cuesta', 'enviar',
+    'dinero', 'remesa', 'remittance', 'money', 'send', 'costo', 'real', 'me',
+    'se', 'en', 'y', 'o', 'del', 'al', 'para', 'con', 'sin', 'es', 'lo',
+    'unsubscribe', 'lower', 'negotiate', 'reduce', 'discount']);
+  const words = chat88Norm(q).replace(/[^a-z0-9 ]/g, ' ').split(/\s+/)
+    .filter((w) => w && !stop.has(w));
+  const name = words.join(' ').trim().slice(0, 40);
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : '';
+}
+function chat94RouteBill(q) {
+  if (!requirePro()) return;
+  chat88Push('tool94', { tool: 'bill', name: chat94GuessName(q), amount: '', status: '' }, q);
+}
+function chat94RouteCancel(q) {
+  if (!requirePro()) return;
+  chat88Push('tool94', { tool: 'cancel', name: chat94GuessName(q), amount: '', status: '' }, q);
+}
+function chat94RouteRemit(q) {
+  if (!requirePro()) return;
+  chat88Push('tool94', { tool: 'remit' }, q);
+}
+async function chat94SubmitTool(m) {
+  const d = m.data || {};
+  const name = String(d.name || '').trim();
+  const cents = d.amount ? parseAmount(String(d.amount), false) : null;
+  if (!name || (d.tool === 'bill' && (cents === null || cents <= 0))) {
+    d.status = t('c94_err_fields'); renderAiChat(); return;
+  }
+  d.status = t('c94_working'); renderAiChat();
+  try {
+    const r = d.tool === 'bill'
+      ? await aiFn('bill-script', { issuer: name, currentCents: cents, lang: lang() })
+      : await aiFn('cancel-script', { merchant: name, currentCents: cents, lang: lang() });
+    if (!r || !r.script_en) throw new Error('ai_generic');
+    m.state = 'done94'; d.status = '';
+    chat88Push('script94', { tool: d.tool, result: r }, m.q);
+  } catch (e) {
+    d.status = aiErrorText(e); renderAiChat(); aiGatePaywall(e);
+  }
+}
+
+/* ---------------- Modales del agente (chooser) ---------------- */
+function ai94ShowModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.hidden = false; syncAdsForModals(); }
+}
+function ai94HideModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.hidden = true; syncAdsForModals(); }
+}
+function openBill94(prefill) {
+  if (!requirePro()) return;
+  const f = document.getElementById('bill94-form');
+  if (f) f.reset();
+  if (prefill) {
+    if (prefill.issuer) document.getElementById('bill94-issuer').value = prefill.issuer;
+    if (prefill.amountCents) document.getElementById('bill94-amount').value = (prefill.amountCents / 100).toFixed(2);
+  }
+  const st = document.getElementById('bill94-status');
+  if (st) st.textContent = '';
+  const box = document.getElementById('bill94-result');
+  if (box) { clearNode(box); box.hidden = true; }
+  ai94ShowModal('bill94-modal');
+}
+function closeBill94() { ai94HideModal('bill94-modal'); }
+async function onBill94Submit(ev) {
+  ev.preventDefault();
+  const issuer = document.getElementById('bill94-issuer').value.trim();
+  const service = document.getElementById('bill94-service').value.trim();
+  const cents = parseAmount(document.getElementById('bill94-amount').value, false);
+  const tenureRaw = document.getElementById('bill94-tenure').value.trim();
+  const tenure = tenureRaw === '' ? null : Math.trunc(Number(tenureRaw));
+  const st = document.getElementById('bill94-status');
+  if (!issuer || cents === null || cents <= 0) { if (st) st.textContent = t('c94_err_fields'); return; }
+  if (st) st.textContent = t('c94_working');
+  try {
+    const payload = { issuer: issuer, currentCents: cents, lang: lang() };
+    if (service) payload.service = service;
+    if (tenure !== null && Number.isFinite(tenure) && tenure >= 0) payload.tenureMonths = tenure;
+    const r = await aiFn('bill-script', payload);
+    if (!r || !r.script_en) throw new Error('ai_generic');
+    if (st) st.textContent = '';
+    const box = document.getElementById('bill94-result');
+    clearNode(box); box.hidden = false;
+    ai94RenderScriptInto(box, r, 'tips');
+  } catch (e) { if (st) st.textContent = aiErrorText(e); aiGatePaywall(e); }
+}
+function openCancel94(prefill) {
+  if (!requirePro()) return;
+  const f = document.getElementById('cancel94-form');
+  if (f) f.reset();
+  if (prefill) {
+    if (prefill.merchant) document.getElementById('cancel94-merchant').value = prefill.merchant;
+    if (prefill.amountCents) document.getElementById('cancel94-amount').value = (prefill.amountCents / 100).toFixed(2);
+  }
+  const st = document.getElementById('cancel94-status');
+  if (st) st.textContent = '';
+  const box = document.getElementById('cancel94-result');
+  if (box) { clearNode(box); box.hidden = true; }
+  ai94ShowModal('cancel94-modal');
+}
+function closeCancel94() { ai94HideModal('cancel94-modal'); }
+async function onCancel94Submit(ev) {
+  ev.preventDefault();
+  const merchant = document.getElementById('cancel94-merchant').value.trim();
+  const rawAmt = document.getElementById('cancel94-amount').value.trim();
+  const cents = rawAmt === '' ? null : parseAmount(rawAmt, false);
+  const st = document.getElementById('cancel94-status');
+  if (!merchant || (rawAmt !== '' && (cents === null || cents <= 0))) {
+    if (st) st.textContent = t('c94_err_fields'); return;
+  }
+  if (st) st.textContent = t('c94_working');
+  try {
+    const r = await aiFn('cancel-script', { merchant: merchant, currentCents: cents, lang: lang() });
+    if (!r || !r.script_en) throw new Error('ai_generic');
+    if (st) st.textContent = '';
+    const box = document.getElementById('cancel94-result');
+    clearNode(box); box.hidden = false;
+    ai94RenderScriptInto(box, r, 'warnings');
+  } catch (e) { if (st) st.textContent = aiErrorText(e); aiGatePaywall(e); }
+}
+function openRemit94() {
+  if (!requirePro()) return;
+  const st = document.getElementById('remit94-status');
+  if (st) st.textContent = '';
+  const box = document.getElementById('remit94-result');
+  if (box) { clearNode(box); box.hidden = true; }
+  ai94ShowModal('remit94-modal');
+}
+function closeRemit94() { ai94HideModal('remit94-modal'); }
+function remit94Num(id) {
+  const n = document.getElementById(id);
+  const v = n ? String(n.value).trim().replace(',', '.') : '';
+  if (v === '') return null;
+  const x = Number(v);
+  return Number.isFinite(x) ? x : null;
+}
+async function onRemit94Submit(ev) {
+  ev.preventDefault();
+  const st = document.getElementById('remit94-status');
+  const amount = remit94Num('remit94-amount');
+  const fee = remit94Num('remit94-fee');
+  const rate = remit94Num('remit94-rate');
+  const market = remit94Num('remit94-market');
+  const altName = document.getElementById('remit94-alt-name').value.trim();
+  const altFee = remit94Num('remit94-alt-fee');
+  const altRate = remit94Num('remit94-alt-rate');
+  if (amount === null || amount <= 0 || fee === null || fee < 0 ||
+      rate === null || rate <= 0) {
+    if (st) st.textContent = t('c94_remit_err'); return;
+  }
+  const amountCents = Math.round(amount * 100);
+  const feeCents = Math.round(fee * 100);
+  const hasAlt = altFee !== null && altFee >= 0 && altRate !== null && altRate > 0;
+  const calc = remitCost94(amountCents, feeCents, rate, market,
+    hasAlt ? Math.round(altFee * 100) : null, hasAlt ? altRate : null);
+  /* Las cuentas se pintan AL INSTANTE, sin esperar a la IA. */
+  const box = document.getElementById('remit94-result');
+  clearNode(box); box.hidden = false;
+  box.appendChild(el('p', 'item-sub', t('c94_remit_cost_line',
+    { cost: fmt(calc.costCents), pct: String(calc.costPct) })));
+  if (calc.altCostCents !== null) {
+    box.appendChild(el('p', 'item-sub', t('c94_remit_alt_line',
+      { name: altName || '—', cost: fmt(calc.altCostCents), save: fmt(calc.savingsCents) })));
+  }
+  if (st) st.textContent = t('ai_working');
+  try {
+    const payload = {
+      amountCents: amountCents, feeCents: feeCents, rateReceived: rate,
+      costCents: calc.costCents, costPct: calc.costPct, lang: lang()
+    };
+    if (market !== null && market > 0) payload.rateMarket = market;
+    if (hasAlt) {
+      payload.altFeeCents = Math.round(altFee * 100);
+      payload.altRate = altRate;
+      payload.altCostCents = calc.altCostCents;
+      payload.savingsCents = calc.savingsCents;
+      if (altName) payload.altName = altName;
+    }
+    const r = await aiFn('remit-compare', payload);
+    if (!r || !r.text) throw new Error('ai_generic');
+    if (st) st.textContent = '';
+    box.appendChild(el('p', 'ai-flow-alert', r.text));
+  } catch (e) { if (st) st.textContent = aiErrorText(e); aiGatePaywall(e); }
+}
+
+/* ---------------- «Tu quincena con IA» ----------------
+   Hitos locales del motor único + la narrativa de cashflow con
+   los facts enriquecidos: la frecuencia configurada, el historial
+   reciente de ingresos (para que el servidor detecte el patrón
+   de cobro), el próximo cobro, el punto más bajo y los pagos que
+   caen en medio. */
+function ai94QuinFacts(p, proj) {
+  const inc = (db.incomes || []).slice()
+    .sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 8);
+  const lines = [
+    'Frecuencia de cobro configurada: ' + payFreqOf() + '. Próximo cobro: ' + p.nextStr + '.',
+    'Historial reciente de ingresos: ' +
+      (inc.length ? inc.map((i) => fmt(i.amountCents) + ' el ' + i.date).join('; ') : 'sin ingresos registrados') + '.',
+    'Saldo de hoy: ' + fmt(p.startCents) + '.',
+    'Pagos antes del cobro: ' +
+      (p.events.length ? p.events.slice(0, 10).map((e) => e.name + ' ' + fmt(e.cents) + ' el ' + e.date).join('; ') : 'ninguno') + '.',
+    'El saldo más bajo sería ' + fmt(p.minCents) + ' el ' + p.minDate + '.' +
+      (proj && proj.firstNeg ? ' Primer día en rojo: ' + proj.firstNeg + '.' : ' No cae en rojo antes del cobro.')
+  ];
+  return lines.join('\n').slice(0, 1900);
+}
+async function openQuin94() {
+  if (!requirePro()) return;
+  ai94ShowModal('quin94-modal');
+  const box = document.getElementById('quin94-body');
+  const st = document.getElementById('quin94-status');
+  if (box) clearNode(box);
+  if (st) st.textContent = '';
+  const p = ai2FlowProjection();
+  if (!p) {
+    if (box) box.appendChild(el('p', 'item-sub', t('ai2_flow_nodata')));
+    return;
+  }
+  const nx = nextPaydayDate(new Date());
+  const startToday = new Date();
+  startToday.setHours(0, 0, 0, 0);
+  const daysTo = nx ? Math.max(1, Math.round((nx - startToday) / 86400000)) : 30;
+  const proj = computeFlowProjection(daysTo);
+  box.appendChild(el('p', 'item-sub', t('c91_flow_payday', { date: recurringDateLabel(p.nextStr) })));
+  box.appendChild(el('p', 'item-sub', t('flow_min', { amount: fmt(p.minCents), date: recurringDateLabel(p.minDate) })));
+  box.appendChild(el('p', 'item-sub', proj && proj.firstNeg
+    ? t('flow_neg', { date: recurringDateLabel(proj.firstNeg) }) : t('flow_ok')));
+  const txt = el('p', 'ai-flow-alert');
+  txt.id = 'quin94-text';
+  box.appendChild(txt);
+  if (st) st.textContent = t('c94_quin_working');
+  try {
+    const r = await aiFn('cashflow', { facts: ai94QuinFacts(p, proj), lang: lang() });
+    if (!r || !r.alert) throw new Error('ai_generic');
+    if (st) st.textContent = '';
+    txt.textContent = r.alert;
+  } catch (e) { if (st) st.textContent = aiErrorText(e); aiGatePaywall(e); }
+}
+function closeQuin94() { ai94HideModal('quin94-modal'); }
 
 /* ---------------- Compilación 85 · IA gratis + Pro (Fase A) ----
    Lo nuevo de la Fase A sobre la misma Edge Function «ai»:
@@ -25320,6 +26246,7 @@ async function refreshProWall() {
   try { info = await PetoBilling.productInfo(); } catch (e) { info = null; }
   proWallInfo = info;
   proWallChecked = true;
+  if (typeof document === 'undefined' || !document) return;
   const o = document.getElementById('pro-paywall');
   if (o && !o.hidden) renderProPaywall();
 }
@@ -26491,7 +27418,7 @@ function wireEvents() {
      ellos (pasaba con el «Agregar» del formulario del san). Todos los
      paneles se abren y cierran con el atributo hidden, así que un
      MutationObserver sobre ese atributo los vigila a todos. */
-  const fabOverlayIds = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'share-chooser91', 'menu-drawer-wrap', 'view-chat'];
+  const fabOverlayIds = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'share-chooser91', 'bill94-modal', 'cancel94-modal', 'remit94-modal', 'quin94-modal', 'menu-drawer-wrap', 'view-chat'];
   /* Compilación 58 (informe de testers, día 6): el + redondo TODAVÍA
      tapaba el botón «Agregar» del san con ese formulario abierto — la
      57 solo lo ocultaba con un panel abierto o el foco en un campo, y
@@ -26640,6 +27567,32 @@ function wireEvents() {
   if (week87Refresh) week87Refresh.addEventListener('click', () => { closeHome87WeekModal(); onAiWeeklyGenerate(); });
   const week87Modal = document.getElementById('home87-week-modal');
   if (week87Modal) week87Modal.addEventListener('click', (ev) => { if (ev.target === week87Modal) closeHome87WeekModal(); });
+  /* Compilación 94 (Fase B): los cuatro modales del agente Pro,
+     con su formulario, su botón de cierre y el toque fuera. */
+  const bill94Form = document.getElementById('bill94-form');
+  if (bill94Form) bill94Form.addEventListener('submit', onBill94Submit);
+  const bill94Close = document.getElementById('bill94-close');
+  if (bill94Close) bill94Close.addEventListener('click', closeBill94);
+  const bill94Modal = document.getElementById('bill94-modal');
+  if (bill94Modal) bill94Modal.addEventListener('click', (ev) => { if (ev.target === bill94Modal) closeBill94(); });
+  const cancel94Form = document.getElementById('cancel94-form');
+  if (cancel94Form) cancel94Form.addEventListener('submit', onCancel94Submit);
+  const cancel94Close = document.getElementById('cancel94-close');
+  if (cancel94Close) cancel94Close.addEventListener('click', closeCancel94);
+  const cancel94Modal = document.getElementById('cancel94-modal');
+  if (cancel94Modal) cancel94Modal.addEventListener('click', (ev) => { if (ev.target === cancel94Modal) closeCancel94(); });
+  const remit94Form = document.getElementById('remit94-form');
+  if (remit94Form) remit94Form.addEventListener('submit', onRemit94Submit);
+  const remit94Close = document.getElementById('remit94-close');
+  if (remit94Close) remit94Close.addEventListener('click', closeRemit94);
+  const remit94Modal = document.getElementById('remit94-modal');
+  if (remit94Modal) remit94Modal.addEventListener('click', (ev) => { if (ev.target === remit94Modal) closeRemit94(); });
+  const remit94Open = document.getElementById('remit94-open');
+  if (remit94Open) remit94Open.addEventListener('click', openRemit94);
+  const quin94Close = document.getElementById('quin94-close');
+  if (quin94Close) quin94Close.addEventListener('click', closeQuin94);
+  const quin94Modal = document.getElementById('quin94-modal');
+  if (quin94Modal) quin94Modal.addEventListener('click', (ev) => { if (ev.target === quin94Modal) closeQuin94(); });
   const permExplainClose = document.getElementById('perm-explain-close');
   if (permExplainClose) permExplainClose.addEventListener('click', closePermExplain86);
   document.getElementById('ai-reward-btn').addEventListener('click', onAiReward86);
