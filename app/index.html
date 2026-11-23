@@ -52,12 +52,20 @@
   <div id="ai-chat-msgs" class="chat-msgs"></div>
   <p id="ai-chat-status" class="muted small" aria-live="polite"></p>
   <p id="ai-usage-line" class="muted small" aria-live="polite"></p>
-  <form id="ai-chat-form" class="chat-form" autocomplete="off">
-    <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
-    <button id="ai-chat-voice" class="btn btn-secondary chat-voice-btn" type="button" data-i18n-aria="ai3_voice_btn" aria-label="🎤 Dictar"><span class="chat-voice-icon" aria-hidden="true">🎤</span><span class="chat-voice-label" data-i18n="ai3_voice_word">Dictar</span></button>
-    <button id="ai-chat-photo-btn" class="btn btn-secondary chat-photo-btn" type="button" data-i18n-aria="chat88_photo_aria" aria-label="Adjuntar la foto de un recibo">📷</button>
-    <input id="ai-chat-photo" type="file" accept="image/*" hidden>
-    <button class="btn btn-primary chat-send-btn" type="submit" data-i18n="ai2_chat_send">Preguntar</button>
+  <form id="ai-chat-form" class="chat-form chat-bar93" autocomplete="off">
+    <!-- Compilación 93 «Barra del chat estilo WhatsApp» (pedido de
+         Sterlin con captura, 23-nov): UNA píldora de cristal con el
+         campo y la cámara DENTRO, y UN solo botón circular verde
+         FUERA, a la derecha: micrófono con el campo vacío (dictado
+         de siempre) y flecha de enviar en cuanto hay texto; sin voz
+         en el aparato, enseña siempre enviar. Fuera la fila de
+         piezas sueltas (campo + Dictar + cámara + «Preguntar»). -->
+    <div class="chat-pill93">
+      <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
+      <button id="ai-chat-photo-btn" class="chat-pill-cam93" type="button" data-i18n-aria="chat88_photo_aria" aria-label="Adjuntar la foto de un recibo">📷</button>
+      <input id="ai-chat-photo" type="file" accept="image/*" hidden>
+    </div>
+    <button id="ai-chat-action93" class="chat-action93" type="submit" data-state="mic" data-i18n-aria="ai3_voice_btn" aria-label="🎤 Dictar"><span class="chat-action-icon93" aria-hidden="true">🎤</span></button>
   </form>
   <div id="ai-reward-box" hidden>
     <div class="form-actions">
@@ -1144,13 +1152,13 @@
          al abrir una se cierran las demás) y la trae a la vista.
          Las cabeceras de siempre siguen funcionando igual. -->
     <nav class="card set92-index" id="set92-index" aria-label="Ajustes">
-      <button type="button" class="set92-index-row" data-acc92="profile"><span data-i18n="set_group_account">Cuenta</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="bank"><span>🏦 <span data-i18n="bank_title">Conexión bancaria</span></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="pro"><span>⭐ <span data-i18n="pro_title">PETO Pro</span></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="split"><span data-i18n="set_group_rules">Reglas de tu dinero</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="security"><span data-i18n="set_group_security">Seguridad y privacidad</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="sections"><span data-i18n="set_group_personalization">Personalización</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="news"><span data-i18n="set_news_title">Novedades</span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="profile" aria-expanded="false"><span data-i18n="set_group_account">Cuenta</span><span class="set93-index-sum muted small" id="set93-sum-profile"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="bank" aria-expanded="false"><span>🏦 <span data-i18n="bank_title">Conexión bancaria</span></span><span class="set93-index-sum muted small" id="set93-sum-bank"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="pro" aria-expanded="false"><span>⭐ <span data-i18n="pro_title">PETO Pro</span></span><span class="set93-index-sum muted small" id="set93-sum-pro"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="split" aria-expanded="false"><span data-i18n="set_group_rules">Reglas de tu dinero</span><span class="set93-index-sum muted small" id="set93-sum-split"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="security" aria-expanded="false"><span data-i18n="set_group_security">Seguridad y privacidad</span><span class="set93-index-sum muted small" id="set93-sum-security"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="sections" aria-expanded="false"><span data-i18n="set_group_personalization">Personalización</span><span class="set93-index-sum muted small" id="set93-sum-sections"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
+      <button type="button" class="set92-index-row" data-acc92="news" aria-expanded="false"><span data-i18n="set_news_title">Novedades</span><span class="set93-index-sum muted small" id="set93-sum-news"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
     </nav>
 
     <!-- Compilación 75: Ajustes en OCHO tarjetas, por importancia:
@@ -1161,7 +1169,7 @@
          (secciones visibles + tema y apariencia) y 8 Novedades.
          Las fusionadas viven ANIDADAS dentro de su tarjeta con sus
          ids y acordeones de siempre (clase «setacc-nested»). -->
-    <form id="settings-form" class="card form-card" autocomplete="off">
+    <form id="settings-form" class="card form-card set93-sec" autocomplete="off" hidden>
       <div class="sections-head" id="setacc-profile-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-profile-body">
         <h3 data-i18n="set_group_account">Cuenta</h3>
         <span class="sections-summary muted small" id="setacc-profile-summary"></span>
@@ -1290,7 +1298,7 @@
       </div>
     </form>
 
-    <section class="card form-card" id="settings-bank">
+    <section class="card form-card set93-sec" id="settings-bank" hidden>
       <div class="sections-head" id="setacc-bank-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-bank-body">
         <h3>🏦 <span data-i18n="bank_title">Conexión bancaria</span></h3>
         <span class="sections-summary muted small" id="setacc-bank-summary"></span>
@@ -1323,7 +1331,7 @@
       </div>
     </section>
 
-    <section class="card form-card" id="pro-card">
+    <section class="card form-card set93-sec" id="pro-card" hidden>
       <div class="sections-head" id="setacc-pro-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-pro-body">
         <h3>⭐ <span data-i18n="pro_title">PETO Pro</span></h3>
         <span class="sections-summary muted small" id="setacc-pro-summary"></span>
@@ -1384,7 +1392,7 @@
       </div>
     </section>
 
-    <section class="card form-card" id="settings-split">
+    <section class="card form-card set93-sec" id="settings-split" hidden>
       <div class="sections-head" id="setacc-split-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-split-body">
         <h3 data-i18n="set_group_rules">Reglas de tu dinero</h3>
         <span class="sections-summary muted small" id="setacc-split-summary"></span>
@@ -1444,7 +1452,7 @@
       </div>
     </section>
 
-    <section class="card form-card">
+    <section class="card form-card set93-sec" id="settings-security" hidden>
       <div class="sections-head" id="setacc-security-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-security-body">
         <h3 data-i18n="set_group_security">Seguridad y privacidad</h3>
         <span class="sections-summary muted small" id="setacc-security-summary"></span>
@@ -1546,7 +1554,7 @@
       </div>
     </section>
 
-    <section class="card form-card">
+    <section class="card form-card set93-sec" id="settings-sections" hidden>
       <div class="sections-head" id="sections-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="sections-body">
         <h3 data-i18n="set_group_personalization">Personalización</h3>
         <span class="sections-summary muted small" id="sections-summary"></span>
@@ -1582,7 +1590,7 @@
       </div>
     </section>
 
-    <section class="card form-card" id="settings-news">
+    <section class="card form-card set93-sec" id="settings-news" hidden>
       <div class="sections-head" id="setacc-news-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-news-body">
         <h3 data-i18n="set_news_title">Novedades</h3>
         <span class="sections-summary muted small" id="setacc-news-summary"></span>

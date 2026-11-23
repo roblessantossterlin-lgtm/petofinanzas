@@ -1567,14 +1567,7 @@ html.ios body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px +
    manifiesto); al cerrarlo, la vista vuelve a 100dvh con su inset. */
 .chat-form{align-items:stretch;width:100%;max-width:100%}
 .chat-form input{flex:1 1 auto;min-width:0;height:48px;min-height:48px;font-size:16px;padding:.55rem .8rem}
-.chat-form .btn{flex:0 0 auto;height:48px;min-height:48px;padding:.55rem .7rem;font-size:1rem;white-space:nowrap}
-.chat-form .chat-voice-btn{display:inline-flex;align-items:center;gap:.35rem}
-.chat-send-btn{min-width:64px}
 .chat-view.kb-open{padding-bottom:0}
-@media (max-width:430px){
-  .chat-voice-label{display:none}
-  .chat-form .chat-voice-btn{width:48px;padding:.55rem 0;justify-content:center}
-}
 
 /* PETO-C86-PERMS10 */
 /* Compilación 86 · Añadido 10: pantalla de permisos y filas. */
@@ -1711,3 +1704,44 @@ input[type="date"], input[type="time"] { max-width: 100%; min-width: 0; -webkit-
    el ancho de su contenedor, esté o no dentro de una .form-card.
    Se suma al bloque PETO-C89-DATE, que se conserva tal cual. */
 input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"] { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+
+/* ============ PETO-C93-CHATBAR (Compilación 93) ============
+   «Barra del chat estilo WhatsApp» (pedido de Sterlin con captura
+   de WhatsApp, 23-nov): la fila de piezas sueltas de la Comp. 84/86
+   (campo + botón Dictar + botón de cámara + botón «Preguntar»)
+   pasa a UNA píldora de cristal flotante con el campo y la cámara
+   DENTRO, y UN solo botón circular verde FUERA, a la derecha:
+   micrófono con el campo vacío y flecha de enviar en cuanto hay
+   texto (el estado lo manda data-state, vía chat93SyncAction).
+   La píldora usa la receta de cristal de la casa (Comp. 81/88:
+   blanco translúcido + blur + saturación; gris translúcido en
+   tema oscuro) y anillo verde al enfocar, como en la captura.
+   El campo conserva sus 16px (antizoom de iPhone, Comp. 85/86) y
+   la barra vive dentro de #view-chat, que ya respeta el área
+   segura inferior y sube con el teclado (petoChatKbSync86). */
+.chat-bar93{align-items:center;gap:.55rem}
+.chat-pill93{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:.15rem;border-radius:999px;padding:.22rem .3rem .22rem .35rem;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(14px) saturate(1.7);backdrop-filter:blur(14px) saturate(1.7);border:1px solid var(--line);box-shadow:0 8px 22px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35)}
+html[data-theme="oscuro"] .chat-pill93{background:rgba(32,36,40,.30)}
+.chat-pill93:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft), inset 0 1px 0 rgba(255,255,255,.35)}
+.chat-pill93 input{flex:1 1 auto;min-width:0;height:44px;min-height:44px;font-size:16px;padding:.4rem .45rem;background:transparent;border:0;border-radius:999px;box-shadow:none}
+.chat-pill93 input:focus{outline:none}
+.chat-pill-cam93{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:transparent;font-size:1.15rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;color:inherit}
+.chat-action93{flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:1.2rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22)}
+.chat-action93:active{transform:scale(.96)}
+.chat-action93.listening93{background:var(--danger);animation:chat93pulse 1.1s ease-in-out infinite}
+@keyframes chat93pulse{0%,100%{box-shadow:0 0 0 0 rgba(179,38,30,.45)}50%{box-shadow:0 0 0 9px rgba(179,38,30,0)}}
+
+/* ============ PETO-C93-AJUSTES (Compilación 93) ============
+   «Ajustes sin duplicación» (reporte de Sterlin con capturas,
+   23-nov, sobre la build 92): el índice de las 7 secciones ya no
+   convive con las 7 tarjetas siempre visibles — las tarjetas
+   (.set93-sec) nacen ocultas y solo se ve la del panel abierto
+   bajo el índice (set93ShowPanel). Las filas del índice llevan el
+   resumen de una línea a la derecha y respiro derecho amplio, y
+   las cabeceras dentro del panel también, para que el botón
+   flotante del chat (60px, esquina inferior derecha) nunca tape
+   un valor: en la captura tapaba el resumen de la fila Cuenta. */
+.set93-sec[hidden]{display:none}
+.set92-index-row{padding-right:5.25rem}
+.set93-index-sum{margin-left:auto;text-align:right}
+.set93-sec .sections-head{padding-right:5rem}

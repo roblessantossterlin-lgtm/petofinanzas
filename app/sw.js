@@ -16,7 +16,7 @@
      «Actualizar» en la barra de aviso. */
 'use strict';
 
-const CACHE_NAME = 'peto-web-v62';
+const CACHE_NAME = 'peto-web-v63';
 const APP_SHELL = [
   './',
   './index.html',

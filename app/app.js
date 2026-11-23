@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 92';
-const BUILD_NUM = 92;
+const BUILD_LABEL = 'Compilación 93';
+const BUILD_NUM = 93;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -18330,6 +18330,10 @@ function updateSectionsSummary() {
   const total = SECTION_DEFS.length;
   const visible = SECTION_DEFS.filter((def) => db.settings.sections[def.id] !== false).length;
   summary.textContent = t('set_sections_summary', { visible: visible, total: total });
+  /* Compilación 93: el «{visibles} de {total} visibles» también
+     va en la fila de Personalización del índice. */
+  const idx93 = document.getElementById('set93-sum-sections');
+  if (idx93) idx93.textContent = summary.textContent;
 }
 /* Compilación 56 (pedido de Sterlin, captura tras captura):
    TODAS las tarjetas de Ajustes se retraen con el mismo patrón
@@ -18383,12 +18387,23 @@ function setAccOpen(key) {
 function resetSetAccClosed() {
   setAccSession = {};
   for (const [k] of SET_ACC_CARDS) setAccSession[k] = false;
+  /* Compilación 93: también nace vacío el panel de Ajustes (solo
+     se ve el índice; ninguna tarjeta de sección visible). */
+  set93ShowPanel(null);
 }
 /* Apertura programática para los saltos desde otra pantalla:
    la tarjeta destino se expande aunque todas nazcan cerradas. */
 function openSetAccCard(key) {
   setAccState()[key] = true;
+  /* Compilación 93: el salto también trae la tarjeta al PANEL
+     (vive oculta hasta que su fila del índice o un salto la abre);
+     las anidadas (nube, compartido, reglas, confianza, privacidad,
+     datos) abren el panel y el cuerpo de su sección madre, que es
+     donde viven, para que el destino se vea de verdad. */
+  const panelKey93 = SET93_PANEL_CARDS[key] ? key : SET93_NESTED_PANEL[key];
+  if (panelKey93 && panelKey93 !== key) setAccState()[panelKey93] = true;
   applySetAcc();
+  if (panelKey93) set93ShowPanel(panelKey93);
 }
 function applySetAcc() {
   for (const [key, headId, bodyId] of SET_ACC_CARDS) {
@@ -18437,6 +18452,41 @@ function set92SectionsOpen(open) {
   const chevron = head.querySelector('.sections-chevron');
   if (chevron) chevron.textContent = open ? '▾' : '▸';
 }
+/* Compilación 93 · AÑADIDO URGENTE «Ajustes sin duplicación»
+   (reporte de Sterlin con capturas, 23-nov, sobre la build 92):
+   el índice de la Comp. 92 convivía con las 7 tarjetas de sección
+   siempre visibles y Ajustes quedaba el doble de largo. Ahora las
+   tarjetas de sección (clase .set93-sec) nacen OCULTAS y solo UNA
+   se ve a la vez, en la zona de panel bajo el índice: la de la
+   fila tocada (o la del salto desde otra pantalla). Tocar la fila
+   de la abierta la devuelve a oculto. Nunca hay dos
+   representaciones de la misma sección visibles a la vez. */
+const SET93_PANEL_CARDS = {
+  profile: 'settings-form', bank: 'settings-bank', pro: 'pro-card',
+  split: 'settings-split', security: 'settings-security',
+  sections: 'settings-sections', news: 'settings-news'
+};
+const SET93_NESTED_PANEL = {
+  cloud: 'profile', shared: 'pro', rules: 'split',
+  trust: 'security', privacy: 'security', data: 'security'
+};
+let set93PanelKey = null;
+function set93ShowPanel(key) {
+  set93PanelKey = key || null;
+  for (const k of Object.keys(SET93_PANEL_CARDS)) {
+    const card = document.getElementById(SET93_PANEL_CARDS[k]);
+    if (card) card.hidden = set93PanelKey !== k;
+    /* La tarjeta del banco conserva su apagado por bandera: con
+       la función bancaria inactiva no la abre ni el panel. */
+    if (k === 'bank' && card && !PETO_BANK_ENABLED) card.hidden = true;
+  }
+  document.querySelectorAll('#set92-index [data-acc92]').forEach((row) => {
+    const open = row.getAttribute('data-acc92') === set93PanelKey;
+    row.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const chev = row.querySelector('.set92-index-chev');
+    if (chev) chev.textContent = open ? '▾' : '›';
+  });
+}
 function set92IndexGo(key) {
   if (key === 'sections') {
     const body = document.getElementById('sections-body');
@@ -18445,7 +18495,8 @@ function set92IndexGo(key) {
     for (const k of SET92_INDEX_KEYS) st[k] = false;
     applySetAcc();
     set92SectionsOpen(willOpen);
-    if (willOpen) set92ScrollTo(document.getElementById('sections-toggle'));
+    set93ShowPanel(willOpen ? 'sections' : null);
+    if (willOpen) set92ScrollTo(document.getElementById('settings-sections'));
     return;
   }
   const st = setAccState();
@@ -18462,7 +18513,8 @@ function set92IndexGo(key) {
   }
   set92SectionsOpen(false);
   applySetAcc();
-  if (willOpen) set92ScrollTo(document.getElementById('setacc-' + key + '-head'));
+  set93ShowPanel(willOpen ? key : null);
+  if (willOpen) set92ScrollTo(document.getElementById(SET93_PANEL_CARDS[key]));
 }
 /* Los resúmenes cortos de las cabeceras: nombre en el perfil,
    el reparto vigente (el efectivo, no el editado a medias) en
@@ -18488,6 +18540,16 @@ function updateSetAccSummaries() {
   setSummary('setacc-security-summary', db.settings.pinHash ? t('setacc_pin_on') : t('setacc_pin_off'));
   const conns = bankStoredConns();
   setSummary('setacc-bank-summary', conns.length
+    ? conns[0].name + (conns.length > 1 ? ' +' + (conns.length - 1) : '')
+    : t('setacc_bank_none'));
+  /* Compilación 93: los mismos resúmenes de una línea viven en
+     las filas del índice (nombre, banco, reparto y PIN), que es
+     lo que se ve al entrar; la cabecera de la tarjeta lo sigue
+     llevando dentro del panel. */
+  setSummary('set93-sum-profile', db.settings.name || '');
+  setSummary('set93-sum-split', sp.ahorro + '/' + sp.negocio + '/' + sp.gastos + '/' + sp.familia);
+  setSummary('set93-sum-security', db.settings.pinHash ? t('setacc_pin_on') : t('setacc_pin_off'));
+  setSummary('set93-sum-bank', conns.length
     ? conns[0].name + (conns.length > 1 ? ' +' + (conns.length - 1) : '')
     : t('setacc_bank_none'));
 }
@@ -20486,10 +20548,14 @@ function voiceSupported() {
 }
 function updateVoiceButtons() {
   const ok = voiceSupported();
-  for (const id of ['exp-voice', 'inc-voice', 'ai-text-voice', 'ai-chat-voice']) {
+  for (const id of ['exp-voice', 'inc-voice', 'ai-text-voice']) {
     const b = document.getElementById(id);
     if (b) b.hidden = !ok;
   }
+  /* Compilación 93: el chat ya no tiene botón de voz suelto que
+     ocultar: su botón circular enseña el estado enviar cuando el
+     aparato no tiene voz (chat93SyncAction lo decide). */
+  chat93SyncAction();
 }
 /* Dictado directo con la Web Speech API, cuando no hay plugin
    nativo (un navegador sin el puente de la copia web, por
@@ -21647,6 +21713,7 @@ function openAiChat() {
   renderAiUsage();
   syncAdsForModals();
   petoChatKbBind86();
+  chat93SyncAction();
   renderAiRewardBox86(false);
   const input = document.getElementById('ai-chat-input');
   if (input) input.focus();
@@ -21933,6 +22000,7 @@ async function onAiChatSubmit(ev) {
   if (!q) { if (input) input.focus(); return; }
   aiChatMsgs.push({ role: 'user', text: q });
   if (input) input.value = '';
+  chat93SyncAction();
   renderAiChat();
   const intent = chat88Classify(q);
   if (intent === 'register') { await chat88RouteRegister(q); return; }
@@ -22344,6 +22412,47 @@ function renderAiLetter() {
     const ol = el('ol', 'ai-letter-steps');
     for (const st of r.steps) ol.appendChild(el('li', null, String(st)));
     box.appendChild(ol);
+  }
+}
+
+/* ---------- Compilación 93 · Barra del chat estilo WhatsApp ----------
+   UNA píldora de cristal con el campo y la cámara dentro, y UN solo
+   botón circular verde fuera de la píldora: micrófono con el campo
+   vacío (toca → el dictado de siempre, aiVoiceToInput, con su texto
+   «escuchando» del chat) y flecha de enviar en cuanto hay texto (el
+   botón ES el submit del formulario). Sin reconocimiento de voz en
+   el aparato, el botón enseña siempre el estado enviar. Mientras se
+   dicta, el botón lleva la clase listening93 (estado activo, pulso
+   rojo) y los toques extra se ignoran: el dictado actual no tiene
+   «parar»; al terminar, lo dictado cae en el campo y el botón pasa
+   solo a enviar. La lógica del chat (ruteo por intención de la
+   Comp. 88, confirmación antes de guardar, respaldo manual, topes)
+   no cambia: solo cambia la barra. */
+let chat93Listening = false;
+function chat93SyncAction() {
+  const btn = document.getElementById('ai-chat-action93');
+  if (!btn) return;
+  const input = document.getElementById('ai-chat-input');
+  const hasText = !!(input && input.value.trim());
+  const mode = (hasText || !voiceSupported()) ? 'send' : 'mic';
+  btn.setAttribute('data-state', mode);
+  const icon = btn.querySelector('.chat-action-icon93');
+  if (icon) icon.textContent = mode === 'send' ? '➤' : '🎤';
+  btn.setAttribute('aria-label', mode === 'send' ? t('ai2_chat_send') : t('ai3_voice_btn'));
+}
+async function chat93OnActionClick(ev) {
+  const btn = document.getElementById('ai-chat-action93');
+  if (!btn || btn.getAttribute('data-state') !== 'mic') return; /* enviar: manda el formulario */
+  ev.preventDefault();
+  if (chat93Listening) return;
+  chat93Listening = true;
+  btn.classList.add('listening93');
+  try {
+    await aiVoiceToInput('ai-chat-input', 'ai-chat-status', 'voice_listening_chat');
+  } finally {
+    chat93Listening = false;
+    btn.classList.remove('listening93');
+    chat93SyncAction();
   }
 }
 
@@ -22847,7 +22956,11 @@ function renderBankCard() {
   const sec = document.getElementById('settings-bank');
   if (!sec) return;
   if (!PETO_BANK_ENABLED) { sec.hidden = true; return; }
-  sec.hidden = false;
+  /* Compilación 93: la visibilidad de la tarjeta es del PANEL de
+     Ajustes (nace oculta; la abre su fila del índice o un salto).
+     Aquí ya no se fuerza a visible — hacerlo duplicaba Ajustes
+     (la tarjeta se veía siempre bajo el índice). El apagado por
+     bandera de arriba se conserva tal cual. */
   const need = document.getElementById('bank-needcloud');
   const main = document.getElementById('bank-main');
   if (!need || !main) return;
@@ -26490,9 +26603,13 @@ function wireEvents() {
     if (!file) return;
     processReceiptFile(file, (url) => { if (url) aiLetterFromDataUrl(url); });
   });
-  document.getElementById('ai-chat-voice').addEventListener('click', () => {
-    aiVoiceToInput('ai-chat-input', 'ai-chat-status', 'voice_listening_chat');
-  });
+  /* Compilación 93: el botón circular de la barra — micrófono con
+     el campo vacío (el dictado de siempre, capturado antes de que
+     el formulario se envíe) y enviar con texto (es el submit). El
+     campo sincroniza el estado del botón al escribir. */
+  document.getElementById('ai-chat-action93').addEventListener('click', chat93OnActionClick);
+  document.getElementById('ai-chat-input').addEventListener('input', chat93SyncAction);
+  chat93SyncAction();
   /* Compilación 84: el chat con su dinero (pantalla propia). */
   document.getElementById('ai-chat-form').addEventListener('submit', onAiChatSubmit);
   /* Compilación 88: cámara/adjuntar del chat → recibo → la misma
