@@ -1628,3 +1628,19 @@ html[data-theme="oscuro"] .fab-universal88{background:rgba(255,255,255,.18)}
 .chat88-ok{font-weight:700}
 .chat88-result{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--hatch-widget-border,rgba(127,127,127,.25));padding:.45rem .1rem;color:inherit;font:inherit;cursor:pointer}
 .chat-photo-btn{flex:0 0 auto}
+
+/* PETO-C89-DATE (Compilación 89 · punto 5): la fecha/hora nunca se sale
+   de su tarjeta — misma corrección que AYUNA Comp. 15 — y auditoría de
+   anchos: ningún campo de formulario supera el 100% de su tarjeta. */
+input[type="date"], input[type="time"] { max-width: 100%; min-width: 0; -webkit-appearance: none; appearance: none; box-sizing: border-box; }
+.form-card input, .form-card select, .form-card textarea { max-width: 100%; min-width: 0; box-sizing: border-box; }
+/* PETO-C89-EXPENSES (Compilación 89 · punto 1): filas compactas de
+   máx. 2 líneas, agrupadas por día, sin botones visibles en la lista. */
+.exp-day-head89 { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 2px 4px; font-weight: 700; list-style: none; }
+.exp-day-total89 { font-weight: 600; opacity: .75; }
+.exp-row89 { cursor: pointer; padding: 8px 2px; }
+.exp-row89 .exp-line1 { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.exp-row89 .exp-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.exp-row89 .exp-line2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .72; font-size: .92em; }
+.exp-uncat89 { margin: 6px 0; padding: 8px 10px; border-radius: 10px; background: rgba(127,127,127,.14); }
+.summary-sub { display: block; font-size: .78em; opacity: .75; font-weight: 400; }

@@ -51,6 +51,7 @@
   <h2 data-i18n="ai2_chat_title">Pregúntale a tu dinero</h2>
   <div id="ai-chat-msgs" class="chat-msgs"></div>
   <p id="ai-chat-status" class="muted small" aria-live="polite"></p>
+  <p id="ai-usage-line" class="muted small" aria-live="polite"></p>
   <form id="ai-chat-form" class="chat-form" autocomplete="off">
     <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
     <button id="ai-chat-voice" class="btn btn-secondary chat-voice-btn" type="button" data-i18n-aria="ai3_voice_btn" aria-label="🎤 Dictar"><span class="chat-voice-icon" aria-hidden="true">🎤</span><span class="chat-voice-label" data-i18n="ai3_voice_word">Dictar</span></button>
@@ -230,6 +231,7 @@
       <button id="tile-expenses" class="summary-item" type="button" data-i18n-aria="tile_expenses_aria" aria-label="Gastos: ir a Gastos del mes">
         <span class="summary-label" data-i18n="tile_expenses">Gastos</span>
         <span id="sum-expenses" class="summary-value">$0.00</span>
+        <span id="sum-expenses-note89" class="summary-sub" data-i18n="c89_no_transfers">sin transferencias</span>
         <span class="summary-go" aria-hidden="true">›</span>
       </button>
     </div>
@@ -301,33 +303,16 @@
       <button id="exp-next" class="btn btn-ghost" type="button" data-i18n-aria="month_next_aria" aria-label="Mes siguiente">›</button>
     </div>
     <p class="total-line"><span data-i18n="exp_total_label">Total del mes:</span> <strong id="exp-total">$0.00</strong></p>
+    <p class="muted small" id="exp-total-note89"></p>
+    <div id="exp-uncat89" class="exp-uncat89" hidden></div>
 
-    <form id="ai-text-form" class="card form-card" autocomplete="off">
-      <h3 data-i18n="ai_text_label">Registrar con IA (Pro)</h3>
-      <label for="ai-text-input" data-i18n="ai_text_help">Escribe el gasto como lo dirías y la IA llena el formulario de abajo: tú lo revisas y lo guardas.</label>
-      <input id="ai-text-input" type="text" maxlength="200" data-i18n-ph="ai_text_ph" placeholder="Ej.: gasté 20 en gasolina ayer">
-      <p id="ai-text-status" class="muted small" aria-live="polite"></p>
-      <p id="ai-usage-line" class="muted small" aria-live="polite"></p>
-      <div class="form-actions">
-        <button id="ai-text-voice" type="button" class="btn btn-secondary" data-i18n="ai3_voice_btn">🎤 Dictar</button>
-        <button type="submit" class="btn btn-secondary" data-i18n="ai_text_btn">Crear gasto</button>
-      </div>
-    </form>
 
-    <!-- Compilación 85 · IA gratis (Fase A): «Explicar una carta».
-         Reutiliza la captura de foto del recibo (cámara/galería);
-         el resultado solo se muestra: nada se guarda solo. -->
-    <section id="ai-letter-card" class="card form-card">
-      <h3 data-i18n="ai3_letter_title">✉️ Tu carta, explicada</h3>
-      <p class="muted small" data-i18n="ai3_letter_help">Foto de una carta que no entiendas (una factura, un aviso, una carta oficial) y la IA te la explica en palabras simples. Nada se guarda solo.</p>
-      <div class="form-actions">
-        <button id="exp-ai-letter" type="button" class="btn btn-secondary" data-i18n="ai3_letter_btn">✉️ Explicar una carta</button>
-      </div>
-      <input id="exp-ai-letter-photo" type="file" accept="image/*" hidden>
-      <p id="ai-letter-status" class="muted small" aria-live="polite"></p>
-      <div id="ai-letter-result"></div>
-    </section>
 
+    <!-- Compilación 89: el formulario clásico NO forma parte de la vista
+         (vive oculto y se abre solo al tocar un gasto o desde la
+         confirmación del chat / el respaldo manual). -->
+    <div id="exp-form-wrap89" hidden>
+    <button id="exp-form-close89" type="button" class="btn btn-ghost" data-i18n="c89_close_form">← Volver a la lista</button>
     <form id="expense-form" class="card form-card" autocomplete="off">
       <h3 id="expense-form-title">Nuevo gasto</h3>
       <input type="hidden" id="exp-id">
@@ -338,8 +323,8 @@
         <button id="exp-ocr" type="button" class="btn btn-secondary" data-i18n="ocr_btn">Foto de recibo</button>
         <button id="exp-ai-receipt" type="button" class="btn btn-secondary" data-i18n="ai_receipt_btn">✨ Recibo con IA</button>
       </div>
-      <p class="muted small" data-i18n="ocr_help">La foto se lee aquí, en tu teléfono: nada se sube a internet. Relleno el monto, la fecha y el comercio; tú lo revisas antes de guardar.</p>
-      <p class="muted small" data-i18n="ai_help">Con IA (Pro) la foto viaja segura a nuestro servidor de IA y regresa con monto, fecha, comercio y categoría. Tú revisas todo antes de guardar.</p>
+      <p class="muted small" data-i18n="ocr_help">Foto local: se lee en tu teléfono, sin subirla; revisas antes de guardar.</p>
+      <p class="muted small" data-i18n="ai_help">Recibo con IA: la foto va segura al servidor y vuelve completa; revisas antes de guardar.</p>
       <input id="exp-ai-photo" type="file" accept="image/*" hidden>
       <p id="exp-voice-status" class="muted small" aria-live="polite"></p>
       <label for="exp-category" data-i18n="category_label">Categoría</label>
@@ -372,31 +357,17 @@
         <button id="exp-cancel-edit" type="button" class="btn btn-ghost" hidden data-i18n="btn_cancel">Cancelar</button>
       </div>
     </form>
+    <div id="exp-detail-actions89" class="form-actions" hidden>
+      <button id="exp-act-repeat89" type="button" class="btn btn-secondary" data-i18n="btn_repeat">Repetir</button>
+      <button id="exp-act-suggest89" type="button" class="btn btn-secondary" data-i18n="ai_suggest_btn" hidden>✨ Sugerir con IA</button>
+      <button id="exp-act-delete89" type="button" class="btn btn-danger" data-i18n="btn_delete">Borrar</button>
+    </div>
+    <div id="exp-ai-box89"></div>
+    </div>
 
     <ul id="expense-list" class="item-list"></ul>
-    <p id="expense-empty" class="empty-state" hidden data-i18n="exp_empty">Todavía no hay gastos en este mes. Registra el primero con el formulario de arriba. 👍</p>
-    <p class="empty-state" id="exp-import-row" hidden><button id="exp-import-link" class="btn btn-ghost" type="button" data-i18n="import_hint">¿Tienes tu estado de cuenta? Impórtalo y empieza con datos</button></p>
+    <p id="expense-empty" class="empty-state" hidden data-i18n="exp_empty">Todavía no hay gastos en este mes. Registra el primero con el botón ✨ de abajo. 👍</p>
 
-    <section class="card form-card" id="csv-card">
-      <h3 data-i18n="csv_title">Importar estado de cuenta (CSV)</h3>
-      <p class="muted small" data-i18n="csv_help">Sube el archivo CSV de tu banco y revisa todo en una vista previa antes de importar: nada se guarda hasta que confirmes.</p>
-      <label for="csv-file" data-i18n="csv_file_label">Archivo CSV del banco</label>
-      <input id="csv-file" type="file" accept=".csv,.pdf,text/csv,text/plain,application/pdf">
-      <div id="csv-preview" hidden>
-        <p class="total-line" data-i18n="csv_preview_title">Vista previa de la importación</p>
-        <p id="csv-summary" class="muted small"></p>
-        <div class="form-actions">
-          <button id="csv-all" type="button" class="btn btn-ghost btn-small" data-i18n="csv_all">Marcar todos</button>
-          <button id="csv-none" type="button" class="btn btn-ghost btn-small" data-i18n="csv_none">Desmarcar todos</button>
-        </div>
-        <ul id="csv-rows" class="item-list"></ul>
-        <p id="csv-error" class="error" role="alert" hidden></p>
-        <div class="form-actions">
-          <button id="csv-apply" type="button" class="btn btn-primary" data-i18n="csv_apply">Importar seleccionados</button>
-          <button id="csv-cancel" type="button" class="btn btn-ghost" data-i18n="csv_cancel">Cancelar importación</button>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- ======= INGRESOS ======= -->
@@ -805,6 +776,26 @@
           <button type="submit" class="btn btn-primary" data-i18n="inst_create">Crear cuotas</button>
         </div>
       </form>
+    </section>
+    <section class="card form-card" id="csv-card">
+      <h3 data-i18n="csv_title">Importar estado de cuenta (CSV o PDF)</h3>
+      <p class="muted small" data-i18n="csv_help">Elige el archivo de tu banco (CSV o PDF) y revísalo antes de importar; nada se guarda sin confirmar.</p>
+      <button id="csv-pick89" type="button" class="btn btn-secondary" data-i18n="c89_import_btn">📥 Elegir archivo del banco…</button>
+      <input id="csv-file" type="file" accept=".csv,.pdf,text/csv,text/plain,application/pdf" hidden>
+      <div id="csv-preview" hidden>
+        <p class="total-line" data-i18n="csv_preview_title">Vista previa de la importación</p>
+        <p id="csv-summary" class="muted small"></p>
+        <div class="form-actions">
+          <button id="csv-all" type="button" class="btn btn-ghost btn-small" data-i18n="csv_all">Marcar todos</button>
+          <button id="csv-none" type="button" class="btn btn-ghost btn-small" data-i18n="csv_none">Desmarcar todos</button>
+        </div>
+        <ul id="csv-rows" class="item-list"></ul>
+        <p id="csv-error" class="error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button id="csv-apply" type="button" class="btn btn-primary" data-i18n="csv_apply">Importar seleccionados</button>
+          <button id="csv-cancel" type="button" class="btn btn-ghost" data-i18n="csv_cancel">Cancelar importación</button>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -1729,6 +1720,25 @@
 
 <!-- Compilación 55: área de impresión del informe del mes (solo se ve al imprimir). -->
 <div id="print-area" aria-hidden="true"></div>
+
+<!-- Compilación 89: la carta explicada vive en su propia vista;
+     se llega desde el chat (ruta de funciones). Ayuda a una línea. -->
+<section id="view-letter89" class="view" hidden>
+  <button class="btn btn-back" type="button" id="letter89-back" data-i18n="back">← Todas las opciones</button>
+    <!-- Compilación 85 · IA gratis (Fase A): «Explicar una carta».
+         Reutiliza la captura de foto del recibo (cámara/galería);
+         el resultado solo se muestra: nada se guarda solo. -->
+    <section id="ai-letter-card" class="card form-card">
+      <h3 data-i18n="ai3_letter_title">✉️ Tu carta, explicada</h3>
+      <p class="muted small" data-i18n="ai3_letter_help">Foto de una carta y la IA te la explica simple; nada se guarda solo.</p>
+      <div class="form-actions">
+        <button id="exp-ai-letter" type="button" class="btn btn-secondary" data-i18n="ai3_letter_btn">✉️ Explicar una carta</button>
+      </div>
+      <input id="exp-ai-letter-photo" type="file" accept="image/*" hidden>
+      <p id="ai-letter-status" class="muted small" aria-live="polite"></p>
+      <div id="ai-letter-result"></div>
+    </section>
+</section>
 
 <script src="vendor/supabase.js"></script>
 <script src="web.js"></script>
