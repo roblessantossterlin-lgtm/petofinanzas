@@ -1407,25 +1407,32 @@ html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px
 /* ================= Compilación 81 =================
    Botones flotantes de cristal («Liquid Glass», pedido de Sterlin):
    los dos flotantes (la lupa y el +) dejan el verde sólido y pasan
-   a cristal transparente en AMBAS plataformas, sin distinción: el
-   fondo es el tinte verde de la marca translúcido y detrás se ve
-   el contenido desenfocado con el material del sistema
-   (backdrop-filter: desenfoque + saturación), con borde fino claro
-   y sombra suave. Así, al pasar sobre una tarjeta o el pie, el
-   contenido se sigue viendo a través de ellos y dejan de «tapar».
-   Los iconos quedan en blanco con sombra de texto para leerse
-   sobre cualquier fondo. El respiro inferior del shell sube a
-   13rem: al final del scroll, el pie y la última tarjeta quedan
-   completos por encima de los dos flotantes en todos los estados
-   (con/sin barra inferior, con/sin anuncios, iOS y Android). */
+   a cristal transparente en AMBAS plataformas, sin distinción, con
+   el contenido desenfocado detrás (backdrop-filter: desenfoque +
+   saturación), borde fino claro y sombra suave. Los iconos quedan
+   en blanco con sombra de texto para leerse sobre cualquier fondo.
+   El respiro inferior del shell sube a 13rem: al final del scroll,
+   el pie y la última tarjeta quedan completos por encima de los
+   dos flotantes en todos los estados (con/sin barra inferior,
+   con/sin anuncios, iOS y Android).
+   Compilación 85 (corrección de raíz, captura de Sterlin en iOS):
+   el fondo de la C81 era color-mix() con tinte VERDE al 55 %; en
+   WKWebView sin soporte de color-mix la declaración se descarta y
+   manda la regla anterior (el degradado verde sólido), y donde sí
+   aplica, el 55 % de verde se lee como verde sólido. Fuera el
+   verde: el cristal es NEUTRO (blanco translúcido con rgba(), que
+   todo WebView entiende) y en tema oscuro, gris translúcido. El
+   icono va en blanco/gris claro sobre el cristal, sin fondo. */
 .fab{
-  background:color-mix(in srgb, var(--accent) 55%, transparent);
+  background:rgba(255,255,255,.18);
   -webkit-backdrop-filter:blur(14px) saturate(1.7);
   backdrop-filter:blur(14px) saturate(1.7);
   border:1px solid rgba(255,255,255,.38);
-  box-shadow:0 8px 22px rgba(6,60,40,.28), inset 0 1px 0 rgba(255,255,255,.35);
-  text-shadow:0 1px 3px rgba(0,40,24,.5);
+  box-shadow:0 8px 22px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.35);
+  color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.45);
 }
+html[data-theme="oscuro"] .fab{background:rgba(32,36,40,.30)}
 
 /* ================= Compilación 83 =================
    IA Pro (Fase 1): la caja de la sugerencia de categoría en
@@ -1455,3 +1462,9 @@ html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px
 .ai-flow-warn{color:var(--danger);font-weight:600}
 .ai-flow-ok{color:var(--accent-dark);font-weight:600}
 #ai-subs-box:empty{display:none}
+
+/* Compilación 85 · Fase A: carta explicada y subidas de precio */
+.ai-letter-scam{border:2px solid #c0392b;border-radius:10px;padding:.6rem .8rem;margin:.6rem 0;background:rgba(192,57,43,.08)}
+.ai-letter-scam-h{font-weight:700;color:#c0392b;margin:.1rem 0 .4rem}
+.ai-letter-due{font-weight:700}
+.ai3-hike{font-weight:600}

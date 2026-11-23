@@ -53,6 +53,7 @@
   <p id="ai-chat-status" class="muted small" aria-live="polite"></p>
   <form id="ai-chat-form" class="chat-form" autocomplete="off">
     <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
+    <button id="ai-chat-voice" class="btn btn-secondary" type="button" data-i18n="ai3_voice_btn">🎤 Dictar</button>
     <button class="btn btn-primary" type="submit" data-i18n="ai2_chat_send">Preguntar</button>
   </form>
 </section>
@@ -299,10 +300,26 @@
       <label for="ai-text-input" data-i18n="ai_text_help">Escribe el gasto como lo dirías y la IA llena el formulario de abajo: tú lo revisas y lo guardas.</label>
       <input id="ai-text-input" type="text" maxlength="200" data-i18n-ph="ai_text_ph" placeholder="Ej.: gasté 20 en gasolina ayer">
       <p id="ai-text-status" class="muted small" aria-live="polite"></p>
+      <p id="ai-usage-line" class="muted small" aria-live="polite"></p>
       <div class="form-actions">
+        <button id="ai-text-voice" type="button" class="btn btn-secondary" data-i18n="ai3_voice_btn">🎤 Dictar</button>
         <button type="submit" class="btn btn-secondary" data-i18n="ai_text_btn">Crear gasto</button>
       </div>
     </form>
+
+    <!-- Compilación 85 · IA gratis (Fase A): «Explicar una carta».
+         Reutiliza la captura de foto del recibo (cámara/galería);
+         el resultado solo se muestra: nada se guarda solo. -->
+    <section id="ai-letter-card" class="card form-card">
+      <h3 data-i18n="ai3_letter_title">✉️ Tu carta, explicada</h3>
+      <p class="muted small" data-i18n="ai3_letter_help">Foto de una carta que no entiendas (una factura, un aviso, una carta oficial) y la IA te la explica en palabras simples. Nada se guarda solo.</p>
+      <div class="form-actions">
+        <button id="exp-ai-letter" type="button" class="btn btn-secondary" data-i18n="ai3_letter_btn">✉️ Explicar una carta</button>
+      </div>
+      <input id="exp-ai-letter-photo" type="file" accept="image/*" hidden>
+      <p id="ai-letter-status" class="muted small" aria-live="polite"></p>
+      <div id="ai-letter-result"></div>
+    </section>
 
     <form id="expense-form" class="card form-card" autocomplete="off">
       <h3 id="expense-form-title">Nuevo gasto</h3>
@@ -590,9 +607,24 @@
         <option value="ahorros" data-i18n="type_ahorros">Ahorros</option>
       </select>
     </div>
+    <h3 id="search-places-title" data-i18n="ai3_search_places" hidden>Opciones y funciones</h3>
+    <ul id="search-places" class="item-list"></ul>
     <p id="search-hint" class="muted" data-i18n="search_hint">Escribe para buscar en tus movimientos</p>
     <ul id="search-results" class="item-list"></ul>
     <p id="search-empty" class="empty-state" hidden data-i18n="search_empty">Sin resultados.</p>
+    <!-- Compilación 85: «Pregúntale a PETO» — la pregunta usa el
+         motor del chat (#view-chat) y también busca movimientos. -->
+    <section id="search-ai-card" class="card form-card">
+      <h3 data-i18n="ai3_search_ask_title">✨ Pregúntale a PETO Finanzas</h3>
+      <p class="muted small" data-i18n="ai3_search_ask_help">Pregunta sobre tu presupuesto y tus gastos: la IA responde con tus números. Si tu pregunta coincide con movimientos, también quedan buscados aquí.</p>
+      <form id="search-ai-form" autocomplete="off">
+        <label class="sr-only" for="search-ai-input" data-i18n="ai3_search_ask_title">✨ Pregúntale a PETO Finanzas</label>
+        <input id="search-ai-input" type="text" maxlength="300" data-i18n-ph="ai3_search_ask_ph" placeholder="Ej.: ¿cuánto gasté en comida este mes?">
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit" data-i18n="ai3_search_ask_btn">Preguntar</button>
+        </div>
+      </form>
+    </section>
   </main>
 
   <!-- ======= PRESUPUESTO ======= -->
