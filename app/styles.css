@@ -1615,3 +1615,16 @@ body.chat-open{overflow:hidden}
    tarjeta grande y quedan como una línea compacta accionable. */
 .home87-compact{padding-top:.55rem;padding-bottom:.55rem}
 .home87-efund-row{width:100%;text-align:left;font-weight:600}
+
+/* ================= Compilación 88 · PETO-C88-CHAT =================
+   UN SOLO botón flotante: cristal de la casa (rgba(255,255,255,.18)
+   + blur, icono blanco, SIN verde), que abre el chat universal.
+   El desplegable .fab-menu de la Comp. 85 ya no se usa. */
+.fab-universal88{width:60px;height:60px;border-radius:50%;font-size:1.45rem;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+html[data-theme="oscuro"] .fab-universal88{background:rgba(255,255,255,.18)}
+.chat88-card{min-width:min(78vw,340px)}
+.chat88-title{font-weight:700;margin-bottom:.35rem}
+.chat88-line{margin:.15rem 0}
+.chat88-ok{font-weight:700}
+.chat88-result{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--hatch-widget-border,rgba(127,127,127,.25));padding:.45rem .1rem;color:inherit;font:inherit;cursor:pointer}
+.chat-photo-btn{flex:0 0 auto}

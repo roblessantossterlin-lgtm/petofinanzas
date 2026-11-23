@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 87';
-const BUILD_NUM = 87;
+const BUILD_LABEL = 'Compilación 88';
+const BUILD_NUM = 88;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1439,7 +1439,7 @@ es: {
   ins_biggest: 'Tu mayor gasto del mes: {note} · {amount}.', ins_saved: 'Llevas ahorrado {amount} este mes. ¡Sigue así!',
   bud_alert_title: 'Presupuesto en riesgo', bud_alert_warn: '{cat}: vas en {pct}% del presupuesto.',
   bud_alert_over: 'Te pasaste de tu tope de {cat}: {spent} de {limit}.',
-  voice_btn: 'Dictar', voice_listening: 'Escuchando… di la cantidad y en qué fue.', voice_listening_chat: 'Escuchando… haz tu pregunta.',
+  voice_btn: 'Dictar', voice_listening: 'Escuchando… di la cantidad y en qué fue.', voice_listening_chat: 'Escuchando… haz tu pregunta.', chat88_fab_aria: 'Abrir el chat de PETO Finanzas', chat88_intro: 'Escríbeme lo que sea: «gasté 20 en gasolina», una pregunta sobre tu dinero, «busca…» o adjunta la foto de un recibo 📷. Nada se guarda sin tu confirmación.', chat88_confirm_title: '¿Guardo este movimiento?', chat88_save: 'Guardar', chat88_discard: 'Descartar', chat88_saved: 'Guardado ✓', chat88_discarded: 'Descartado. No se guardó nada.', chat88_expense: 'Gasto', chat88_income: 'Ingreso', chat88_results_title: 'Esto encontré:', chat88_no_results: 'Sin resultados para «{q}».', chat88_places_title: 'Te llevo a:', chat88_ask_which: 'No estoy seguro de qué quieres hacer. Elige una opción:', chat88_opt_register: 'Registrar un movimiento', chat88_opt_search: 'Buscar movimientos', chat88_opt_ask: 'Preguntar sobre mi dinero', chat88_manual_btn: 'Abrir el formulario manual', chat88_fallback: 'La IA no está disponible ahora (sin conexión o con el tope alcanzado). Nadie se queda sin registrar: usa el formulario manual o la búsqueda local.', chat88_photo_aria: 'Adjuntar la foto de un recibo', chat88_working: 'Leyendo tu movimiento…',
   voice_unavailable: 'La voz no está disponible en este dispositivo.', voice_heard: 'Escuché: «{text}». Revisa y guarda.',
   voice_no_amount: 'Escuché: «{text}», pero no encontré la cantidad.',
   ocr_found: 'Detecté {amount} en el recibo. Verifícalo antes de guardar.',
@@ -2059,7 +2059,7 @@ en: {
   ins_biggest: 'Your biggest expense this month: {note} · {amount}.', ins_saved: 'You have saved {amount} this month. Keep going!',
   bud_alert_title: 'Budget at risk', bud_alert_warn: '{cat}: you are at {pct}% of the budget.',
   bud_alert_over: 'You went over your {cat} cap: {spent} of {limit}.',
-  voice_btn: 'Dictate', voice_listening: 'Listening… say the amount and what it was for.', voice_listening_chat: 'Listening… ask your question.',
+  voice_btn: 'Dictate', voice_listening: 'Listening… say the amount and what it was for.', voice_listening_chat: 'Listening… ask your question.', chat88_fab_aria: 'Open the PETO Finanzas chat', chat88_intro: 'Write me anything: “I spent 20 on gas”, a question about your money, “search…” or attach a receipt photo 📷. Nothing is saved without your confirmation.', chat88_confirm_title: 'Save this transaction?', chat88_save: 'Save', chat88_discard: 'Discard', chat88_saved: 'Saved ✓', chat88_discarded: 'Discarded. Nothing was saved.', chat88_expense: 'Expense', chat88_income: 'Income', chat88_results_title: 'Here is what I found:', chat88_no_results: 'No results for “{q}”.', chat88_places_title: 'Taking you to:', chat88_ask_which: 'I am not sure what you want to do. Pick one:', chat88_opt_register: 'Record a transaction', chat88_opt_search: 'Search transactions', chat88_opt_ask: 'Ask about my money', chat88_manual_btn: 'Open the manual form', chat88_fallback: 'AI is not available right now (offline or limit reached). You can still record by hand or use local search.', chat88_photo_aria: 'Attach a receipt photo', chat88_working: 'Reading your transaction…',
   voice_unavailable: 'Voice is not available on this device.', voice_heard: 'I heard: “{text}”. Check it and save.',
   voice_no_amount: 'I heard: “{text}”, but I could not find the amount.',
   ocr_found: 'I detected {amount} on the receipt. Check it before saving.',
@@ -2731,7 +2731,7 @@ it: {
   bud_alert_warn: '{cat}: sei al {pct}% del budget.',
   bud_alert_over: 'Hai superato il tuo tetto di {cat}: {spent} su {limit}.',
   voice_btn: 'Detta',
-  voice_listening: 'In ascolto… dì l’importo e per cosa è stato.', voice_listening_chat: 'In ascolto… fai la tua domanda.',
+  voice_listening: 'In ascolto… dì l’importo e per cosa è stato.', voice_listening_chat: 'In ascolto… fai la tua domanda.', chat88_fab_aria: 'Apri la chat di PETO Finanzas', chat88_intro: 'Scrivimi qualsiasi cosa: «ho speso 20 in benzina», una domanda sui tuoi soldi, «cerca…» o allega la foto di uno scontrino 📷. Niente viene salvato senza la tua conferma.', chat88_confirm_title: 'Salvo questo movimento?', chat88_save: 'Salva', chat88_discard: 'Scarta', chat88_saved: 'Salvato ✓', chat88_discarded: 'Scartato. Non è stato salvato nulla.', chat88_expense: 'Spesa', chat88_income: 'Entrata', chat88_results_title: 'Ecco cosa ho trovato:', chat88_no_results: 'Nessun risultato per «{q}».', chat88_places_title: 'Ti porto a:', chat88_ask_which: 'Non sono sicuro di cosa vuoi fare. Scegli:', chat88_opt_register: 'Registrare un movimento', chat88_opt_search: 'Cercare movimenti', chat88_opt_ask: 'Chiedere dei miei soldi', chat88_manual_btn: 'Apri il modulo manuale', chat88_fallback: 'L’IA non è disponibile ora (offline o limite raggiunto). Puoi registrare a mano o usare la ricerca locale.', chat88_photo_aria: 'Allega la foto di uno scontrino', chat88_working: 'Leggo il tuo movimento…',
   voice_unavailable: 'La voce non è disponibile su questo dispositivo.',
   voice_heard: 'Ho sentito: «{text}». Controlla e salva.',
   voice_no_amount: 'Ho sentito: «{text}», ma non ho trovato l’importo.',
@@ -3594,7 +3594,7 @@ pt: {
   bud_alert_warn: '{cat}: você está em {pct}% do orçamento.',
   bud_alert_over: 'Você passou do seu teto de {cat}: {spent} de {limit}.',
   voice_btn: 'Ditar',
-  voice_listening: 'Ouvindo… diga o valor e para quê foi.', voice_listening_chat: 'Ouvindo… faça sua pergunta.',
+  voice_listening: 'Ouvindo… diga o valor e para quê foi.', voice_listening_chat: 'Ouvindo… faça sua pergunta.', chat88_fab_aria: 'Abrir o chat do PETO Finanzas', chat88_intro: 'Escreva qualquer coisa: «gastei 20 em gasolina», uma pergunta sobre seu dinheiro, «buscar…» ou anexe a foto de um recibo 📷. Nada é salvo sem sua confirmação.', chat88_confirm_title: 'Guardo este movimento?', chat88_save: 'Salvar', chat88_discard: 'Descartar', chat88_saved: 'Salvo ✓', chat88_discarded: 'Descartado. Nada foi salvo.', chat88_expense: 'Despesa', chat88_income: 'Receita', chat88_results_title: 'Isto foi o que encontrei:', chat88_no_results: 'Sem resultados para «{q}».', chat88_places_title: 'Levo você a:', chat88_ask_which: 'Não tenho certeza do que você quer fazer. Escolha:', chat88_opt_register: 'Registrar um movimento', chat88_opt_search: 'Buscar movimentos', chat88_opt_ask: 'Perguntar sobre meu dinheiro', chat88_manual_btn: 'Abrir o formulário manual', chat88_fallback: 'A IA não está disponível agora (sem conexão ou limite atingido). Você pode registrar manualmente ou usar a busca local.', chat88_photo_aria: 'Anexar a foto de um recibo', chat88_working: 'Lendo seu movimento…',
   voice_unavailable: 'A voz não está disponível neste aparelho.',
   voice_heard: 'Ouvi: “{text}”. Confira e salve.',
   voice_no_amount: 'Ouvi: “{text}”, mas não encontrei o valor.',
@@ -4457,7 +4457,7 @@ fr: {
   bud_alert_warn: '{cat} : tu es à {pct} % du budget.',
   bud_alert_over: 'Tu as dépassé ton plafond de {cat} : {spent} sur {limit}.',
   voice_btn: 'Dicter',
-  voice_listening: 'J’écoute… dis le montant et à quoi ça correspond.', voice_listening_chat: 'J’écoute… pose ta question.',
+  voice_listening: 'J’écoute… dis le montant et à quoi ça correspond.', voice_listening_chat: 'J’écoute… pose ta question.', chat88_fab_aria: 'Ouvrir le chat PETO Finanzas', chat88_intro: 'Écris-moi ce que tu veux : « j’ai dépensé 20 en essence », une question sur ton argent, « cherche… » ou joins la photo d’un reçu 📷. Rien n’est enregistré sans ta confirmation.', chat88_confirm_title: 'J’enregistre ce mouvement ?', chat88_save: 'Enregistrer', chat88_discard: 'Ignorer', chat88_saved: 'Enregistré ✓', chat88_discarded: 'Ignoré. Rien n’a été enregistré.', chat88_expense: 'Dépense', chat88_income: 'Revenu', chat88_results_title: 'Voici ce que j’ai trouvé :', chat88_no_results: 'Aucun résultat pour « {q} ».', chat88_places_title: 'Je t’emmène à :', chat88_ask_which: 'Je ne suis pas sûr de ce que tu veux faire. Choisis :', chat88_opt_register: 'Enregistrer un mouvement', chat88_opt_search: 'Rechercher des mouvements', chat88_opt_ask: 'Poser une question sur mon argent', chat88_manual_btn: 'Ouvrir le formulaire manuel', chat88_fallback: 'L’IA n’est pas disponible (hors ligne ou limite atteinte). Tu peux enregistrer à la main ou utiliser la recherche locale.', chat88_photo_aria: 'Joindre la photo d’un reçu', chat88_working: 'Lecture de ton mouvement…',
   voice_unavailable: 'La voix n’est pas disponible sur cet appareil.',
   voice_heard: 'J’ai entendu : « {text} ». Vérifie et enregistre.',
   voice_no_amount: 'J’ai entendu : « {text} », mais je n’ai pas trouvé le montant.',
@@ -5320,7 +5320,7 @@ de: {
   bud_alert_warn: '{cat}: Du bist bei {pct} % des Budgets.',
   bud_alert_over: 'Du hast dein Limit für {cat} überschritten: {spent} von {limit}.',
   voice_btn: 'Diktieren',
-  voice_listening: 'Ich höre zu… sag den Betrag und wofür es war.', voice_listening_chat: 'Ich höre zu… stell deine Frage.',
+  voice_listening: 'Ich höre zu… sag den Betrag und wofür es war.', voice_listening_chat: 'Ich höre zu… stell deine Frage.', chat88_fab_aria: 'Chat von PETO Finanzas öffnen', chat88_intro: 'Schreib mir irgendetwas: „20 für Benzin ausgegeben“, eine Frage zu deinem Geld, „suche …“ oder hänge ein Kassenbon-Foto an 📷. Nichts wird ohne deine Bestätigung gespeichert.', chat88_confirm_title: 'Diesen Eintrag speichern?', chat88_save: 'Speichern', chat88_discard: 'Verwerfen', chat88_saved: 'Gespeichert ✓', chat88_discarded: 'Verworfen. Nichts wurde gespeichert.', chat88_expense: 'Ausgabe', chat88_income: 'Einnahme', chat88_results_title: 'Das habe ich gefunden:', chat88_no_results: 'Keine Ergebnisse für „{q}“.', chat88_places_title: 'Ich bringe dich zu:', chat88_ask_which: 'Ich bin nicht sicher, was du tun möchtest. Wähle:', chat88_opt_register: 'Einen Eintrag erfassen', chat88_opt_search: 'Einträge suchen', chat88_opt_ask: 'Zu meinem Geld fragen', chat88_manual_btn: 'Manuelles Formular öffnen', chat88_fallback: 'Die KI ist gerade nicht verfügbar (offline oder Limit erreicht). Du kannst manuell erfassen oder lokal suchen.', chat88_photo_aria: 'Foto eines Kassenbons anhängen', chat88_working: 'Ich lese deinen Eintrag…',
   voice_unavailable: 'Sprache ist auf diesem Gerät nicht verfügbar.',
   voice_heard: 'Ich habe gehört: „{text}“. Prüfe es und speichere.',
   voice_no_amount: 'Ich habe gehört: „{text}“, aber den Betrag nicht gefunden.',
@@ -6183,7 +6183,7 @@ zh: {
   bud_alert_warn: '{cat}：你已用了预算的 {pct}%。',
   bud_alert_over: '你已超出{cat}的上限：{spent} / {limit}。',
   voice_btn: '语音输入',
-  voice_listening: '正在聆听…请说出金额和用途。', voice_listening_chat: '正在聆听…请说出你的问题。',
+  voice_listening: '正在聆听…请说出金额和用途。', voice_listening_chat: '正在聆听…请说出你的问题。', chat88_fab_aria: '打开 PETO Finanzas 聊天', chat88_intro: '随便写:「汽油花了20」、关于你的钱的问题、「搜索…」,或附上收据照片 📷。未经你确认不会保存任何内容。', chat88_confirm_title: '保存这笔记录吗?', chat88_save: '保存', chat88_discard: '放弃', chat88_saved: '已保存 ✓', chat88_discarded: '已放弃,没有保存任何内容。', chat88_expense: '支出', chat88_income: '收入', chat88_results_title: '找到这些:', chat88_no_results: '没有找到「{q}」的结果。', chat88_places_title: '带你去:', chat88_ask_which: '我不确定你想做什么,请选择:', chat88_opt_register: '记录一笔', chat88_opt_search: '搜索记录', chat88_opt_ask: '询问我的钱', chat88_manual_btn: '打开手动表单', chat88_fallback: 'AI 现在不可用(离线或已达上限)。你可以手动记录或使用本地搜索。', chat88_photo_aria: '附上收据照片', chat88_working: '正在读取你的记录…',
   voice_unavailable: '此设备不支持语音。',
   voice_heard: '我听到：「{text}」。请核对后保存。',
   voice_no_amount: '我听到：「{text}」，但没有找到金额。',
@@ -7046,7 +7046,7 @@ ja: {
   bud_alert_warn: '{cat}：予算の{pct}%まで来ています。',
   bud_alert_over: '{cat}の上限を超えました：{limit} 中 {spent}。',
   voice_btn: '音声入力',
-  voice_listening: '聞き取り中…金額と何に使ったか言ってください。', voice_listening_chat: '聞き取り中…質問をどうぞ。',
+  voice_listening: '聞き取り中…金額と何に使ったか言ってください。', voice_listening_chat: '聞き取り中…質問をどうぞ。', chat88_fab_aria: 'PETO Finanzas チャットを開く', chat88_intro: '何でも書いてください:「ガソリンに20使った」、お金についての質問、「検索…」、またはレシートの写真を添付 📷。あなたの確認なしに保存されることはありません。', chat88_confirm_title: 'この記録を保存しますか?', chat88_save: '保存', chat88_discard: '破棄', chat88_saved: '保存しました ✓', chat88_discarded: '破棄しました。何も保存されていません。', chat88_expense: '支出', chat88_income: '収入', chat88_results_title: '見つけたもの:', chat88_no_results: '「{q}」の結果はありません。', chat88_places_title: 'こちらへご案内:', chat88_ask_which: '何をしたいかわかりません。選んでください:', chat88_opt_register: '記録する', chat88_opt_search: '記録を検索', chat88_opt_ask: 'お金について質問', chat88_manual_btn: '手動フォームを開く', chat88_fallback: 'AIは現在利用できません(オフラインまたは上限到達)。手動で記録するか、ローカル検索を使えます。', chat88_photo_aria: 'レシートの写真を添付', chat88_working: '記録を読み取り中…',
   voice_unavailable: 'このデバイスでは音声は使えません。',
   voice_heard: '聞き取りました：「{text}」。確認して保存してください。',
   voice_no_amount: '聞き取りました：「{text}」。でも金額が見つかりませんでした。',
@@ -7909,7 +7909,7 @@ ko: {
   bud_alert_warn: '{cat}: 예산의 {pct}%에 도달했습니다.',
   bud_alert_over: '{cat} 한도를 넘었어요: {limit} 중 {spent}.',
   voice_btn: '말하기',
-  voice_listening: '듣고 있습니다… 금액과 용도를 말하세요.', voice_listening_chat: '듣고 있습니다… 질문을 말하세요.',
+  voice_listening: '듣고 있습니다… 금액과 용도를 말하세요.', voice_listening_chat: '듣고 있습니다… 질문을 말하세요.', chat88_fab_aria: 'PETO Finanzas 채팅 열기', chat88_intro: '아무거나 쓰세요: "기름값 20 썼어", 돈에 대한 질문, "검색…" 또는 영수증 사진 첨부 📷. 확인 없이는 아무것도 저장되지 않습니다.', chat88_confirm_title: '이 내역을 저장할까요?', chat88_save: '저장', chat88_discard: '버리기', chat88_saved: '저장됨 ✓', chat88_discarded: '버렸습니다. 아무것도 저장되지 않았습니다.', chat88_expense: '지출', chat88_income: '수입', chat88_results_title: '찾은 결과:', chat88_no_results: '"{q}" 결과가 없습니다.', chat88_places_title: '여기로 이동:', chat88_ask_which: '무엇을 원하는지 확실하지 않습니다. 선택하세요:', chat88_opt_register: '내역 기록', chat88_opt_search: '내역 검색', chat88_opt_ask: '내 돈에 대해 묻기', chat88_manual_btn: '수동 양식 열기', chat88_fallback: 'AI를 지금 사용할 수 없습니다(오프라인 또는 한도 도달). 수동으로 기록하거나 로컬 검색을 사용할 수 있습니다.', chat88_photo_aria: '영수증 사진 첨부', chat88_working: '내역을 읽는 중…',
   voice_unavailable: '이 기기에서는 음성을 사용할 수 없습니다.',
   voice_heard: '들었습니다: \'{text}\'. 확인하고 저장하세요.',
   voice_no_amount: '들었습니다: \'{text}\'. 하지만 금액을 찾지 못했습니다.',
@@ -8772,7 +8772,7 @@ ru: {
   bud_alert_warn: '{cat}: вы на {pct}% бюджета.',
   bud_alert_over: 'Вы вышли за лимит по «{cat}»: {spent} из {limit}.',
   voice_btn: 'Надиктовать',
-  voice_listening: 'Слушаю… назовите сумму и на что.', voice_listening_chat: 'Слушаю… задайте ваш вопрос.',
+  voice_listening: 'Слушаю… назовите сумму и на что.', voice_listening_chat: 'Слушаю… задайте ваш вопрос.', chat88_fab_aria: 'Открыть чат PETO Finanzas', chat88_intro: 'Напишите что угодно: «потратил 20 на бензин», вопрос о ваших деньгах, «найди…» или прикрепите фото чека 📷. Ничего не сохраняется без вашего подтверждения.', chat88_confirm_title: 'Сохранить эту запись?', chat88_save: 'Сохранить', chat88_discard: 'Отбросить', chat88_saved: 'Сохранено ✓', chat88_discarded: 'Отброшено. Ничего не сохранено.', chat88_expense: 'Расход', chat88_income: 'Доход', chat88_results_title: 'Вот что я нашёл:', chat88_no_results: 'Нет результатов для «{q}».', chat88_places_title: 'Перейти к:', chat88_ask_which: 'Не уверен, что вы хотите сделать. Выберите:', chat88_opt_register: 'Записать операцию', chat88_opt_search: 'Искать операции', chat88_opt_ask: 'Спросить о моих деньгах', chat88_manual_btn: 'Открыть ручную форму', chat88_fallback: 'ИИ сейчас недоступен (нет сети или достигнут лимит). Можно записать вручную или искать локально.', chat88_photo_aria: 'Прикрепить фото чека', chat88_working: 'Читаю вашу запись…',
   voice_unavailable: 'Голос недоступен на этом устройстве.',
   voice_heard: 'Я услышал: «{text}». Проверьте и сохраните.',
   voice_no_amount: 'Я услышал: «{text}», но не нашёл сумму.',
@@ -9635,7 +9635,7 @@ hi: {
   bud_alert_warn: '{cat}: आप बजट के {pct}% पर हैं।',
   bud_alert_over: 'आप {cat} की सीमा पार कर गए: {limit} में से {spent}।',
   voice_btn: 'बोलकर लिखें',
-  voice_listening: 'सुन रहा हूँ… राशि और किस लिए था, बोलें।', voice_listening_chat: 'सुन रहा हूँ… अपना सवाल पूछें।',
+  voice_listening: 'सुन रहा हूँ… राशि और किस लिए था, बोलें।', voice_listening_chat: 'सुन रहा हूँ… अपना सवाल पूछें।', chat88_fab_aria: 'PETO Finanzas चैट खोलें', chat88_intro: 'कुछ भी लिखें: "पेट्रोल पर 20 खर्च किए", अपने पैसों के बारे में सवाल, "खोजें…" या रसीद की फोटो जोड़ें 📷। आपकी पुष्टि के बिना कुछ भी सहेजा नहीं जाता।', chat88_confirm_title: 'क्या यह लेन-देन सहेजूँ?', chat88_save: 'सहेजें', chat88_discard: 'हटाएँ', chat88_saved: 'सहेजा गया ✓', chat88_discarded: 'हटा दिया। कुछ भी सहेजा नहीं गया।', chat88_expense: 'खर्च', chat88_income: 'आय', chat88_results_title: 'यह मिला:', chat88_no_results: '"{q}" के लिए कोई परिणाम नहीं।', chat88_places_title: 'आपको ले चलते हैं:', chat88_ask_which: 'मुझे यकीन नहीं कि आप क्या करना चाहते हैं। चुनें:', chat88_opt_register: 'लेन-देन दर्ज करें', chat88_opt_search: 'लेन-देन खोजें', chat88_opt_ask: 'मेरे पैसों के बारे में पूछें', chat88_manual_btn: 'मैन्युअल फॉर्म खोलें', chat88_fallback: 'AI अभी उपलब्ध नहीं है (ऑफ़लाइन या सीमा पूरी)। आप हाथ से दर्ज कर सकते हैं या स्थानीय खोज उपयोग कर सकते हैं।', chat88_photo_aria: 'रसीद की फोटो जोड़ें', chat88_working: 'आपका लेन-देन पढ़ रहे हैं…',
   voice_unavailable: 'इस डिवाइस पर आवाज़ उपलब्ध नहीं है।',
   voice_heard: 'मैंने सुना: “{text}”। जाँचकर सहेजें।',
   voice_no_amount: 'मैंने सुना: “{text}”, लेकिन राशि नहीं मिली।',
@@ -10498,7 +10498,7 @@ ar: {
   bud_alert_warn: '{cat}: أنت عند {pct}% من الميزانية.',
   bud_alert_over: 'تجاوزت حدّ {cat}: {spent} من {limit}.',
   voice_btn: 'إملاء',
-  voice_listening: 'أستمع… قل المبلغ وما كان من أجله.', voice_listening_chat: 'أستمع… اطرح سؤالك.',
+  voice_listening: 'أستمع… قل المبلغ وما كان من أجله.', voice_listening_chat: 'أستمع… اطرح سؤالك.', chat88_fab_aria: 'افتح محادثة PETO Finanzas', chat88_intro: 'اكتب أي شيء: «صرفت 20 على البنزين»، سؤال عن أموالك، «ابحث…» أو أرفق صورة إيصال 📷. لا يُحفظ أي شيء دون تأكيدك.', chat88_confirm_title: 'هل أحفظ هذه الحركة؟', chat88_save: 'حفظ', chat88_discard: 'تجاهل', chat88_saved: 'تم الحفظ ✓', chat88_discarded: 'تم التجاهل. لم يُحفظ أي شيء.', chat88_expense: 'مصروف', chat88_income: 'دخل', chat88_results_title: 'هذا ما وجدته:', chat88_no_results: 'لا نتائج لـ «{q}».', chat88_places_title: 'آخذك إلى:', chat88_ask_which: 'لست متأكدًا مما تريد فعله. اختر:', chat88_opt_register: 'تسجيل حركة', chat88_opt_search: 'بحث الحركات', chat88_opt_ask: 'اسأل عن أموالي', chat88_manual_btn: 'افتح النموذج اليدوي', chat88_fallback: 'الذكاء الاصطناعي غير متاح الآن (لا اتصال أو بلغت الحد). يمكنك التسجيل يدويًا أو استخدام البحث المحلي.', chat88_photo_aria: 'أرفق صورة إيصال', chat88_working: 'أقرأ حركتك…',
   voice_unavailable: 'الصوت غير متاح على هذا الجهاز.',
   voice_heard: 'سمعت: «{text}». تحقق منه واحفظه.',
   voice_no_amount: 'سمعت: «{text}»، لكنني لم أجد المبلغ.',
@@ -21282,41 +21282,286 @@ function renderAiChat() {
   if (!box) return;
   clearNode(box);
   if (!aiChatMsgs.length) {
-    box.appendChild(el('p', 'muted', t('ai2_chat_intro')));
+    box.appendChild(el('p', 'muted', t('chat88_intro')));
     return;
   }
   for (const m of aiChatMsgs) {
+    if (m.kind) { chat88RenderKind(box, m); continue; }
     const row = el('div', 'chat-row ' + (m.role === 'user' ? 'user' : 'ai'));
     row.appendChild(el('div', 'chat-bubble', m.text));
     box.appendChild(row);
   }
   box.scrollTop = box.scrollHeight;
 }
-async function onAiChatSubmit(ev) {
-  ev.preventDefault();
-  const input = document.getElementById('ai-chat-input');
-  const status = document.getElementById('ai-chat-status');
-  const q = input ? input.value.trim() : '';
-  if (!q) { if (input) input.focus(); return; }
-  const history = aiChatMsgs.slice(-6).map((m) => ({ role: m.role, text: m.text }));
-  aiChatMsgs.push({ role: 'user', text: q });
-  if (input) input.value = '';
+/* Compilación 88 · PETO-C88-CHAT: el chat pinta además sus piezas
+   propias (tarjeta de confirmación, resultados, funciones,
+   opciones y respaldo) como mensajes con botones vivos. */
+function chat88RenderKind(box, m) {
+  const row = el('div', 'chat-row ai');
+  const card = el('div', 'chat-bubble chat88-card');
+  if (m.kind === 'confirm88') {
+    const d = m.data || {};
+    card.appendChild(el('div', 'chat88-title', t('chat88_confirm_title')));
+    card.appendChild(el('div', 'chat88-line',
+      (d.type === 'income' ? t('chat88_income') : t('chat88_expense')) + ' · ' + fmt(d.amountCents || 0)));
+    if (d.category) card.appendChild(el('div', 'chat88-line', catName(d.category)));
+    card.appendChild(el('div', 'chat88-line', prettyDate(d.date || todayStr())));
+    if (d.note) card.appendChild(el('div', 'chat88-line', d.note));
+    if (m.state === 'saved') {
+      card.appendChild(el('div', 'chat88-line chat88-ok', t('chat88_saved')));
+    } else if (m.state === 'discarded') {
+      card.appendChild(el('div', 'chat88-line muted', t('chat88_discarded')));
+    } else {
+      const acts = el('div', 'form-actions');
+      acts.appendChild(actionButton(t('chat88_save'), 'btn-primary btn-small', () => { chat88SaveCard(m); }));
+      acts.appendChild(actionButton(t('btn_edit'), 'btn-secondary btn-small', () => { chat88EditCard(m); }));
+      acts.appendChild(actionButton(t('chat88_discard'), 'btn-ghost btn-small', () => { m.state = 'discarded'; renderAiChat(); }));
+      card.appendChild(acts);
+    }
+  } else if (m.kind === 'results88') {
+    card.appendChild(el('div', 'chat88-title', t('chat88_results_title')));
+    const items = m.data || [];
+    if (!items.length) card.appendChild(el('div', 'chat88-line', t('chat88_no_results', { q: m.q || '' })));
+    for (const r of items) {
+      const b = el('button', 'chat88-result', (r.sub || r.title) + ' · ' + prettyDate(r.date) + ' · ' + (r.type === 'gastos' ? '-' : '+') + fmt(r.amountCents));
+      b.type = 'button';
+      b.addEventListener('click', () => { chat88OpenResult(r); });
+      card.appendChild(b);
+    }
+  } else if (m.kind === 'places88') {
+    card.appendChild(el('div', 'chat88-title', t('chat88_places_title')));
+    const acts = el('div', 'form-actions');
+    for (const p of (m.data || [])) {
+      acts.appendChild(actionButton(t(p.key), 'btn-secondary btn-small', () => { closeAiChat(); showView(p.view); }));
+    }
+    card.appendChild(acts);
+  } else if (m.kind === 'choices88') {
+    card.appendChild(el('div', 'chat88-title', t('chat88_ask_which')));
+    const acts = el('div', 'form-actions');
+    acts.appendChild(actionButton(t('chat88_opt_register'), 'btn-secondary btn-small', () => { chat88RouteRegister(m.q); }));
+    acts.appendChild(actionButton(t('chat88_opt_search'), 'btn-secondary btn-small', () => { chat88RouteSearch(m.q); }));
+    acts.appendChild(actionButton(t('chat88_opt_ask'), 'btn-secondary btn-small', () => { chat88AskAi(m.q); }));
+    card.appendChild(acts);
+  } else if (m.kind === 'fallback88') {
+    card.appendChild(el('div', 'chat88-line', t('chat88_fallback')));
+    const acts = el('div', 'form-actions');
+    acts.appendChild(actionButton(t('chat88_manual_btn'), 'btn-primary btn-small', () => { chat88OpenManual(); }));
+    if (m.q) acts.appendChild(actionButton(t('chat88_opt_search'), 'btn-secondary btn-small', () => { chat88RouteSearch(m.q); }));
+    card.appendChild(acts);
+  }
+  row.appendChild(card);
+  box.appendChild(row);
+}
+/* ---------------- Compilación 88 · Chat universal (PETO-C88-CHAT) ----
+   El ÚNICO botón flotante abre este chat y TODO entra por aquí:
+   registro (parse-expense), recibo por foto (receipt), preguntas
+   (chat), búsqueda local de movimientos y navegación a funciones
+   (índice local de la Comp. 85). Heurística local primero; ante la
+   duda, opciones tocables — nunca falla en silencio. Sin IA
+   (offline, sin sesión o tope), respaldo: formulario manual y
+   búsqueda local. NADA se guarda sin la tarjeta de confirmación. */
+function chat88Norm(s) { return ai3NormText(s); }
+function chat88FindPlaces(text) {
+  const words = chat88Norm(text).split(/[^a-z0-9]+/).filter((w) => w.length >= 4);
+  if (!words.length) return [];
+  const out = [];
+  for (const e of AI3_SEARCH_INDEX) {
+    const hayWords = (ai3NormText(t(e.key)) + ' ' + ai3NormText(e.kw)).split(/[^a-z0-9]+/).filter(Boolean);
+    const hit = words.some((w) => hayWords.some((h) => h === w || h.startsWith(w) || w.startsWith(h)));
+    if (hit && !out.some((x) => x.view === e.view)) out.push(e);
+  }
+  return out.slice(0, 3);
+}
+function chat88Classify(text) {
+  const raw = String(text || '');
+  const q = chat88Norm(raw).trim();
+  if (!q) return 'unknown';
+  if (/^(busca|buscar|encuentra|muestrame|muestra|search|find|look for)\b/.test(q)) return 'search';
+  const hasAmount = /\d/.test(q);
+  const regVerb = /(gaste|gastar|pague|pagar|compre|comprar|cobre|recibi|ingrese|gane|me pagaron|spent|paid|bought|purchased|received|earned|got paid)/.test(q);
+  if (hasAmount && regVerb) return 'register';
+  const question = /^\s*¿/.test(raw) || /\?\s*$/.test(raw) ||
+    /^(cuanto|cuanta|cuantos|cuantas|que|cual|cuales|como|donde|cuando|por que|how|what|which|where|when|why)\b/.test(q);
+  const navVerb = /(quiero|necesito|donde|where|how do i|como registro|como veo)/.test(q);
+  if (navVerb && chat88FindPlaces(raw).length) return 'place';
+  if (question) return 'question';
+  if (hasAmount && /(en|de|para|por|on|for)\b/.test(q)) return 'register';
+  if (!hasAmount && chat88FindPlaces(raw).length && q.split(/\s+/).length <= 6) return 'place';
+  return 'unknown';
+}
+function chat88IsIncomeText(text) {
+  return /(pagaron|recibi|cobre|ingres|salario|sueldo|nomina|paycheck|salary|received|earned|got paid)/.test(chat88Norm(text));
+}
+function chat88Offline() {
+  try { return typeof navigator !== 'undefined' && navigator.onLine === false; } catch (e) { return false; }
+}
+function chat88Push(kind, data, q) {
+  const m = { role: 'ai', kind: kind, data: data || null, q: q || '', state: null };
+  aiChatMsgs.push(m);
   renderAiChat();
-  if (status) status.textContent = t('ai2_chat_thinking');
+  return m;
+}
+function chat88Status(msg) {
+  const s = document.getElementById('ai-chat-status');
+  if (s) s.textContent = msg || '';
+}
+async function chat88RouteRegister(q) {
+  if (chat88Offline()) { chat88Push('fallback88', null, q); return; }
+  chat88Status(t('chat88_working'));
   try {
-    const r = await aiFn('chat', {
-      question: q, summary: ai2ChatSummary(), history: history, lang: lang()
-    });
+    const result = await aiFn('parse-expense', { text: q, categories: allCategories(db), today: todayStr() });
+    chat88Status('');
+    if (!result || !result.amountCents) {
+      aiChatMsgs.push({ role: 'ai', text: t('ai_no_amount') });
+      chat88Push('fallback88', null, q);
+      return;
+    }
+    chat88Push('confirm88', {
+      type: chat88IsIncomeText(q) ? 'income' : 'expense',
+      amountCents: result.amountCents,
+      category: (result.category && allCategories(db).includes(result.category)) ? result.category : null,
+      date: result.date || todayStr(),
+      note: cleanText(result.merchant || result.note || q, 120),
+      photo: null
+    }, q);
+  } catch (e) {
+    chat88Status('');
+    aiGatePaywall(e);
+    aiChatMsgs.push({ role: 'ai', text: aiErrorText(e) });
+    chat88Push('fallback88', null, q);
+  }
+}
+async function chat88ReceiptFromDataUrl(dataUrl) {
+  if (chat88Offline()) { chat88Push('fallback88', null, ''); return; }
+  chat88Status(t('chat88_working'));
+  try {
+    const result = await aiFn('receipt', { image: dataUrl, categories: allCategories(db) });
+    chat88Status('');
+    if (!result || !result.amountCents) {
+      aiChatMsgs.push({ role: 'ai', text: t('ai_no_amount') });
+      chat88Push('fallback88', null, '');
+      return;
+    }
+    chat88Push('confirm88', {
+      type: 'expense',
+      amountCents: result.amountCents,
+      category: (result.category && allCategories(db).includes(result.category)) ? result.category : null,
+      date: result.date || todayStr(),
+      note: cleanText(result.merchant || result.note || '', 120),
+      photo: dataUrl
+    }, '');
+  } catch (e) {
+    chat88Status('');
+    aiGatePaywall(e);
+    aiChatMsgs.push({ role: 'ai', text: aiErrorText(e) });
+    chat88Push('fallback88', null, '');
+  }
+}
+function chat88RouteSearch(q) {
+  let term = String(q || '');
+  term = term.replace(/^\s*(busca|buscar|encuentra|muestra(me)?|search|find|look for)\b/i, '');
+  for (let k88 = 0; k88 < 3; k88++) {
+    const t88 = term.replace(/^\s*(los|las|el|la|mis|my|the|payments to|payments for|pagos a|pagos de|gastos de|gastos en)\s+/i, '');
+    if (t88 === term) break;
+    term = t88;
+  }
+  const results = searchMovements(term.trim(), '', 'todos').slice(0, 10);
+  chat88Push('results88', results, term.trim());
+}
+function chat88OpenResult(r) {
+  if (!r) return;
+  if (r.type === 'gastos') {
+    const item = db.expenses.find((x) => x.id === r.id);
+    if (!item) return;
+    expMonth = monthKeyOf(item.date);
+    closeAiChat();
+    openExpenseEdit(item);
+    showView('gastos');
+  } else if (r.type === 'ingresos') {
+    const item = db.incomes.find((x) => x.id === r.id);
+    if (!item) return;
+    closeAiChat();
+    openIncomeEdit(item);
+    showView('ingresos');
+  } else {
+    closeAiChat();
+    showView(r.type);
+  }
+}
+function chat88OpenManual() {
+  closeAiChat();
+  const chooser = document.getElementById('quick-chooser');
+  if (chooser) chooser.hidden = false;
+}
+function chat88SaveCard(m) {
+  if (!m || m.state === 'saved' || !m.data) return;
+  const d = m.data;
+  beginUndo();
+  if (d.type === 'income') {
+    db.incomes.push({ id: uid(), amountCents: d.amountCents, savingsCents: 0, date: cleanDate(d.date), note: cleanText(d.note || '', 120), biz: false, accountId: null, toSavings: false, src: 'avail', goalId: null });
+  } else {
+    db.expenses.push({ id: uid(), amountCents: d.amountCents, category: (d.category && allCategories(db).includes(d.category)) ? d.category : 'Otros', date: cleanDate(d.date), note: cleanText(d.note || '', 120), photo: d.photo || null, biz: false, accountId: null, fromSavings: false, src: 'avail' });
+  }
+  save();
+  m.state = 'saved';
+  renderAiChat();
+  if (typeof showUndoToast === 'function') showUndoToast();
+}
+function chat88EditCard(m) {
+  if (!m || !m.data) return;
+  const d = m.data;
+  m.state = 'discarded';
+  closeAiChat();
+  if (d.type === 'income') {
+    showView('ingresos');
+    const amt = document.getElementById('inc-amount');
+    if (amt) amt.value = (d.amountCents / 100).toFixed(2);
+    const dt = document.getElementById('inc-date');
+    if (dt) dt.value = d.date || todayStr();
+    const nt = document.getElementById('inc-note');
+    if (nt) nt.value = d.note || '';
+  } else {
+    showView('gastos');
+    aiApplyResult({ amountCents: d.amountCents, category: d.category, date: d.date, merchant: d.note });
+    if (d.photo) setExpensePhoto(d.photo);
+  }
+}
+async function chat88AskAi(q) {
+  const history = aiChatMsgs.filter((m) => !m.kind).slice(-6).map((m) => ({ role: m.role, text: m.text }));
+  chat88Status(t('ai2_chat_thinking'));
+  try {
+    const r = await aiFn('chat', { question: q, summary: ai2ChatSummary(), history: history, lang: lang() });
     aiChatMsgs.push({ role: 'ai', text: (r && r.answer) ? r.answer : t('ai_error') });
   } catch (e) {
     aiGatePaywall(e);
-    /* Compilación 86 (formatos): al chocar con el tope, el chat
-       ofrece el recompensado opt-in (una consulta extra). */
     if (e && e.message === 'ai_limit') renderAiRewardBox86(true);
     aiChatMsgs.push({ role: 'ai', text: aiErrorText(e) });
+    chat88Push('fallback88', null, q);
+    chat88Status('');
+    renderAiChat();
+    return;
   }
-  if (status) status.textContent = '';
+  chat88Status('');
   renderAiChat();
+}
+async function onAiChatSubmit(ev) {
+  ev.preventDefault();
+  const input = document.getElementById('ai-chat-input');
+  const q = input ? input.value.trim() : '';
+  if (!q) { if (input) input.focus(); return; }
+  aiChatMsgs.push({ role: 'user', text: q });
+  if (input) input.value = '';
+  renderAiChat();
+  const intent = chat88Classify(q);
+  if (intent === 'register') { await chat88RouteRegister(q); return; }
+  if (intent === 'search') { chat88RouteSearch(q); return; }
+  if (intent === 'place') { chat88Push('places88', chat88FindPlaces(q), q); return; }
+  if (intent === 'question') {
+    if (chat88Offline()) { chat88Push('fallback88', null, q); return; }
+    await chat88AskAi(q);
+    return;
+  }
+  chat88Push('choices88', null, q);
 }
 
 /* ---------- Detector de suscripciones con IA ----------
@@ -21905,14 +22150,12 @@ async function onSearchAiSubmit(ev) {
    (Agregar / Buscar / Chat), cada una con el flujo de siempre. Al
    elegir una acción o tocar fuera, se contrae solo. El chat vive
    aquí: la tarjeta «Chat con tu dinero» de Inicio desapareció. */
-function toggleFabMenu() {
-  const m = document.getElementById('fab-menu');
-  if (m) m.classList.toggle('open');
-}
-function closeFabMenu() {
-  const m = document.getElementById('fab-menu');
-  if (m) m.classList.remove('open');
-}
+/* Compilación 88: el FAB desplegable de tres botones quedó
+   CANCELADO como diseño final. toggleFabMenu/closeFabMenu se
+   conservan como funciones vacías por compatibilidad con
+   llamadas viejas: ya no hay menú que desplegar. */
+function toggleFabMenu() {}
+function closeFabMenu() {}
 
 /* ---------------- Compilación 50 · Saldos del banco guardados
    y banco visible fuera de Ajustes ----------------
@@ -25015,7 +25258,7 @@ function showOnboarding() {
    primera apertura de una cuenta nueva. */
 const GUIDE_STEPS = [
   { anchor: '#spend-card', title: 'guide_1_title', text: 'guide_1_text' },
-  { anchor: '#fab-add', title: 'guide_2_title', text: 'guide_2_text' },
+  { anchor: '#fab-universal', title: 'guide_2_title', text: 'guide_2_text' },
   { anchor: '#bottom-nav [data-bnav="presupuesto"]', title: 'guide_3_title', text: 'guide_3_text' },
   { anchor: '#bottom-nav [data-bnav="resumen"]', title: 'guide_4_title', text: 'guide_4_text' },
   { anchor: '#home-bank', title: 'guide_5_title', text: 'guide_5_text' },
@@ -25789,15 +26032,11 @@ function wireEvents() {
   /* Botón flotante + : selector rápido Gasto / Ingreso / Ahorro. */
   const chooser = document.getElementById('quick-chooser');
   const closeChooser = () => { chooser.hidden = true; };
-  document.getElementById('fab-add').addEventListener('click', () => { closeFabMenu(); chooser.hidden = false; });
+  /* Compilación 88: el selector rápido lo abre el respaldo manual
+     del chat (chat88OpenManual); el FAB de tres botones ya no existe. */
   /* Compilación 43 (Bloque I): la lupa flotante sobre el + abre
      Buscar con el campo listo para escribir. */
-  document.getElementById('fab-search').addEventListener('click', () => {
-    closeFabMenu();
-    showView('buscar');
-    const st = document.getElementById('search-text');
-    if (st) st.focus();
-  });
+  /* Compilación 88: sin botón de lupa — la búsqueda vive en el chat. */
   document.getElementById('quick-cancel').addEventListener('click', closeChooser);
   document.getElementById('quick-expense').addEventListener('click', () => { closeChooser(); showView('gastos'); });
   document.getElementById('quick-income').addEventListener('click', () => { closeChooser(); showView('ingresos'); });
@@ -25838,7 +26077,8 @@ function wireEvents() {
     processReceiptFile(file, (url) => { if (url) aiReceiptFromDataUrl(url); });
   });
   document.getElementById('ai-text-form').addEventListener('submit', onAiTextSubmit);
-  document.getElementById('search-ai-form').addEventListener('submit', onSearchAiSubmit);
+  /* Compilación 88: la tarjeta «Pregúntale a PETO» de Buscar se
+     retiró (el chat la reemplaza); su listener ya no se registra. */
   /* Compilación 85 (Fase A): carta explicada (mismo selector de
      foto que el recibo con IA) y dictado por voz en el texto
      libre y en el chat. */
@@ -25859,6 +26099,20 @@ function wireEvents() {
   });
   /* Compilación 84: el chat con su dinero (pantalla propia). */
   document.getElementById('ai-chat-form').addEventListener('submit', onAiChatSubmit);
+  /* Compilación 88: cámara/adjuntar del chat → recibo → la misma
+     tarjeta de confirmación (chat88ReceiptFromDataUrl). */
+  const chat88PhotoBtn = document.getElementById('ai-chat-photo-btn');
+  if (chat88PhotoBtn) chat88PhotoBtn.addEventListener('click', () => {
+    const f = document.getElementById('ai-chat-photo');
+    if (f) f.click();
+  });
+  const chat88PhotoInput = document.getElementById('ai-chat-photo');
+  if (chat88PhotoInput) chat88PhotoInput.addEventListener('change', (ev) => {
+    const file = ev.target.files && ev.target.files[0];
+    ev.target.value = '';
+    if (!file) return;
+    processReceiptFile(file, (url) => { if (url) chat88ReceiptFromDataUrl(url); });
+  });
   /* Compilación 86 (formatos): el recompensado opt-in del chat y
      el botón «Cancelar Pro» de la tarjeta de Ajustes. */
   const permSkipBtn = document.getElementById('perm-skip');
@@ -25887,18 +26141,10 @@ function wireEvents() {
   document.getElementById('ai-chat-back').addEventListener('click', closeAiChat);
   /* Compilación 85 (cambio 4): el botón flotante único se despliega
      y el Chat vive en su menú; tocar fuera lo contrae. */
-  document.getElementById('fab-main').addEventListener('click', (ev) => {
-    ev.stopPropagation();
-    toggleFabMenu();
-  });
-  document.getElementById('fab-chat').addEventListener('click', () => {
-    closeFabMenu();
-    openAiChat();
-  });
-  document.addEventListener('click', (ev) => {
-    const m = document.getElementById('fab-menu');
-    if (m && m.classList.contains('open') && !m.contains(ev.target)) closeFabMenu();
-  });
+  /* Compilación 88 (punto 1): UN SOLO botón flotante de cristal
+     que abre DIRECTAMENTE el chat universal, sin despliegue. */
+  const fab88 = document.getElementById('fab-universal');
+  if (fab88) fab88.addEventListener('click', () => { openAiChat(); });
   document.getElementById('exp-photo').addEventListener('change', (ev) => {
     const file = ev.target.files && ev.target.files[0];
     if (!file) return;

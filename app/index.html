@@ -54,6 +54,8 @@
   <form id="ai-chat-form" class="chat-form" autocomplete="off">
     <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
     <button id="ai-chat-voice" class="btn btn-secondary chat-voice-btn" type="button" data-i18n-aria="ai3_voice_btn" aria-label="🎤 Dictar"><span class="chat-voice-icon" aria-hidden="true">🎤</span><span class="chat-voice-label" data-i18n="ai3_voice_word">Dictar</span></button>
+    <button id="ai-chat-photo-btn" class="btn btn-secondary chat-photo-btn" type="button" data-i18n-aria="chat88_photo_aria" aria-label="Adjuntar la foto de un recibo">📷</button>
+    <input id="ai-chat-photo" type="file" accept="image/*" hidden>
     <button class="btn btn-primary chat-send-btn" type="submit" data-i18n="ai2_chat_send">Preguntar</button>
   </form>
   <div id="ai-reward-box" hidden>
@@ -617,19 +619,7 @@
     <p id="search-hint" class="muted" data-i18n="search_hint">Escribe para buscar en tus movimientos</p>
     <ul id="search-results" class="item-list"></ul>
     <p id="search-empty" class="empty-state" hidden data-i18n="search_empty">Sin resultados.</p>
-    <!-- Compilación 85: «Pregúntale a PETO» — la pregunta usa el
-         motor del chat (#view-chat) y también busca movimientos. -->
-    <section id="search-ai-card" class="card form-card">
-      <h3 data-i18n="ai3_search_ask_title">✨ Pregúntale a PETO Finanzas</h3>
-      <p class="muted small" data-i18n="ai3_search_ask_help">Pregunta sobre tu presupuesto y tus gastos: la IA responde con tus números. Si tu pregunta coincide con movimientos, también quedan buscados aquí.</p>
-      <form id="search-ai-form" autocomplete="off">
-        <label class="sr-only" for="search-ai-input" data-i18n="ai3_search_ask_title">✨ Pregúntale a PETO Finanzas</label>
-        <input id="search-ai-input" type="text" maxlength="300" data-i18n-ph="ai3_search_ask_ph" placeholder="Ej.: ¿cuánto gasté en comida este mes?">
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit" data-i18n="ai3_search_ask_btn">Preguntar</button>
-        </div>
-      </form>
-    </section>
+    <!-- Compilación 88: la tarjeta «Pregúntale a PETO» se retiró; el chat universal la reemplaza. -->
   </main>
 
   <!-- ======= PRESUPUESTO ======= -->
@@ -1630,16 +1620,10 @@
     </div>
   </div>
 
-  <!-- Compilación 85 (cambio 4): UN solo botón flotante de cristal
-       (sin verde) que se despliega en Agregar / Buscar / Chat, cada
-       uno con su etiqueta. Contraído es solo el +, para no tapar. -->
-  <div id="fab-menu" class="fab-menu">
-    <button id="fab-chat" class="fab fab-item" type="button" data-i18n-aria="ai2_chat_open" aria-label="Abrir el chat">💬<span class="fab-label" data-i18n="ai3_fab_chat">Chat</span></button>
-    <button id="fab-search" class="fab fab-item fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍<span class="fab-label" data-i18n="ai3_fab_search">Buscar</span></button>
-    <button id="fab-add" class="fab fab-item" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">➕<span class="fab-label" data-i18n="ai3_fab_add">Agregar</span></button>
-    <button id="fab-main" class="fab fab-main" type="button" aria-label="Más acciones">+</button>
-  </div>
-
+  <!-- Compilación 88 · UN SOLO botón flotante de cristal
+       (sin verde) que abre DIRECTAMENTE el chat universal. El
+       desplegable de tres botones de la Comp. 85 quedó cancelado. -->
+  <button id="fab-universal" class="fab fab-universal88" type="button" data-i18n-aria="chat88_fab_aria" aria-label="Abrir el chat de PETO">✨</button>
   <!-- Compilación 86 · Añadido 10: pantalla de permisos de primer uso. -->
 <section id="view-perms" class="view perms-view" hidden>
   <header class="chat-head">
