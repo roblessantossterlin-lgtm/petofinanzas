@@ -104,6 +104,14 @@
     <div id="ob-start-wrap">
       <button id="ob-start" type="button" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </div>
+    <!-- Compilación 98 (Fase F · 7): la entrevista inicial con
+         IA como puerta de entrada alternativa. Entra como
+         «Empezar» y deja abierta su tarjeta en el chat; nada se
+         guarda sin la confirmación de la tarjeta final. -->
+    <div class="ob-interview">
+      <button id="ob-interview-btn" type="button" class="btn btn-secondary" data-i18n="c98_ob_btn">✨ Empezar con la entrevista de IA</button>
+      <p class="muted small" data-i18n="c98_ob_hint">La IA te pregunta y arma tus datos iniciales: ingreso, pagos fijos, deudas y categorías. Nada se guarda sin que lo confirmes.</p>
+    </div>
     <div class="ob-demo">
       <button id="ob-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">Ver una demo</button>
       <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
@@ -565,6 +573,21 @@
         <button type="button" class="btn btn-ghost" data-flow-days="90" data-i18n="flow_d90">90 días</button>
       </div>
       <div id="flow-body"></div>
+    </section>
+
+    <!-- Compilación 98 (Fase F · 4): predicción de flujo con IA.
+         La IA redacta sobre los hechos del motor local de la
+         tarjeta de arriba (computeFlowProjection): saldo en las
+         fechas clave, días de riesgo y qué mover. No toca el
+         motor ni mueve nada. -->
+    <section id="flow-ai98-card" class="card">
+      <h3 data-i18n="c98_fc_title">🔮 Tu flujo, predicho con IA</h3>
+      <p class="muted small" data-i18n="c98_fc_note">La IA toma la proyección que la app ya calcula —tu ritmo de cobro, tus pagos fijos y tu ritmo de gasto— y te dice el saldo esperado en las fechas clave, los días de riesgo y qué mover para evitarlos. Es un texto para ti: no mueve nada.</p>
+      <div class="form-actions">
+        <button id="flow-ai98-btn" type="button" class="btn btn-secondary" data-i18n="c98_fc_btn">✨ Predecir mi flujo</button>
+      </div>
+      <p id="flow-ai98-status" class="muted small" aria-live="polite"></p>
+      <div id="flow-ai98-results"></div>
     </section>
     <!-- Compilación 76: detector de gastos hormiga anualizado. -->
     <section id="ants-card" class="card">
