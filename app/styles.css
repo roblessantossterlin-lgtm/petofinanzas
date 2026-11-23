@@ -1583,3 +1583,28 @@ html.ios body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px +
 .perm-mid small { color: var(--muted, #5b6b60); }
 .perm-status { font-weight: 600; }
 .perm-allow { flex: 0 0 auto; min-height: 44px; white-space: nowrap; }
+
+/* Compilación 86 · Añadido 11 — PETO-C86-CHAT11: chat vacío SIN
+   scroll fantasma. Causa raíz: #view-chat era una .view EN FLUJO con
+   height:100dvh y NADA bloqueaba el scroll del documento (la clase
+   body.chat-open que pone openAiChat no tenía regla CSS): el
+   documento seguía siendo el que scrolleaba y en iOS la vista
+   entera se arrastraba/rebotaba aun con la conversación vacía; y
+   .chat-msgs (flex:1) no tenía min-height:0, así que su tamaño
+   mínimo automático era el de su contenido y podía empujar la
+   columna más allá del viewport en vez de scrollear por dentro.
+   Corrección: la vista sale del flujo y se FIJA al viewport visible
+   exacto (position:fixed; inset:0 — ni un píxel más, «encógelo un
+   poco»: también pierde el padding superior de 1rem de .view fuera
+   de iOS, donde manda el inset seguro), el documento se bloquea
+   mientras el chat está abierto (body.chat-open) y el ÚNICO scroll
+   posible es el de la zona de mensajes, solo si no caben. La misma
+   receta se aplica a la pantalla de permisos (añadido 10), que
+   comparte el patrón de vista a pantalla completa. El mecanismo de
+   teclado de la Comp. 86 sigue intacto: con el teclado abierto se
+   fija la altura inline (visualViewport) sobre la vista fija. */
+.chat-view{position:fixed;inset:0;height:auto;width:100%;max-width:none;margin:0;z-index:45;padding-top:0;overscroll-behavior:none}
+.chat-msgs{min-height:0;overscroll-behavior:contain}
+body.chat-open{overflow:hidden}
+.perms-view{position:fixed;inset:0;height:auto;width:100%;z-index:45;overscroll-behavior:none}
+.perms-body{min-height:0}
