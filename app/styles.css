@@ -1654,3 +1654,19 @@ input[type="date"], input[type="time"] { max-width: 100%; min-width: 0; -webkit-
 .bud-cfg-line90{display:block}
 .bud-cfg-sub90{color:var(--muted);font-size:.85rem}
 #cat-add-btn90{margin:.35rem 0}
+
+/* ============ PETO-C91-RESUMEN (Compilación 91) ============ */
+/* Punto 3: PETO Score compacto — título y número en una línea,
+   factores en filas de una línea (nombre + porqué + puntos) y
+   factores sin actividad atenuados: se ven, pero no cuentan
+   como logro. */
+.score-head91{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.score-head91 h3{margin:0}
+.score-head91 .score-big{margin:0}
+.score-list91{list-style:none;margin:.35rem 0 0;padding:0}
+.score-row91{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem;padding:.32rem 0;border-top:1px solid var(--line)}
+.score-main91{display:flex;align-items:baseline;gap:.55rem;min-width:0}
+.score-name91{font-weight:600;white-space:nowrap}
+.score-hint91{color:var(--muted);font-size:.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score-pts91{font-weight:700;white-space:nowrap}
+.score-dim91{opacity:.45}

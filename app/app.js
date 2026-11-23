@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 90';
-const BUILD_NUM = 90;
+const BUILD_LABEL = 'Compilación 91';
+const BUILD_NUM = 91;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1357,6 +1357,8 @@ es: {
   c90_unassigned_left: 'Te faltan {amount} por asignar: es parte de tu ingreso que aún no tiene límite. Repártelo entre tus categorías.',
   c90_unassigned_over: 'Asignaste {amount} de más: tus límites suman más que tu ingreso. Baja algún límite para que cuadre.',
   c90_unassigned_noincome: 'Tienes {amount} en límites, pero sin un ingreso anotado este mes no se puede saber cuánto falta por asignar.',
+  c91_share_title: 'Compartir',
+  c91_flow_payday: 'Próximo cobro: {date}',
   pro_open_adv: 'Abrir el informe avanzado',
   pro_open_org: 'Abrir el modo organizador de san',
   pin_err_mismatch: 'Los PIN no coinciden.',
@@ -1987,6 +1989,8 @@ en: {
   c90_unassigned_left: 'You still have {amount} to assign: part of your income has no limit yet. Spread it across your categories.',
   c90_unassigned_over: 'You assigned {amount} too much: your limits add up to more than your income. Lower a limit to make it fit.',
   c90_unassigned_noincome: 'You have {amount} in limits, but with no income recorded this month there is no way to know what is left to assign.',
+  c91_share_title: 'Share',
+  c91_flow_payday: 'Next payday: {date}',
   pro_open_adv: 'Open the advanced report',
   pro_open_org: 'Open the san organizer mode',
   pin_err_mismatch: 'The PINs do not match.',
@@ -2617,6 +2621,8 @@ it: {
   c90_unassigned_left: 'Ti mancano {amount} da assegnare: parte del tuo reddito non ha ancora un limite. Distribuiscila tra le categorie.',
   c90_unassigned_over: 'Hai assegnato {amount} di troppo: i tuoi limiti superano il tuo reddito. Abbassa un limite per far quadrare.',
   c90_unassigned_noincome: 'Hai {amount} di limiti, ma senza un reddito registrato questo mese non si può sapere quanto manca da assegnare.',
+  c91_share_title: 'Condividi',
+  c91_flow_payday: 'Prossima paga: {date}',
   pro_open_adv: 'Apri il rapporto avanzato',
   pro_open_org: 'Apri la modalità organizzatore di san',
   pin_err_mismatch: 'I PIN non coincidono.',
@@ -3490,6 +3496,8 @@ pt: {
   c90_unassigned_left: 'Faltam {amount} para atribuir: parte da sua renda ainda não tem limite. Distribua entre as categorias.',
   c90_unassigned_over: 'Você atribuiu {amount} a mais: seus limites somam mais que sua renda. Reduza algum limite para fechar.',
   c90_unassigned_noincome: 'Você tem {amount} em limites, mas sem uma renda registrada neste mês não dá para saber quanto falta atribuir.',
+  c91_share_title: 'Compartilhar',
+  c91_flow_payday: 'Próximo pagamento: {date}',
   pro_open_adv: 'Abrir o relatório avançado',
   pro_open_org: 'Abrir o modo organizador de san',
   pin_err_mismatch: 'Os PIN não coincidem.',
@@ -4363,6 +4371,8 @@ fr: {
   c90_unassigned_left: 'Il vous reste {amount} à attribuer : une partie de votre revenu n’a pas encore de limite. Répartissez-la entre vos catégories.',
   c90_unassigned_over: 'Vous avez attribué {amount} de trop : vos limites dépassent votre revenu. Baissez une limite pour équilibrer.',
   c90_unassigned_noincome: 'Vous avez {amount} de limites, mais sans revenu enregistré ce mois-ci, impossible de savoir ce qu’il reste à attribuer.',
+  c91_share_title: 'Partager',
+  c91_flow_payday: 'Prochaine paie : {date}',
   pro_open_adv: 'Ouvrir le rapport avancé',
   pro_open_org: 'Ouvrir le mode organisateur de san',
   pin_err_mismatch: 'Les PIN ne correspondent pas.',
@@ -5236,6 +5246,8 @@ de: {
   c90_unassigned_left: 'Dir fehlen noch {amount} zuzuweisen: Ein Teil deines Einkommens hat noch kein Limit. Verteile ihn auf deine Kategorien.',
   c90_unassigned_over: 'Du hast {amount} zu viel zugewiesen: Deine Limits übersteigen dein Einkommen. Senke ein Limit, damit es aufgeht.',
   c90_unassigned_noincome: 'Du hast {amount} an Limits, aber ohne ein in diesem Monat erfasstes Einkommen lässt sich nicht sagen, was noch zuzuweisen ist.',
+  c91_share_title: 'Teilen',
+  c91_flow_payday: 'Nächster Zahltag: {date}',
   pro_open_adv: 'Erweiterten Bericht öffnen',
   pro_open_org: 'San-Organizer-Modus öffnen',
   pin_err_mismatch: 'Die PINs stimmen nicht überein.',
@@ -6109,6 +6121,8 @@ zh: {
   c90_unassigned_left: '你还有 {amount} 未分配：这是你收入中尚未设置限额的部分。请把它分配到各个类别。',
   c90_unassigned_over: '你多分配了 {amount}：你的限额总和超过了收入。请调低某个限额来平衡。',
   c90_unassigned_noincome: '你已设置 {amount} 的限额，但本月没有记录收入，无法知道还剩多少未分配。',
+  c91_share_title: '分享',
+  c91_flow_payday: '下一次发薪日：{date}',
   pro_open_adv: '打开高级报告',
   pro_open_org: '打开 san 组织模式',
   pin_err_mismatch: 'PIN 不一致。',
@@ -6982,6 +6996,8 @@ ja: {
   c90_unassigned_left: 'あと {amount} を割り当てる必要があります。これはまだ上限が設定されていない収入の一部です。カテゴリに振り分けてください。',
   c90_unassigned_over: '{amount} 多く割り当てています。上限の合計が収入を超えています。どれかの上限を下げて調整してください。',
   c90_unassigned_noincome: '上限は {amount} ありますが、今月の収入が記録されていないため、あといくら割り当てられるか分かりません。',
+  c91_share_title: '共有',
+  c91_flow_payday: '次回の給料日：{date}',
   pro_open_adv: '高度なレポートを開く',
   pro_open_org: 'san オーガナイザーモードを開く',
   pin_err_mismatch: 'PINが一致しません。',
@@ -7855,6 +7871,8 @@ ko: {
   c90_unassigned_left: '아직 {amount}를 배정해야 합니다. 수입 중 아직 한도가 없는 부분입니다. 카테고리에 나눠 배정하세요.',
   c90_unassigned_over: '{amount}를 초과 배정했습니다. 한도 합계가 수입을 초과합니다. 한도를 낮춰 맞추세요.',
   c90_unassigned_noincome: '한도가 {amount} 있지만 이번 달 수입이 기록되지 않아 얼마를 더 배정할 수 있는지 알 수 없습니다.',
+  c91_share_title: '공유',
+  c91_flow_payday: '다음 급여일: {date}',
   pro_open_adv: '고급 보고서 열기',
   pro_open_org: 'san 정리 모드 열기',
   pin_err_mismatch: 'PIN이 일치하지 않습니다.',
@@ -8728,6 +8746,8 @@ ru: {
   c90_unassigned_left: 'Осталось распределить {amount}: это часть вашего дохода, у которой пока нет лимита. Разнесите её по категориям.',
   c90_unassigned_over: 'Вы распределили на {amount} больше: сумма лимитов превышает доход. Уменьшите какой-нибудь лимит.',
   c90_unassigned_noincome: 'У вас {amount} в лимитах, но без дохода, записанного в этом месяце, нельзя узнать, сколько осталось распределить.',
+  c91_share_title: 'Поделиться',
+  c91_flow_payday: 'Следующая зарплата: {date}',
   pro_open_adv: 'Открыть расширенный отчёт',
   pro_open_org: 'Открыть режим организатора san',
   pin_err_mismatch: 'PIN не совпадают.',
@@ -9601,6 +9621,8 @@ hi: {
   c90_unassigned_left: 'आपको अभी {amount} आवंटित करना बाकी है: यह आपकी आय का वह हिस्सा है जिसकी अभी कोई सीमा नहीं है। इसे श्रेणियों में बाँटें।',
   c90_unassigned_over: 'आपने {amount} अधिक आवंटित किया: आपकी सीमाओं का योग आपकी आय से अधिक है। कोई सीमा घटाकर बराबर करें।',
   c90_unassigned_noincome: 'आपकी सीमाएँ {amount} हैं, लेकिन इस महीने कोई आय दर्ज न होने से यह पता नहीं चलता कि कितना आवंटित करना बाकी है।',
+  c91_share_title: 'साझा करें',
+  c91_flow_payday: 'अगली तनख्वाह: {date}',
   pro_open_adv: 'उन्नत रिपोर्ट खोलें',
   pro_open_org: 'san आयोजक मोड खोलें',
   pin_err_mismatch: 'PIN मेल नहीं खाते।',
@@ -10474,6 +10496,8 @@ ar: {
   c90_unassigned_left: 'يتبقى لديك {amount} لتخصيصه: إنه جزء من دخلك ليس له حد بعد. وزّعه على فئاتك.',
   c90_unassigned_over: 'خصصت {amount} زيادة: مجموع حدودك يتجاوز دخلك. اخفض حدًا ما ليستقيم الحساب.',
   c90_unassigned_noincome: 'لديك {amount} من الحدود، لكن دون دخل مسجل هذا الشهر لا يمكن معرفة كم يتبقى للتخصيص.',
+  c91_share_title: 'مشاركة',
+  c91_flow_payday: 'يوم القبض التالي: {date}',
   pro_open_adv: 'فتح التقرير المتقدم',
   pro_open_org: 'فتح وضع منظم san',
   pin_err_mismatch: 'رمزا PIN غير متطابقين.',
@@ -11591,7 +11615,7 @@ function syncAds(navVisible) {
    plugin ni banner ni contenedor de anuncio (Compilación 74), así
    que la misma ruta corre sin efecto y el modal web jamás tiene
    anuncio encima. */
-const MODAL_OVERLAY_IDS = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'menu-drawer-wrap', 'view-chat', 'perm-explain-modal', 'home87-week-modal'];
+const MODAL_OVERLAY_IDS = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'menu-drawer-wrap', 'view-chat', 'perm-explain-modal', 'home87-week-modal', 'share-chooser91'];
 let adsModalHeld = false;
 function anyModalOpen() {
   return MODAL_OVERLAY_IDS.some((id) => {
@@ -14431,35 +14455,13 @@ function renderResumen() {
   document.getElementById('res-next').disabled = chartMonth >= currentMonthKey();
   const key = chartMonth;
   renderBizCard(key);
-  /* Compilación 75: Resumen ya NO duplica la lista «Gastos por
-     categoría» (vive en Presupuesto, unificada) y TODAS sus cifras
-     excluyen las transferencias (regla de Sterlin del 27-oct: las
-     transferencias no son gasto ni ingreso y quedan fuera de
-     totales y gráficas — se usan las variantes *Counted*). */
-  const totalSpent = sumCents(monthCountedExpenses(key));
-  /* Compilación 75: el ingreso del bloque es el ANUAL acumulado
-     hasta hoy (1-ene → hoy) del año del mes visible: en modo
-     manual, la suma de ingresos registrados; en modo banco, los
-     depósitos ya llegan como ingresos contados. Sin transferencias. */
-  const year = key.slice(0, 4);
-  const today = todayStr();
-  let income = 0;
-  for (const inc of db.incomes) {
-    if (!isTransferMov(inc) && inc.date.slice(0, 4) === year && inc.date <= today) {
-      income += inc.amountCents;
-    }
-  }
-  const savings = monthSavings(key);
-  const max = Math.max(income, totalSpent, savings);
-  const sumBox = document.getElementById('chart-summary');
-  clearNode(sumBox);
-  document.getElementById('chart-summary-empty').hidden = max > 0;
-  if (max > 0) {
-    sumBox.appendChild(chartBarRow(t('income_ytd_label'), fmt(income), Math.round(income / max * 100)));
-    sumBox.appendChild(chartBarRow(t('chart_expenses'), fmt(totalSpent), Math.round(totalSpent / max * 100)));
-    sumBox.appendChild(chartBarRow(t('chart_savings'), fmt(savings), Math.round(savings / max * 100)));
-  }
-  renderReport();
+  /* Compilación 91 (punto 1): las cifras del mes viven SOLO en la
+     tarjeta del mes (renderMonthCard91, con los datos de
+     reportData: sin transferencias, variantes *Counted*, regla
+     del 27-oct). El bloque de barras que mezclaba el ingreso
+     ANUAL acumulado con el gasto y el ahorro del mes desapareció,
+     y la tabla del informe ya no se pinta aparte: es esta tarjeta. */
+  renderMonthCard91();
   renderTrend();
   renderYearCard();
   renderFlowCard();
@@ -14482,7 +14484,7 @@ function computePetoScore() {
     const ok = cats.filter((c) => budgetPeriodSpentCents(c, budgetPeriodOf(c)) <= db.budgets[c]).length;
     factors.push({ k: 'score_f_budget', pts: Math.round(30 * ok / cats.length), max: 30, hint: t('score_h_budget', { n: ok, m: cats.length }) });
   } else {
-    factors.push({ k: 'score_f_budget', pts: 15, max: 30, hint: t('score_h_budget_none') });
+    factors.push({ k: 'score_f_budget', pts: 15, max: 30, hint: t('score_h_budget_none'), inactive: true });
   }
   const inc = sumCents(monthCountedIncomes(key));
   const sav = monthSavings(key);
@@ -14502,7 +14504,11 @@ function computePetoScore() {
     }
   }
   if (due === 0) {
-    factors.push({ k: 'score_f_ontime', pts: 20, max: 20, hint: t('score_h_ontime_none') });
+    /* Compilación 91 (punto 3): sin pagos que vencieran, esto NO
+       es un logro: se otorga la mitad neutra (el mismo criterio
+       que «sin topes») y la fila se pinta atenuada. Antes daba
+       20/20 por no tener ningún pago: un mérito sin hacer nada. */
+    factors.push({ k: 'score_f_ontime', pts: 10, max: 20, hint: t('score_h_ontime_none'), inactive: true });
   } else {
     factors.push({ k: 'score_f_ontime', pts: Math.round(20 * paid / due), max: 20, hint: t('score_h_ontime', { n: paid, m: due }) });
   }
@@ -14510,9 +14516,11 @@ function computePetoScore() {
   let snap = db.settings.scoreSnap;
   let debtPts;
   let debtHint;
+  let debtInactive = false;
   if (!snap) {
     debtPts = 8;
     debtHint = t('score_h_debt_first');
+    debtInactive = true;
   } else {
     const base = snap.debtCents;
     if (debt === 0 && base === 0) { debtPts = 15; debtHint = t('score_h_debt_zero'); }
@@ -14520,7 +14528,7 @@ function computePetoScore() {
     else if (debt === base) { debtPts = 10; debtHint = t('score_h_debt_same'); }
     else { debtPts = 5; debtHint = t('score_h_debt_up', { amount: fmt(debt - base) }); }
   }
-  factors.push({ k: 'score_f_debt', pts: debtPts, max: 15, hint: debtHint });
+  factors.push({ k: 'score_f_debt', pts: debtPts, max: 15, hint: debtHint, inactive: debtInactive });
   if (!snap || snap.month !== key) {
     db.settings.scoreSnap = { month: key, debtCents: debt };
     if (!demoMode) save();
@@ -14530,7 +14538,7 @@ function computePetoScore() {
   const refMonth = fixedMonthly > 0 ? fixedMonthly : sumCents(monthCountedExpenses(key));
   const efund = efundBalanceCents();
   const efPct = refMonth > 0 ? Math.min(1, efund / refMonth) : (efund > 0 ? 1 : 0);
-  factors.push({ k: 'score_f_efund', pts: Math.round(10 * efPct), max: 10, hint: t('score_h_efund', { pct: Math.round(efPct * 100) }) });
+  factors.push({ k: 'score_f_efund', pts: Math.round(10 * efPct), max: 10, hint: t('score_h_efund', { pct: Math.round(efPct * 100) }), inactive: refMonth <= 0 && efund <= 0 });
   const total = factors.reduce((s, f) => s + f.pts, 0);
   return { total: total, factors: factors };
 }
@@ -14541,35 +14549,48 @@ function renderScoreCard() {
   const sc = computePetoScore();
   num.textContent = String(sc.total);
   clearNode(list);
+  /* Compilación 91 (punto 3): filas COMPACTAS de una línea, sin
+     sub-tarjetas: nombre, el porqué en pequeño y los puntos.
+     Los factores sin actividad (inactive) van atenuados: están
+     a la vista, pero no cuentan como logro. */
   for (const f of sc.factors) {
-    const li = el('li', 'item');
-    const main = el('div', 'item-main');
-    main.appendChild(el('div', 'item-title', t(f.k)));
-    main.appendChild(el('div', 'item-sub', f.hint));
+    const li = el('li', 'score-row91' + (f.inactive ? ' score-dim91' : ''));
+    const main = el('span', 'score-main91');
+    main.appendChild(el('span', 'score-name91', t(f.k)));
+    main.appendChild(el('span', 'score-hint91', f.hint));
     li.appendChild(main);
-    li.appendChild(el('span', 'item-amount', f.pts + '/' + f.max));
+    li.appendChild(el('span', 'score-pts91', f.pts + '/' + f.max));
     list.appendChild(li);
   }
 }
-/* ---------------- Compilación 76 · Flujo de caja futuro ------------
-   Proyección día a día a 30/60/90 días: saldo inicial (el banco si
-   hay saldos; si no, las cuentas anotadas), cobros según la
-   frecuencia del ajuste, pagos fijos y cuotas por sus
-   ocurrencias reales, suscripciones detectadas y el gasto
-   variable promedio de los últimos 30 días como estimación.
-   Marca el saldo mínimo y el primer día en negativo. */
+/* ---------------- Flujo de caja futuro — MOTOR ÚNICO -------------
+   Compilación 91 (puntos 5 y 6): UNA sola proyección para toda
+   la app. Antes había dos: la tarjeta de Resumen (día a día, con
+   cobros, pagos fijos, recurrentes y el gasto variable promedio)
+   y la alerta de Inicio (solo pagos hasta el próximo cobro, sin
+   gasto variable ni cobros): se contradecían — Inicio decía
+   «vas bien» mientras Resumen veía el saldo en rojo, o al revés.
+   computeFlowProjection(days) es la única fuente (nació en la
+   Compilación 76 como el motor de esta tarjeta): saldo inicial
+   (el banco si hay saldos; si no, las cuentas anotadas), cobros
+   según la frecuencia del ajuste, pagos fijos por sus
+   ocurrencias reales, recurrentes detectados (mes y semana) y
+   el gasto variable promedio de los últimos 30 días como
+   estimación diaria. Devuelve los HITOS — punto más bajo,
+   primer día en negativo y próximo cobro — que pintan igual
+   Resumen (a 30/60/90 días) y la alerta de Inicio (hasta el
+   próximo cobro): del mismo tramo ya no pueden concluir
+   distinto. */
 let flowDaysSel = 30;
 function flowStartCents() {
   if (typeof bankBalancesKnown === 'function' && bankBalancesKnown()) return bankDepositTotalCents();
   return (db.accounts || []).reduce((s, a) => s + accountShownBalance(a), 0);
 }
-function renderFlowCard() {
-  const body = document.getElementById('flow-body');
-  if (!body || !db) return;
-  clearNode(body);
-  const days = flowDaysSel;
+function computeFlowProjection(days) {
+  if (!db) return null;
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endDate = new Date(start.getFullYear(), start.getMonth(), start.getDate() + days);
   const events = new Map();
   const addEv = (dateStr, label, cents) => {
     if (!events.has(dateStr)) events.set(dateStr, []);
@@ -14587,7 +14608,7 @@ function renderFlowCard() {
       for (const occ of fixedMonthOccurrences(f, y, m)) {
         const p = occ.split('-');
         const od = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
-        if (od >= start && od < new Date(start.getFullYear(), start.getMonth(), start.getDate() + days)) {
+        if (od >= start && od < endDate) {
           addEv(occ, f.name, -f.amountCents);
         }
       }
@@ -14596,15 +14617,15 @@ function renderFlowCard() {
   }
   const fixedNames = new Set((db.fixed || []).map((f) => f.name.toLowerCase()));
   for (const d of detectRecurring()) {
-    if (d.freq !== 'month' || fixedNames.has(d.name.toLowerCase())) continue;
+    if (fixedNames.has(d.name.toLowerCase())) continue;
+    const step = d.freq === 'week' ? 7 : 30;
     let nd = d.nextDate;
-    for (let k = 0; k < 4 && nd; k++) {
+    for (let k = 0; k < 40 && nd; k++) {
       const p = nd.split('-');
       const od = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
-      if (od >= start && od < new Date(start.getFullYear(), start.getMonth(), start.getDate() + days)) {
-        addEv(nd, d.name, -d.amount);
-      }
-      nd = addDaysStr(nd, 30);
+      if (od >= endDate) break;
+      if (od >= start) addEv(nd, d.name, -d.amount);
+      nd = addDaysStr(nd, step);
     }
   }
   let varSum = 0;
@@ -14616,29 +14637,57 @@ function renderFlowCard() {
     varSum += e.amountCents;
   }
   const varDaily = Math.round(varSum / 30);
-  let bal = flowStartCents();
+  const startCents = flowStartCents();
+  let bal = startCents;
   let minBal = bal;
   let minDate = localDateStr(start);
   let firstNeg = null;
   const rows = [];
+  const flat = [];
   for (let i = 0; i < days; i++) {
     const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
     const ds = localDateStr(d);
     const evs = events.get(ds) || [];
-    for (const ev of evs) bal += ev.cents;
+    for (const ev of evs) { bal += ev.cents; flat.push({ date: ds, label: ev.label, cents: ev.cents }); }
     if (varDaily > 0) bal -= varDaily;
     if (bal < minBal) { minBal = bal; minDate = ds; }
     if (bal < 0 && !firstNeg) firstNeg = ds;
     if (evs.length) rows.push({ ds: ds, evs: evs, bal: bal });
   }
-  body.appendChild(el('p', 'item-sub', t('flow_start') + ': ' + fmt(flowStartCents()) + ' · ' + t('flow_end') + ': ' + fmt(bal)));
-  body.appendChild(el('p', 'item-sub', t('flow_min', { amount: fmt(minBal), date: recurringDateLabel(minDate) })));
-  body.appendChild(el('p', 'item-sub', firstNeg
-    ? t('flow_neg', { date: recurringDateLabel(firstNeg) })
+  const next = payConfigured() ? nextPaydayDate(now) : null;
+  return {
+    startCents: startCents, endCents: bal, minCents: minBal, minDate: minDate,
+    firstNeg: firstNeg, varDaily: varDaily, rows: rows, events: flat,
+    nextPayday: next ? localDateStr(next) : null
+  };
+}
+function renderFlowCard() {
+  const body = document.getElementById('flow-body');
+  if (!body || !db) return;
+  clearNode(body);
+  const proj = computeFlowProjection(flowDaysSel);
+  if (!proj) return;
+  /* Sin nada que proyectar (ni saldo, ni eventos previstos, ni
+     gasto variable que estimar), la tarjeta no ocupa pantalla. */
+  const card = document.getElementById('flow-card');
+  if (card) {
+    card.hidden = !proj.events.length && proj.varDaily <= 0 && proj.startCents === 0;
+    if (card.hidden) return;
+  }
+  body.appendChild(el('p', 'item-sub', t('flow_start') + ': ' + fmt(proj.startCents) + ' · ' + t('flow_end') + ': ' + fmt(proj.endCents)));
+  /* Compilación 91 (punto 5): el futuro se cuenta por HITOS —
+     punto más bajo, primer día en rojo y próximo cobro — con el
+     mismo motor que la alerta de Inicio (punto 6). */
+  body.appendChild(el('p', 'item-sub', t('flow_min', { amount: fmt(proj.minCents), date: recurringDateLabel(proj.minDate) })));
+  body.appendChild(el('p', 'item-sub', proj.firstNeg
+    ? t('flow_neg', { date: recurringDateLabel(proj.firstNeg) })
     : t('flow_ok')));
-  if (varDaily > 0) body.appendChild(el('p', 'item-sub', t('flow_var_note')));
+  if (proj.nextPayday) {
+    body.appendChild(el('p', 'item-sub', t('c91_flow_payday', { date: recurringDateLabel(proj.nextPayday) })));
+  }
+  if (proj.varDaily > 0) body.appendChild(el('p', 'item-sub', t('flow_var_note')));
   const ul = el('ul', 'item-list');
-  for (const r of rows.slice(0, 45)) {
+  for (const r of proj.rows.slice(0, 45)) {
     const li = el('li', 'item');
     const main = el('div', 'item-main');
     main.appendChild(el('div', 'item-title', recurringDateLabel(r.ds)));
@@ -14647,7 +14696,7 @@ function renderFlowCard() {
     li.appendChild(el('span', 'item-amount', fmt(r.bal)));
     ul.appendChild(li);
   }
-  if (!rows.length) body.appendChild(el('p', 'item-sub', t('flow_no_events')));
+  if (!proj.rows.length) body.appendChild(el('p', 'item-sub', t('flow_no_events')));
   body.appendChild(ul);
 }
 /* ---------------- Compilación 76 · Gastos hormiga ------------------
@@ -14726,25 +14775,24 @@ function yearData(year) {
   return { income: income, expenses: expenses, saved: saved, best: best };
 }
 function renderYearCard() {
+  const card = document.getElementById('year-card');
   const title = document.getElementById('year-title');
   const body = document.getElementById('year-body');
-  if (!title || !body) return;
+  if (!card || !title || !body) return;
   const year = chartMonth.slice(0, 4);
+  const d = yearData(year);
+  /* Compilación 91 (punto 1): la tarjeta del año ya NO repite las
+     cifras de ingresos/gastos/ahorro (viven solo en la tarjeta
+     del mes y, para el año entero, en la imagen de «Compartir mi
+     año»): conserva lo único que solo ella sabe, el mejor mes.
+     Sin mejor mes no hay nada que decir: la tarjeta no ocupa
+     pantalla. */
+  if (!d.best) { card.hidden = true; return; }
+  card.hidden = false;
   title.textContent = t('year_title', { year: year });
   clearNode(body);
-  const d = yearData(year);
-  if (!d.income && !d.expenses && d.saved <= 0) {
-    body.appendChild(el('p', 'muted', t('year_empty')));
-    return;
-  }
-  const max = Math.max(d.income, d.expenses, Math.max(0, d.saved), 1);
-  body.appendChild(chartBarRow(t('chart_income'), fmt(d.income), Math.round(d.income / max * 100)));
-  body.appendChild(chartBarRow(t('chart_expenses'), fmt(d.expenses), Math.round(d.expenses / max * 100)));
-  body.appendChild(chartBarRow(t('chart_savings'), fmt(Math.max(0, d.saved)), Math.round(Math.max(0, d.saved) / max * 100)));
-  if (d.best) {
-    body.appendChild(el('p', 'muted',
-      t('year_best_month', { month: monthLabel(d.best.key), amount: fmt(d.best.saved) })));
-  }
+  body.appendChild(el('p', 'muted',
+    t('year_best_month', { month: monthLabel(d.best.key), amount: fmt(d.best.saved) })));
 }
 function buildYearCanvas() {
   const year = chartMonth.slice(0, 4);
@@ -14894,15 +14942,22 @@ function renderTrend() {
   const weeksBox = document.getElementById('trend-weeks');
   if (!canvas || !weeksBox) return;
   const data = trendData(chartMonth);
-  const has = data.months.some((m) => m.cents > 0);
+  /* Compilación 91 (punto 4): las gráficas solo se pintan donde
+     hay datos — los meses sin gasto no entran al lienzo y las
+     semanas sin gasto no se listan (antes salían en $0.00). */
+  const monthsWith = data.months.filter((m) => m.cents > 0);
+  const has = monthsWith.length > 0;
   const emptyEl = document.getElementById('trend-empty');
   if (emptyEl) emptyEl.hidden = has;
   canvas.hidden = !has;
-  if (has) drawTrendCanvas(canvas, data.months);
+  if (has) drawTrendCanvas(canvas, monthsWith);
   clearNode(weeksBox);
   /* Compilación 75: solo hasta la semana actual — las semanas
      futuras (vacías por definición) ya no se pintan. */
-  const visibleWeeks = data.weeks.filter((w) => w.start <= todayStr());
+  const visibleWeeks = data.weeks.filter((w) => w.start <= todayStr() && w.cents > 0);
+  const weeksH = document.getElementById('trend-weeks-h');
+  if (weeksH) weeksH.hidden = visibleWeeks.length === 0;
+  weeksBox.hidden = visibleWeeks.length === 0;
   const maxW = Math.max.apply(null, visibleWeeks.map((w) => w.cents).concat([0]));
   for (const w of visibleWeeks) {
     weeksBox.appendChild(chartBarRow(
@@ -19827,6 +19882,18 @@ async function shareText(title, text) {
     window.alert(t('share_copied'));
   } catch (e) { window.alert(text); }
 }
+/* Compilación 91 (punto 2): UN solo botón «Compartir» en
+   Resumen abre este selector — texto, imagen del mes, imagen
+   del año y descarga de la imagen viven aquí dentro (antes
+   eran cuatro botones sueltos en la vista). */
+function openShareChooser91() {
+  const c = document.getElementById('share-chooser91');
+  if (c) c.hidden = false;
+}
+function closeShareChooser91() {
+  const c = document.getElementById('share-chooser91');
+  if (c) c.hidden = true;
+}
 function onShareReport() {
   const d = reportData(chartMonth);
   const lines = ['📋 PETO Finanzas — ' + d.month,
@@ -22005,13 +22072,17 @@ async function onAiWeeklyGenerate() {
 }
 
 /* ---------- Alerta de flujo hasta el próximo cobro ----------
-   Proyección LOCAL y corta (no es la tarjeta de flujo de
-   Resumen): saldo de hoy (el mismo de flowStartCents) menos los
-   pagos fijos y los cargos recurrentes detectados que caen antes
-   del próximo cobro, día a día. Si el saldo queda en negativo,
-   la tarjeta lo dice con el monto y la fecha más justos y la IA
-   redacta la alerta con una sugerencia; si no hay día de cobro
-   configurado o no hay nada que proyectar, la tarjeta lo dice
+   Compilación 91 (punto 6): la alerta de Inicio consume el
+   MISMO motor que la tarjeta de flujo de Resumen
+   (computeFlowProjection), con el horizonte puesto en el
+   próximo cobro: mismo saldo inicial, mismos pagos fijos,
+   mismos recurrentes y el mismo gasto variable estimado día a
+   día. Las dos vistas ya no pueden concluir distinto del mismo
+   tramo (antes esta proyección era otra, sin gasto variable, y
+   se contradecían). Si el saldo queda en negativo, la tarjeta
+   lo dice con el monto y la fecha más justos y la IA redacta
+   la alerta con una sugerencia; si no hay día de cobro
+   configurado o no hay nada que proyectar, la tarjeta se oculta
    SIN llamar a la IA. */
 let aiFlowState = null;
 function ai2FlowProjection() {
@@ -22019,42 +22090,21 @@ function ai2FlowProjection() {
   const next = nextPaydayDate(new Date());
   if (!next) return null;
   const nextStr = localDateStr(next);
-  const today = todayStr();
-  const td = new Date();
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const daysTo = Math.max(1, Math.round((next - start) / 86400000));
+  const proj = computeFlowProjection(daysTo);
+  if (!proj) return null;
   const events = [];
-  const endMonth = new Date(next.getFullYear(), next.getMonth() + 1, 1);
-  for (const f of (db.fixed || [])) {
-    let yy = td.getFullYear();
-    let mm = td.getMonth();
-    while (new Date(yy, mm, 1) < endMonth) {
-      for (const occ of fixedMonthOccurrences(f, yy, mm)) {
-        if (occ >= today && occ < nextStr) events.push({ date: occ, name: f.name, cents: f.amountCents });
-      }
-      mm++; if (mm > 11) { mm = 0; yy++; }
+  for (const ev of proj.events) {
+    if (ev.cents < 0 && ev.date < nextStr) {
+      events.push({ date: ev.date, name: ev.label, cents: -ev.cents });
     }
   }
-  const fixedNames = new Set((db.fixed || []).map((f) => f.name.toLowerCase()));
-  for (const d of detectRecurring()) {
-    if (fixedNames.has(d.name.toLowerCase())) continue;
-    let nd = d.nextDate;
-    for (let k = 0; k < 6 && nd && nd < nextStr; k++) {
-      if (nd >= today) events.push({ date: nd, name: d.name, cents: d.amount });
-      nd = addDaysStr(nd, d.freq === 'week' ? 7 : 30);
-    }
-  }
-  if (!events.length && !(db.fixed || []).length && !db.expenses.length) return null;
-  events.sort((a, b) => (a.date < b.date ? -1 : (a.date > b.date ? 1 : 0)));
-  const startCents = flowStartCents();
-  let bal = startCents;
-  let min = bal;
-  let minDate = today;
-  for (const ev of events) {
-    bal -= ev.cents;
-    if (bal < min) { min = bal; minDate = ev.date; }
-  }
+  if (!events.length && proj.varDaily <= 0 && !(db.fixed || []).length && !db.expenses.length) return null;
   return {
-    startCents: startCents, events: events, minCents: min, minDate: minDate,
-    nextStr: nextStr, short: min < 0
+    startCents: proj.startCents, events: events, minCents: proj.minCents, minDate: proj.minDate,
+    nextStr: nextStr, short: proj.minCents < 0
   };
 }
 function ai2FlowSig(p) { return p.minDate + '|' + p.minCents + '|' + p.nextStr; }
@@ -24332,8 +24382,15 @@ function reportRow(label, value) {
   row.appendChild(el('strong', null, value));
   return row;
 }
-function renderReport() {
-  const card = document.getElementById('report-card');
+/* Compilación 91 (punto 1): LA tarjeta del mes — la única
+   presentación de ingresos/gastos/ahorro del mes en Resumen.
+   Antes esas cifras salían tres veces: el bloque de barras, la
+   tabla del informe (esta misma función sobre #report-card) y
+   la tarjeta del año. Los datos son los de reportData — los
+   mismos que viajan en la imagen compartible y en el texto de
+   «Compartir»: una sola fuente, una sola presentación. */
+function renderMonthCard91() {
+  const card = document.getElementById('month-card91');
   if (!card) return;
   clearNode(card);
   const d = reportData(chartMonth);
@@ -26219,7 +26276,7 @@ function wireEvents() {
      ellos (pasaba con el «Agregar» del formulario del san). Todos los
      paneles se abren y cierran con el atributo hidden, así que un
      MutationObserver sobre ese atributo los vigila a todos. */
-  const fabOverlayIds = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'menu-drawer-wrap', 'view-chat'];
+  const fabOverlayIds = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'share-chooser91', 'menu-drawer-wrap', 'view-chat'];
   /* Compilación 58 (informe de testers, día 6): el + redondo TODAVÍA
      tapaba el botón «Agregar» del san con ese formulario abierto — la
      57 solo lo ocultaba con un panel abierto o el foco en un campo, y
@@ -26406,9 +26463,18 @@ function wireEvents() {
 
   /* Calculadora de deudas e informe en imagen. */
   document.getElementById('calc-run').addEventListener('click', renderCalc);
-  document.getElementById('btn-report-png').addEventListener('click', downloadReportPng);
-  document.getElementById('btn-report-share-img').addEventListener('click', shareReportPng);
-  document.getElementById('btn-year-share').addEventListener('click', () => { shareYearPng(); });
+  /* Compilación 91 (punto 2): los botones sueltos de imagen y
+     del año ya no existen en la vista; sus funciones viven en
+     el selector que abre el único botón «Compartir». */
+  const shareChooser91 = document.getElementById('share-chooser91');
+  if (shareChooser91) {
+    shareChooser91.addEventListener('click', (ev) => { if (ev.target === shareChooser91) closeShareChooser91(); });
+  }
+  document.getElementById('share-opt-text').addEventListener('click', () => { closeShareChooser91(); onShareReport(); });
+  document.getElementById('share-opt-img').addEventListener('click', () => { closeShareChooser91(); shareReportPng(); });
+  document.getElementById('share-opt-year').addEventListener('click', () => { closeShareChooser91(); shareYearPng(); });
+  document.getElementById('share-opt-dl').addEventListener('click', () => { closeShareChooser91(); downloadReportPng(); });
+  document.getElementById('share-opt-cancel').addEventListener('click', closeShareChooser91);
 
   document.querySelectorAll('[data-nav="home"]').forEach((b) =>
     b.addEventListener('click', () => showView('home')));
@@ -26661,7 +26727,7 @@ function wireEvents() {
   const cashFormEl = document.getElementById('cash-form');
   if (cashFormEl) cashFormEl.addEventListener('submit', onCashSubmit);
   document.getElementById('btn-biometric').addEventListener('click', tryBiometric);
-  document.getElementById('btn-share-report').addEventListener('click', onShareReport);
+  document.getElementById('btn-share-report').addEventListener('click', openShareChooser91);
   document.getElementById('btn-share-san').addEventListener('click', onShareSan);
   document.getElementById('btn-reset').addEventListener('click', onReset);
   document.getElementById('file-import').addEventListener('change', onImportFile);
