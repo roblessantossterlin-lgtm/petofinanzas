@@ -566,6 +566,25 @@
     <div id="adv-card" class="card report-card" hidden></div>
     <button id="btn-adv-open" type="button" class="btn btn-secondary" data-i18n="adv_open_btn">Ver informe avanzado</button>
     <button id="btn-adv-csv" type="button" class="btn btn-secondary" data-i18n="adv_export_csv" hidden>Exportar mes en CSV</button>
+
+    <!-- Compilación 90 (punto 6): el informe del mes imprimible vive
+         en Resumen desde esta compilación; en Presupuesto sobraba. -->
+    <!-- Compilación 55: informe del mes imprimible (PDF) y en CSV. -->
+    <section class="card form-card" id="mr-card">
+      <h3 data-i18n="mr_btn">Informe del mes</h3>
+      <div class="form-actions">
+        <button id="mr-generate" type="button" class="btn btn-secondary" data-i18n="mr_generate">Ver el informe de este mes</button>
+      </div>
+      <div id="mr-output" hidden>
+        <div id="mr-body"></div>
+        <div class="form-actions">
+          <button id="mr-print" type="button" class="btn btn-secondary" data-i18n="mr_print">🖨️ Imprimir / guardar PDF</button>
+          <button id="mr-csv" type="button" class="btn btn-secondary" data-i18n="mr_csv">⬇️ Descargar CSV</button>
+        </div>
+        <div id="mr-actions" class="form-actions"></div>
+        <p id="mr-status" class="muted small" aria-live="polite"></p>
+      </div>
+    </section>
   </main>
 
   <!-- ======= BUSCAR ======= -->
@@ -598,6 +617,10 @@
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_presupuesto">Presupuesto por categoría</h2>
     <p class="muted" data-i18n="bud_intro">Pon un límite mensual por categoría y mira cuánto llevas gastado.</p>
+    <!-- Compilación 90 (punto 4): resumen de DOS líneas de la
+         configuración (ingreso + reparto + base cero) cuando ya hay
+         topes guardados; tocarlo despliega la configuración. -->
+    <button id="budget-config-summary90" type="button" class="card budget-cfg-summary90" hidden></button>
     <section id="budget-starter" class="card form-card">
       <label for="budget-income" data-i18n="bud_income_label">¿Cuánto entra al mes?</label>
       <input id="budget-income" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
@@ -618,25 +641,10 @@
     <section id="budget-zero" class="card"></section>
     <ul id="budget-list" class="item-list budget-grid"></ul>
 
-    <!-- Compilación 55: informe del mes imprimible (PDF) y en CSV. -->
-    <section class="card form-card" id="mr-card">
-      <h3 data-i18n="mr_btn">Informe del mes</h3>
-      <div class="form-actions">
-        <button id="mr-generate" type="button" class="btn btn-secondary" data-i18n="mr_generate">Ver el informe de este mes</button>
-      </div>
-      <div id="mr-output" hidden>
-        <div id="mr-body"></div>
-        <div class="form-actions">
-          <button id="mr-print" type="button" class="btn btn-secondary" data-i18n="mr_print">🖨️ Imprimir / guardar PDF</button>
-          <button id="mr-csv" type="button" class="btn btn-secondary" data-i18n="mr_csv">⬇️ Descargar CSV</button>
-        </div>
-        <div id="mr-actions" class="form-actions"></div>
-        <p id="mr-status" class="muted small" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <form id="category-form" class="card form-card" autocomplete="off">
-      <h3 data-i18n="cat_form_title">Categoría personalizada</h3>
+    <!-- Compilación 90 (punto 7): «Categoría personalizada» pasa a
+         ser el botón «+ Categoría»; el formulario nace plegado. -->
+    <button id="cat-add-btn90" type="button" class="btn btn-secondary" data-i18n="c90_add_category">+ Categoría</button>
+    <form id="category-form" class="card form-card" autocomplete="off" hidden>
       <label for="cat-name" data-i18n="cat_name_label">Nombre de la categoría</label>
       <input id="cat-name" type="text" maxlength="30" data-i18n-ph="cat_name_ph" placeholder="Ej.: Mascotas" required>
       <p id="cat-error" class="error" role="alert" hidden></p>

@@ -27,8 +27,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 89';
-const BUILD_NUM = 89;
+const BUILD_LABEL = 'Compilación 90';
+const BUILD_NUM = 90;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1347,6 +1347,16 @@ es: {
   env_zero_noincome: 'Anota un ingreso este mes para ver lo que falta por asignar.',
   env_unassigned: 'Sin asignar',
   env_zero_ok: 'todo asignado',
+  c90_add_category: '+ Categoría',
+  c90_nolimit_title: 'Sin límite',
+  c90_cfg_income: 'Ingreso al mes: {amount}',
+  c90_cfg_limits: 'Límites al mes: {amount}',
+  c90_cfg_zero_on: 'Base cero: activado',
+  c90_cfg_zero_off: 'Base cero: desactivado',
+  c90_cfg_edit: 'toca para editar',
+  c90_unassigned_left: 'Te faltan {amount} por asignar: es parte de tu ingreso que aún no tiene límite. Repártelo entre tus categorías.',
+  c90_unassigned_over: 'Asignaste {amount} de más: tus límites suman más que tu ingreso. Baja algún límite para que cuadre.',
+  c90_unassigned_noincome: 'Tienes {amount} en límites, pero sin un ingreso anotado este mes no se puede saber cuánto falta por asignar.',
   pro_open_adv: 'Abrir el informe avanzado',
   pro_open_org: 'Abrir el modo organizador de san',
   pin_err_mismatch: 'Los PIN no coinciden.',
@@ -1967,6 +1977,16 @@ en: {
   env_zero_noincome: 'Add income this month to see what is left to assign.',
   env_unassigned: 'Unassigned',
   env_zero_ok: 'all assigned',
+  c90_add_category: '+ Category',
+  c90_nolimit_title: 'No limit',
+  c90_cfg_income: 'Monthly income: {amount}',
+  c90_cfg_limits: 'Monthly limits: {amount}',
+  c90_cfg_zero_on: 'Zero-based: on',
+  c90_cfg_zero_off: 'Zero-based: off',
+  c90_cfg_edit: 'tap to edit',
+  c90_unassigned_left: 'You still have {amount} to assign: part of your income has no limit yet. Spread it across your categories.',
+  c90_unassigned_over: 'You assigned {amount} too much: your limits add up to more than your income. Lower a limit to make it fit.',
+  c90_unassigned_noincome: 'You have {amount} in limits, but with no income recorded this month there is no way to know what is left to assign.',
   pro_open_adv: 'Open the advanced report',
   pro_open_org: 'Open the san organizer mode',
   pin_err_mismatch: 'The PINs do not match.',
@@ -2587,6 +2607,16 @@ it: {
   env_zero_noincome: 'Aggiungi un reddito questo mese per vedere quanto manca da assegnare.',
   env_unassigned: 'Non assegnato',
   env_zero_ok: 'tutto assegnato',
+  c90_add_category: '+ Categoria',
+  c90_nolimit_title: 'Senza limite',
+  c90_cfg_income: 'Reddito mensile: {amount}',
+  c90_cfg_limits: 'Limiti mensili: {amount}',
+  c90_cfg_zero_on: 'Base zero: attivo',
+  c90_cfg_zero_off: 'Base zero: disattivato',
+  c90_cfg_edit: 'tocca per modificare',
+  c90_unassigned_left: 'Ti mancano {amount} da assegnare: parte del tuo reddito non ha ancora un limite. Distribuiscila tra le categorie.',
+  c90_unassigned_over: 'Hai assegnato {amount} di troppo: i tuoi limiti superano il tuo reddito. Abbassa un limite per far quadrare.',
+  c90_unassigned_noincome: 'Hai {amount} di limiti, ma senza un reddito registrato questo mese non si può sapere quanto manca da assegnare.',
   pro_open_adv: 'Apri il rapporto avanzato',
   pro_open_org: 'Apri la modalità organizzatore di san',
   pin_err_mismatch: 'I PIN non coincidono.',
@@ -3450,6 +3480,16 @@ pt: {
   env_zero_noincome: 'Adicione um rendimento este mês para ver o que falta atribuir.',
   env_unassigned: 'Não atribuído',
   env_zero_ok: 'tudo atribuído',
+  c90_add_category: '+ Categoria',
+  c90_nolimit_title: 'Sem limite',
+  c90_cfg_income: 'Renda mensal: {amount}',
+  c90_cfg_limits: 'Limites mensais: {amount}',
+  c90_cfg_zero_on: 'Base zero: ativado',
+  c90_cfg_zero_off: 'Base zero: desativado',
+  c90_cfg_edit: 'toque para editar',
+  c90_unassigned_left: 'Faltam {amount} para atribuir: parte da sua renda ainda não tem limite. Distribua entre as categorias.',
+  c90_unassigned_over: 'Você atribuiu {amount} a mais: seus limites somam mais que sua renda. Reduza algum limite para fechar.',
+  c90_unassigned_noincome: 'Você tem {amount} em limites, mas sem uma renda registrada neste mês não dá para saber quanto falta atribuir.',
   pro_open_adv: 'Abrir o relatório avançado',
   pro_open_org: 'Abrir o modo organizador de san',
   pin_err_mismatch: 'Os PIN não coincidem.',
@@ -4313,6 +4353,16 @@ fr: {
   env_zero_noincome: 'Ajoutez un revenu ce mois-ci pour voir ce qu\'il reste à attribuer.',
   env_unassigned: 'Non attribué',
   env_zero_ok: 'tout attribué',
+  c90_add_category: '+ Catégorie',
+  c90_nolimit_title: 'Sans limite',
+  c90_cfg_income: 'Revenu mensuel : {amount}',
+  c90_cfg_limits: 'Limites mensuelles : {amount}',
+  c90_cfg_zero_on: 'Base zéro : activé',
+  c90_cfg_zero_off: 'Base zéro : désactivé',
+  c90_cfg_edit: 'touchez pour modifier',
+  c90_unassigned_left: 'Il vous reste {amount} à attribuer : une partie de votre revenu n’a pas encore de limite. Répartissez-la entre vos catégories.',
+  c90_unassigned_over: 'Vous avez attribué {amount} de trop : vos limites dépassent votre revenu. Baissez une limite pour équilibrer.',
+  c90_unassigned_noincome: 'Vous avez {amount} de limites, mais sans revenu enregistré ce mois-ci, impossible de savoir ce qu’il reste à attribuer.',
   pro_open_adv: 'Ouvrir le rapport avancé',
   pro_open_org: 'Ouvrir le mode organisateur de san',
   pin_err_mismatch: 'Les PIN ne correspondent pas.',
@@ -5176,6 +5226,16 @@ de: {
   env_zero_noincome: 'Trage diesen Monat ein Einkommen ein, um zu sehen, was noch zuzuweisen ist.',
   env_unassigned: 'Nicht zugewiesen',
   env_zero_ok: 'alles zugewiesen',
+  c90_add_category: '+ Kategorie',
+  c90_nolimit_title: 'Ohne Limit',
+  c90_cfg_income: 'Monatliches Einkommen: {amount}',
+  c90_cfg_limits: 'Monatslimits: {amount}',
+  c90_cfg_zero_on: 'Nullbasis: an',
+  c90_cfg_zero_off: 'Nullbasis: aus',
+  c90_cfg_edit: 'tippen zum Bearbeiten',
+  c90_unassigned_left: 'Dir fehlen noch {amount} zuzuweisen: Ein Teil deines Einkommens hat noch kein Limit. Verteile ihn auf deine Kategorien.',
+  c90_unassigned_over: 'Du hast {amount} zu viel zugewiesen: Deine Limits übersteigen dein Einkommen. Senke ein Limit, damit es aufgeht.',
+  c90_unassigned_noincome: 'Du hast {amount} an Limits, aber ohne ein in diesem Monat erfasstes Einkommen lässt sich nicht sagen, was noch zuzuweisen ist.',
   pro_open_adv: 'Erweiterten Bericht öffnen',
   pro_open_org: 'San-Organizer-Modus öffnen',
   pin_err_mismatch: 'Die PINs stimmen nicht überein.',
@@ -6039,6 +6099,16 @@ zh: {
   env_zero_noincome: '本月添加一笔收入，查看还剩多少待分配。',
   env_unassigned: '未分配',
   env_zero_ok: '全部已分配',
+  c90_add_category: '+ 类别',
+  c90_nolimit_title: '无限制',
+  c90_cfg_income: '每月收入：{amount}',
+  c90_cfg_limits: '每月限额：{amount}',
+  c90_cfg_zero_on: '零基预算：已开启',
+  c90_cfg_zero_off: '零基预算：已关闭',
+  c90_cfg_edit: '点按编辑',
+  c90_unassigned_left: '你还有 {amount} 未分配：这是你收入中尚未设置限额的部分。请把它分配到各个类别。',
+  c90_unassigned_over: '你多分配了 {amount}：你的限额总和超过了收入。请调低某个限额来平衡。',
+  c90_unassigned_noincome: '你已设置 {amount} 的限额，但本月没有记录收入，无法知道还剩多少未分配。',
   pro_open_adv: '打开高级报告',
   pro_open_org: '打开 san 组织模式',
   pin_err_mismatch: 'PIN 不一致。',
@@ -6902,6 +6972,16 @@ ja: {
   env_zero_noincome: '今月の収入を追加すると、割り当て残りが見えます。',
   env_unassigned: '未割り当て',
   env_zero_ok: 'すべて割り当て済み',
+  c90_add_category: '+ カテゴリ',
+  c90_nolimit_title: '制限なし',
+  c90_cfg_income: '月の収入：{amount}',
+  c90_cfg_limits: '月の上限：{amount}',
+  c90_cfg_zero_on: 'ゼロベース：オン',
+  c90_cfg_zero_off: 'ゼロベース：オフ',
+  c90_cfg_edit: 'タップして編集',
+  c90_unassigned_left: 'あと {amount} を割り当てる必要があります。これはまだ上限が設定されていない収入の一部です。カテゴリに振り分けてください。',
+  c90_unassigned_over: '{amount} 多く割り当てています。上限の合計が収入を超えています。どれかの上限を下げて調整してください。',
+  c90_unassigned_noincome: '上限は {amount} ありますが、今月の収入が記録されていないため、あといくら割り当てられるか分かりません。',
   pro_open_adv: '高度なレポートを開く',
   pro_open_org: 'san オーガナイザーモードを開く',
   pin_err_mismatch: 'PINが一致しません。',
@@ -7765,6 +7845,16 @@ ko: {
   env_zero_noincome: '이번 달 소득을 추가하면 배정할 금액이 보입니다.',
   env_unassigned: '미배정',
   env_zero_ok: '모두 배정됨',
+  c90_add_category: '+ 카테고리',
+  c90_nolimit_title: '제한 없음',
+  c90_cfg_income: '월 수입: {amount}',
+  c90_cfg_limits: '월 한도: {amount}',
+  c90_cfg_zero_on: '제로베이스: 켜짐',
+  c90_cfg_zero_off: '제로베이스: 꺼짐',
+  c90_cfg_edit: '편집하려면 탭',
+  c90_unassigned_left: '아직 {amount}를 배정해야 합니다. 수입 중 아직 한도가 없는 부분입니다. 카테고리에 나눠 배정하세요.',
+  c90_unassigned_over: '{amount}를 초과 배정했습니다. 한도 합계가 수입을 초과합니다. 한도를 낮춰 맞추세요.',
+  c90_unassigned_noincome: '한도가 {amount} 있지만 이번 달 수입이 기록되지 않아 얼마를 더 배정할 수 있는지 알 수 없습니다.',
   pro_open_adv: '고급 보고서 열기',
   pro_open_org: 'san 정리 모드 열기',
   pin_err_mismatch: 'PIN이 일치하지 않습니다.',
@@ -8628,6 +8718,16 @@ ru: {
   env_zero_noincome: 'Добавьте доход в этом месяце, чтобы увидеть, что осталось распределить.',
   env_unassigned: 'Не распределено',
   env_zero_ok: 'всё распределено',
+  c90_add_category: '+ Категория',
+  c90_nolimit_title: 'Без лимита',
+  c90_cfg_income: 'Доход в месяц: {amount}',
+  c90_cfg_limits: 'Лимиты в месяц: {amount}',
+  c90_cfg_zero_on: 'Нулевая база: вкл.',
+  c90_cfg_zero_off: 'Нулевая база: выкл.',
+  c90_cfg_edit: 'нажмите, чтобы изменить',
+  c90_unassigned_left: 'Осталось распределить {amount}: это часть вашего дохода, у которой пока нет лимита. Разнесите её по категориям.',
+  c90_unassigned_over: 'Вы распределили на {amount} больше: сумма лимитов превышает доход. Уменьшите какой-нибудь лимит.',
+  c90_unassigned_noincome: 'У вас {amount} в лимитах, но без дохода, записанного в этом месяце, нельзя узнать, сколько осталось распределить.',
   pro_open_adv: 'Открыть расширенный отчёт',
   pro_open_org: 'Открыть режим организатора san',
   pin_err_mismatch: 'PIN не совпадают.',
@@ -9491,6 +9591,16 @@ hi: {
   env_zero_noincome: 'इस माह आय जोड़ें ताकि पता चले कितना सौंपना बाकी है।',
   env_unassigned: 'असाइन नहीं किया गया',
   env_zero_ok: 'सब सौंपा गया',
+  c90_add_category: '+ श्रेणी',
+  c90_nolimit_title: 'कोई सीमा नहीं',
+  c90_cfg_income: 'मासिक आय: {amount}',
+  c90_cfg_limits: 'मासिक सीमाएँ: {amount}',
+  c90_cfg_zero_on: 'शून्य-आधार: चालू',
+  c90_cfg_zero_off: 'शून्य-आधार: बंद',
+  c90_cfg_edit: 'संपादन के लिए टैप करें',
+  c90_unassigned_left: 'आपको अभी {amount} आवंटित करना बाकी है: यह आपकी आय का वह हिस्सा है जिसकी अभी कोई सीमा नहीं है। इसे श्रेणियों में बाँटें।',
+  c90_unassigned_over: 'आपने {amount} अधिक आवंटित किया: आपकी सीमाओं का योग आपकी आय से अधिक है। कोई सीमा घटाकर बराबर करें।',
+  c90_unassigned_noincome: 'आपकी सीमाएँ {amount} हैं, लेकिन इस महीने कोई आय दर्ज न होने से यह पता नहीं चलता कि कितना आवंटित करना बाकी है।',
   pro_open_adv: 'उन्नत रिपोर्ट खोलें',
   pro_open_org: 'san आयोजक मोड खोलें',
   pin_err_mismatch: 'PIN मेल नहीं खाते।',
@@ -10354,6 +10464,16 @@ ar: {
   env_zero_noincome: 'أضف دخلًا هذا الشهر لترى ما تبقى لتعيينه.',
   env_unassigned: 'غير معيّن',
   env_zero_ok: 'تم تعيين الكل',
+  c90_add_category: '+ فئة',
+  c90_nolimit_title: 'بدون حد',
+  c90_cfg_income: 'الدخل الشهري: {amount}',
+  c90_cfg_limits: 'الحدود الشهرية: {amount}',
+  c90_cfg_zero_on: 'القاعدة الصفرية: مفعّلة',
+  c90_cfg_zero_off: 'القاعدة الصفرية: معطّلة',
+  c90_cfg_edit: 'انقر للتحرير',
+  c90_unassigned_left: 'يتبقى لديك {amount} لتخصيصه: إنه جزء من دخلك ليس له حد بعد. وزّعه على فئاتك.',
+  c90_unassigned_over: 'خصصت {amount} زيادة: مجموع حدودك يتجاوز دخلك. اخفض حدًا ما ليستقيم الحساب.',
+  c90_unassigned_noincome: 'لديك {amount} من الحدود، لكن دون دخل مسجل هذا الشهر لا يمكن معرفة كم يتبقى للتخصيص.',
   pro_open_adv: 'فتح التقرير المتقدم',
   pro_open_org: 'فتح وضع منظم san',
   pin_err_mismatch: 'رمزا PIN غير متطابقين.',
@@ -14872,6 +14992,7 @@ function onBudgetSaveAll() {
     else delete db.budgets[p.cat];
   }
   save();
+  budgetCfgOpen90 = false; /* Compilación 90: ya quedó configurado. */
   renderBudgets();
 }
 
@@ -15201,12 +15322,21 @@ function renderZeroStrip() {
     if (!seen.has(cat)) assigned += budgetMonthlyEquivalentCents(cat, db.budgets[cat] || 0);
   }
   if (income <= 0) {
-    box.appendChild(el('p', 'item-sub', t('env_zero_noincome')));
+    /* Compilación 90 (punto 5): «Sin asignar» explicado en palabras,
+       nunca un negativo frío sin contexto. */
+    box.appendChild(el('p', 'item-sub',
+      assigned > 0 ? t('c90_unassigned_noincome', { amount: fmt(assigned) }) : t('env_zero_noincome')));
     return;
   }
   const left = income - assigned;
-  box.appendChild(el('p', 'item-sub',
-    t('env_unassigned') + ': ' + fmt(left) + (left === 0 ? ' · ' + t('env_zero_ok') : '')));
+  if (left > 0) {
+    box.appendChild(el('p', 'item-sub', t('c90_unassigned_left', { amount: fmt(left) })));
+  } else if (left < 0) {
+    box.appendChild(el('p', 'item-sub', t('c90_unassigned_over', { amount: fmt(-left) })));
+  } else {
+    box.appendChild(el('p', 'item-sub',
+      t('env_unassigned') + ': ' + fmt(0) + ' · ' + t('env_zero_ok')));
+  }
 }
 
 function renderBudgets() {
@@ -15221,14 +15351,35 @@ function renderBudgets() {
   const ul = document.getElementById('budget-list');
   clearNode(ul);
   budgetRowInputs = [];
-  for (const cat of allCategories(db)) {
+  /* Compilación 90 (puntos 2 y 8): las categorías CON límite van
+     primero, ordenadas por % usado (en términos mensuales) de mayor
+     a menor; las que no tienen límite van al final, en la sección
+     compacta «Sin límite» de filas de una línea. */
+  const cats90 = allCategories(db);
+  const withLimit90 = cats90.filter((c) => (db.budgets[c] || 0) > 0);
+  const noLimit90 = cats90.filter((c) => !((db.budgets[c] || 0) > 0));
+  const pctUsed90 = (c) => {
+    const lim = budgetMonthlyEquivalentCents(c);
+    return lim > 0 ? (spentByCat[c] || 0) / lim : 0;
+  };
+  withLimit90.sort((a, b) => pctUsed90(b) - pctUsed90(a));
+  const ordered90 = withLimit90.concat(noLimit90);
+  let nolimitHead90 = false;
+  for (const cat of ordered90) {
     const budget = db.budgets[cat] || 0;
+    const compact90 = budget <= 0;
+    if (compact90 && !nolimitHead90) {
+      nolimitHead90 = true;
+      const headLi = el('li', 'bud-nolimit-head90');
+      headLi.appendChild(el('span', null, t('c90_nolimit_title')));
+      ul.appendChild(headLi);
+    }
     /* Compilación 67: con tope, el «gastado» de la fila es el de
        SU período en curso (y la línea lo nombra); sin tope sigue
        el gasto del mes, como dice su texto. */
     const period = budgetPeriodOf(cat);
     const spent = budget > 0 ? budgetPeriodSpentCents(cat, period) : (spentByCat[cat] || 0);
-    const li = el('li', 'item bud-card');
+    const li = el('li', compact90 ? 'item bud-nolimit-row90' : 'item bud-card');
     /* Compilación 49: la fila lleva su categoría para poder enfocarla
        al llegar desde el aviso de Inicio (goBudgetCategory). */
     li.dataset.cat = cat;
@@ -15237,25 +15388,38 @@ function renderBudgets() {
     budHead.appendChild(catChipEl(cat));
     budHead.appendChild(el('div', 'item-title bud-title', catName(cat)));
     /* Compilación 75: % del gasto del mes de esta categoría y la
-       cabecera como botón que abre el editor de la tarjeta. */
-    const pctMonth = totalMonthSpent > 0
-      ? Math.round((spentByCat[cat] || 0) / totalMonthSpent * 100) : 0;
-    budHead.appendChild(el('span', 'bud-pct', pctMonth + '%'));
+       cabecera como botón que abre el editor de la tarjeta.
+       Compilación 90 (punto 8): la fila compacta «Sin límite» lleva
+       en la misma línea el gastado del mes, sin % ni líneas extra. */
+    if (compact90) {
+      budHead.appendChild(el('span', 'bud-nolimit-spent90', fmt(spentByCat[cat] || 0)));
+    } else {
+      const pctMonth = totalMonthSpent > 0
+        ? Math.round((spentByCat[cat] || 0) / totalMonthSpent * 100) : 0;
+      budHead.appendChild(el('span', 'bud-pct', pctMonth + '%'));
+    }
     budHead.appendChild(el('span', 'bud-chev', '▾'));
     budHead.setAttribute('role', 'button');
     main.appendChild(budHead);
     if (budget > 0) {
+      /* Compilación 90 (punto 3): en la lista, el tope se expresa en
+         términos MENSUALES (su equivalente mensual) y el gastado es
+         el del mes: la misma moneda en que hablan la franja base
+         cero y la proyección. En período 'mes' es la cuenta de
+         siempre, centavo a centavo. */
+      const spentM90 = spentByCat[cat] || 0;
+      const limitM90 = budgetMonthlyEquivalentCents(cat);
       main.appendChild(el('div', 'item-sub',
-        (spent <= budget
-          ? t('bud_spent_left', { spent: fmt(spent), budget: fmt(budget), left: fmt(budget - spent) })
-          : t('bud_spent_over', { spent: fmt(spent), budget: fmt(budget), over: fmt(spent - budget) }))));
+        (spentM90 <= limitM90
+          ? t('bud_spent_left', { spent: fmt(spentM90), budget: fmt(limitM90), left: fmt(limitM90 - spentM90) })
+          : t('bud_spent_over', { spent: fmt(spentM90), budget: fmt(limitM90), over: fmt(spentM90 - limitM90) }))));
       /* Compilación 80 (punto 8): el período va en su propia línea
          pequeña; pegado a la línea de gasto la partía en tres
          líneas y estiraba la tarjeta. */
       main.appendChild(el('div', 'item-sub bud-period', t('bud_per_' + period)));
       const bar = el('div', 'budget-bar');
-      const fill = el('div', 'budget-fill' + budgetFillClass(spent, budget));
-      fill.style.width = Math.min(100, Math.round(spent / budget * 100)) + '%';
+      const fill = el('div', 'budget-fill' + budgetFillClass(spentM90, limitM90));
+      fill.style.width = Math.min(100, Math.round(spentM90 / limitM90 * 100)) + '%';
       bar.appendChild(fill);
       main.appendChild(bar);
       /* Compilación 76: si la categoría es un sobre, su arrastre
@@ -15265,7 +15429,7 @@ function renderBudgets() {
         const carry = envelopeCarryCents(cat, key);
         if (carry !== 0) main.appendChild(el('div', 'item-sub', t('env_carry_line', { amount: fmt(carry) })));
       }
-    } else {
+    } else if (!compact90) {
       main.appendChild(el('div', 'item-sub', t('bud_nolimit', { spent: fmt(spent) })));
     }
     /* Compilación 75: el editor de la tarjeta (sugerencia, tope,
@@ -15367,8 +15531,37 @@ function renderBudgets() {
   const splitHelp = document.getElementById('budget-split-help');
   if (splitHelp) splitHelp.textContent = t('bud_split_help', { pct: effectiveSplit().gastos });
   renderZeroStrip();
+  renderBudgetConfig90();
   updateBudgetTotal();
 }
+/* ---------------- Compilación 90 · Configuración plegable --------
+   Punto 4: en cuanto hay topes guardados, el arranque (ingreso +
+   reparto) y el modo base cero se pliegan a un resumen de DOS
+   líneas; tocarlo lo despliega para editar y «Guardar todo» lo
+   vuelve a plegar. Sin topes, la configuración se ve completa,
+   como siempre. */
+let budgetCfgOpen90 = false;
+function renderBudgetConfig90() {
+  const summary = document.getElementById('budget-config-summary90');
+  const starter = document.getElementById('budget-starter');
+  const zero = document.getElementById('budget-zero');
+  if (!summary || !starter || !zero) return;
+  const configured = monthlyEquivalentBudgetTotalCents() > 0;
+  summary.hidden = !configured;
+  const open = !configured || budgetCfgOpen90;
+  starter.hidden = !open;
+  zero.hidden = !open;
+  if (!configured) return;
+  clearNode(summary);
+  const income = sumCents(monthCountedIncomes(currentMonthKey()));
+  summary.appendChild(el('span', 'bud-cfg-line90',
+    (income > 0 ? t('c90_cfg_income', { amount: fmt(income) }) + ' · ' : '')
+    + t('c90_cfg_limits', { amount: fmt(monthlyEquivalentBudgetTotalCents()) })));
+  summary.appendChild(el('span', 'bud-cfg-line90 bud-cfg-sub90',
+    t(db.settings.zeroBased === true ? 'c90_cfg_zero_on' : 'c90_cfg_zero_off')
+    + ' · ' + t('c90_cfg_edit')));
+}
+
 function onCategorySubmit(ev) {
   ev.preventDefault();
   const name = cleanText(document.getElementById('cat-name').value, 30);
@@ -15380,6 +15573,8 @@ function onCategorySubmit(ev) {
   save();
   document.getElementById('category-form').reset();
   showError('cat-error', '');
+  /* Compilación 90 (punto 7): al guardar, el formulario se repliega. */
+  document.getElementById('category-form').hidden = true;
   renderBudgets();
 }
 
@@ -25869,6 +26064,17 @@ function wireEvents() {
   document.getElementById('inc-more').addEventListener('change', (ev) => { document.getElementById('inc-more-box').hidden = !ev.target.checked; });
   document.getElementById('budget-split-btn').addEventListener('click', onBudgetSplit);
   document.getElementById('budget-save-all').addEventListener('click', onBudgetSaveAll);
+  /* Compilación 90 (punto 4): el resumen despliega/repliega la configuración. */
+  document.getElementById('budget-config-summary90').addEventListener('click', () => {
+    budgetCfgOpen90 = !budgetCfgOpen90;
+    renderBudgets();
+  });
+  /* Compilación 90 (punto 7): el botón «+ Categoría» abre el formulario. */
+  document.getElementById('cat-add-btn90').addEventListener('click', () => {
+    const form = document.getElementById('category-form');
+    form.hidden = !form.hidden;
+    if (!form.hidden) document.getElementById('cat-name').focus();
+  });
   document.getElementById('income-form').addEventListener('submit', onIncomeSubmit);
   document.getElementById('savings-form').addEventListener('submit', onSavingsSubmit);
   document.getElementById('goal-form').addEventListener('submit', onGoalSubmit);

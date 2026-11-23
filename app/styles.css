@@ -1300,9 +1300,10 @@ html.plaid-open body{
    Cuadrícula de categorías en Presupuesto, editor dentro de la
    tarjeta, franja de pagos fijos, tarjeta Pro de Inicio, tarjeta
    del tour contextual y tarjetas anidadas de Ajustes. */
-.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0;list-style:none}
-@media (min-width:720px){.budget-grid{grid-template-columns:1fr 1fr 1fr}}
-.budget-grid .bud-card{margin:0;height:100%}
+/* Compilación 90 (punto 1): filas de ANCHO COMPLETO — la rejilla
+   2×2 cortaba los nombres de categoría («Trans…», «Clothi…»). */
+.budget-grid{display:grid;grid-template-columns:1fr;gap:10px;padding:0;list-style:none}
+.budget-grid .bud-card{margin:0}
 .bud-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bud-pct{margin-left:auto;font-weight:700;color:var(--accent-dark,#1d7a5c);font-size:.85em;white-space:nowrap}
 .bud-chev{color:var(--muted);font-size:.8em}
@@ -1401,8 +1402,7 @@ html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px
 .exp-title{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .exp-desc{overflow-wrap:break-word}
 .exp-actions{display:flex;gap:.4rem;flex-wrap:wrap}
-.budget-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-@media (min-width:720px){.budget-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.budget-grid{grid-template-columns:1fr}
 .budget-grid .bud-card{padding:.55rem .6rem;min-width:0}
 .bud-title{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bud-card .item-sub{font-size:.8rem;line-height:1.3}
@@ -1644,3 +1644,13 @@ input[type="date"], input[type="time"] { max-width: 100%; min-width: 0; -webkit-
 .exp-row89 .exp-line2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .72; font-size: .92em; }
 .exp-uncat89 { margin: 6px 0; padding: 8px 10px; border-radius: 10px; background: rgba(127,127,127,.14); }
 .summary-sub { display: block; font-size: .78em; opacity: .75; font-weight: 400; }
+
+/* PETO-C90-BUDGET (Compilación 90 · Presupuesto en orden): la sección
+   «Sin límite» de filas de una línea, el resumen plegable de la
+   configuración y el botón «+ Categoría». */
+.bud-nolimit-head90{list-style:none;padding:.8rem .2rem .25rem;font-weight:700;color:var(--muted)}
+.bud-nolimit-spent90{margin-left:auto;font-weight:600;white-space:nowrap}
+.budget-cfg-summary90{display:block;width:100%;text-align:left;cursor:pointer;font:inherit}
+.bud-cfg-line90{display:block}
+.bud-cfg-sub90{color:var(--muted);font-size:.85rem}
+#cat-add-btn90{margin:.35rem 0}
