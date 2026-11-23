@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-22",
+  "actualizado": "2026-11-23",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -72,6 +72,20 @@
       "titulo": "La canción de la paciencia",
       "archivo": "assets/cancion-2026-11-22-paciencia.mp3",
       "fecha": "2026-11-22"
+    },
+    {
+      "id": "dibujo-2026-11-23-barco",
+      "tipo": "dibujo",
+      "titulo": "Tito y el barco",
+      "archivo": "assets/dibujo-2026-11-23-barco.png",
+      "fecha": "2026-11-23"
+    },
+    {
+      "id": "cancion-2026-11-23-plantas",
+      "tipo": "cancion",
+      "titulo": "La canción de cuidar las plantas",
+      "archivo": "assets/cancion-2026-11-23-plantas.mp3",
+      "fecha": "2026-11-23"
     }
   ]
 }
