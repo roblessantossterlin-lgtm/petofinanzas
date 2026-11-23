@@ -245,16 +245,11 @@
     <section id="home-panel-top" class="card"></section>
     <section id="home-panel-flow" class="card"></section>
 
-    <!-- Compilación 84 · IA Pro (Fase 2) en Inicio: la entrada al
-         chat y las tarjetas de resumen semanal y alerta de flujo.
-         Sus cuerpos los pintan renderAiWeeklyCard/renderAiFlowCard. -->
-    <section id="ai2-chat-card" class="card">
-      <h3 data-i18n="ai2_chat_card_title">💬 Chat con tu dinero</h3>
-      <p class="muted" data-i18n="ai2_chat_card_text">Pregunta en palabras simples y la IA responde con tus números: gastos por categoría, ahorro, presupuesto y tus últimos movimientos.</p>
-      <div class="form-actions">
-        <button id="ai2-chat-open" class="btn btn-primary" type="button" data-i18n="ai2_chat_open">Abrir el chat</button>
-      </div>
-    </section>
+    <!-- Compilación 84 · IA Pro (Fase 2) en Inicio: las tarjetas de
+         resumen semanal y alerta de flujo (sus cuerpos los pintan
+         renderAiWeeklyCard/renderAiFlowCard). Compilación 85
+         (cambio 4): la tarjeta «Chat con tu dinero» se eliminó de
+         Inicio — el chat vive en el botón flotante único. -->
 
     <section id="ai2-weekly-card" class="card">
       <h3 data-i18n="ai2_week_title">🗓️ Tu semana en dinero</h3>
@@ -1616,8 +1611,15 @@
     </div>
   </div>
 
-  <button id="fab-search" class="fab fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍</button>
-  <button id="fab-add" class="fab" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">+</button>
+  <!-- Compilación 85 (cambio 4): UN solo botón flotante de cristal
+       (sin verde) que se despliega en Agregar / Buscar / Chat, cada
+       uno con su etiqueta. Contraído es solo el +, para no tapar. -->
+  <div id="fab-menu" class="fab-menu">
+    <button id="fab-chat" class="fab fab-item" type="button" data-i18n-aria="ai2_chat_open" aria-label="Abrir el chat">💬<span class="fab-label" data-i18n="ai3_fab_chat">Chat</span></button>
+    <button id="fab-search" class="fab fab-item fab-search" type="button" data-i18n-aria="search_fab_aria" aria-label="Buscar movimientos">🔍<span class="fab-label" data-i18n="ai3_fab_search">Buscar</span></button>
+    <button id="fab-add" class="fab fab-item" type="button" data-i18n-aria="fab_aria" aria-label="Agregar rápido">➕<span class="fab-label" data-i18n="ai3_fab_add">Agregar</span></button>
+    <button id="fab-main" class="fab fab-main" type="button" aria-label="Más acciones">+</button>
+  </div>
 
   <div id="quick-chooser" class="chooser" hidden>
     <div class="chooser-card">

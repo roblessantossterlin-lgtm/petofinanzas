@@ -1446,7 +1446,7 @@ html[data-theme="oscuro"] .fab{background:rgba(32,36,40,.30)}
    ocupa el alto y el formulario queda pegado abajo), las
    etiquetas del detector de suscripciones y las líneas de las
    tarjetas de Inicio (resumen semanal y alerta de flujo). */
-.chat-view{display:flex;flex-direction:column;height:100dvh}
+.chat-view{display:flex;flex-direction:column;height:100vh;height:100dvh}
 .chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem;padding:.5rem 0}
 .chat-row{display:flex}
 .chat-row.user{justify-content:flex-end}
@@ -1468,3 +1468,53 @@ html[data-theme="oscuro"] .fab{background:rgba(32,36,40,.30)}
 .ai-letter-scam-h{font-weight:700;color:#c0392b;margin:.1rem 0 .4rem}
 .ai-letter-due{font-weight:700}
 .ai3-hike{font-weight:600}
+
+/* Compilación 85 (arreglo 3, captura de Sterlin en iPhone): la
+   barra de escribir del chat (#view-chat) quedaba FUERA de
+   pantalla en iOS — el campo y el botón «Ask» cortados a la mitad
+   en el borde inferior — y TAMBIÉN en Android (Samsung de Sterlin,
+   Comp. 84). Causa raíz COMPARTIDA, en el código: #view-chat es
+   una .view, y la regla genérica .view le suma padding de 1rem
+   arriba y 2rem abajo; como .chat-view fijaba height:100dvh SIN
+   box-sizing (content-box), la caja medía 100dvh + 3rem y la
+   barra — última hija del flex — quedaba ~48px POR DEBAJO del
+   borde visible en las dos plataformas. En iOS se sumaba el
+   indicador de inicio (sin inset seguro) y en WebViews Android
+   sin dvh la altura caía a auto y la columna desbordaba igual.
+   Corrección de raíz: box-sizing border-box (la altura incluye
+   el padding), cadena de altura 100vh -> 100dvh (respaldo donde
+   dvh no exista) y padding con los insets seguros ABAJO en toda
+   plataforma y ARRIBA tras html.ios; al abrir el teclado la
+   vista se acorta (dvh) y la barra queda pegada al teclado. Auditoría con el mismo criterio: la barra inferior
+   (.bottom-nav), el selector rápido y las hojas modales (.chooser),
+   el toast de deshacer, la tarjeta guía, el reproductor de podcast,
+   la barra pública del san y los flotantes YA descuentan env() en
+   iOS (reglas html.ios y de base); la vista del buscador (cambio 2)
+   no tiene barra fija: su tarjeta «Pregúntale a PETO» va en el
+   flujo dentro de #app-shell, cuyo respiro inferior en iOS ya
+   suma el inset — no nace con el defecto. */
+.chat-view{box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom)}
+html.ios .chat-view{padding-top:env(safe-area-inset-top)}
+.chat-form{padding-top:.45rem;padding-bottom:.35rem}
+
+/* ================= Compilación 85 (cambio 4) =================
+   Botón flotante ÚNICO desplegable: el contenedor lleva la esquina
+   y los estados de siempre (barra inferior, anuncios y, en iOS, el
+   inset seguro inferior — el menú desplegado nunca queda cortado);
+   dentro, los botones dejan de ser fijos y se apilan en columna.
+   Contraído solo se ve el + (cristal neutro de la regla .fab);
+   desplegado, las tres acciones suben con una animación breve y
+   suave, cada una con su etiqueta. body.fabs-off sigue apagando
+   TODO el conjunto (la regla .fab los cubre a todos). */
+.fab-menu{position:fixed;right:1.1rem;bottom:1.1rem;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:.65rem}
+body.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px)}
+body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px)}
+html.ios .fab-menu{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
+html.ios body.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + env(safe-area-inset-bottom))}
+html.ios body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px + env(safe-area-inset-bottom))}
+#fab-menu .fab{position:relative;right:auto;bottom:auto}
+.fab-menu .fab-item{width:auto;height:52px;border-radius:999px;padding:0 1.05rem;display:flex;align-items:center;gap:.5rem;font-size:1.02rem;font-weight:600;opacity:0;transform:translateY(10px) scale(.94);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.fab-menu.open .fab-item{opacity:1;transform:none;pointer-events:auto}
+.fab-menu .fab-label{font-size:.95rem}
+.fab-menu .fab-main{transition:transform .18s ease}
+.fab-menu.open .fab-main{transform:rotate(45deg)}
