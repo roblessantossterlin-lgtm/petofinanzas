@@ -235,7 +235,7 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .month-nav .btn{min-width:52px}
 
 /* ---------- Presupuesto ---------- */
-.budget-bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:.45rem 0}
+.budget-bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:.45rem 0}
 .budget-fill{height:100%;background:var(--accent)}
 .budget-fill.over{background:var(--danger)}
 /* Compilación 60 · Panel visual: barras comparativas (Este mes vs.
@@ -251,7 +251,7 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .vs-week{margin:.55rem 0}
 .vs-week-label{font-weight:600;font-size:.92rem;margin-bottom:.15rem}
 .vs-line{display:flex;align-items:center;gap:.5rem;margin:.22rem 0}
-.vs-track{flex:1 1 auto;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.vs-track{flex:1 1 auto;height:8px;background:var(--line);border-radius:999px;overflow:hidden}
 .vs-fill{height:100%;background:var(--accent)}
 .vs-fill.prev{background:var(--muted)}
 .vs-fill.out{background:#c2570b}
@@ -565,7 +565,7 @@ body.fabs-off .fab{display:none}
   padding:1.1rem 1rem;margin:0 0 1.1rem;box-shadow:0 10px 26px rgba(0,0,0,.22);
 }
 .pub-san-name{margin:.1rem 0 .4rem;font-size:1.5rem;line-height:1.2}
-.pub-progress{height:12px;background:var(--line);border-radius:999px;overflow:hidden;margin:.7rem 0 .35rem}
+.pub-progress{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:.7rem 0 .35rem}
 .pub-progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .5s ease}
 .pub-progress-text{margin:.15rem 0 .4rem;font-weight:700;color:var(--accent-dark)}
 .pub-seal{
@@ -956,11 +956,10 @@ select:focus, textarea:focus{
 /* Tarjetas de topes (Presupuesto): barra con color propio por
    tarjeta, como las categorías de la referencia (naranja, azul,
    verde, morado, celeste); el «over» conserva su rojo de aviso. */
-.bc-grid .bc-card:nth-child(5n+1) .budget-fill:not(.over){background:#f59e0b}
-.bc-grid .bc-card:nth-child(5n+2) .budget-fill:not(.over){background:#4d94dd}
-.bc-grid .bc-card:nth-child(5n+3) .budget-fill:not(.over){background:#2fb457}
-.bc-grid .bc-card:nth-child(5n+4) .budget-fill:not(.over){background:#9a78e0}
-.bc-grid .bc-card:nth-child(5n+5) .budget-fill:not(.over){background:#38b6c9}
+/* Compilación 100 · P-G2 (guía §1.3/§5): FUERA la rotación de 5
+   colores por nth-child de las tarjetas de presupuesto: el color
+   de la barra es FUNCIONAL (verde de marca < 80 %, ámbar 80–99 %,
+   rojo ≥ 100 %) con el % siempre en texto, como el resto de la app. */
 
 /* Bienvenida según la referencia: progreso fino y brillante, logo
    con resplandor e icono de lámina grande con centro luminoso. */
@@ -1218,7 +1217,7 @@ body{font-variant-numeric:tabular-nums}
 }
 .spend-context svg{width:15px;height:15px;flex:none}
 .spend-context-sep{opacity:.6}
-.budget-bar,.vs-track,.pub-progress{height:10px}
+.budget-bar,.vs-track,.pub-progress{height:8px}
 .vs-fill,.budget-fill,.pub-progress-fill{
   background:linear-gradient(90deg,var(--accent-dark),var(--accent));
   background-size:100% 100%;
@@ -1866,3 +1865,9 @@ html[data-theme="oscuro"] .chat-pill93{background:rgba(32,36,40,.30)}
    lectura (estado: «Pagada»/«Pendiente», repartos) se quedan en
    su medida de chip de estado (26 px). */
 button.chip{min-height:38px;padding:.5rem .9rem;font-size:.875rem}
+
+/* ---------- Compilación 100 · tour guiado y flujo ---------- */
+.guide-count100{margin:0 0 .3rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.flow-hist100{margin-top:.6rem}
+.flow-hist100 .chart-row{margin-top:.35rem}
+.flow-out-fill100{background:var(--danger);opacity:.78}

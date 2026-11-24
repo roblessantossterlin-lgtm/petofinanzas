@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 99';
-const BUILD_NUM = 99;
+const BUILD_LABEL = 'Compilación 100';
+const BUILD_NUM = 100;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1723,7 +1723,7 @@ es: {
   goal_delete_confirm: '¿Borrar la meta "{name}"? Tus ahorros no se tocan: solo se borra la meta.',
   err_goal_name: 'Escribe un nombre para tu meta.', err_goal_zero: 'La cantidad de la meta debe ser mayor que 0.',
   res_cats_title: 'Gastos por categoría', res_summary_title: 'Ingresos vs Gastos vs Ahorros',
-  chart_income: 'Ingresos', income_ytd_label: 'Ingreso anual hasta la fecha', fixed_badge: 'Fijo', bud_fixed_title: 'Pagos fijos de este mes', pro_home_title: 'Únete a PETO Pro', pro_home_text: 'Sin anuncios y con todo desbloqueado: sincronización bancaria, presupuestos compartidos y más.', guide_1_title: 'Tu dinero de hoy', guide_1_text: 'Aquí ves cuánto puedes gastar hoy sin pasarte de tu presupuesto.', guide_2_title: 'Registra en segundos', guide_2_text: 'Toca el botón + para anotar un gasto o un ingreso al momento.', guide_3_title: 'Tu presupuesto', guide_3_text: 'Aquí pones un tope a cada categoría y ves cuánto llevas gastado.', guide_4_title: 'Tu resumen', guide_4_text: 'Gráficas claras de tus ingresos, gastos y ahorros, mes a mes.', guide_5_title: 'Conecta tu banco', guide_5_text: 'Si quieres, conecta tu banco y tus gastos se anotan solos.', guide_done: 'Listo', set_group_account: 'Cuenta', set_group_rules: 'Reglas de tu dinero', set_group_security: 'Seguridad y privacidad', set_group_personalization: 'Personalización', chart_expenses: 'Gastos', chart_savings: 'Ahorros',
+  chart_income: 'Ingresos', income_ytd_label: 'Ingreso anual hasta la fecha', fixed_badge: 'Fijo', bud_fixed_title: 'Pagos fijos de este mes', pro_home_title: 'Únete a PETO Pro', pro_home_text: 'Sin anuncios y con todo desbloqueado: sincronización bancaria, presupuestos compartidos y más.', guide_1_title: 'Tu dinero de hoy', guide_1_text: 'Aquí ves cuánto puedes gastar hoy sin pasarte de tu presupuesto.', guide_2_title: 'Registra en segundos', guide_2_text: 'Toca el botón + para anotar un gasto o un ingreso al momento.', guide_3_title: 'Tu presupuesto', guide_3_text: 'Aquí pones un tope a cada categoría y ves cuánto llevas gastado.', guide_4_title: 'Tu resumen', guide_4_text: 'Gráficas claras de tus ingresos, gastos y ahorros, mes a mes.', guide_5_title: 'Conecta tu banco', guide_5_text: 'Si quieres, conecta tu banco y tus gastos se anotan solos.', guide_done: 'Listo', tour100_1_title: 'Tu Inicio, de un vistazo', tour100_1_text: 'Aquí ves cuánto puedes gastar hoy, tu frase del día con IA y la dona con tus gastos del mes por categoría. Todo sale de lo que anotas: nada se inventa.', tour100_2_title: 'Agregar en segundos', tour100_2_text: 'El botón ✨ de abajo abre las acciones rápidas: agregar un gasto o un ingreso, buscar un movimiento o hablar con el chat. También puedes dictarlo o mandar la foto de un recibo.', tour100_3_title: 'Tus cuentas y tu banco', tour100_3_text: 'Aquí viven tus cuentas y tus tarjetas, con el mismo saldo disponible que ves en Inicio. Si quieres, conecta tu banco y tus movimientos se anotan solos.', tour100_4_title: 'Metas y Ahorros', tour100_4_text: 'Crea tus metas y tu fondo de emergencia. La IA te puede sugerir un plan, pero el ahorro que cuenta es el que TÚ anotas: nunca se guarda solo.', tour100_5_title: 'Chat con tu dinero', tour100_5_text: 'El mismo botón ✨ abre el chat: pregúntale cosas como «¿en qué gasté más este mes?» y responde con tus números. ¡Ya está! Puedes repetir este tour cuando quieras desde Ajustes.', tour100_count: 'Paso {n} de {total}', tour100_settings_btn: 'Ver el tour', set_group_account: 'Cuenta', set_group_rules: 'Reglas de tu dinero', set_group_security: 'Seguridad y privacidad', set_group_personalization: 'Personalización', chart_expenses: 'Gastos', chart_savings: 'Ahorros',
   res_cats_empty: 'No hay gastos en este mes.', res_summary_empty: 'Todavía no hay movimientos en este mes.',
   bud_intro: 'Pon un límite mensual por categoría y mira cuánto llevas gastado.',
   bud_income_label: '¿Cuánto entra al mes?', bud_split_btn: 'Repartir según mi ingreso', bud_split_help: 'Repartimos la parte de Gastos de tu reparto sugerido ({pct}% de tu ingreso) entre tus categorías. Ajusta lo que quieras y guarda todo de una vez.',
@@ -2484,7 +2484,7 @@ en: {
   goal_delete_confirm: 'Delete the goal "{name}"? Your savings are not touched: only the goal is deleted.',
   err_goal_name: 'Enter a name for your goal.', err_goal_zero: 'The goal amount must be greater than 0.',
   res_cats_title: 'Expenses by category', res_summary_title: 'Income vs Expenses vs Savings',
-  chart_income: 'Income', income_ytd_label: 'Year-to-date income', fixed_badge: 'Fixed', bud_fixed_title: 'This month\'s fixed payments', pro_home_title: 'Join PETO Pro', pro_home_text: 'No ads and everything unlocked: bank sync, shared budgets and more.', guide_1_title: 'Your money today', guide_1_text: 'Here you see how much you can spend today without going over your budget.', guide_2_title: 'Log in seconds', guide_2_text: 'Tap the + button to log an expense or income right away.', guide_3_title: 'Your budget', guide_3_text: 'Here you set a limit for each category and see how much you have spent.', guide_4_title: 'Your summary', guide_4_text: 'Clear charts of your income, expenses and savings, month by month.', guide_5_title: 'Connect your bank', guide_5_text: 'If you want, connect your bank and your spending is logged automatically.', guide_done: 'Done', set_group_account: 'Account', set_group_rules: 'Your money rules', set_group_security: 'Security and privacy', set_group_personalization: 'Personalization', chart_expenses: 'Expenses', chart_savings: 'Savings',
+  chart_income: 'Income', income_ytd_label: 'Year-to-date income', fixed_badge: 'Fixed', bud_fixed_title: 'This month\'s fixed payments', pro_home_title: 'Join PETO Pro', pro_home_text: 'No ads and everything unlocked: bank sync, shared budgets and more.', guide_1_title: 'Your money today', guide_1_text: 'Here you see how much you can spend today without going over your budget.', guide_2_title: 'Log in seconds', guide_2_text: 'Tap the + button to log an expense or income right away.', guide_3_title: 'Your budget', guide_3_text: 'Here you set a limit for each category and see how much you have spent.', guide_4_title: 'Your summary', guide_4_text: 'Clear charts of your income, expenses and savings, month by month.', guide_5_title: 'Connect your bank', guide_5_text: 'If you want, connect your bank and your spending is logged automatically.', guide_done: 'Done', tour100_1_title: 'Your Home, at a glance', tour100_1_text: 'Here you see how much you can spend today, your AI daily phrase and the donut with this month’s spending by category. Everything comes from what you log: nothing is made up.', tour100_2_title: 'Add in seconds', tour100_2_text: 'The ✨ button below opens the quick actions: add an expense or income, search a transaction or talk to the chat. You can also dictate it or send a receipt photo.', tour100_3_title: 'Your accounts and your bank', tour100_3_text: 'Your accounts and cards live here, with the same available balance you see on Home. If you want, connect your bank and your transactions are logged on their own.', tour100_4_title: 'Goals and Savings', tour100_4_text: 'Create your goals and your emergency fund. The AI can suggest a plan, but the savings that count are the ones YOU log: they are never saved on their own.', tour100_5_title: 'Chat with your money', tour100_5_text: 'The same ✨ button opens the chat: ask it things like «what did I spend the most on this month?» and it answers with your numbers. That’s it! You can replay this tour anytime from Settings.', tour100_count: 'Step {n} of {total}', tour100_settings_btn: 'See the tour', set_group_account: 'Account', set_group_rules: 'Your money rules', set_group_security: 'Security and privacy', set_group_personalization: 'Personalization', chart_expenses: 'Expenses', chart_savings: 'Savings',
   res_cats_empty: 'No expenses this month.', res_summary_empty: 'No activity this month yet.',
   bud_intro: 'Set a monthly limit per category and see how much you have spent.',
   bud_income_label: 'How much comes in each month?', bud_split_btn: 'Split it by my income', bud_split_help: 'We spread the Expenses part of your suggested split ({pct}% of your income) across your categories. Adjust whatever you want and save everything at once.',
@@ -3367,7 +3367,7 @@ it: {
   err_goal_name: 'Scrivi un nome per il tuo obiettivo.', err_goal_zero: 'L’importo dell’obiettivo deve essere maggiore di 0.',
   res_cats_title: 'Spese per categoria',
   res_summary_title: 'Entrate vs Spese vs Risparmi',
-  chart_income: 'Entrate', income_ytd_label: 'Reddito annuale a oggi', fixed_badge: 'Fisso', bud_fixed_title: 'Pagamenti fissi di questo mese', pro_home_title: 'Passa a PETO Pro', pro_home_text: 'Niente annunci e tutto sbloccato: sincronizzazione bancaria, budget condivisi e altro.', guide_1_title: 'I tuoi soldi di oggi', guide_1_text: 'Qui vedi quanto puoi spendere oggi senza superare il budget.', guide_2_title: 'Registra in pochi secondi', guide_2_text: 'Tocca il pulsante + per registrare subito una spesa o un\'entrata.', guide_3_title: 'Il tuo budget', guide_3_text: 'Qui imposti un limite per ogni categoria e vedi quanto hai speso.', guide_4_title: 'Il tuo riepilogo', guide_4_text: 'Grafici chiari di entrate, spese e risparmi, mese per mese.', guide_5_title: 'Collega la tua banca', guide_5_text: 'Se vuoi, collega la tua banca e le spese si registrano da sole.', guide_done: 'Fatto', set_group_account: 'Account', set_group_rules: 'Regole dei tuoi soldi', set_group_security: 'Sicurezza e privacy', set_group_personalization: 'Personalizzazione',
+  chart_income: 'Entrate', income_ytd_label: 'Reddito annuale a oggi', fixed_badge: 'Fisso', bud_fixed_title: 'Pagamenti fissi di questo mese', pro_home_title: 'Passa a PETO Pro', pro_home_text: 'Niente annunci e tutto sbloccato: sincronizzazione bancaria, budget condivisi e altro.', guide_1_title: 'I tuoi soldi di oggi', guide_1_text: 'Qui vedi quanto puoi spendere oggi senza superare il budget.', guide_2_title: 'Registra in pochi secondi', guide_2_text: 'Tocca il pulsante + per registrare subito una spesa o un\'entrata.', guide_3_title: 'Il tuo budget', guide_3_text: 'Qui imposti un limite per ogni categoria e vedi quanto hai speso.', guide_4_title: 'Il tuo riepilogo', guide_4_text: 'Grafici chiari di entrate, spese e risparmi, mese per mese.', guide_5_title: 'Collega la tua banca', guide_5_text: 'Se vuoi, collega la tua banca e le spese si registrano da sole.', guide_done: 'Fatto', tour100_1_title: 'La tua Home, a colpo d’occhio', tour100_1_text: 'Qui vedi quanto puoi spendere oggi, la tua frase del giorno con IA e la ciambella con le spese del mese per categoria. Tutto viene da ciò che annoti: non si inventa nulla.', tour100_2_title: 'Aggiungi in pochi secondi', tour100_2_text: 'Il pulsante ✨ in basso apre le azioni rapide: aggiungere una spesa o un’entrata, cercare un movimento o parlare con la chat. Puoi anche dettarlo o inviare la foto di uno scontrino.', tour100_3_title: 'I tuoi conti e la tua banca', tour100_3_text: 'Qui vivono i tuoi conti e le tue carte, con lo stesso saldo disponibile che vedi nella Home. Se vuoi, collega la tua banca e i movimenti si annotano da soli.', tour100_4_title: 'Obiettivi e Risparmi', tour100_4_text: 'Crea i tuoi obiettivi e il tuo fondo di emergenza. L’IA può suggerirti un piano, ma il risparmio che conta è quello che annoti TU: non si salva mai da solo.', tour100_5_title: 'Chat con i tuoi soldi', tour100_5_text: 'Lo stesso pulsante ✨ apre la chat: chiedile cose come «in cosa ho speso di più questo mese?» e risponde con i tuoi numeri. Fatto! Puoi ripetere questo tour quando vuoi dalle Impostazioni.', tour100_count: 'Passo {n} di {total}', tour100_settings_btn: 'Vedi il tour', set_group_account: 'Account', set_group_rules: 'Regole dei tuoi soldi', set_group_security: 'Sicurezza e privacy', set_group_personalization: 'Personalizzazione',
   chart_expenses: 'Spese',
   chart_savings: 'Risparmi',
   res_cats_empty: 'Non ci sono spese in questo mese.',
@@ -4371,7 +4371,7 @@ pt: {
   err_goal_name: 'Digite um nome para a sua meta.', err_goal_zero: 'O valor da meta deve ser maior que 0.',
   res_cats_title: 'Gastos por categoria',
   res_summary_title: 'Renda vs Gastos vs Poupança',
-  chart_income: 'Renda', income_ytd_label: 'Renda anual até hoje', fixed_badge: 'Fixo', bud_fixed_title: 'Pagamentos fixos deste mês', pro_home_title: 'Assine o PETO Pro', pro_home_text: 'Sem anúncios e tudo desbloqueado: sincronização bancária, orçamentos compartilhados e mais.', guide_1_title: 'Seu dinheiro de hoje', guide_1_text: 'Aqui você vê quanto pode gastar hoje sem estourar o orçamento.', guide_2_title: 'Registre em segundos', guide_2_text: 'Toque no botão + para anotar uma despesa ou renda na hora.', guide_3_title: 'Seu orçamento', guide_3_text: 'Aqui você define um limite para cada categoria e vê quanto já gastou.', guide_4_title: 'Seu resumo', guide_4_text: 'Gráficos claros de suas rendas, despesas e economias, mês a mês.', guide_5_title: 'Conecte seu banco', guide_5_text: 'Se quiser, conecte seu banco e seus gastos são anotados automaticamente.', guide_done: 'Pronto', set_group_account: 'Conta', set_group_rules: 'Regras do seu dinheiro', set_group_security: 'Segurança e privacidade', set_group_personalization: 'Personalização',
+  chart_income: 'Renda', income_ytd_label: 'Renda anual até hoje', fixed_badge: 'Fixo', bud_fixed_title: 'Pagamentos fixos deste mês', pro_home_title: 'Assine o PETO Pro', pro_home_text: 'Sem anúncios e tudo desbloqueado: sincronização bancária, orçamentos compartilhados e mais.', guide_1_title: 'Seu dinheiro de hoje', guide_1_text: 'Aqui você vê quanto pode gastar hoje sem estourar o orçamento.', guide_2_title: 'Registre em segundos', guide_2_text: 'Toque no botão + para anotar uma despesa ou renda na hora.', guide_3_title: 'Seu orçamento', guide_3_text: 'Aqui você define um limite para cada categoria e vê quanto já gastou.', guide_4_title: 'Seu resumo', guide_4_text: 'Gráficos claros de suas rendas, despesas e economias, mês a mês.', guide_5_title: 'Conecte seu banco', guide_5_text: 'Se quiser, conecte seu banco e seus gastos são anotados automaticamente.', guide_done: 'Pronto', tour100_1_title: 'Seu Início, num relance', tour100_1_text: 'Aqui você vê quanto pode gastar hoje, sua frase do dia com IA e o gráfico de rosca com seus gastos do mês por categoria. Tudo sai do que você anota: nada é inventado.', tour100_2_title: 'Adicionar em segundos', tour100_2_text: 'O botão ✨ abaixo abre as ações rápidas: adicionar uma despesa ou renda, buscar um lançamento ou falar com o chat. Você também pode ditar ou enviar a foto de um recibo.', tour100_3_title: 'Suas contas e seu banco', tour100_3_text: 'Aqui ficam suas contas e seus cartões, com o mesmo saldo disponível que você vê no Início. Se quiser, conecte seu banco e seus lançamentos são anotados sozinhos.', tour100_4_title: 'Metas e Economias', tour100_4_text: 'Crie suas metas e seu fundo de emergência. A IA pode sugerir um plano, mas a economia que conta é a que VOCÊ anota: nunca é salva sozinha.', tour100_5_title: 'Chat com seu dinheiro', tour100_5_text: 'O mesmo botão ✨ abre o chat: pergunte coisas como «com o que gastei mais este mês?» e ele responde com seus números. Pronto! Você pode repetir este tour quando quiser em Ajustes.', tour100_count: 'Passo {n} de {total}', tour100_settings_btn: 'Ver o tour', set_group_account: 'Conta', set_group_rules: 'Regras do seu dinheiro', set_group_security: 'Segurança e privacidade', set_group_personalization: 'Personalização',
   chart_expenses: 'Gastos',
   chart_savings: 'Poupança',
   res_cats_empty: 'Nenhum gasto este mês.',
@@ -5375,7 +5375,7 @@ fr: {
   err_goal_name: 'Donne un nom à ton objectif.', err_goal_zero: 'Le montant de l’objectif doit être supérieur à 0.',
   res_cats_title: 'Dépenses par catégorie',
   res_summary_title: 'Revenus vs Dépenses vs Épargne',
-  chart_income: 'Revenus', income_ytd_label: 'Revenu annuel à ce jour', fixed_badge: 'Fixe', bud_fixed_title: 'Paiements fixes de ce mois', pro_home_title: 'Passe à PETO Pro', pro_home_text: 'Sans pubs et tout débloqué : synchronisation bancaire, budgets partagés et plus.', guide_1_title: 'Ton argent du jour', guide_1_text: 'Ici, tu vois combien tu peux dépenser aujourd\'hui sans dépasser ton budget.', guide_2_title: 'Enregistre en quelques secondes', guide_2_text: 'Touche le bouton + pour noter une dépense ou un revenu tout de suite.', guide_3_title: 'Ton budget', guide_3_text: 'Ici, tu fixes une limite par catégorie et tu vois ce que tu as dépensé.', guide_4_title: 'Ton résumé', guide_4_text: 'Des graphiques clairs de tes revenus, dépenses et économies, mois par mois.', guide_5_title: 'Connecte ta banque', guide_5_text: 'Si tu veux, connecte ta banque et tes dépenses se notent toutes seules.', guide_done: 'Terminé', set_group_account: 'Compte', set_group_rules: 'Règles de ton argent', set_group_security: 'Sécurité et confidentialité', set_group_personalization: 'Personnalisation',
+  chart_income: 'Revenus', income_ytd_label: 'Revenu annuel à ce jour', fixed_badge: 'Fixe', bud_fixed_title: 'Paiements fixes de ce mois', pro_home_title: 'Passe à PETO Pro', pro_home_text: 'Sans pubs et tout débloqué : synchronisation bancaire, budgets partagés et plus.', guide_1_title: 'Ton argent du jour', guide_1_text: 'Ici, tu vois combien tu peux dépenser aujourd\'hui sans dépasser ton budget.', guide_2_title: 'Enregistre en quelques secondes', guide_2_text: 'Touche le bouton + pour noter une dépense ou un revenu tout de suite.', guide_3_title: 'Ton budget', guide_3_text: 'Ici, tu fixes une limite par catégorie et tu vois ce que tu as dépensé.', guide_4_title: 'Ton résumé', guide_4_text: 'Des graphiques clairs de tes revenus, dépenses et économies, mois par mois.', guide_5_title: 'Connecte ta banque', guide_5_text: 'Si tu veux, connecte ta banque et tes dépenses se notent toutes seules.', guide_done: 'Terminé', tour100_1_title: 'Votre Accueil, en un coup d’œil', tour100_1_text: 'Ici vous voyez combien vous pouvez dépenser aujourd’hui, votre phrase du jour avec IA et le beignet avec vos dépenses du mois par catégorie. Tout vient de ce que vous notez : rien n’est inventé.', tour100_2_title: 'Ajouter en quelques secondes', tour100_2_text: 'Le bouton ✨ ci-dessous ouvre les actions rapides : ajouter une dépense ou un revenu, chercher un mouvement ou parler au chat. Vous pouvez aussi le dicter ou envoyer la photo d’un reçu.', tour100_3_title: 'Vos comptes et votre banque', tour100_3_text: 'Vos comptes et vos cartes vivent ici, avec le même solde disponible que sur l’Accueil. Si vous voulez, connectez votre banque et vos mouvements se notent tout seuls.', tour100_4_title: 'Objectifs et Épargne', tour100_4_text: 'Créez vos objectifs et votre fonds d’urgence. L’IA peut vous suggérer un plan, mais l’épargne qui compte est celle que VOUS notez : elle ne s’enregistre jamais toute seule.', tour100_5_title: 'Chat avec votre argent', tour100_5_text: 'Le même bouton ✨ ouvre le chat : demandez-lui des choses comme «où ai-je le plus dépensé ce mois-ci ?» et il répond avec vos chiffres. C’est tout ! Vous pouvez refaire ce tour quand vous voulez depuis les Réglages.', tour100_count: 'Étape {n} sur {total}', tour100_settings_btn: 'Voir le tour', set_group_account: 'Compte', set_group_rules: 'Règles de ton argent', set_group_security: 'Sécurité et confidentialité', set_group_personalization: 'Personnalisation',
   chart_expenses: 'Dépenses',
   chart_savings: 'Épargne',
   res_cats_empty: 'Aucune dépense ce mois-ci.',
@@ -6379,7 +6379,7 @@ de: {
   err_goal_name: 'Gib einen Namen für dein Ziel ein.', err_goal_zero: 'Der Zielbetrag muss größer als 0 sein.',
   res_cats_title: 'Ausgaben nach Kategorie',
   res_summary_title: 'Einnahmen vs. Ausgaben vs. Ersparnisse',
-  chart_income: 'Einnahmen', income_ytd_label: 'Jahreseinkommen bis heute', fixed_badge: 'Fest', bud_fixed_title: 'Fixe Zahlungen in diesem Monat', pro_home_title: 'Werde PETO Pro', pro_home_text: 'Keine Werbung und alles freigeschaltet: Bankabgleich, geteilte Budgets und mehr.', guide_1_title: 'Dein Geld heute', guide_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, ohne dein Budget zu sprengen.', guide_2_title: 'In Sekunden erfassen', guide_2_text: 'Tippe auf die Schaltfläche +, um eine Ausgabe oder Einnahme sofort zu erfassen.', guide_3_title: 'Dein Budget', guide_3_text: 'Hier legst du für jede Kategorie ein Limit fest und siehst, wie viel du ausgegeben hast.', guide_4_title: 'Deine Übersicht', guide_4_text: 'Klare Grafiken zu Einnahmen, Ausgaben und Ersparnissen, Monat für Monat.', guide_5_title: 'Verbinde deine Bank', guide_5_text: 'Wenn du möchtest, verbinde deine Bank und deine Ausgaben werden automatisch erfasst.', guide_done: 'Fertig', set_group_account: 'Konto', set_group_rules: 'Regeln für dein Geld', set_group_security: 'Sicherheit und Datenschutz', set_group_personalization: 'Personalisierung',
+  chart_income: 'Einnahmen', income_ytd_label: 'Jahreseinkommen bis heute', fixed_badge: 'Fest', bud_fixed_title: 'Fixe Zahlungen in diesem Monat', pro_home_title: 'Werde PETO Pro', pro_home_text: 'Keine Werbung und alles freigeschaltet: Bankabgleich, geteilte Budgets und mehr.', guide_1_title: 'Dein Geld heute', guide_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, ohne dein Budget zu sprengen.', guide_2_title: 'In Sekunden erfassen', guide_2_text: 'Tippe auf die Schaltfläche +, um eine Ausgabe oder Einnahme sofort zu erfassen.', guide_3_title: 'Dein Budget', guide_3_text: 'Hier legst du für jede Kategorie ein Limit fest und siehst, wie viel du ausgegeben hast.', guide_4_title: 'Deine Übersicht', guide_4_text: 'Klare Grafiken zu Einnahmen, Ausgaben und Ersparnissen, Monat für Monat.', guide_5_title: 'Verbinde deine Bank', guide_5_text: 'Wenn du möchtest, verbinde deine Bank und deine Ausgaben werden automatisch erfasst.', guide_done: 'Fertig', tour100_1_title: 'Dein Start auf einen Blick', tour100_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, deinen KI-Spruch des Tages und den Donut mit deinen Ausgaben des Monats nach Kategorie. Alles kommt aus dem, was du einträgst: Nichts wird erfunden.', tour100_2_title: 'In Sekunden hinzufügen', tour100_2_text: 'Die Schaltfläche ✨ unten öffnet die Schnellaktionen: Ausgabe oder Einnahme hinzufügen, einen Eintrag suchen oder mit dem Chat sprechen. Du kannst es auch diktieren oder ein Kassenbon-Foto senden.', tour100_3_title: 'Deine Konten und deine Bank', tour100_3_text: 'Hier leben deine Konten und Karten, mit demselben verfügbaren Saldo wie auf dem Startbildschirm. Wenn du willst, verbinde deine Bank und deine Einträge werden von selbst erfasst.', tour100_4_title: 'Ziele und Sparen', tour100_4_text: 'Erstelle deine Ziele und deinen Notfallfonds. Die KI kann dir einen Plan vorschlagen, aber das Sparen, das zählt, ist das, das DU einträgst: Es wird nie von allein gespeichert.', tour100_5_title: 'Chat mit deinem Geld', tour100_5_text: 'Dieselbe Schaltfläche ✨ öffnet den Chat: Frag sie Dinge wie «Wofür habe ich diesen Monat am meisten ausgegeben?» und sie antwortet mit deinen Zahlen. Fertig! Du kannst diese Tour jederzeit in den Einstellungen wiederholen.', tour100_count: 'Schritt {n} von {total}', tour100_settings_btn: 'Tour ansehen', set_group_account: 'Konto', set_group_rules: 'Regeln für dein Geld', set_group_security: 'Sicherheit und Datenschutz', set_group_personalization: 'Personalisierung',
   chart_expenses: 'Ausgaben',
   chart_savings: 'Ersparnisse',
   res_cats_empty: 'Keine Ausgaben in diesem Monat.',
@@ -7383,7 +7383,7 @@ zh: {
   err_goal_name: '请输入目标名称。', err_goal_zero: '目标金额必须大于 0。',
   res_cats_title: '按类别支出',
   res_summary_title: '收入 vs 支出 vs 储蓄',
-  chart_income: '收入', income_ytd_label: '今年至今收入', fixed_badge: '固定', bud_fixed_title: '本月固定支出', pro_home_title: '加入 PETO Pro', pro_home_text: '无广告，全部解锁：银行同步、共享预算等。', guide_1_title: '你今天的钱', guide_1_text: '这里显示你今天在不超预算的情况下可以花多少钱。', guide_2_title: '几秒钟记录', guide_2_text: '点 + 按钮即可立即记录支出或收入。', guide_3_title: '你的预算', guide_3_text: '在这里为每个类别设定上限，并查看已花费金额。', guide_4_title: '你的汇总', guide_4_text: '按月清晰展示你的收入、支出和储蓄图表。', guide_5_title: '连接你的银行', guide_5_text: '如果愿意，可以连接银行，支出会自动记录。', guide_done: '完成', set_group_account: '账户', set_group_rules: '你的资金规则', set_group_security: '安全与隐私', set_group_personalization: '个性化',
+  chart_income: '收入', income_ytd_label: '今年至今收入', fixed_badge: '固定', bud_fixed_title: '本月固定支出', pro_home_title: '加入 PETO Pro', pro_home_text: '无广告，全部解锁：银行同步、共享预算等。', guide_1_title: '你今天的钱', guide_1_text: '这里显示你今天在不超预算的情况下可以花多少钱。', guide_2_title: '几秒钟记录', guide_2_text: '点 + 按钮即可立即记录支出或收入。', guide_3_title: '你的预算', guide_3_text: '在这里为每个类别设定上限，并查看已花费金额。', guide_4_title: '你的汇总', guide_4_text: '按月清晰展示你的收入、支出和储蓄图表。', guide_5_title: '连接你的银行', guide_5_text: '如果愿意，可以连接银行，支出会自动记录。', guide_done: '完成', tour100_1_title: '你的首页，一目了然', tour100_1_text: '在这里你可以看到今天能花多少钱、你的 AI 每日一语，以及按类别显示本月支出的甜甜圈图。一切都来自你记录的内容：不会凭空编造。', tour100_2_title: '几秒钟添加', tour100_2_text: '点击下方的 ✨ 按钮打开快捷操作：添加支出或收入、搜索一笔记录或与聊天对话。你也可以语音输入或发送收据照片。', tour100_3_title: '你的账户和银行', tour100_3_text: '你的账户和银行卡都在这里，可用余额与首页显示的一致。如果你愿意，连接你的银行，交易会自动记录。', tour100_4_title: '目标和储蓄', tour100_4_text: '创建你的目标和应急基金。AI 可以为你建议一个计划，但真正算数的是你自己记录的储蓄：它永远不会自动保存。', tour100_5_title: '与你的钱聊天', tour100_5_text: '同一个 ✨ 按钮打开聊天：问它「这个月我在哪方面花得最多？」它会用你的数字回答。就这样！你可以随时在设置中重看本导览。', tour100_count: '第 {n} 步，共 {total} 步', tour100_settings_btn: '查看导览', set_group_account: '账户', set_group_rules: '你的资金规则', set_group_security: '安全与隐私', set_group_personalization: '个性化',
   chart_expenses: '支出',
   chart_savings: '储蓄',
   res_cats_empty: '本月没有支出。',
@@ -8387,7 +8387,7 @@ ja: {
   err_goal_name: '目標の名前を入力してください。', err_goal_zero: '目標金額は 0 より大きくしてください。',
   res_cats_title: 'カテゴリ別支出',
   res_summary_title: '収入 vs 支出 vs 貯蓄',
-  chart_income: '収入', income_ytd_label: '今年これまでの収入', fixed_badge: '固定', bud_fixed_title: '今月の固定費', pro_home_title: 'PETO Pro に参加', pro_home_text: '広告なしで全機能が使えます：銀行同期、共有予算など。', guide_1_title: '今日のお金', guide_1_text: '予算を超えずに今日使える金額がここに表示されます。', guide_2_title: '数秒で記録', guide_2_text: '+ ボタンをタップすると、支出や収入をすぐに記録できます。', guide_3_title: 'あなたの予算', guide_3_text: 'ここでカテゴリごとに上限を設定し、使った金額を確認できます。', guide_4_title: 'あなたのサマリー', guide_4_text: '月ごとの収入、支出、貯蓄がわかりやすいグラフで表示されます。', guide_5_title: '銀行を接続', guide_5_text: 'よければ銀行を接続すると、支出が自動で記録されます。', guide_done: '完了', set_group_account: 'アカウント', set_group_rules: 'お金のルール', set_group_security: 'セキュリティとプライバシー', set_group_personalization: 'カスタマイズ',
+  chart_income: '収入', income_ytd_label: '今年これまでの収入', fixed_badge: '固定', bud_fixed_title: '今月の固定費', pro_home_title: 'PETO Pro に参加', pro_home_text: '広告なしで全機能が使えます：銀行同期、共有予算など。', guide_1_title: '今日のお金', guide_1_text: '予算を超えずに今日使える金額がここに表示されます。', guide_2_title: '数秒で記録', guide_2_text: '+ ボタンをタップすると、支出や収入をすぐに記録できます。', guide_3_title: 'あなたの予算', guide_3_text: 'ここでカテゴリごとに上限を設定し、使った金額を確認できます。', guide_4_title: 'あなたのサマリー', guide_4_text: '月ごとの収入、支出、貯蓄がわかりやすいグラフで表示されます。', guide_5_title: '銀行を接続', guide_5_text: 'よければ銀行を接続すると、支出が自動で記録されます。', guide_done: '完了', tour100_1_title: 'ホームをひと目で', tour100_1_text: 'ここでは、今日使える金額、AI の今日の一言、今月の支出をカテゴリ別に示すドーナツグラフが見られます。すべてあなたが記録した内容から作られます：でっち上げはありません。', tour100_2_title: '数秒で追加', tour100_2_text: '下の ✨ ボタンを押すとクイックアクションが開きます：支出や収入の追加、取引の検索、チャットへの相談。音声入力やレシート写真の送信もできます。', tour100_3_title: 'あなたの口座と銀行', tour100_3_text: 'あなたの口座とカードはここにあり、利用可能残高はホームと同じです。よければ銀行を連携すると、取引が自動で記録されます。', tour100_4_title: '目標と貯蓄', tour100_4_text: '目標と緊急資金を作りましょう。AI がプランを提案できますが、実際に数えられるのはあなた自身が記録した貯蓄です：自動で保存されることはありません。', tour100_5_title: 'あなたのお金とチャット', tour100_5_text: '同じ ✨ ボタンでチャットが開きます：「今月いちばんお金を使ったのは何？」と聞くと、あなたの数字で答えます。以上です！このツアーは設定からいつでも再生できます。', tour100_count: '{total} ステップ中の {n}', tour100_settings_btn: 'ツアーを見る', set_group_account: 'アカウント', set_group_rules: 'お金のルール', set_group_security: 'セキュリティとプライバシー', set_group_personalization: 'カスタマイズ',
   chart_expenses: '支出',
   chart_savings: '貯蓄',
   res_cats_empty: '今月は支出がありません。',
@@ -9391,7 +9391,7 @@ ko: {
   err_goal_name: '목표의 이름을 입력하세요.', err_goal_zero: '목표 금액은 0보다 커야 합니다.',
   res_cats_title: '카테고리별 지출',
   res_summary_title: '수입 vs 지출 vs 저축',
-  chart_income: '수입', income_ytd_label: '올해 누적 수입', fixed_badge: '고정', bud_fixed_title: '이번 달 고정 지출', pro_home_title: 'PETO Pro 가입', pro_home_text: '광고 없이 모든 기능 잠금 해제: 은행 동기화, 공유 예산 등.', guide_1_title: '오늘의 돈', guide_1_text: '예산을 초과하지 않고 오늘 쓸 수 있는 금액을 여기서 확인하세요.', guide_2_title: '몇 초 만에 기록', guide_2_text: '+ 버튼을 눌러 지출이나 수입을 바로 기록하세요.', guide_3_title: '내 예산', guide_3_text: '여기서 카테고리별 한도를 정하고 지출 금액을 확인하세요.', guide_4_title: '내 요약', guide_4_text: '월별 수입, 지출, 저축을 한눈에 보여주는 그래프입니다.', guide_5_title: '은행 연결하기', guide_5_text: '원하시면 은행을 연결해 지출이 자동으로 기록됩니다.', guide_done: '완료', set_group_account: '계정', set_group_rules: '내 돈 규칙', set_group_security: '보안 및 개인정보', set_group_personalization: '개인 설정',
+  chart_income: '수입', income_ytd_label: '올해 누적 수입', fixed_badge: '고정', bud_fixed_title: '이번 달 고정 지출', pro_home_title: 'PETO Pro 가입', pro_home_text: '광고 없이 모든 기능 잠금 해제: 은행 동기화, 공유 예산 등.', guide_1_title: '오늘의 돈', guide_1_text: '예산을 초과하지 않고 오늘 쓸 수 있는 금액을 여기서 확인하세요.', guide_2_title: '몇 초 만에 기록', guide_2_text: '+ 버튼을 눌러 지출이나 수입을 바로 기록하세요.', guide_3_title: '내 예산', guide_3_text: '여기서 카테고리별 한도를 정하고 지출 금액을 확인하세요.', guide_4_title: '내 요약', guide_4_text: '월별 수입, 지출, 저축을 한눈에 보여주는 그래프입니다.', guide_5_title: '은행 연결하기', guide_5_text: '원하시면 은행을 연결해 지출이 자동으로 기록됩니다.', guide_done: '완료', tour100_1_title: '한눈에 보는 홈', tour100_1_text: '여기서는 오늘 쓸 수 있는 금액, AI 오늘의 한마디, 이번 달 지출을 카테고리별로 보여주는 도넛 그래프를 볼 수 있어요. 모든 것은 당신이 기록한 내용에서 나옵니다: 지어낸 것은 없어요.', tour100_2_title: '몇 초 만에 추가', tour100_2_text: '아래의 ✨ 버튼을 누르면 빠른 작업이 열립니다: 지출이나 수입 추가, 거래 검색, 채팅과 대화하기. 음성으로 입력하거나 영수증 사진을 보낼 수도 있어요.', tour100_3_title: '내 계좌와 은행', tour100_3_text: '내 계좌와 카드가 여기에 있고, 사용 가능 잔액은 홈에서 보는 것과 같아요. 원하면 은행을 연결하세요. 거래가 자동으로 기록됩니다.', tour100_4_title: '목표와 저축', tour100_4_text: '목표와 비상금을 만들어 보세요. AI가 계획을 제안할 수 있지만, 실제로 인정되는 저축은 당신이 직접 기록한 것입니다: 절대 자동으로 저장되지 않아요.', tour100_5_title: '내 돈과 채팅', tour100_5_text: '같은 ✨ 버튼으로 채팅이 열립니다: «이번 달에 어디에 가장 많이 썼어?»라고 물으면 당신의 숫자로 답해요. 끝이에요! 이 투어는 설정에서 언제든 다시 볼 수 있어요.', tour100_count: '{total}단계 중 {n}단계', tour100_settings_btn: '투어 보기', set_group_account: '계정', set_group_rules: '내 돈 규칙', set_group_security: '보안 및 개인정보', set_group_personalization: '개인 설정',
   chart_expenses: '지출',
   chart_savings: '저축',
   res_cats_empty: '이번 달 지출이 없습니다.',
@@ -10395,7 +10395,7 @@ ru: {
   err_goal_name: 'Введите название для вашей цели.', err_goal_zero: 'Сумма цели должна быть больше 0.',
   res_cats_title: 'Расходы по категориям',
   res_summary_title: 'Доходы против расходов против сбережений',
-  chart_income: 'Доходы', income_ytd_label: 'Доход за год на сегодня', fixed_badge: 'Фикс.', bud_fixed_title: 'Фиксированные платежи этого месяца', pro_home_title: 'Переходите на PETO Pro', pro_home_text: 'Без рекламы и со всем разблокированным: синхронизация с банком, общие бюджеты и др.', guide_1_title: 'Ваши деньги на сегодня', guide_1_text: 'Здесь видно, сколько можно потратить сегодня, не выходя за бюджет.', guide_2_title: 'Запись за секунды', guide_2_text: 'Нажмите кнопку +, чтобы сразу записать расход или доход.', guide_3_title: 'Ваш бюджет', guide_3_text: 'Здесь вы задаёте лимит для каждой категории и видите, сколько потрачено.', guide_4_title: 'Ваша сводка', guide_4_text: 'Понятные графики ваших доходов, расходов и сбережений по месяцам.', guide_5_title: 'Подключите ваш банк', guide_5_text: 'При желании подключите банк, и расходы будут записываться сами.', guide_done: 'Готово', set_group_account: 'Аккаунт', set_group_rules: 'Правила ваших денег', set_group_security: 'Безопасность и конфиденциальность', set_group_personalization: 'Персонализация',
+  chart_income: 'Доходы', income_ytd_label: 'Доход за год на сегодня', fixed_badge: 'Фикс.', bud_fixed_title: 'Фиксированные платежи этого месяца', pro_home_title: 'Переходите на PETO Pro', pro_home_text: 'Без рекламы и со всем разблокированным: синхронизация с банком, общие бюджеты и др.', guide_1_title: 'Ваши деньги на сегодня', guide_1_text: 'Здесь видно, сколько можно потратить сегодня, не выходя за бюджет.', guide_2_title: 'Запись за секунды', guide_2_text: 'Нажмите кнопку +, чтобы сразу записать расход или доход.', guide_3_title: 'Ваш бюджет', guide_3_text: 'Здесь вы задаёте лимит для каждой категории и видите, сколько потрачено.', guide_4_title: 'Ваша сводка', guide_4_text: 'Понятные графики ваших доходов, расходов и сбережений по месяцам.', guide_5_title: 'Подключите ваш банк', guide_5_text: 'При желании подключите банк, и расходы будут записываться сами.', guide_done: 'Готово', tour100_1_title: 'Ваш главный экран с одного взгляда', tour100_1_text: 'Здесь вы видите, сколько можно потратить сегодня, вашу фразу дня от ИИ и кольцо с расходами месяца по категориям. Всё берётся из того, что вы записываете: ничего не выдумывается.', tour100_2_title: 'Добавить за секунды', tour100_2_text: 'Кнопка ✨ внизу открывает быстрые действия: добавить расход или доход, найти операцию или поговорить с чатом. Можно также надиктовать или отправить фото чека.', tour100_3_title: 'Ваши счета и ваш банк', tour100_3_text: 'Здесь живут ваши счета и карты, с тем же доступным остатком, что и на главном экране. Если хотите, подключите банк, и операции будут записываться сами.', tour100_4_title: 'Цели и сбережения', tour100_4_text: 'Создавайте цели и резервный фонд. ИИ может предложить план, но сбережения, которые засчитываются, — это те, что записываете ВЫ: они никогда не сохраняются сами.', tour100_5_title: 'Чат с вашими деньгами', tour100_5_text: 'Та же кнопка ✨ открывает чат: спросите что-то вроде «на что я потратил больше всего в этом месяце?» — и он ответит вашими цифрами. Вот и всё! Этот тур можно повторить в любое время в настройках.', tour100_count: 'Шаг {n} из {total}', tour100_settings_btn: 'Смотреть тур', set_group_account: 'Аккаунт', set_group_rules: 'Правила ваших денег', set_group_security: 'Безопасность и конфиденциальность', set_group_personalization: 'Персонализация',
   chart_expenses: 'Расходы',
   chart_savings: 'Сбережения',
   res_cats_empty: 'В этом месяце нет расходов.',
@@ -11399,7 +11399,7 @@ hi: {
   err_goal_name: 'अपने लक्ष्य का नाम लिखें।', err_goal_zero: 'लक्ष्य राशि 0 से अधिक होनी चाहिए।',
   res_cats_title: 'श्रेणी अनुसार खर्च',
   res_summary_title: 'आय बनाम खर्च बनाम बचत',
-  chart_income: 'आय', income_ytd_label: 'आज तक की वार्षिक आय', fixed_badge: 'निश्चित', bud_fixed_title: 'इस महीने के निश्चित भुगतान', pro_home_title: 'PETO Pro से जुड़ें', pro_home_text: 'कोई विज्ञापन नहीं और सब कुछ अनलॉक: बैंक सिंक, साझा बजट और अधिक।', guide_1_title: 'आज का आपका पैसा', guide_1_text: 'यहाँ आप देख सकते हैं कि बजट से बाहर गए बिना आज कितना खर्च कर सकते हैं।', guide_2_title: 'सेकंडों में दर्ज करें', guide_2_text: '+ बटन दबाकर खर्च या आय तुरंत दर्ज करें।', guide_3_title: 'आपका बजट', guide_3_text: 'यहाँ आप हर श्रेणी के लिए सीमा तय करते हैं और देखते हैं कि कितना खर्च हुआ।', guide_4_title: 'आपका सारांश', guide_4_text: 'आपकी आय, खर्च और बचत के स्पष्ट ग्राफ़, महीने दर महीने।', guide_5_title: 'अपना बैंक जोड़ें', guide_5_text: 'चाहें तो अपना बैंक जोड़ें और आपके खर्च अपने आप दर्ज हो जाएँगे।', guide_done: 'हो गया', set_group_account: 'खाता', set_group_rules: 'आपके पैसे के नियम', set_group_security: 'सुरक्षा और गोपनीयता', set_group_personalization: 'निजीकरण',
+  chart_income: 'आय', income_ytd_label: 'आज तक की वार्षिक आय', fixed_badge: 'निश्चित', bud_fixed_title: 'इस महीने के निश्चित भुगतान', pro_home_title: 'PETO Pro से जुड़ें', pro_home_text: 'कोई विज्ञापन नहीं और सब कुछ अनलॉक: बैंक सिंक, साझा बजट और अधिक।', guide_1_title: 'आज का आपका पैसा', guide_1_text: 'यहाँ आप देख सकते हैं कि बजट से बाहर गए बिना आज कितना खर्च कर सकते हैं।', guide_2_title: 'सेकंडों में दर्ज करें', guide_2_text: '+ बटन दबाकर खर्च या आय तुरंत दर्ज करें।', guide_3_title: 'आपका बजट', guide_3_text: 'यहाँ आप हर श्रेणी के लिए सीमा तय करते हैं और देखते हैं कि कितना खर्च हुआ।', guide_4_title: 'आपका सारांश', guide_4_text: 'आपकी आय, खर्च और बचत के स्पष्ट ग्राफ़, महीने दर महीने।', guide_5_title: 'अपना बैंक जोड़ें', guide_5_text: 'चाहें तो अपना बैंक जोड़ें और आपके खर्च अपने आप दर्ज हो जाएँगे।', guide_done: 'हो गया', tour100_1_title: 'आपका होम, एक नज़र में', tour100_1_text: 'यहाँ आप देखते हैं कि आज आप कितना खर्च कर सकते हैं, AI की आपकी आज की पंक्ति, और इस महीने के खर्च को श्रेणी के हिसाब से दिखाने वाला डोनट. सब कुछ उसी से बनता है जो आप दर्ज करते हैं: कुछ भी बनाया नहीं जाता.', tour100_2_title: 'सेकंडों में जोड़ें', tour100_2_text: 'नीचे ✨ बटन से त्वरित कार्रवाइयाँ खुलती हैं: खर्च या आय जोड़ना, कोई लेन-देन खोजना या चैट से बात करना. आप बोलकर भी दर्ज कर सकते हैं या रसीद की फ़ोटो भेज सकते हैं.', tour100_3_title: 'आपके खाते और आपका बैंक', tour100_3_text: 'आपके खाते और कार्ड यहाँ रहते हैं, उपलब्ध शेष वही जो होम पर दिखता है. चाहें तो अपना बैंक जोड़ें और आपके लेन-देन अपने आप दर्ज हो जाएँगे.', tour100_4_title: 'लक्ष्य और बचत', tour100_4_text: 'अपने लक्ष्य और आपातकालीन कोष बनाएँ. AI एक योजना सुझा सकता है, लेकिन जो बचत गिनी जाती है वह वही है जो आप दर्ज करते हैं: वह कभी अपने आप सहेजी नहीं जाती.', tour100_5_title: 'अपने पैसे से चैट', tour100_5_text: 'वही ✨ बटन चैट खोलता है: पूछें «इस महीने मैंने सबसे ज़्यादा किस पर खर्च किया?» और वह आपके आँकड़ों से जवाब देता है. बस इतना ही! आप सेटिंग्स से यह टूर कभी भी दोबारा देख सकते हैं.', tour100_count: 'चरण {n} / {total}', tour100_settings_btn: 'टूर देखें', set_group_account: 'खाता', set_group_rules: 'आपके पैसे के नियम', set_group_security: 'सुरक्षा और गोपनीयता', set_group_personalization: 'निजीकरण',
   chart_expenses: 'खर्च',
   chart_savings: 'बचत',
   res_cats_empty: 'इस माह कोई खर्च नहीं।',
@@ -12403,7 +12403,7 @@ ar: {
   err_goal_name: 'اكتب اسمًا لهدفك.', err_goal_zero: 'يجب أن يكون مبلغ الهدف أكبر من 0.',
   res_cats_title: 'المصروفات حسب الفئة',
   res_summary_title: 'الدخل مقابل المصروفات مقابل المدّخرات',
-  chart_income: 'الدخل', income_ytd_label: 'الدخل السنوي حتى اليوم', fixed_badge: 'ثابت', bud_fixed_title: 'مدفوعات هذا الشهر الثابتة', pro_home_title: 'انضم إلى PETO Pro', pro_home_text: 'بدون إعلانات وكل شيء مفتوح: مزامنة البنك والميزانيات المشتركة والمزيد.', guide_1_title: 'أموالك اليوم', guide_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم دون تجاوز ميزانيتك.', guide_2_title: 'سجّل في ثوانٍ', guide_2_text: 'اضغط زر + لتسجيل مصروف أو دخل على الفور.', guide_3_title: 'ميزانيتك', guide_3_text: 'هنا تضع حدًا لكل فئة وترى كم أنفقت.', guide_4_title: 'ملخصك', guide_4_text: 'رسوم واضحة لدخلك ومصاريفك ومدخراتك، شهرًا بعد شهر.', guide_5_title: 'اربط بنكك', guide_5_text: 'إذا أردت، اربط بنكك وستُسجَّل مصاريفك تلقائيًا.', guide_done: 'تم', set_group_account: 'الحساب', set_group_rules: 'قواعد أموالك', set_group_security: 'الأمان والخصوصية', set_group_personalization: 'التخصيص',
+  chart_income: 'الدخل', income_ytd_label: 'الدخل السنوي حتى اليوم', fixed_badge: 'ثابت', bud_fixed_title: 'مدفوعات هذا الشهر الثابتة', pro_home_title: 'انضم إلى PETO Pro', pro_home_text: 'بدون إعلانات وكل شيء مفتوح: مزامنة البنك والميزانيات المشتركة والمزيد.', guide_1_title: 'أموالك اليوم', guide_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم دون تجاوز ميزانيتك.', guide_2_title: 'سجّل في ثوانٍ', guide_2_text: 'اضغط زر + لتسجيل مصروف أو دخل على الفور.', guide_3_title: 'ميزانيتك', guide_3_text: 'هنا تضع حدًا لكل فئة وترى كم أنفقت.', guide_4_title: 'ملخصك', guide_4_text: 'رسوم واضحة لدخلك ومصاريفك ومدخراتك، شهرًا بعد شهر.', guide_5_title: 'اربط بنكك', guide_5_text: 'إذا أردت، اربط بنكك وستُسجَّل مصاريفك تلقائيًا.', guide_done: 'تم', tour100_1_title: 'شاشتك الرئيسية في لمحة', tour100_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم، وعبارتك اليومية بالذكاء الاصطناعي، والدائرة التي تعرض مصروفات الشهر حسب الفئة. كل شيء يأتي مما تسجّله: لا شيء يُخترع.', tour100_2_title: 'أضف في ثوانٍ', tour100_2_text: 'يفتح زر ✨ في الأسفل الإجراءات السريعة: إضافة مصروف أو دخل، أو البحث عن حركة، أو التحدث مع المحادثة. يمكنك أيضًا الإملاء أو إرسال صورة إيصال.', tour100_3_title: 'حساباتك وبنكك', tour100_3_text: 'تعيش حساباتك وبطاقاتك هنا، بنفس الرصيد المتاح الذي تراه في الرئيسية. إذا أردت، اربط بنكك وستُسجَّل حركاتك تلقائيًا.', tour100_4_title: 'الأهداف والادخار', tour100_4_text: 'أنشئ أهدافك وصندوق الطوارئ. يمكن للذكاء الاصطناعي أن يقترح خطة، لكن الادخار الذي يُحتسب هو ما تسجّله أنت: لا يُحفظ أبدًا من تلقاء نفسه.', tour100_5_title: 'محادثة مع أموالك', tour100_5_text: 'يفتح الزر نفسه ✨ المحادثة: اسأله أشياء مثل «على ماذا أنفقت أكثر هذا الشهر؟» فيجيب بأرقامك. هذا كل شيء! يمكنك إعادة هذه الجولة متى شئت من الإعدادات.', tour100_count: 'الخطوة {n} من {total}', tour100_settings_btn: 'عرض الجولة', set_group_account: 'الحساب', set_group_rules: 'قواعد أموالك', set_group_security: 'الأمان والخصوصية', set_group_personalization: 'التخصيص',
   chart_expenses: 'المصروفات',
   chart_savings: 'المدّخرات',
   res_cats_empty: 'لا توجد مصروفات هذا الشهر.',
@@ -15165,10 +15165,39 @@ function renderHomeSan() {
    deshacer) la repinta solo al volver a Inicio. Los montos pasan
    por fmt(): con el modo privacidad (ojo) se ven •••• igual que en
    el resto de la página. */
-const CHART_COLORS = ['#0b6e4f', '#1565c0', '#c2570b', '#6d3fc4', '#b3261e', '#00838f', '#9a6a00', '#5d6b7a'];
+/* Compilación 100 · P-G1 (guía de diseño §2.1/§2.2): fuera el
+   arcoíris de 8 colores asignado por posición de la categoría. La
+   dona usa la familia del color de marca VIGENTE (--accent, con el
+   tema claro/oscuro ya resuelto por canvasPalette): el segmento
+   mayor va en el color pleno, los siguientes en tintes del mismo
+   color y luego los neutros pizarra; «Otros» siempre en su gris.
+   Con el verde de marca se usa la paleta exacta de la guía. */
+function hexToRgb100(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function hexMix100(hex, hex2, f) {
+  const a = hexToRgb100(hex);
+  const b = hexToRgb100(hex2);
+  if (!a || !b) return hex;
+  const c = a.map((v, i) => Math.round(v + (b[i] - v) * f));
+  return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+const CHART_OTHERS_COLOR100 = '#d8dee3';
+function chartSegPalette100() {
+  const base = canvasPalette().header;
+  if (String(base).toLowerCase() === '#0b6e4f') return ['#0b6e4f', '#35a37d', '#8fc1ae', '#5d6b7a', '#b9c4ce'];
+  return [base, hexMix100(base, '#ffffff', 0.30), hexMix100(base, '#ffffff', 0.58), '#5d6b7a', '#b9c4ce'];
+}
 function chartColor(cat) {
-  const idx = allCategories().indexOf(cat);
-  return CHART_COLORS[(idx >= 0 ? idx : 0) % CHART_COLORS.length];
+  if (cat === 'Otros') return CHART_OTHERS_COLOR100;
+  const pal = chartSegPalette100();
+  const segs = homeChartSegments(currentMonthKey()).segs;
+  const idx = segs.findIndex((s) => s.cat === cat);
+  if (idx >= 0) return pal[Math.min(idx, pal.length - 1)];
+  return pal[0];
 }
 function homeChartSegments(key) {
   const byCat = new Map();
@@ -15180,11 +15209,13 @@ function homeChartSegments(key) {
     .filter((r) => r.cents > 0)
     .sort((a, b) => b.cents - a.cents);
   const total = rows.reduce((s, r) => s + r.cents, 0);
-  const segs = rows.slice(0, 6);
-  const rest = rows.slice(6);
+  /* Compilación 100 · P-G1 (guía §1.7): la dona enseña como
+     máximo 5 categorías + «Otros» (6 segmentos en total). */
+  const segs = rows.slice(0, 5);
+  const rest = rows.slice(5);
   if (rest.length) {
-    /* Lo que pasa de las 6 principales se agrupa en «Otros»; si
-       «Otros» ya está entre las 6, el resto se suma a su segmento
+    /* Lo que pasa de las 5 principales se agrupa en «Otros»; si
+       «Otros» ya está entre las 5, el resto se suma a su segmento
        (nunca dos segmentos con el mismo nombre). */
     const restCents = rest.reduce((s, r) => s + r.cents, 0);
     const otros = segs.find((r) => r.cat === 'Otros');
@@ -15218,7 +15249,7 @@ function renderHomeChart(key) {
   track.setAttribute('cy', '60');
   track.setAttribute('r', String(R));
   track.setAttribute('fill', 'none');
-  track.setAttribute('stroke-width', '20');
+  track.setAttribute('stroke-width', '13');
   track.setAttribute('class', 'chart-track');
   svg.appendChild(track);
   let acc = 0;
@@ -15231,7 +15262,7 @@ function renderHomeChart(key) {
     c.setAttribute('r', String(R));
     c.setAttribute('fill', 'none');
     c.setAttribute('stroke', chartColor(s.cat));
-    c.setAttribute('stroke-width', '20');
+    c.setAttribute('stroke-width', '13');
     c.setAttribute('class', 'chart-seg');
     c.setAttribute('data-cat', s.cat);
     c.setAttribute('stroke-dasharray', Math.max(0, len - gap) + ' ' + Math.max(0, C - len + gap));
@@ -15246,7 +15277,7 @@ function renderHomeChart(key) {
   centerVal.setAttribute('text-anchor', 'middle');
   centerVal.setAttribute('class', 'chart-center-value');
   const totalTxt = fmt(total);
-  centerVal.setAttribute('font-size', totalTxt.length > 9 ? '11' : (totalTxt.length > 7 ? '13' : '15'));
+  centerVal.setAttribute('font-size', totalTxt.length > 9 ? '13' : (totalTxt.length > 7 ? '16' : '20'));
   centerVal.textContent = totalTxt;
   svg.appendChild(centerVal);
   const centerLbl = document.createElementNS(NS, 'text');
@@ -15254,7 +15285,7 @@ function renderHomeChart(key) {
   centerLbl.setAttribute('y', '74');
   centerLbl.setAttribute('text-anchor', 'middle');
   centerLbl.setAttribute('class', 'chart-center-label');
-  centerLbl.setAttribute('font-size', '8.5');
+  centerLbl.setAttribute('font-size', '10.5');
   centerLbl.textContent = t('chart_center_label');
   svg.appendChild(centerLbl);
   svgBox.appendChild(svg);
@@ -15263,9 +15294,9 @@ function renderHomeChart(key) {
   for (const s of data.segs.slice(0, 3)) {
     const li = el('li', 'chart-legend-item');
     const dot = el('span', 'chart-dot');
+    /* Compilación 100 · P-G1: el punto de la leyenda es SOLO color
+       (sin icono blanco dentro: era el toque más infantil). */
     dot.style.background = chartColor(s.cat);
-    dot.style.color = '#fff';
-    dot.innerHTML = iconSvg(catIconName(s.cat));
     li.appendChild(dot);
     li.appendChild(el('span', 'chart-legend-name', catName(s.cat)));
     li.appendChild(el('span', 'chart-legend-amt', fmt(s.cents)));
@@ -16374,6 +16405,35 @@ function renderFlowCard() {
     body.appendChild(el('p', 'item-sub', t('c91_flow_payday', { date: recurringDateLabel(proj.nextPayday) })));
   }
   if (proj.varDaily > 0) body.appendChild(el('p', 'item-sub', t('flow_var_note')));
+  /* Compilación 100 · P-G4 (guía §5): mini-barras mensuales de
+     flujo — lo que entra y lo que sale de los últimos 6 meses con
+     el sistema de barras (marca para lo que entra, rojo funcional
+     para lo que sale, el monto SIEMPRE en texto: nunca solo el
+     color). Sin movimientos en los 6 meses, el bloque no sale. */
+  const fhMonths100 = [];
+  for (let fi100 = 5; fi100 >= 0; fi100--) {
+    const fk100 = shiftMonth(chartMonth, -fi100);
+    fhMonths100.push({ key: fk100, inc: sumCents(monthCountedIncomes(fk100)), exp: sumCents(monthCountedExpenses(fk100)) });
+  }
+  const fhMax100 = Math.max.apply(null, fhMonths100.map((m) => Math.max(m.inc, m.exp)).concat([1]));
+  if (fhMonths100.some((m) => m.inc > 0 || m.exp > 0)) {
+    const fhBox100 = el('div', 'flow-hist100');
+    fhBox100.appendChild(el('p', 'item-sub', t('chart_income') + ' / ' + t('chart_expenses')));
+    for (const fm100 of fhMonths100) {
+      if (fm100.inc <= 0 && fm100.exp <= 0) continue;
+      const fp100 = fm100.key.split('-');
+      const fLabel100 = new Intl.DateTimeFormat(localeTag(), { month: 'short' })
+        .format(new Date(Number(fp100[0]), Number(fp100[1]) - 1, 1));
+      fhBox100.appendChild(chartBarRow(fLabel100 + ' · ' + t('chart_income'), fmt(fm100.inc),
+        Math.round(fm100.inc / fhMax100 * 100)));
+      const outRow100 = chartBarRow(fLabel100 + ' · ' + t('chart_expenses'), fmt(fm100.exp),
+        Math.round(fm100.exp / fhMax100 * 100));
+      const outFill100 = outRow100.querySelector('.budget-fill');
+      if (outFill100) outFill100.classList.add('flow-out-fill100');
+      fhBox100.appendChild(outRow100);
+    }
+    body.appendChild(fhBox100);
+  }
   const ul = el('ul', 'item-list');
   for (const r of proj.rows.slice(0, 45)) {
     const li = el('li', 'item');
@@ -16508,16 +16568,24 @@ function buildYearCanvas() {
     [t('chart_expenses'), fmt(d.expenses), P.red],
     [t('chart_savings'), fmt(Math.max(0, d.saved)), P.ink]
   ];
+  const maxRow100 = Math.max(d.income, d.expenses, Math.max(0, d.saved), 1);
+  const rowCents100 = [d.income, d.expenses, Math.max(0, d.saved)];
   let y = 270;
-  for (const row of rows) {
+  rows.forEach((row, ri100) => {
     ctx.fillStyle = P.muted;
     ctx.font = '30px system-ui, sans-serif';
     ctx.fillText(row[0], 48, y);
     ctx.fillStyle = row[2];
     ctx.font = 'bold 58px system-ui, sans-serif';
     ctx.fillText(row[1], 48, y + 64);
+    /* Compilación 100 · P-G5: la barra del sistema bajo cada cifra
+       del año (ancho ∝ valor, el color funcional de su fila). */
+    if (ctx.fillRect && rowCents100[ri100] > 0) {
+      ctx.fillStyle = row[2];
+      ctx.fillRect(48, y + 84, Math.max(8, Math.round(680 * rowCents100[ri100] / maxRow100)), 14);
+    }
     y += 175;
-  }
+  });
   if (d.best) {
     ctx.fillStyle = P.ink;
     ctx.font = '30px system-ui, sans-serif';
@@ -16602,7 +16670,26 @@ function trendData(key) {
    la 71 «inventaba una montaña» entre meses, informe de Sterlin):
    una barra por mes con su cifra legible encima, en el formato de
    dinero de la app (fmtMoney). Colores de la paleta activa. */
-function drawTrendCanvas(canvas, months) {
+/* Compilación 100 · P-G3 (guía §2.1): barra con la esquina
+   superior redondeada (5 px); si el lienzo no sabe de caminos, se
+   cae al rectángulo de siempre. */
+function roundTopRect100(ctx, x, y, w, h, r) {
+  if (!(ctx.beginPath && ctx.moveTo && ctx.lineTo && ctx.quadraticCurveTo && ctx.closePath && ctx.fill)) {
+    ctx.fillRect(x, y, w, h);
+    return;
+  }
+  const rr = Math.min(r, w / 2, h);
+  ctx.beginPath();
+  ctx.moveTo(x, y + h);
+  ctx.lineTo(x, y + rr);
+  ctx.quadraticCurveTo(x, y, x + rr, y);
+  ctx.lineTo(x + w - rr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h);
+  ctx.closePath();
+  ctx.fill();
+}
+function drawTrendCanvas(canvas, months, selected) {
   const ctx = canvas.getContext && canvas.getContext('2d');
   if (!ctx) return;
   const P = canvasPalette();
@@ -16612,22 +16699,39 @@ function drawTrendCanvas(canvas, months) {
   const base = H - 30, top = 34;
   const slot = W / months.length;
   const barW = Math.min(64, Math.max(18, slot * 0.52));
+  const maxIdx = months.reduce((bi, m, i) => (m.cents > months[bi].cents ? i : bi), 0);
+  const curIdx = months.length - 1;
   ctx.textAlign = 'center';
   months.forEach((m, i) => {
     const cx = slot * i + slot / 2;
     const h = Math.max(0, Math.round((base - top) * m.cents / max));
     if (h > 0) {
-      ctx.fillStyle = P.header;
-      ctx.fillRect(cx - barW / 2, base - h, barW, h);
+      /* Gradiente sutil de marca: claro arriba, pleno en la base. */
+      let fill = P.header;
+      if (ctx.createLinearGradient) {
+        const grad = ctx.createLinearGradient(0, base - h, 0, base);
+        if (grad && grad.addColorStop) {
+          grad.addColorStop(0, hexMix100(P.header, '#ffffff', 0.35));
+          grad.addColorStop(1, P.header);
+          fill = grad;
+        }
+      }
+      ctx.fillStyle = fill;
+      roundTopRect100(ctx, cx - barW / 2, base - h, barW, h, 5);
     }
-    ctx.fillStyle = P.ink;
-    ctx.font = 'bold 14px sans-serif';
-    ctx.fillText(fmtMoney(m.cents), cx, h > 0 ? base - h - 8 : base - 8);
+    /* Guía §1.5: la cifra va SOLO en el mes mayor, en el actual y
+       en el que la persona toque; el resto se lee al tocar. */
+    if (i === maxIdx || i === curIdx || i === selected) {
+      ctx.fillStyle = P.ink;
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText(fmtMoney(m.cents), cx, h > 0 ? base - h - 8 : base - 8);
+    }
     ctx.fillStyle = P.muted;
     ctx.font = '14px sans-serif';
     ctx.fillText(m.label, cx, base + 20);
   });
-  ctx.fillStyle = P.muted;
+  /* Línea base única, al 12 % de la tinta (guía §2.1). */
+  ctx.fillStyle = hexMix100(P.ink, P.bg, 0.88);
   ctx.fillRect(0, base + 1, W, 1);
 }
 function renderTrend() {
@@ -16643,7 +16747,19 @@ function renderTrend() {
   const emptyEl = document.getElementById('trend-empty');
   if (emptyEl) emptyEl.hidden = has;
   canvas.hidden = !has;
-  if (has) drawTrendCanvas(canvas, monthsWith);
+  if (has) {
+    drawTrendCanvas(canvas, monthsWith, -1);
+    /* Compilación 100 · P-G3: tocar una barra enseña su cifra
+       (las demás siguen sin etiqueta, como manda la guía). */
+    canvas.onclick = (ev) => {
+      try {
+        const r = canvas.getBoundingClientRect();
+        const x = (ev.clientX - r.left) * (canvas.width / (r.width || canvas.width));
+        const idx = Math.max(0, Math.min(monthsWith.length - 1, Math.floor(x / (canvas.width / monthsWith.length))));
+        drawTrendCanvas(canvas, monthsWith, idx);
+      } catch (e) { /* sin geometría disponible: sin selección */ }
+    };
+  }
   clearNode(weeksBox);
   /* Compilación 75: solo hasta la semana actual — las semanas
      futuras (vacías por definición) ya no se pintan. */
@@ -27060,14 +27176,18 @@ try {
    que la imagen compartida se vea como la app. Si las variables no se
    pueden leer, respalda con la paleta clara de siempre. */
 function canvasPalette() {
-  const p = { bg: '#ffffff', header: '#0b6e4f', headerText: '#ffffff', ink: '#1c2733', muted: '#5d6b7a' };
+  const p = { bg: '#ffffff', header: '#0b6e4f', headerText: '#ffffff', ink: '#1c2733', muted: '#5d6b7a', accent: '#0b6e4f', green: '#0b6e4f', red: '#b3261e', amber: '#9a6a00' };
   try {
     const cs = window.getComputedStyle(document.documentElement);
     const read = (name) => (cs.getPropertyValue(name) || '').trim();
     if (read('--card')) p.bg = read('--card');
-    if (read('--accent')) p.header = read('--accent');
+    if (read('--accent')) { p.header = read('--accent'); p.accent = read('--accent'); p.green = read('--accent'); }
     if (read('--ink')) p.ink = read('--ink');
     if (read('--muted')) p.muted = read('--muted');
+    /* Compilación 100: los colores funcionales de los lienzos salen
+       del tema activo, como el resto (guía de diseño §2.3). */
+    if (read('--danger')) p.red = read('--danger');
+    if (read('--amber')) p.amber = read('--amber');
   } catch (e) { /* sin CSS disponible: paleta clara de respaldo */ }
   return p;
 }
@@ -27342,7 +27462,7 @@ function buildReportCanvas() {
   ];
   if (d.goal) mainLines.push([t('rep_goal') + ' · ' + d.goal.name, d.goal.pct + '%']);
   const top = d.topCats || [];
-  const height = 190 + mainLines.length * 52 + (top.length ? 80 + top.length * 46 : 0) + 24 + 88;
+  const height = 190 + mainLines.length * 52 + (top.length ? 96 + top.length * 66 : 0) + 24 + 88;
   const canvas = document.createElement('canvas');
   canvas.width = 800; canvas.height = height;
   const ctx = canvas.getContext('2d');
@@ -27355,6 +27475,24 @@ function buildReportCanvas() {
   ctx.fillText(t('app_title'), 40, 58);
   ctx.fillStyle = P.ink; ctx.font = 'bold 30px sans-serif';
   ctx.fillText(d.month, 40, 150);
+  /* Compilación 100 · P-G5 (guía §5): la dona pequeña del mes con
+     la MISMA paleta de la dona de Inicio, junto al título. */
+  try {
+    const hd100 = homeChartSegments(chartMonth);
+    if (hd100.total > 0 && ctx.arc && ctx.stroke && ctx.beginPath) {
+      const palD100 = chartSegPalette100();
+      let a100 = -Math.PI / 2;
+      ctx.lineWidth = 13;
+      hd100.segs.forEach((s100, si100) => {
+        const sweep100 = (s100.cents / hd100.total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.strokeStyle = s100.cat === 'Otros' ? CHART_OTHERS_COLOR100 : palD100[Math.min(si100, palD100.length - 1)];
+        ctx.arc(688, 226, 44, a100 + 0.02, a100 + Math.max(0.03, sweep100 - 0.02));
+        ctx.stroke();
+        a100 += sweep100;
+      });
+    }
+  } catch (e) { /* sin lienzo completo: el informe sigue en texto */ }
   ctx.font = '26px sans-serif';
   let y = 210;
   for (const line of mainLines) {
@@ -27368,10 +27506,18 @@ function buildReportCanvas() {
     ctx.fillText(t('rep_top3'), 40, y);
     ctx.font = '25px sans-serif';
     y += 48;
+    const pal100 = chartSegPalette100();
+    const topMax100 = Math.max.apply(null, top.map((c) => c.amt).concat([1]));
     top.forEach((c, i) => {
       ctx.fillStyle = P.muted; ctx.fillText((i + 1) + '. ' + catName(c.cat), 40, y);
       ctx.fillStyle = P.ink; ctx.fillText(fmtMoney(c.amt), 420, y);
-      y += 46;
+      /* Compilación 100 · P-G5: la barra del sistema bajo cada
+         categoría del top (ancho ∝ monto, color de la paleta). */
+      if (ctx.fillRect) {
+        ctx.fillStyle = pal100[Math.min(i, pal100.length - 1)];
+        ctx.fillRect(40, y + 12, Math.max(6, Math.round(680 * c.amt / topMax100)), 12);
+      }
+      y += 66;
     });
   }
   ctx.fillStyle = BRAND_GREEN; ctx.fillRect(0, height - 64, 800, 64);
@@ -28715,7 +28861,10 @@ function enterApp() {
      uso (cuenta → PIN → banco); el tour arranca al terminarlo. */
   if (setupPending) { setupPending = false; startSetupWizard(); }
   else if (guidePending) { guidePending = false; startGuideTour(); }
-  else if (ob98Pending) { ob98Pending = false; openAiChat(); chat88Push('start98', null, ''); }
+  else if (ob98Pending) { ob98Pending = false; tour100AfterInterview = !db.settings.guideDone; openAiChat(); chat88Push('start98', null, ''); }
+  /* Compilación 100: sin asistente, sin guía pendiente y sin
+     entrevista, llegar a Inicio dispara el tour si nunca se vio. */
+  else maybeStartTour100();
   /* Compilación 76 (punto 18): entrar (también tras desbloquear)
      re-dispara la sincronización del banco si toca; el freno de
      15 min de bankResumeSync la hace gratis tras la de apertura. */
@@ -28782,19 +28931,27 @@ function showOnboarding() {
   applyStaticI18n();
   window.scrollTo(0, 0);
 }
-/* ---- Tour contextual DENTRO de la app (Compilación 75) ----------
-   Tarjetas guía secuenciales ancladas a elementos reales: el héroe
-   de Inicio, el botón +, las pestañas Presupuesto y Resumen de la
-   barra inferior y la tarjeta de conexión bancaria. Cada paso tiene
-   «Siguiente» y «Saltar» (saltar cierra todo el tour). El estado se
-   persiste (db.settings.guideDone): se muestra una sola vez, en la
-   primera apertura de una cuenta nueva. */
+/* ---- Tour guiado DENTRO de la app (Compilación 75 → 100) -------
+   Nació en la 75 como tarjetas ancladas; la Compilación 100 lo
+   rehace con los pasos que pidió Sterlin, siguiendo el patrón del
+   tour de AYUNA (1.9.8): cada paso NAVEGA a su pantalla y la
+   tarjeta lo explica en dos o tres líneas — Inicio, Agregar, Mis
+   cuentas/banco, Metas y Ahorros y el Chat con tu dinero. Los
+   textos son LOCALES y completos en los 12 idiomas (tour100_*):
+   ninguna acción del servidor genera tours y el servidor no se
+   toca. «Saltar» está siempre a la vista y cierra el tour en un
+   toque; al terminar o saltarlo, la persona queda en Inicio. La
+   marca persistente de «tour visto» es db.settings.guideDone (la
+   misma de la 75: quien ya hizo aquel tour no recibe otro). Desde
+   Ajustes se repite con «Ver el tour» sin tocar la marca. Si la
+   entrevista inicial de la bienvenida va primero, el tour ESPERA
+   a que el chat se cierre (lección del P21 de la Comp. 99). */
 const GUIDE_STEPS = [
-  { anchor: '#spend-card', title: 'guide_1_title', text: 'guide_1_text' },
-  { anchor: '#fab-universal', title: 'guide_2_title', text: 'guide_2_text' },
-  { anchor: '#bottom-nav [data-bnav="presupuesto"]', title: 'guide_3_title', text: 'guide_3_text' },
-  { anchor: '#bottom-nav [data-bnav="resumen"]', title: 'guide_4_title', text: 'guide_4_text' },
-  { anchor: '#home-bank', title: 'guide_5_title', text: 'guide_5_text' },
+  { view: 'home', anchor: '#spend-card', title: 'tour100_1_title', text: 'tour100_1_text' },
+  { view: 'home', anchor: '#fab-universal', title: 'tour100_2_title', text: 'tour100_2_text' },
+  { view: 'cuentas', anchor: '#acc-avail99', title: 'tour100_3_title', text: 'tour100_3_text' },
+  { view: 'ahorros', anchor: '#goal-card', title: 'tour100_4_title', text: 'tour100_4_text' },
+  { view: 'home', anchor: '#fab-universal', title: 'tour100_5_title', text: 'tour100_5_text' },
 ];
 let guideStep = -1;
 let guideAnchorEl = null;
@@ -28823,24 +28980,43 @@ function guideAdsHold(on) {
   guideAdsHeld = on;
   setAdsSuppressed(on);
 }
-function startGuideTour() {
-  if (!db || demoMode || db.settings.guideDone) return;
+/* Compilación 100: guideForce100 distingue la repetición manual
+   desde Ajustes (vale aunque el tour ya esté marcado como visto);
+   tour100AfterInterview recuerda que la entrevista inicial de la
+   bienvenida va primero y el tour sale al cerrarse el chat. */
+let guideForce100 = false;
+let tour100AfterInterview = false;
+function startGuideTour(force) {
+  if (!db || demoMode) return;
+  if (db.settings.guideDone && !force) return;
+  guideForce100 = !!force;
   if (currentView !== 'home') showView('home');
   guideAdsHold(true);
   guideStep = -1;
   guideAdvance();
 }
 function guideAdvance() {
-  /* Con la guía ya hecha, un avance de más no la resucita. */
-  if (guideStep < 0 && db && db.settings.guideDone) return;
+  /* Con la guía ya hecha, un avance de más no la resucita (la
+     repetición desde Ajustes entra con guideForce100). */
+  if (guideStep < 0 && db && db.settings.guideDone && !guideForce100) return;
   clearGuideHighlight();
   guideStep += 1;
-  while (guideStep < GUIDE_STEPS.length && !guideAnchorFor(GUIDE_STEPS[guideStep])) guideStep += 1;
+  /* Compilación 100: cada paso NAVEGA primero a su pantalla
+     (patrón AYUNA) y luego busca su ancla; un paso cuya pantalla
+     no está disponible (sección apagada) se salta solo. */
+  while (guideStep < GUIDE_STEPS.length) {
+    const st100 = GUIDE_STEPS[guideStep];
+    if (st100.view && currentView !== st100.view) showView(st100.view);
+    if (guideAnchorFor(st100)) break;
+    guideStep += 1;
+  }
   if (guideStep >= GUIDE_STEPS.length) { endGuideTour(); return; }
   const step = GUIDE_STEPS[guideStep];
   guideAnchorEl = guideAnchorFor(step);
   guideAnchorEl.classList.add('guide-highlight');
   try { guideAnchorEl.scrollIntoView({ block: 'center' }); } catch (e) { /* entornos sin scroll */ }
+  const count = document.getElementById('guide-count');
+  if (count) count.textContent = t('tour100_count', { n: guideStep + 1, total: GUIDE_STEPS.length });
   const title = document.getElementById('guide-title');
   if (title) title.textContent = t(step.title);
   const text = document.getElementById('guide-text');
@@ -28854,9 +29030,28 @@ function endGuideTour() {
   clearGuideHighlight();
   guideAdsHold(false);
   guideStep = -1;
+  guideForce100 = false;
   const card = document.getElementById('guide-card');
   if (card) card.hidden = true;
   if (db && !db.settings.guideDone) { db.settings.guideDone = true; save(); }
+  /* Compilación 100: al terminar o saltarlo, la persona queda en
+     Inicio (patrón AYUNA), esté en la pantalla que esté. */
+  if (db && currentView !== 'home') showView('home');
+}
+/* Compilación 100: el tour sale SOLO al llegar a Inicio cuando
+   nada más tiene el turno — ni el asistente de primer uso, ni la
+   entrevista inicial, ni el chat abierto. Si algo iba primero,
+   espera a la próxima llegada (patrón AYUNA 1.9.8). */
+function maybeStartTour100() {
+  if (!db || demoMode || db.settings.guideDone || guideStep >= 0) return;
+  if (!db.settings.onboarded) return;
+  const shell = document.getElementById('app-shell');
+  if (!shell || shell.hidden) return;
+  const wiz = document.getElementById('setup-wizard');
+  if (wiz && !wiz.hidden) return;
+  const chat = document.getElementById('view-chat');
+  if (chat && !chat.hidden) return;
+  startGuideTour();
 }
 
 /* ---------------- Compilación 76 · Asistente de primer uso --------
@@ -28923,7 +29118,7 @@ function finishSetupWizard() {
      toques de la tarjeta de arranque: botón aparentemente
      muerto). Si la IA falla, ob98Start98 ya enseña el error en
      el chat con su tarjeta de respaldo: nunca pantalla muerta. */
-  if (ob98Pending) { ob98Pending = false; openAiChat(); chat88Push('start98', null, ''); return; }
+  if (ob98Pending) { ob98Pending = false; tour100AfterInterview = !db.settings.guideDone; openAiChat(); chat88Push('start98', null, ''); return; }
   startGuideTour();
 }
 async function onSetupSignup() {
@@ -29370,6 +29565,10 @@ function wireEvents() {
   if (guideNextBtn) guideNextBtn.addEventListener('click', guideAdvance);
   const guideSkipBtn = document.getElementById('guide-skip');
   if (guideSkipBtn) guideSkipBtn.addEventListener('click', endGuideTour);
+  /* Compilación 100: «Ver el tour» en Ajustes repite el tour
+     guiado aunque ya esté marcado como visto (sin tocar la marca). */
+  const tourReplayBtn100 = document.getElementById('btn-open-tour100');
+  if (tourReplayBtn100) tourReplayBtn100.addEventListener('click', () => { startGuideTour(true); });
   const proHomeBtn = document.getElementById('pro-home-btn');
   if (proHomeBtn) proHomeBtn.addEventListener('click', goProSettings);
   const proHomeClose = document.getElementById('pro-home-close');
@@ -29720,7 +29919,12 @@ function wireEvents() {
     setTimeout(petoChatKbSync86, 60);
     setTimeout(petoChatKbSync86, 350);
   });
-  document.getElementById('ai-chat-back').addEventListener('click', closeAiChat);
+  document.getElementById('ai-chat-back').addEventListener('click', () => {
+    closeAiChat();
+    /* Compilación 100: la entrevista inicial iba primero (P21);
+       al cerrarse el chat, el tour que esperaba sale por fin. */
+    if (tour100AfterInterview) { tour100AfterInterview = false; maybeStartTour100(); }
+  });
   /* Compilación 85 (cambio 4): el botón flotante único se despliega
      y el Chat vive en su menú; tocar fuera lo contrae. */
   /* Compilación 88 (punto 1): UN SOLO botón flotante de cristal
