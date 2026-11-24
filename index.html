@@ -18,33 +18,33 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="logo.png" alt="Logo de PETO" data-i18n-attr="alt:alt_logo">
-    <a class="brand" href="./">PETO</a>
-    <nav>
-      <a href="#calculadoras" data-i18n="nav_calc">Calculadoras</a>
-      <a href="#podcast" data-i18n="nav_podcast">Podcast</a>
-      <a href="precios/" data-i18n="nav_precios">Precios</a>
-      <a href="recursos/" data-i18n="nav_recursos">Recursos</a>
-      <a href="blog/" data-i18n="nav_blog">Blog</a>
-      <a href="privacidad/" data-i18n="nav_priv">Privacidad</a>
+    <img src="/logo.png" alt="Logo de PETO Finanzas" data-i18n-attr="alt:alt_logo">
+    <a class="brand" href="/">PETO Finanzas</a>
+    <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-principal">☰</button>
+    <nav id="nav-principal">
+      <a href="/#calculadoras" data-i18n="nav_calc">Calculadoras</a>
+      <a href="/#podcast" data-i18n="nav_podcast">Podcast</a>
+      <a href="/precios/" data-i18n="nav_precios">Precios</a>
+      <a href="/recursos/" data-i18n="nav_recursos">Recursos</a>
+      <a href="/blog/" data-i18n="nav_blog">Blog</a>
+      <a href="/privacidad/" data-i18n="nav_priv">Privacidad</a>
       <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
         <button type="button" data-lang-btn="es">ES</button>
         <button type="button" data-lang-btn="it">IT</button>
       </span>
-      <a class="btn" href="app/" data-i18n="btn_probar">Probar gratis</a>
-      <a class="btn ghost" href="app/?login=1" data-i18n="btn_login">Iniciar sesión</a>
+      <a class="btn" href="/app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
   <div class="hero">
     <h1 data-i18n="hero_h1">Tu dinero bajo control,<br><span class="verde">sin complicaciones.</span></h1>
+    <p class="hero-tag" data-i18n="hero_tag">Controla tus finanzas, construye tus ahorros.</p>
     <p class="sub" data-i18n="hero_sub">PETO es la app de control de gastos pensada para la vida real: sueldo semanal, pagos fijos, el san con la familia y las deudas que quieres cerrar. Cada día te dice con un solo número <strong>cuánto puedes gastar hoy</strong> sin pasarte de tu presupuesto.</p>
     <div class="cta-row">
       <a class="btn" href="app/" data-i18n="btn_probar">Probar gratis</a>
       <a class="btn ghost" href="app/?login=1" data-i18n="btn_login">Iniciar sesión</a>
     </div>
-    <img class="banner" src="portada.png" alt="PETO — Control de gastos" data-i18n-attr="alt:alt_banner">
-    <p class="muted" data-i18n="hero_nota">Gratis. Sin anuncios. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.</p>
+    <p class="muted" data-i18n="hero_nota">Gratis para empezar: la versión gratis muestra anuncios, y PETO Pro ($4.99/mes, con 14 días de prueba gratis) es sin anuncios e incluye la sincronización bancaria. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.</p>
   </div>
 
   <section id="que-es">
@@ -120,24 +120,51 @@
     </div>
   </section>
 
-  <section id="prueba">
-    <h2 data-i18n="tst_h2">🧪 Prueba PETO antes que nadie</h2>
-    <p class="muted" data-i18n="tst_sub">PETO entra en prueba cerrada en Google Play (Android) antes de su lanzamiento. Las plazas son limitadas y participar es gratis: déjanos tu correo y te escribimos en cuanto haya una plaza para ti.</p>
-    <form class="calc" id="form-testers">
-      <label for="tst-nombre" data-i18n="tst_nombre_l">Tu nombre (opcional)</label>
-      <input id="tst-nombre" type="text" autocomplete="name" placeholder="Ej. María" data-i18n-attr="placeholder:tst_nombre_ph">
-      <label for="tst-email" data-i18n="tst_email_l">Tu correo</label>
-      <input id="tst-email" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" data-i18n-attr="placeholder:tst_email_ph" required>
-      <button class="btn" type="submit" data-i18n="tst_btn">Quiero probarla</button>
-    </form>
-    <div class="resultado" id="tst-resultado"></div>
+  <section id="descargar">
+    <h2 data-i18n="dl_h2">📲 Ya está en Google Play</h2>
+    <p class="muted" data-i18n="dl_sub">PETO ya está disponible en Google Play: descárgala gratis y crea tu cuenta en un minuto. La versión gratis muestra anuncios; <strong>PETO Pro ($4.99/mes, con 14 días de prueba gratis) es sin anuncios</strong> e incluye la sincronización bancaria.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://play.google.com/store/apps/details?id=app.peto" target="_blank" rel="noopener" data-i18n="dl_btn">Descargar en Google Play</a>
+      <a class="btn ghost" href="app/" data-i18n="btn_abrir">Abrir la app web</a>
+    </div>
+    <p class="muted" data-i18n="dl_ios">¿Tienes iPhone? La app de iOS está en revisión con Apple. Mientras tanto, usa la <a href="app/">app web</a>: es la misma cuenta y los mismos datos.</p>
+  </section>
+
+  <section id="comunidad">
+    <h2 data-i18n="com_h2">👥 Comunidad y más</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="emoji">💬</div>
+        <h3 data-i18n="com1_t">Canal de WhatsApp «Dinero en Orden»</h3>
+        <p data-i18n="com1_p">El episodio de la semana, un consejo de la app y el reto de ahorro de los viernes, directo en tu WhatsApp.</p>
+        <a class="btn ghost" href="https://whatsapp.com/channel/0029Vb95p7c5fM5gIzzMaQ2O" target="_blank" rel="noopener" data-i18n="com1_btn">Unirme al canal</a>
+      </div>
+      <div class="card">
+        <div class="emoji">👥</div>
+        <h3 data-i18n="com2_t">Grupo de Facebook «Dinero en Orden»</h3>
+        <p data-i18n="com2_p">La comunidad de PETO Finanzas: comparte tu meta de dinero, pregunta sin pena y celebra las victorias de la semana con el grupo.</p>
+        <a class="btn ghost" href="https://www.facebook.com/share/g/1Eq7WNgLGG/" target="_blank" rel="noopener" data-i18n="com2_btn">Unirme al grupo</a>
+      </div>
+      <div class="card">
+        <div class="emoji">📗</div>
+        <h3 data-i18n="com3_t">Mi libro: «De cheque en cheque a dinero en orden»</h3>
+        <p data-i18n="com3_p">El método de PETO Finanzas en papel y en Kindle: capítulos cortos, números reales y un plan para dejar de vivir de cheque en cheque.</p>
+        <a class="btn ghost" href="https://www.amazon.com/dp/B0HSKN49JK" target="_blank" rel="noopener" data-i18n="com3_btn">Ver el libro en Amazon</a>
+      </div>
+      <div class="card">
+        <div class="emoji">🦊</div>
+        <h3 data-i18n="com4_t">Tito el Zorrito</h3>
+        <p data-i18n="com4_p">Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin: canciones cortas para que los niños aprendan valores y hábitos jugando. También tiene su propio libro en Amazon.</p>
+        <p><a class="btn ghost" href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener" data-i18n="com4_btn">Ver el canal de Tito</a> <a class="btn ghost" href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener" data-i18n="com5_btn">Libro de Tito en Amazon</a></p>
+      </div>
+    </div>
   </section>
 
   <footer class="site">
-    <p data-i18n="foot_1">PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · <a href="precios/">Precios</a> · <a href="recursos/">Recursos</a> · <a href="blog/">Blog</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a></p>
-    <p data-i18n="foot_2">Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.</p>
-    <p><a href="https://www.youtube.com/@PetoFinanzas" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/peto_finanzas" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@peto.finanzas" target="_blank" rel="noopener">TikTok</a> · <a href="https://www.facebook.com/profile.php?id=286141488762368" target="_blank" rel="noopener">Facebook</a> · <a href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener">Spotify</a> · <a href="https://play.google.com/store/apps/details?id=app.peto" target="_blank" rel="noopener">Google Play</a> · <a href="https://linktr.ee/petofinanzas" target="_blank" rel="noopener">Linktree</a></p>
-    <p><a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a></p>
+    <p data-i18n="foot_1">PETO Finanzas · <a href="/privacidad/">Política de privacidad</a> · <a href="/terminos/">Términos</a> · <a href="/app/">Abrir la app web</a> · <a href="/precios/">Precios</a> · <a href="/recursos/">Recursos</a> · <a href="/blog/">Blog</a></p>
+    <p data-i18n="foot_2">Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Teléfono: <a href="tel:+13474492484">+1 (347) 449-2484</a></p>
+    <p><a href="https://www.youtube.com/@PetoFinanzas" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.youtube.com/@PETOFinances" target="_blank" rel="noopener">YouTube (inglés)</a> · <a href="https://www.instagram.com/peto_finanzas" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@peto.finanzas" target="_blank" rel="noopener">TikTok</a> · <a href="https://www.facebook.com/share/g/1Eq7WNgLGG/" target="_blank" rel="noopener">Facebook</a> · <a href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener">Spotify</a> · <a href="https://play.google.com/store/apps/details?id=app.peto" target="_blank" rel="noopener">Google Play</a> · <a href="https://linktr.ee/petofinanzas" target="_blank" rel="noopener">Linktree</a></p>
+    <p data-i18n="foot_3">Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin, para que los niños aprendan jugando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro de Tito en Amazon</a></p>
   </footer>
 </div>
 <script>
@@ -145,20 +172,21 @@ window.PETO_TEXTOS = {
   es: {
     __title: 'PETO — Control de gastos, presupuestos y tu san bajo control',
     __desc: 'PETO es tu app gratuita de control de gastos: presupuestos por categoría, pagos fijos con avisos, tu san o tanda, calculadora de deudas y un número claro cada día: cuánto puedes gastar hoy. En tu teléfono y en la web, con la misma cuenta.',
-    alt_logo: 'Logo de PETO',
-    alt_banner: 'PETO — Control de gastos',
+    alt_logo: 'Logo de PETO Finanzas',
+    hero_tag: 'Controla tus finanzas, construye tus ahorros.',
     nav_calc: 'Calculadoras',
     nav_podcast: 'Podcast',
     nav_precios: 'Precios',
     nav_recursos: 'Recursos',
     nav_blog: 'Blog',
     nav_priv: 'Privacidad',
-    btn_probar: 'Probar gratis', btn_login: 'Iniciar sesión',
+    btn_probar: 'Probar gratis',
+    btn_login: 'Iniciar sesión', btn_login: 'Iniciar sesión',
     btn_ver: 'Ver la app',
     btn_crear: 'Crear mi cuenta gratis',
     hero_h1: 'Tu dinero bajo control,<br><span class="verde">sin complicaciones.</span>',
     hero_sub: 'PETO es la app de control de gastos pensada para la vida real: sueldo semanal, pagos fijos, el san con la familia y las deudas que quieres cerrar. Cada día te dice con un solo número <strong>cuánto puedes gastar hoy</strong> sin pasarte de tu presupuesto.',
-    hero_nota: 'Gratis. Sin anuncios. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.',
+    hero_nota: 'Gratis para empezar: la versión gratis muestra anuncios, y PETO Pro ($4.99/mes, con 14 días de prueba gratis) es sin anuncios e incluye la sincronización bancaria. Tus datos viajan cifrados y la app funciona en tu teléfono y aquí en la web con la misma cuenta.',
     que_h2: 'Qué hace PETO por ti',
     c1_t: '«Hoy puedes gastar $X»',
     c1_p: 'Al abrir la app ves un solo número: lo que te queda del mes dividido entre los días que faltan. Si hoy no te pasas, el mes cierra bien.',
@@ -188,8 +216,28 @@ window.PETO_TEXTOS = {
     pod_p: 'El podcast en español de la familia PETO: episodios a fondo, de 15 a 25 minutos, con ejemplos y plan paso a paso, con un tema de dinero por día y un paso concreto para aplicarlo hoy mismo. Fondo de emergencia, salir de deudas, auditar suscripciones, subir tu crédito y más, explicado sin palabras raras.',
     pod_btn: 'Escuchar el podcast',
     pod_blog_btn: 'Leer los episodios (blog)',
-    foot_1: 'PETO — Control de gastos · <a href="privacidad/">Política de privacidad</a> · <a href="app/">Abrir la app web</a> · <a href="precios/">Precios</a> · <a href="recursos/">Recursos</a> · <a href="blog/">Blog</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>',
-    foot_2: 'Hecho con la regla de la casa: el ahorro no se calcula solo — tú anotas tu ahorro real.',
+    foot_1: 'PETO Finanzas · <a href="/privacidad/">Política de privacidad</a> · <a href="/terminos/">Términos</a> · <a href="/app/">Abrir la app web</a> · <a href="/precios/">Precios</a> · <a href="/recursos/">Recursos</a> · <a href="/blog/">Blog</a>',
+    foot_2: 'Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Teléfono: <a href="tel:+13474492484">+1 (347) 449-2484</a>',
+    foot_3: 'Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin, para que los niños aprendan jugando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro de Tito en Amazon</a>',
+    btn_abrir: 'Abrir la app web',
+    dl_h2: '📲 Ya está en Google Play',
+    dl_sub: 'PETO ya está disponible en Google Play: descárgala gratis y crea tu cuenta en un minuto. La versión gratis muestra anuncios; <strong>PETO Pro ($4.99/mes, con 14 días de prueba gratis) es sin anuncios</strong> e incluye la sincronización bancaria.',
+    dl_btn: 'Descargar en Google Play',
+    dl_ios: '¿Tienes iPhone? La app de iOS está en revisión con Apple. Mientras tanto, usa la <a href="app/">app web</a>: es la misma cuenta y los mismos datos.',
+    com_h2: '👥 Comunidad y más',
+    com1_t: 'Canal de WhatsApp «Dinero en Orden»',
+    com1_p: 'El episodio de la semana, un consejo de la app y el reto de ahorro de los viernes, directo en tu WhatsApp.',
+    com1_btn: 'Unirme al canal',
+    com2_t: 'Grupo de Facebook «Dinero en Orden»',
+    com2_p: 'La comunidad de PETO Finanzas: comparte tu meta de dinero, pregunta sin pena y celebra las victorias de la semana con el grupo.',
+    com2_btn: 'Unirme al grupo',
+    com3_t: 'Mi libro: «De cheque en cheque a dinero en orden»',
+    com3_p: 'El método de PETO Finanzas en papel y en Kindle: capítulos cortos, números reales y un plan para dejar de vivir de cheque en cheque.',
+    com3_btn: 'Ver el libro en Amazon',
+    com4_t: 'Tito el Zorrito',
+    com4_p: 'Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin: canciones cortas para que los niños aprendan valores y hábitos jugando. También tiene su propio libro en Amazon.',
+    com4_btn: 'Ver el canal de Tito',
+    com5_btn: 'Libro de Tito en Amazon',
     tst_h2: '🧪 Prueba PETO antes que nadie',
     tst_sub: 'PETO entra en prueba cerrada en Google Play (Android) antes de su lanzamiento. Las plazas son limitadas y participar es gratis: déjanos tu correo y te escribimos en cuanto haya una plaza para ti.',
     tst_nombre_l: 'Tu nombre (opcional)',
@@ -204,20 +252,21 @@ window.PETO_TEXTOS = {
   it: {
     __title: 'PETO — Controllo delle spese, budget e il tuo san sotto controllo',
     __desc: 'PETO è la tua app gratuita per il controllo delle spese: budget per categoria, pagamenti fissi con avvisi, il tuo san o tanda, calcolatore di debiti e un numero chiaro ogni giorno: quanto puoi spendere oggi. Sul tuo telefono e sul web, con lo stesso account.',
-    alt_logo: 'Logo di PETO',
-    alt_banner: 'PETO — Controllo delle spese',
+    alt_logo: 'Logo di PETO Finanzas',
+    hero_tag: 'Controlla le tue finanze, costruisci i tuoi risparmi.',
     nav_calc: 'Calcolatori',
     nav_podcast: 'Podcast',
     nav_precios: 'Prezzi',
     nav_recursos: 'Risorse',
     nav_blog: 'Blog',
     nav_priv: 'Privacy',
-    btn_probar: 'Prova gratis', btn_login: 'Accedi',
+    btn_probar: 'Prova gratis',
+    btn_login: 'Accedi', btn_login: 'Accedi',
     btn_ver: 'Vedi l\'app',
     btn_crear: 'Crea il mio account gratis',
     hero_h1: 'I tuoi soldi sotto controllo,<br><span class="verde">senza complicazioni.</span>',
     hero_sub: 'PETO è l\'app per il controllo delle spese pensata per la vita reale: stipendio settimanale, pagamenti fissi, il san con la famiglia e i debiti che vuoi chiudere. Ogni giorno ti dice con un solo numero <strong>quanto puoi spendere oggi</strong> senza sforare il tuo budget.',
-    hero_nota: 'Gratis. Senza pubblicità. I tuoi dati viaggiano cifrati e l\'app funziona sul tuo telefono e qui sul web con lo stesso account.',
+    hero_nota: 'Gratis per iniziare: la versione gratuita mostra annunci, e PETO Pro ($4,99/mese, con 14 giorni di prova gratuita) è senza pubblicità e include la sincronizzazione bancaria. I tuoi dati viaggiano cifrati e l\'app funziona sul tuo telefono e qui sul web con lo stesso account.',
     que_h2: 'Cosa fa PETO per te',
     c1_t: '«Oggi puoi spendere $X»',
     c1_p: 'Quando apri l\'app vedi un solo numero: quello che ti resta del mese diviso per i giorni che mancano. Se oggi non lo superi, il mese si chiude bene.',
@@ -247,8 +296,28 @@ window.PETO_TEXTOS = {
     pod_p: 'Il podcast in spagnolo della famiglia PETO: episodi a fondo, da 15 a 25 minuti, con esempi e un piano passo dopo passo, con un tema di denaro al giorno e un passo concreto da applicare oggi stesso. Fondo di emergenza, uscire dai debiti, controllare gli abbonamenti, migliorare il tuo punteggio di credito e altro ancora, spiegato senza parole difficili.',
     pod_btn: 'Ascolta il podcast',
     pod_blog_btn: 'Leggi gli episodi (blog)',
-    foot_1: 'PETO — Controllo delle spese · <a href="privacidad/">Informativa sulla privacy</a> · <a href="app/">Apri l\'app web</a> · <a href="precios/">Prezzi</a> · <a href="recursos/">Risorse</a> · <a href="blog/">Blog</a> · Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>',
-    foot_2: 'Fatto con la regola di casa: il risparmio non si calcola da solo — sei tu ad annotare il tuo risparmio reale.',
+    foot_1: 'PETO Finanzas · <a href="/privacidad/">Informativa sulla privacy</a> · <a href="/terminos/">Termini</a> · <a href="/app/">Apri l\'app web</a> · <a href="/precios/">Prezzi</a> · <a href="/recursos/">Risorse</a> · <a href="/blog/">Blog</a>',
+    foot_2: 'Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Telefono: <a href="tel:+13474492484">+1 (347) 449-2484</a>',
+    foot_3: 'Tito el Zorrito è il volpino delle canzoni per bambini in spagnolo di Sterlin, perché i bambini imparino giocando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro di Tito su Amazon</a>',
+    btn_abrir: 'Apri l\'app web',
+    dl_h2: '📲 È già su Google Play',
+    dl_sub: 'PETO è già disponibile su Google Play: scaricala gratis e crea il tuo account in un minuto. La versione gratuita mostra annunci; <strong>PETO Pro ($4,99/mese, con 14 giorni di prova gratuita) è senza pubblicità</strong> e include la sincronizzazione bancaria.',
+    dl_btn: 'Scarica da Google Play',
+    dl_ios: 'Hai un iPhone? L\'app iOS è in revisione da Apple. Nel frattempo usa l\'<a href="app/">app web</a>: è lo stesso account e gli stessi dati.',
+    com_h2: '👥 Comunità e altro',
+    com1_t: 'Canale WhatsApp «Dinero en Orden»',
+    com1_p: 'L\'episodio della settimana, un consiglio dell\'app e la sfida di risparmio del venerdì, direttamente sul tuo WhatsApp.',
+    com1_btn: 'Entra nel canale',
+    com2_t: 'Gruppo Facebook «Dinero en Orden»',
+    com2_p: 'La comunità di PETO Finanzas: condividi il tuo obiettivo di denaro, chiedi senza imbarazzo e celebra le vittorie della settimana con il gruppo.',
+    com2_btn: 'Entra nel gruppo',
+    com3_t: 'Il mio libro: «De cheque en cheque a dinero en orden»',
+    com3_p: 'Il metodo di PETO Finanzas su carta e su Kindle: capitoli brevi, numeri reali e un piano per smettere di vivere da stipendio a stipendio.',
+    com3_btn: 'Vedi il libro su Amazon',
+    com4_t: 'Tito el Zorrito',
+    com4_p: 'Tito el Zorrito è il volpino delle canzoni per bambini in spagnolo di Sterlin: canzoni brevi perché i bambini imparino valori e abitudini giocando. Ha anche un suo libro su Amazon.',
+    com4_btn: 'Vedi il canale di Tito',
+    com5_btn: 'Libro di Tito su Amazon',
     tst_h2: '🧪 Prova PETO prima di tutti',
     tst_sub: 'PETO entra in test chiuso su Google Play (Android) prima del lancio. I posti sono limitati e partecipare è gratis: lasciaci la tua email e ti scriveremo appena c\'è un posto per te.',
     tst_nombre_l: 'Il tuo nome (facoltativo)',
@@ -277,66 +346,5 @@ window.PETO_TEXTOS = {
 };
 </script>
 <script src="i18n.js"></script>
-<script>
-/* Formulario de testers (sección #prueba): inserta el correo en Supabase,
-   tabla tester_signups. La llave anónima es pública a propósito: con RLS
-   solo permite INSERT en esa tabla (nadie puede leer la lista por la API).
-   Sin recarga de página; los mensajes salen en el idioma activo del sitio. */
-(function () {
-  'use strict';
-  var SUPABASE_URL = 'https://sboldltkywwjnslairlg.supabase.co';
-  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNib2xkbHRreXd3am5zbGFpcmxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3MTk1NzEsImV4cCI6MjEwODI5NTU3MX0.MuG3mn6X_GY0Q6YzI14VfWjrxKySjapH7GA5u2DPPe4';
-  var form = document.getElementById('form-testers');
-  if (!form) return;
-  var caja = document.getElementById('tst-resultado');
-
-  function texto(clave) {
-    var lang = (window.PETO_idioma && window.PETO_idioma()) || 'es';
-    var d = (window.PETO_TEXTOS && window.PETO_TEXTOS[lang]) || {};
-    if (d[clave] != null) return d[clave];
-    var es = (window.PETO_TEXTOS && window.PETO_TEXTOS.es) || {};
-    return es[clave] || '';
-  }
-
-  function mostrar(msg, esError) {
-    caja.innerHTML = '';
-    var p = document.createElement('p');
-    if (esError) p.className = 'error';
-    p.textContent = msg;
-    caja.appendChild(p);
-    caja.classList.add('visible');
-  }
-
-  form.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    var nombre = document.getElementById('tst-nombre').value.trim();
-    var email = document.getElementById('tst-email').value.trim().toLowerCase();
-    if (!email) return;
-    var datos = { email: email, source: 'web' };
-    if (nombre) datos.name = nombre;
-    fetch(SUPABASE_URL + '/rest/v1/tester_signups', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON,
-        'Authorization': 'Bearer ' + SUPABASE_ANON,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(datos)
-    }).then(function (resp) {
-      if (resp.status === 201) {
-        form.reset();
-        mostrar(texto('tst_ok'), false);
-      } else if (resp.status === 409) {
-        mostrar(texto('tst_dup'), false);
-      } else {
-        mostrar(texto('tst_err'), true);
-      }
-    }).catch(function () {
-      mostrar(texto('tst_err'), true);
-    });
-  });
-})();
-</script>
 </body>
 </html>
