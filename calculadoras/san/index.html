@@ -11,16 +11,21 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="../../logo.png" alt="Logo de PETO" data-i18n-attr="alt:alt_logo">
-    <a class="brand" href="../../">PETO</a>
-    <nav>
-      <a href="../deudas/" data-i18n="nav_deudas">Deudas</a>
-      <a href="../gasto-diario/" data-i18n="nav_diario">Gasto diario</a>
+    <img src="/logo.png" alt="Logo de PETO Finanzas" data-i18n-attr="alt:alt_logo">
+    <a class="brand" href="/">PETO Finanzas</a>
+    <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-principal">☰</button>
+    <nav id="nav-principal">
+      <a href="/#calculadoras" data-i18n="nav_calc">Calculadoras</a>
+      <a href="/#podcast" data-i18n="nav_podcast">Podcast</a>
+      <a href="/precios/" data-i18n="nav_precios">Precios</a>
+      <a href="/recursos/" data-i18n="nav_recursos">Recursos</a>
+      <a href="/blog/" data-i18n="nav_blog">Blog</a>
+      <a href="/privacidad/" data-i18n="nav_priv">Privacidad</a>
       <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
         <button type="button" data-lang-btn="es">ES</button>
         <button type="button" data-lang-btn="it">IT</button>
       </span>
-      <a class="btn" href="../../app/" data-i18n="btn_probar">Probar gratis</a>
+      <a class="btn" href="/app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
@@ -51,12 +56,26 @@
   </div>
 
   <footer class="site">
-    <p data-i18n="foot">PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a></p>
+    <p data-i18n="foot_1">PETO Finanzas · <a href="/privacidad/">Política de privacidad</a> · <a href="/terminos/">Términos</a> · <a href="/app/">Abrir la app web</a> · <a href="/precios/">Precios</a> · <a href="/recursos/">Recursos</a> · <a href="/blog/">Blog</a></p>
+    <p data-i18n="foot_2">Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Teléfono: <a href="tel:+13474492484">+1 (347) 449-2484</a></p>
+    <p><a href="https://www.youtube.com/@PetoFinanzas" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.youtube.com/@PETOFinances" target="_blank" rel="noopener">YouTube (inglés)</a> · <a href="https://www.instagram.com/peto_finanzas" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@peto.finanzas" target="_blank" rel="noopener">TikTok</a> · <a href="https://www.facebook.com/share/g/1Eq7WNgLGG/" target="_blank" rel="noopener">Facebook</a> · <a href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener">Spotify</a> · <a href="https://play.google.com/store/apps/details?id=app.peto" target="_blank" rel="noopener">Google Play</a> · <a href="https://linktr.ee/petofinanzas" target="_blank" rel="noopener">Linktree</a></p>
+    <p data-i18n="foot_3">Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin, para que los niños aprendan jugando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro de Tito en Amazon</a></p>
   </footer>
 </div>
 <script>
 window.PETO_TEXTOS = {
   es: {
+    alt_logo: 'Logo de PETO Finanzas',
+    nav_calc: 'Calculadoras',
+    nav_podcast: 'Podcast',
+    nav_precios: 'Precios',
+    nav_recursos: 'Recursos',
+    nav_blog: 'Blog',
+    nav_priv: 'Privacidad',
+    btn_probar: 'Probar gratis',
+    foot_1: 'PETO Finanzas · <a href="/privacidad/">Política de privacidad</a> · <a href="/terminos/">Términos</a> · <a href="/app/">Abrir la app web</a> · <a href="/precios/">Precios</a> · <a href="/recursos/">Recursos</a> · <a href="/blog/">Blog</a>',
+    foot_2: 'Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Teléfono: <a href="tel:+13474492484">+1 (347) 449-2484</a>',
+    foot_3: 'Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin, para que los niños aprendan jugando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro de Tito en Amazon</a>',
     __title: 'Calculadora de san / tanda gratis — PETO · petofinanzas',
     __desc: 'Calcula el fondo de cada turno de tu san o tanda según el aporte, la frecuencia y el número de participantes, con el calendario de entregas. Gratis, sin registro.',
     alt_logo: 'Logo de PETO',
@@ -78,9 +97,20 @@ window.PETO_TEXTOS = {
     btn_calc: 'Calcular',
     btn_llevar: 'Llevar esto en PETO',
     btn_volver: 'Volver a la portada',
-    foot: 'PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>''
+    foot: 'PETO — Control de gastos · <a href="../../privacidad/">Política de privacidad</a> · <a href="../../app/">Abrir la app web</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>'
   },
   it: {
+    alt_logo: 'Logo di PETO Finanzas',
+    nav_calc: 'Calcolatori',
+    nav_podcast: 'Podcast',
+    nav_precios: 'Prezzi',
+    nav_recursos: 'Risorse',
+    nav_blog: 'Blog',
+    nav_priv: 'Privacy',
+    btn_probar: 'Prova gratis',
+    foot_1: 'PETO Finanzas · <a href="/privacidad/">Informativa sulla privacy</a> · <a href="/terminos/">Termini</a> · <a href="/app/">Apri l\'app web</a> · <a href="/precios/">Prezzi</a> · <a href="/recursos/">Risorse</a> · <a href="/blog/">Blog</a>',
+    foot_2: 'Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Telefono: <a href="tel:+13474492484">+1 (347) 449-2484</a>',
+    foot_3: 'Tito el Zorrito è il volpino delle canzoni per bambini in spagnolo di Sterlin, perché i bambini imparino giocando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro di Tito su Amazon</a>',
     __title: 'Calcolatore di san / tanda gratuito — PETO · petofinanzas',
     __desc: 'Calcola il fondo di ogni turno del tuo san o tanda in base al contributo, alla frequenza e al numero di partecipanti, con il calendario delle consegne. Gratis, senza registrazione.',
     alt_logo: 'Logo di PETO',
@@ -102,7 +132,7 @@ window.PETO_TEXTOS = {
     btn_calc: 'Calcola',
     btn_llevar: 'Porta tutto in PETO',
     btn_volver: 'Torna alla home',
-    foot: 'PETO — Controllo delle spese · <a href="../../privacidad/">Informativa sulla privacy</a> · <a href="../../app/">Apri l\'app web</a> · Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>''
+    foot: 'PETO — Controllo delle spese · <a href="../../privacidad/">Informativa sulla privacy</a> · <a href="../../app/">Apri l\'app web</a> · Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>'
   }
 };
 </script>
