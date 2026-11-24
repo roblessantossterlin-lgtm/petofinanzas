@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 102';
-const BUILD_NUM = 102;
+const BUILD_LABEL = 'Compilación 105';
+const BUILD_NUM = 105;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1268,7 +1268,13 @@ function bizModeOn() {
    aunque su fila no se vea, y el guardado la lee igual). */
 function applyBizModeUI() {
   const on = bizModeOn();
-  for (const id of ['exp-biz-row', 'inc-biz-row', 'split-negocio-label', 'split-negocio', 'split-negocio-row92']) {
+  /* Compilación 105 (punto 10): la fila «Negocio» del reparto YA NO
+     se esconde con el modo negocio apagado — las CUATRO reglas del
+     dinero quedan visibles siempre y su suma es el total que la
+     propia tarjeta declara (antes se veían 25+55+10=90 y el total
+     decía 100: la cuarta regla estaba escondida). Las casillas
+     «es de mi negocio» de los formularios sí siguen el interruptor. */
+  for (const id of ['exp-biz-row', 'inc-biz-row']) {
     const n = document.getElementById(id);
     if (n) n.hidden = !on;
   }
@@ -1570,7 +1576,7 @@ es: {
   
   org_err_san_name: 'Escribe el nombre del san.', rep_promo_footer: 'Controla tus gastos con PETO Finanzas · petofinanzas.com', rep_saved: 'Imagen guardada.', set_sections_summary: '{visible} de {total} visibles',
   org_err_active_exists: 'Ya hay un san activo («{name}»). Bórralo primero desde su tarjeta si quieres crear otro.',
-  app_title: 'PETO Finanzas', build_word: 'Compilación', back: '← Todas las opciones', greeting: 'Hola', lock_btn: 'Bloquear',
+  app_title: 'PETO Finanzas', build_word: 'Compilación', back: '← Volver', greeting: 'Hola', lock_btn: 'Bloquear',
   home_menu_heading: '¿Qué quieres ver?',
   group_daily: 'Día a día', group_plan: 'Planificación', group_accounts: 'Cuentas y compromisos', group_yourapp: 'Tu app',
   sec_gastos: 'Gastos del mes', sec_ingresos: 'Ingresos semanales', sec_ahorros: 'Ahorros', sec_resumen: 'Resumen',
@@ -1677,7 +1683,7 @@ es: {
   cloud_err_login: 'No se pudo entrar. Revisa tu correo y contraseña.',
   cloud_err_exists: 'Ese correo ya tiene cuenta. Usa «Entrar».',
   cloud_err_confirm: 'Cuenta creada. Revisa tu correo y confirma tu cuenta, luego entra.',
-  cloud_err_generic: 'Algo falló con la nube. Revisa tu internet e inténtalo de nuevo.',
+  cloud_err_generic: 'Algo falló con la nube. Revisa tu internet e inténtalo de nuevo.', cloud_name: 'Tu nombre', cloud_err_signup: 'No se pudo crear la cuenta. Revisa el correo y que la contraseña tenga al menos 6 caracteres, e inténtalo de nuevo.', chat105_edited_line: 'Abierto en el formulario: revísalo y guárdalo desde ahí.', c105_fab_label: '✨ Agregar / Preguntar', c105_add_expense_btn: '+ Agregar gasto', c105_new_btn: '+ Nuevo', c105_subs_btn: '🔁 Suscripciones', c105_bud_income_hint: 'Sin banco conectado, escríbelo tú: es lo que ganas al mes.', c105_bud_detect_btn: 'Detectar desde mi banco', c105_zero_explain: 'Modo base cero: le das un trabajo a cada dólar de tu ingreso hasta que no quede nada sin asignar.', c105_env_explain: 'Sobre con arrastre: lo que no gastes este mes se suma al tope del mes que viene.', c105_efund_note: 'Cualquier ahorro que anotes suma a tu fondo.', c105_next_explain: 'Son 3 pasos para empezar: tu presupuesto, tu primer gasto y tu cuenta.', c105_pro_line: '$4.99 al mes · 14 días gratis · Sincronización bancaria incluida', c105_cloud_two_lines: '«Borrar mis datos de la nube» borra solo la copia guardada en la nube: tu cuenta sigue existiendo y los datos de este teléfono no se tocan. «Eliminar mi cuenta» lo borra TODO —cuenta y datos— para siempre.', c105_cash_to_ph: 'Elige la cuenta', c105_plaid_title: 'Conectar tu banco', c105_plaid_text: 'Conectar tu banco es opcional y seguro (Plaid). Te pedirá tu banco y tus credenciales del banco; no guardamos tu contraseña. O crea una cuenta manual.', c105_plaid_continue: 'Continuar con Plaid', c105_plaid_manual: 'Crear una cuenta manual', c105_plaid_opening: 'Abriendo Plaid…', c105_afford_ask_amount: '¿De cuánto es la compra? Escríbeme el monto y te digo si te lo puedes permitir.', c105_delete_title: 'Eliminar mi cuenta', c105_delete_text: 'Se borrarán tu cuenta, tus movimientos, presupuestos y metas. No se puede deshacer.', c105_delete_btn: 'Sí, eliminar mi cuenta',
   cloud_conflict: 'Hay datos distintos en la nube y en este teléfono. ¿Quieres bajar los de la nube y reemplazar los de este teléfono? (Cancelar = subir los de este teléfono)',
   cloud_wipe_confirm: '¿Borrar TODOS tus datos de la nube? Lo de este teléfono se queda como está.',
   cloud_delete: 'Eliminar mi cuenta',
@@ -2331,7 +2337,7 @@ en: {
   
   org_err_san_name: 'Enter the name of the san.', rep_promo_footer: 'Take control of your spending with PETO Finanzas · petofinanzas.com', rep_saved: 'Image saved.', set_sections_summary: '{visible} of {total} visible',
   org_err_active_exists: 'There is already an active san (“{name}”). Delete it first from its card if you want to create another one.',
-  app_title: 'PETO Finanzas', build_word: 'Build', back: '← All options', greeting: 'Hello', lock_btn: 'Lock',
+  app_title: 'PETO Finanzas', build_word: 'Build', back: '← Back', greeting: 'Hello', lock_btn: 'Lock',
   home_menu_heading: 'What do you want to see?',
   group_daily: 'Day to day', group_plan: 'Planning', group_accounts: 'Accounts & commitments', group_yourapp: 'Your app',
   sec_gastos: 'Monthly expenses', sec_ingresos: 'Weekly income', sec_ahorros: 'Savings', sec_resumen: 'Summary',
@@ -2438,7 +2444,7 @@ en: {
   cloud_err_login: 'Could not sign in. Check your email and password.',
   cloud_err_exists: 'That email already has an account. Use “Sign in”.',
   cloud_err_confirm: 'Account created. Check your email to confirm your account, then sign in.',
-  cloud_err_generic: 'Something failed with the cloud. Check your internet and try again.',
+  cloud_err_generic: 'Something failed with the cloud. Check your internet and try again.', cloud_name: 'Your name', cloud_err_signup: 'The account could not be created. Check the email and make sure the password has at least 6 characters, then try again.', chat105_edited_line: 'Opened in the form: review it and save it from there.', c105_fab_label: '✨ Add / Ask', c105_add_expense_btn: '+ Add expense', c105_new_btn: '+ New', c105_subs_btn: '🔁 Subscriptions', c105_bud_income_hint: 'With no bank connected, type it yourself: it is what you earn each month.', c105_bud_detect_btn: 'Detect it from my bank', c105_zero_explain: 'Zero-based mode: you give every dollar of your income a job until nothing is left unassigned.', c105_env_explain: 'Envelope with rollover: what you do not spend this month adds to next month’s limit.', c105_efund_note: 'Any saving you record counts toward your fund.', c105_next_explain: 'There are 3 steps to get started: your budget, your first expense and your account.', c105_pro_line: '$4.99 a month · 14 days free · Bank sync included', c105_cloud_two_lines: '“Erase my cloud data” deletes only the copy stored in the cloud: your account stays and the data on this phone is untouched. “Delete my account” erases EVERYTHING — account and data — forever.', c105_cash_to_ph: 'Choose the account', c105_plaid_title: 'Connect your bank', c105_plaid_text: 'Connecting your bank is optional and secure (Plaid). It will ask for your bank and your bank credentials; we never store your password. Or create a manual account.', c105_plaid_continue: 'Continue with Plaid', c105_plaid_manual: 'Create a manual account', c105_plaid_opening: 'Opening Plaid…', c105_afford_ask_amount: 'How much is the purchase? Tell me the amount and I will tell you if you can afford it.', c105_delete_title: 'Delete my account', c105_delete_text: 'Your account, your movements, budgets and goals will be erased. This cannot be undone.', c105_delete_btn: 'Yes, delete my account',
   cloud_conflict: 'The cloud and this phone hold different data. Download the cloud data and replace what is on this phone? (Cancel = upload this phone’s data)',
   cloud_wipe_confirm: 'Delete ALL your cloud data? What is on this phone stays as it is.',
   cloud_delete: 'Delete my account',
@@ -3093,7 +3099,7 @@ it: {
   org_err_san_name: 'Scrivi il nome del san.', rep_promo_footer: 'Controlla le tue spese con PETO Finanzas · petofinanzas.com', rep_saved: 'Immagine salvata.', set_sections_summary: '{visible} di {total} visibili',
   org_err_active_exists: 'C’è già un san attivo («{name}»). Eliminalo prima dalla sua scheda se vuoi crearne un altro.',
   app_title: 'PETO Finanzas', build_word: 'Build',
-  back: '← Tutte le opzioni',
+  
   greeting: 'Ciao',
   lock_btn: 'Blocca',
   home_menu_heading: 'Cosa vuoi vedere?',
@@ -3268,7 +3274,7 @@ it: {
   cloud_err_login: 'Non è stato possibile accedere. Controlla email e password.',
   cloud_err_exists: 'Questa email ha già un account. Usa «Accedi».',
   cloud_err_confirm: 'Account creato. Controlla la tua email e conferma l’account, poi accedi.',
-  cloud_err_generic: 'Qualcosa è andato storto con il cloud. Controlla la connessione e riprova.',
+  cloud_err_generic: 'Qualcosa è andato storto con il cloud. Controlla la connessione e riprova.', back: '← Indietro', cloud_name: 'Il tuo nome', cloud_err_signup: 'Impossibile creare l’account. Controlla l’email e che la password abbia almeno 6 caratteri, poi riprova.', chat105_edited_line: 'Aperto nel modulo: controllalo e salvalo da lì.', c105_fab_label: '✨ Aggiungi / Chiedi', c105_add_expense_btn: '+ Aggiungi spesa', c105_new_btn: '+ Nuovo', c105_subs_btn: '🔁 Abbonamenti', c105_bud_income_hint: 'Senza banca collegata, scrivilo tu: è quanto guadagni al mese.', c105_bud_detect_btn: 'Rilevalo dalla mia banca', c105_zero_explain: 'Modalità base zero: assegni un compito a ogni euro del tuo reddito finché non resta nulla senza destinazione.', c105_env_explain: 'Busta con riporto: ciò che non spendi questo mese si somma al limite del mese prossimo.', c105_efund_note: 'Qualsiasi risparmio che registri conta per il tuo fondo.', c105_next_explain: 'Sono 3 passi per iniziare: il tuo budget, la tua prima spesa e il tuo conto.', c105_pro_line: '4,99 $ al mese · 14 giorni gratis · Sincronizzazione bancaria inclusa', c105_cloud_two_lines: '«Cancella i miei dati nel cloud» elimina solo la copia salvata nel cloud: il tuo account resta e i dati di questo telefono non si toccano. «Elimina il mio account» cancella TUTTO — account e dati — per sempre.', c105_cash_to_ph: 'Scegli il conto', c105_plaid_title: 'Collega la tua banca', c105_plaid_text: 'Collegare la tua banca è facoltativo e sicuro (Plaid). Ti chiederà la tua banca e le tue credenziali bancarie; non salviamo la tua password. Oppure crea un conto manuale.', c105_plaid_continue: 'Continua con Plaid', c105_plaid_manual: 'Crea un conto manuale', c105_plaid_opening: 'Apertura di Plaid…', c105_afford_ask_amount: 'Di quanto è l’acquisto? Scrivimi l’importo e ti dico se puoi permettertelo.', c105_delete_title: 'Elimina il mio account', c105_delete_text: 'Verranno cancellati il tuo account, i tuoi movimenti, i budget e gli obiettivi. Non si può annullare.', c105_delete_btn: 'Sì, elimina il mio account',
   cloud_conflict: 'Ci sono dati diversi nel cloud e su questo telefono. Vuoi scaricare quelli del cloud e sostituire quelli di questo telefono? (Annulla = carica quelli di questo telefono)',
   cloud_wipe_confirm: 'Eliminare TUTTI i tuoi dati dal cloud? Quelli di questo telefono restano come sono.',
   cloud_delete: 'Elimina il mio account',
@@ -4097,7 +4103,7 @@ pt: {
   org_err_san_name: 'Digite o nome do san.', rep_promo_footer: 'Controle seus gastos com o PETO Finanzas · petofinanzas.com', rep_saved: 'Imagem salva.', set_sections_summary: '{visible} de {total} visíveis',
   org_err_active_exists: 'Já existe um san ativo («{name}»). Exclua-o primeiro no cartão dele se quiser criar outro.',
   app_title: 'PETO Finanzas', build_word: 'Compilação',
-  back: '← Todas as opções',
+  
   greeting: 'Olá',
   lock_btn: 'Bloquear',
   home_menu_heading: 'O que você quer ver?',
@@ -4272,7 +4278,7 @@ pt: {
   cloud_err_login: 'Não foi possível entrar. Verifique seu e-mail e senha.',
   cloud_err_exists: 'Esse e-mail já tem uma conta. Use «Entrar».',
   cloud_err_confirm: 'Conta criada. Verifique seu e-mail para confirmar a conta e depois entre.',
-  cloud_err_generic: 'Algo falhou com a nuvem. Verifique sua internet e tente de novo.',
+  cloud_err_generic: 'Algo falhou com a nuvem. Verifique sua internet e tente de novo.', back: '← Voltar', cloud_name: 'Seu nome', cloud_err_signup: 'Não foi possível criar a conta. Verifique o e-mail e se a senha tem pelo menos 6 caracteres e tente de novo.', chat105_edited_line: 'Aberto no formulário: revise e salve a partir dele.', c105_fab_label: '✨ Adicionar / Perguntar', c105_add_expense_btn: '+ Adicionar gasto', c105_new_btn: '+ Novo', c105_subs_btn: '🔁 Assinaturas', c105_bud_income_hint: 'Sem banco conectado, escreva você: é o que você ganha por mês.', c105_bud_detect_btn: 'Detectar do meu banco', c105_zero_explain: 'Modo base zero: você dá uma função a cada real da sua renda até não sobrar nada sem destino.', c105_env_explain: 'Envelope com transferência: o que você não gastar este mês soma ao limite do mês que vem.', c105_efund_note: 'Qualquer economia que você registrar conta para o seu fundo.', c105_next_explain: 'São 3 passos para começar: seu orçamento, seu primeiro gasto e sua conta.', c105_pro_line: 'US$ 4,99 por mês · 14 dias grátis · Sincronização bancária incluída', c105_cloud_two_lines: '“Apagar meus dados na nuvem” apaga só a cópia guardada na nuvem: sua conta continua e os dados deste telefone não são tocados. “Excluir minha conta” apaga TUDO — conta e dados — para sempre.', c105_cash_to_ph: 'Escolha a conta', c105_plaid_title: 'Conectar seu banco', c105_plaid_text: 'Conectar seu banco é opcional e seguro (Plaid). Ele pedirá seu banco e suas credenciais do banco; não guardamos sua senha. Ou crie uma conta manual.', c105_plaid_continue: 'Continuar com o Plaid', c105_plaid_manual: 'Criar uma conta manual', c105_plaid_opening: 'Abrindo o Plaid…', c105_afford_ask_amount: 'De quanto é a compra? Escreva o valor e eu digo se você pode pagar.', c105_delete_title: 'Excluir minha conta', c105_delete_text: 'Sua conta, seus movimentos, orçamentos e metas serão apagados. Não dá para desfazer.', c105_delete_btn: 'Sim, excluir minha conta',
   cloud_conflict: 'A nuvem e este telefone têm dados diferentes. Baixar os dados da nuvem e substituir os deste telefone? (Cancelar = enviar os dados deste telefone)',
   cloud_wipe_confirm: 'Excluir TODOS os seus dados da nuvem? O que está neste telefone fica como está.',
   cloud_delete: 'Excluir minha conta',
@@ -5101,7 +5107,7 @@ fr: {
   org_err_san_name: 'Saisis le nom du san.', rep_promo_footer: 'Contrôle tes dépenses avec PETO Finanzas · petofinanzas.com', rep_saved: 'Image enregistrée.', set_sections_summary: '{visible} sur {total} visibles',
   org_err_active_exists: 'Il existe déjà un san actif (« {name} »). Supprime-le d’abord depuis sa fiche si tu veux en créer un autre.',
   app_title: 'PETO Finanzas', build_word: 'Build',
-  back: '← Toutes les options',
+  
   greeting: 'Bonjour',
   lock_btn: 'Verrouiller',
   home_menu_heading: 'Que veux-tu voir ?',
@@ -5276,7 +5282,7 @@ fr: {
   cloud_err_login: 'Connexion impossible. Vérifie ton e-mail et ton mot de passe.',
   cloud_err_exists: 'Cet e-mail a déjà un compte. Utilise « Se connecter ».',
   cloud_err_confirm: 'Compte créé. Vérifie ton e-mail pour confirmer ton compte, puis connecte-toi.',
-  cloud_err_generic: 'Quelque chose a échoué avec le cloud. Vérifie ta connexion et réessaie.',
+  cloud_err_generic: 'Quelque chose a échoué avec le cloud. Vérifie ta connexion et réessaie.', back: '← Retour', cloud_name: 'Votre nom', cloud_err_signup: 'Impossible de créer le compte. Vérifiez l’e-mail et que le mot de passe a au moins 6 caractères, puis réessayez.', chat105_edited_line: 'Ouvert dans le formulaire : vérifiez-le et enregistrez-le depuis là.', c105_fab_label: '✨ Ajouter / Demander', c105_add_expense_btn: '+ Ajouter une dépense', c105_new_btn: '+ Nouveau', c105_subs_btn: '🔁 Abonnements', c105_bud_income_hint: 'Sans banque connectée, écrivez-le vous-même : c’est ce que vous gagnez par mois.', c105_bud_detect_btn: 'Le détecter depuis ma banque', c105_zero_explain: 'Mode base zéro : vous donnez un rôle à chaque euro de vos revenus jusqu’à ce qu’il ne reste rien sans affectation.', c105_env_explain: 'Enveloppe avec report : ce que vous ne dépensez pas ce mois-ci s’ajoute à la limite du mois prochain.', c105_efund_note: 'Toute épargne que vous enregistrez compte pour votre fonds.', c105_next_explain: 'Il y a 3 étapes pour commencer : votre budget, votre première dépense et votre compte.', c105_pro_line: '4,99 $ par mois · 14 jours gratuits · Synchronisation bancaire incluse', c105_cloud_two_lines: '« Effacer mes données du cloud » supprime seulement la copie enregistrée dans le cloud : votre compte reste et les données de ce téléphone ne sont pas touchées. « Supprimer mon compte » efface TOUT — compte et données — pour toujours.', c105_cash_to_ph: 'Choisissez le compte', c105_plaid_title: 'Connecter votre banque', c105_plaid_text: 'Connecter votre banque est facultatif et sécurisé (Plaid). On vous demandera votre banque et vos identifiants bancaires ; nous ne gardons pas votre mot de passe. Ou créez un compte manuel.', c105_plaid_continue: 'Continuer avec Plaid', c105_plaid_manual: 'Créer un compte manuel', c105_plaid_opening: 'Ouverture de Plaid…', c105_afford_ask_amount: 'De combien est l’achat ? Écrivez-moi le montant et je vous dirai si vous pouvez vous le permettre.', c105_delete_title: 'Supprimer mon compte', c105_delete_text: 'Votre compte, vos mouvements, vos budgets et vos objectifs seront effacés. C’est irréversible.', c105_delete_btn: 'Oui, supprimer mon compte',
   cloud_conflict: 'Le cloud et ce téléphone contiennent des données différentes. Télécharger les données du cloud et remplacer celles de ce téléphone ? (Annuler = envoyer les données de ce téléphone)',
   cloud_wipe_confirm: 'Supprimer TOUTES tes données du cloud ? Ce qui est sur ce téléphone reste tel quel.',
   cloud_delete: 'Supprimer mon compte',
@@ -6105,7 +6111,7 @@ de: {
   org_err_san_name: 'Gib den Namen des Sans ein.', rep_promo_footer: 'Kontrolliere deine Ausgaben mit PETO Finanzas · petofinanzas.com', rep_saved: 'Bild gespeichert.', set_sections_summary: '{visible} von {total} sichtbar',
   org_err_active_exists: 'Es gibt bereits einen aktiven San („{name}“). Lösche ihn zuerst auf seiner Karte, wenn du einen neuen erstellen willst.',
   app_title: 'PETO Finanzas', build_word: 'Build',
-  back: '← Alle Optionen',
+  
   greeting: 'Hallo',
   lock_btn: 'Sperren',
   home_menu_heading: 'Was möchtest du sehen?',
@@ -6280,7 +6286,7 @@ de: {
   cloud_err_login: 'Anmeldung nicht möglich. Prüfe deine E-Mail und dein Passwort.',
   cloud_err_exists: 'Für diese E-Mail gibt es bereits ein Konto. Nutze „Anmelden“.',
   cloud_err_confirm: 'Konto erstellt. Prüfe deine E-Mail, um dein Konto zu bestätigen, und melde dich dann an.',
-  cloud_err_generic: 'Mit der Cloud ist etwas fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.',
+  cloud_err_generic: 'Mit der Cloud ist etwas fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.', back: '← Zurück', cloud_name: 'Dein Name', cloud_err_signup: 'Das Konto konnte nicht erstellt werden. Prüfe die E-Mail und ob das Passwort mindestens 6 Zeichen hat, und versuche es erneut.', chat105_edited_line: 'Im Formular geöffnet: Prüfe es und speichere es dort.', c105_fab_label: '✨ Hinzufügen / Fragen', c105_add_expense_btn: '+ Ausgabe hinzufügen', c105_new_btn: '+ Neu', c105_subs_btn: '🔁 Abos', c105_bud_income_hint: 'Ohne verbundene Bank schreibst du es selbst: Es ist dein Monatsverdienst.', c105_bud_detect_btn: 'Von meiner Bank erkennen', c105_zero_explain: 'Nullbasis-Modus: Du gibst jedem Euro deines Einkommens eine Aufgabe, bis nichts mehr ohne Zuordnung ist.', c105_env_explain: 'Umschlag mit Übertrag: Was du diesen Monat nicht ausgibst, erhöht das Limit im nächsten Monat.', c105_efund_note: 'Jede Ersparnis, die du einträgst, zählt für deinen Fonds.', c105_next_explain: 'Es sind 3 Schritte zum Start: dein Budget, deine erste Ausgabe und dein Konto.', c105_pro_line: '4,99 $ im Monat · 14 Tage gratis · Bankabgleich inklusive', c105_cloud_two_lines: '„Meine Cloud-Daten löschen“ löscht nur die in der Cloud gespeicherte Kopie: Dein Konto bleibt und die Daten auf diesem Telefon bleiben unberührt. „Mein Konto löschen“ löscht ALLES — Konto und Daten — für immer.', c105_cash_to_ph: 'Konto wählen', c105_plaid_title: 'Verbinde deine Bank', c105_plaid_text: 'Deine Bank zu verbinden ist optional und sicher (Plaid). Du wirst nach deiner Bank und deinen Bank-Zugangsdaten gefragt; wir speichern dein Passwort nicht. Oder erstelle ein manuelles Konto.', c105_plaid_continue: 'Weiter mit Plaid', c105_plaid_manual: 'Manuelles Konto erstellen', c105_plaid_opening: 'Plaid wird geöffnet…', c105_afford_ask_amount: 'Wie hoch ist der Kauf? Schreib mir den Betrag und ich sage dir, ob du es dir leisten kannst.', c105_delete_title: 'Mein Konto löschen', c105_delete_text: 'Dein Konto, deine Bewegungen, Budgets und Ziele werden gelöscht. Das lässt sich nicht rückgängig machen.', c105_delete_btn: 'Ja, mein Konto löschen',
   cloud_conflict: 'Die Cloud und dieses Telefon enthalten unterschiedliche Daten. Die Cloud-Daten herunterladen und die Daten auf diesem Telefon ersetzen? (Abbrechen = Daten dieses Telefons hochladen)',
   cloud_wipe_confirm: 'ALLE deine Daten in der Cloud löschen? Was auf diesem Telefon ist, bleibt, wie es ist.',
   cloud_delete: 'Mein Konto löschen',
@@ -7109,7 +7115,7 @@ zh: {
   org_err_san_name: '请输入 san 的名称。', rep_promo_footer: '用 PETO Finanzas 控制你的支出 · petofinanzas.com', rep_saved: '图片已保存。', set_sections_summary: '共 {total} 个，已显示 {visible} 个',
   org_err_active_exists: '已有一个正在进行的 san（“{name}”）。如需新建，请先在其卡片中删除它。',
   app_title: 'PETO Finanzas', build_word: '版本',
-  back: '← 全部选项',
+  
   greeting: '你好',
   lock_btn: '锁定',
   home_menu_heading: '你想看什么？',
@@ -7284,7 +7290,7 @@ zh: {
   cloud_err_login: '无法登录。请检查你的邮箱和密码。',
   cloud_err_exists: '该邮箱已有账户。请使用「登录」。',
   cloud_err_confirm: '账户已创建。请查收邮件确认你的账户，然后登录。',
-  cloud_err_generic: '云端出错了。请检查网络后重试。',
+  cloud_err_generic: '云端出错了。请检查网络后重试。', back: '← 返回', cloud_name: '你的名字', cloud_err_signup: '无法创建账户。请检查邮箱，并确认密码至少有 6 个字符，然后重试。', chat105_edited_line: '已在表单中打开：请检查后在那里保存。', c105_fab_label: '✨ 添加 / 提问', c105_add_expense_btn: '+ 添加支出', c105_new_btn: '+ 新建', c105_subs_btn: '🔁 订阅', c105_bud_income_hint: '没有连接银行时，请自己填写：这是你每月的收入。', c105_bud_detect_btn: '从我的银行检测', c105_zero_explain: '零基模式：让你收入的每一块钱都有去处，直到没有未分配的钱。', c105_env_explain: '信封结转：本月没花完的钱会加到下个月的上限里。', c105_efund_note: '你记录的任何储蓄都会计入你的基金。', c105_next_explain: '开始只需 3 步：你的预算、你的第一笔支出和你的账户。', c105_pro_line: '每月 $4.99 · 免费 14 天 · 包含银行同步', c105_cloud_two_lines: '“清除我的云端数据”只删除保存在云端的副本：你的账户仍然存在，本手机的数据不会动。“删除我的账户”会永久删除一切——账户和数据。', c105_cash_to_ph: '选择账户', c105_plaid_title: '连接你的银行', c105_plaid_text: '连接银行是可选的，而且安全（Plaid）。它会要求你选择银行并输入银行凭据；我们不会保存你的密码。或者创建一个手动账户。', c105_plaid_continue: '继续使用 Plaid', c105_plaid_manual: '创建手动账户', c105_plaid_opening: '正在打开 Plaid…', c105_afford_ask_amount: '这笔购买多少钱？告诉我金额，我来告诉你是否负担得起。', c105_delete_title: '删除我的账户', c105_delete_text: '你的账户、流水、预算和目标将被删除。此操作无法撤销。', c105_delete_btn: '是的，删除我的账户',
   cloud_conflict: '云端和这部手机的数据不同。下载云端数据并替换这部手机的数据吗？（取消 = 上传这部手机的数据）',
   cloud_wipe_confirm: '删除你在云端的全部数据？这部手机上的数据保持不变。',
   cloud_delete: '删除我的账户',
@@ -8113,7 +8119,7 @@ ja: {
   org_err_san_name: 'sanの名前を入力してください。', rep_promo_footer: 'PETO Finanzasで支出を管理しよう · petofinanzas.com', rep_saved: '画像を保存しました。', set_sections_summary: '{total}件中{visible}件を表示',
   org_err_active_exists: 'すでにアクティブな san（「{name}」）があります。新しく作るには、まずそのカードから削除してください。',
   app_title: 'PETO Finanzas', build_word: 'ビルド',
-  back: '← すべてのオプション',
+  
   greeting: 'こんにちは',
   lock_btn: 'ロック',
   home_menu_heading: '何を見たいですか？',
@@ -8288,7 +8294,7 @@ ja: {
   cloud_err_login: 'ログインできませんでした。メールアドレスとパスワードを確認してください。',
   cloud_err_exists: 'そのメールアドレスには既にアカウントがあります。「ログイン」を使ってください。',
   cloud_err_confirm: 'アカウントが作成されました。メールを確認してアカウントを確定し、ログインしてください。',
-  cloud_err_generic: 'クラウドで問題が発生しました。インターネット接続を確認して、もう一度お試しください。',
+  cloud_err_generic: 'クラウドで問題が発生しました。インターネット接続を確認して、もう一度お試しください。', back: '← 戻る', cloud_name: 'あなたの名前', cloud_err_signup: 'アカウントを作成できませんでした。メールアドレスと、パスワードが6文字以上かを確認して、もう一度お試しください。', chat105_edited_line: 'フォームで開きました：確認して、そこから保存してください。', c105_fab_label: '✨ 追加 / 質問', c105_add_expense_btn: '+ 支出を追加', c105_new_btn: '+ 新規', c105_subs_btn: '🔁 サブスク', c105_bud_income_hint: '銀行が未接続の場合は自分で入力してください：あなたの月収です。', c105_bud_detect_btn: '銀行から検出', c105_zero_explain: 'ゼロベースモード：収入のすべてのお金に役割を与え、未割り当てをゼロにします。', c105_env_explain: '繰り越し封筒：今月使わなかった分が来月の上限に加算されます。', c105_efund_note: '記録した貯金はすべてこの基金に加算されます。', c105_next_explain: '開始は3ステップ：予算、最初の支出、アカウントです。', c105_pro_line: '月額 $4.99 · 14日間無料 · 銀行同期込み', c105_cloud_two_lines: '「クラウドデータを消去」はクラウドに保存されたコピーだけを削除します：アカウントは残り、このスマホのデータには触れません。「アカウントを削除」はアカウントとデータをすべて永久に削除します。', c105_cash_to_ph: 'アカウントを選択', c105_plaid_title: '銀行を接続', c105_plaid_text: '銀行の接続は任意で安全です（Plaid）。銀行と銀行の認証情報を求められますが、パスワードは保存しません。または手動アカウントを作成してください。', c105_plaid_continue: 'Plaidで続行', c105_plaid_manual: '手動アカウントを作成', c105_plaid_opening: 'Plaidを開いています…', c105_afford_ask_amount: '購入額はいくらですか？金額を教えてください。買えるかどうかお答えします。', c105_delete_title: 'アカウントを削除', c105_delete_text: 'アカウント、履歴、予算、目標が削除されます。元に戻すことはできません。', c105_delete_btn: 'はい、アカウントを削除します',
   cloud_conflict: 'クラウドとこのスマートフォンでデータが異なります。クラウドのデータをダウンロードして、このスマートフォンのデータと置き換えますか？（キャンセル＝このスマートフォンのデータをアップロード）',
   cloud_wipe_confirm: 'クラウド上のあなたのデータをすべて削除しますか？このスマートフォン上のデータはそのままです。',
   cloud_delete: '私のアカウントを削除',
@@ -9117,7 +9123,7 @@ ko: {
   org_err_san_name: 'san 이름을 입력하세요.', rep_promo_footer: 'PETO Finanzas로 지출을 관리하세요 · petofinanzas.com', rep_saved: '이미지가 저장되었습니다.', set_sections_summary: '{total}개 중 {visible}개 표시',
   org_err_active_exists: '이미 활성 san("{name}")이 있습니다. 새로 만들려면 먼저 해당 카드에서 삭제하세요.',
   app_title: 'PETO Finanzas', build_word: '빌드',
-  back: '← 모든 옵션',
+  
   greeting: '안녕하세요',
   lock_btn: '잠그기',
   home_menu_heading: '무엇을 보시겠어요?',
@@ -9292,7 +9298,7 @@ ko: {
   cloud_err_login: '로그인할 수 없습니다. 이메일과 비밀번호를 확인하세요.',
   cloud_err_exists: '그 이메일에는 이미 계정이 있습니다. \'로그인\'을 사용하세요.',
   cloud_err_confirm: '계정이 만들어졌습니다. 이메일에서 계정을 확인한 뒤 로그인하세요.',
-  cloud_err_generic: '클라우드에 문제가 생겼습니다. 인터넷을 확인하고 다시 시도하세요.',
+  cloud_err_generic: '클라우드에 문제가 생겼습니다. 인터넷을 확인하고 다시 시도하세요.', back: '← 뒤로', cloud_name: '이름', cloud_err_signup: '계정을 만들 수 없습니다. 이메일과 비밀번호가 6자 이상인지 확인한 뒤 다시 시도하세요.', chat105_edited_line: '양식에서 열었습니다: 확인하고 거기서 저장하세요.', c105_fab_label: '✨ 추가 / 질문', c105_add_expense_btn: '+ 지출 추가', c105_new_btn: '+ 새로', c105_subs_btn: '🔁 구독', c105_bud_income_hint: '은행이 연결되지 않았다면 직접 입력하세요: 한 달 수입입니다.', c105_bud_detect_btn: '내 은행에서 감지', c105_zero_explain: '제로 베이스 모드: 수입의 모든 돈에 역할을 부여해 미배정 금액이 없게 합니다.', c105_env_explain: '이월 봉투: 이번 달에 쓰지 않은 금액이 다음 달 한도에 더해집니다.', c105_efund_note: '기록하는 모든 저축이 이 기금에 더해집니다.', c105_next_explain: '시작은 3단계입니다: 예산, 첫 지출, 계정.', c105_pro_line: '월 $4.99 · 14일 무료 · 은행 동기화 포함', c105_cloud_two_lines: '“클라우드 데이터 지우기”는 클라우드에 저장된 복사본만 삭제합니다: 계정은 유지되고 이 휴대폰의 데이터는 건드리지 않습니다. “계정 삭제”는 계정과 데이터를 모두 영원히 삭제합니다.', c105_cash_to_ph: '계정 선택', c105_plaid_title: '은행 연결', c105_plaid_text: '은행 연결은 선택 사항이며 안전합니다(Plaid). 은행과 은행 자격 증명을 요청하지만 비밀번호는 저장하지 않습니다. 또는 수동 계정을 만드세요.', c105_plaid_continue: 'Plaid로 계속', c105_plaid_manual: '수동 계정 만들기', c105_plaid_opening: 'Plaid 여는 중…', c105_afford_ask_amount: '구매 금액이 얼마인가요? 금액을 알려주시면 감당할 수 있는지 알려드립니다.', c105_delete_title: '계정 삭제', c105_delete_text: '계정, 내역, 예산, 목표가 삭제됩니다. 되돌릴 수 없습니다.', c105_delete_btn: '네, 계정을 삭제합니다',
   cloud_conflict: '클라우드와 이 휴대전화의 데이터가 다릅니다. 클라우드 데이터를 내려받아 이 휴대전화의 데이터를 바꿀까요?(취소 = 이 휴대전화의 데이터 올리기)',
   cloud_wipe_confirm: '클라우드에 있는 모든 데이터를 삭제할까요? 이 휴대전화에 있는 것은 그대로 둡니다.',
   cloud_delete: '내 계정 삭제',
@@ -10121,7 +10127,7 @@ ru: {
   org_err_san_name: 'Введите название сана.', rep_promo_footer: 'Контролируйте свои расходы с PETO Finanzas · petofinanzas.com', rep_saved: 'Изображение сохранено.', set_sections_summary: 'Видимо {visible} из {total}',
   org_err_active_exists: 'Уже есть активный san («{name}»). Сначала удалите его на его карточке, если хотите создать другой.',
   app_title: 'PETO Finanzas', build_word: 'Сборка',
-  back: '← Все параметры',
+  
   greeting: 'Здравствуйте',
   lock_btn: 'Заблокировать',
   home_menu_heading: 'Что вы хотите посмотреть?',
@@ -10296,7 +10302,7 @@ ru: {
   cloud_err_login: 'Не удалось войти. Проверьте почту и пароль.',
   cloud_err_exists: 'На эту почту уже есть аккаунт. Используйте «Войти».',
   cloud_err_confirm: 'Аккаунт создан. Проверьте почту, чтобы подтвердить аккаунт, а затем войдите.',
-  cloud_err_generic: 'Что-то пошло не так с облаком. Проверьте интернет и попробуйте снова.',
+  cloud_err_generic: 'Что-то пошло не так с облаком. Проверьте интернет и попробуйте снова.', back: '← Назад', cloud_name: 'Ваше имя', cloud_err_signup: 'Не удалось создать аккаунт. Проверьте почту и что пароль не короче 6 символов, и попробуйте снова.', chat105_edited_line: 'Открыто в форме: проверьте и сохраните оттуда.', c105_fab_label: '✨ Добавить / Спросить', c105_add_expense_btn: '+ Добавить расход', c105_new_btn: '+ Новый', c105_subs_btn: '🔁 Подписки', c105_bud_income_hint: 'Без подключённого банка впишите сами: это ваш доход за месяц.', c105_bud_detect_btn: 'Определить из моего банка', c105_zero_explain: 'Режим нулевой базы: вы даёте каждому рублю дохода задачу, пока не останется ничего без назначения.', c105_env_explain: 'Конверт с переносом: то, что вы не потратили в этом месяце, добавляется к лимиту следующего.', c105_efund_note: 'Любые сбережения, которые вы записываете, идут в ваш фонд.', c105_next_explain: 'Для начала нужно 3 шага: ваш бюджет, ваш первый расход и ваш счёт.', c105_pro_line: '$4.99 в месяц · 14 дней бесплатно · Синхронизация с банком включена', c105_cloud_two_lines: '«Стереть мои данные в облаке» удаляет только копию в облаке: ваш аккаунт остаётся, а данные на этом телефоне не трогаются. «Удалить мой аккаунт» стирает ВСЁ — аккаунт и данные — навсегда.', c105_cash_to_ph: 'Выберите счёт', c105_plaid_title: 'Подключить ваш банк', c105_plaid_text: 'Подключение банка необязательно и безопасно (Plaid). Вас попросят выбрать банк и ввести его данные; мы не храним ваш пароль. Или создайте счёт вручную.', c105_plaid_continue: 'Продолжить с Plaid', c105_plaid_manual: 'Создать счёт вручную', c105_plaid_opening: 'Открываю Plaid…', c105_afford_ask_amount: 'На какую сумму покупка? Напишите сумму, и я скажу, можете ли вы себе это позволить.', c105_delete_title: 'Удалить мой аккаунт', c105_delete_text: 'Ваш аккаунт, ваши движения, бюджеты и цели будут удалены. Это действие нельзя отменить.', c105_delete_btn: 'Да, удалить мой аккаунт',
   cloud_conflict: 'В облаке и на этом телефоне разные данные. Загрузить данные из облака и заменить те, что на этом телефоне? (Отмена = загрузить данные этого телефона)',
   cloud_wipe_confirm: 'Удалить ВСЕ ваши данные из облака? То, что на этом телефоне, останется как есть.',
   cloud_delete: 'Удалить мой аккаунт',
@@ -11125,7 +11131,7 @@ hi: {
   org_err_san_name: 'San का नाम लिखें।', rep_promo_footer: 'PETO Finanzas के साथ अपने खर्चों पर नियंत्रण रखें · petofinanzas.com', rep_saved: 'छवि सहेजी गई।', set_sections_summary: '{total} में से {visible} दिख रहे हैं',
   org_err_active_exists: 'पहले से एक सक्रिय san है ("{name}")। नया बनाने के लिए पहले उसे उसके कार्ड से हटाएँ।',
   app_title: 'PETO Finanzas', build_word: 'बिल्ड',
-  back: '← सभी विकल्प',
+  
   greeting: 'नमस्ते',
   lock_btn: 'लॉक करें',
   home_menu_heading: 'आप क्या देखना चाहते हैं?',
@@ -11300,7 +11306,7 @@ hi: {
   cloud_err_login: 'साइन इन नहीं हो सका। अपना ईमेल और पासवर्ड जाँचें।',
   cloud_err_exists: 'उस ईमेल पर पहले से खाता है। «साइन इन» का उपयोग करें।',
   cloud_err_confirm: 'खाता बन गया। अपना खाता पुष्ट करने के लिए ईमेल देखें, फिर साइन इन करें।',
-  cloud_err_generic: 'क्लाउड में कुछ गड़बड़ हुई। अपना इंटरनेट जाँचकर फिर कोशिश करें।',
+  cloud_err_generic: 'क्लाउड में कुछ गड़बड़ हुई। अपना इंटरनेट जाँचकर फिर कोशिश करें।', back: '← वापस', cloud_name: 'आपका नाम', cloud_err_signup: 'खाता नहीं बन पाया। ईमेल जाँचें और सुनिश्चित करें कि पासवर्ड कम से कम 6 अक्षरों का हो, फिर फिर से कोशिश करें।', chat105_edited_line: 'फ़ॉर्म में खोल दिया: उसे जाँचकर वहीं से सहेजें।', c105_fab_label: '✨ जोड़ें / पूछें', c105_add_expense_btn: '+ खर्च जोड़ें', c105_new_btn: '+ नया', c105_subs_btn: '🔁 सदस्यताएँ', c105_bud_income_hint: 'बैंक जुड़ा न हो तो खुद लिखें: यह आपकी महीने की कमाई है।', c105_bud_detect_btn: 'मेरे बैंक से पता लगाएँ', c105_zero_explain: 'शून्य-आधार मोड: अपनी आय के हर रुपये को एक काम दें, जब तक कुछ भी बिना बँटे न रहे।', c105_env_explain: 'रोलओवर लिफ़ाफ़ा: इस महीने जो न खर्च हो, वह अगले महीने की सीमा में जुड़ जाता है।', c105_efund_note: 'आप जो भी बचत दर्ज करते हैं, वह आपके फ़ंड में जुड़ती है।', c105_next_explain: 'शुरू करने के 3 चरण हैं: आपका बजट, आपका पहला खर्च और आपका खाता।', c105_pro_line: '$4.99 प्रति माह · 14 दिन मुफ़्त · बैंक सिंक शामिल', c105_cloud_two_lines: '“मेरे क्लाउड डेटा को मिटाएँ” केवल क्लाउड में सहेजी प्रति मिटाता है: आपका खाता बना रहता है और इस फ़ोन का डेटा नहीं छूता। “मेरा खाता हटाएँ” सब कुछ — खाता और डेटा — हमेशा के लिए मिटा देता है।', c105_cash_to_ph: 'खाता चुनें', c105_plaid_title: 'अपना बैंक जोड़ें', c105_plaid_text: 'अपना बैंक जोड़ना वैकल्पिक और सुरक्षित है (Plaid)। यह आपका बैंक और बैंक क्रेडेंशियल माँगेगा; हम आपका पासवर्ड सहेजते नहीं। या मैन्युअल खाता बनाएँ।', c105_plaid_continue: 'Plaid के साथ जारी रखें', c105_plaid_manual: 'मैन्युअल खाता बनाएँ', c105_plaid_opening: 'Plaid खोला जा रहा है…', c105_afford_ask_amount: 'खरीद कितने की है? राशि लिखें, मैं बताऊँगा कि आप इसे वहन कर सकते हैं या नहीं।', c105_delete_title: 'मेरा खाता हटाएँ', c105_delete_text: 'आपका खाता, आपके लेन-देन, बजट और लक्ष्य मिट जाएँगे। यह वापस नहीं होगा।', c105_delete_btn: 'हाँ, मेरा खाता हटाएँ',
   cloud_conflict: 'क्लाउड और इस फ़ोन में अलग-अलग डेटा है। क्लाउड का डेटा डाउनलोड करके इस फ़ोन के डेटा से बदलें? (रद्द = इस फ़ोन का डेटा अपलोड करें)',
   cloud_wipe_confirm: 'क्लाउड में आपका सारा डेटा हटाएँ? इस फ़ोन पर जो है, वह वैसा ही रहेगा।',
   cloud_delete: 'मेरा खाता हटाएँ',
@@ -12129,7 +12135,7 @@ ar: {
   org_err_san_name: 'اكتب اسم الـ san.', rep_promo_footer: 'تحكّم في مصاريفك مع PETO Finanzas · petofinanzas.com', rep_saved: 'تم حفظ الصورة.', set_sections_summary: '{visible} من {total} ظاهرة',
   org_err_active_exists: 'يوجد سان نشط بالفعل («{name}»). احذفه أولاً من بطاقته إذا أردت إنشاء آخر.',
   app_title: 'PETO Finanzas', build_word: 'الإصدار',
-  back: '← كل الخيارات',
+  
   greeting: 'مرحبًا',
   lock_btn: 'قفل',
   home_menu_heading: 'ما الذي تريد رؤيته؟',
@@ -12304,7 +12310,7 @@ ar: {
   cloud_err_login: 'تعذّر تسجيل الدخول. تحقق من بريدك وكلمة المرور.',
   cloud_err_exists: 'ذلك البريد له حساب بالفعل. استخدم «تسجيل الدخول».',
   cloud_err_confirm: 'تم إنشاء الحساب. تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.',
-  cloud_err_generic: 'حدث خطأ ما مع السحابة. تحقق من اتصالك بالإنترنت وحاول مجددًا.',
+  cloud_err_generic: 'حدث خطأ ما مع السحابة. تحقق من اتصالك بالإنترنت وحاول مجددًا.', back: '← رجوع', cloud_name: 'اسمك', cloud_err_signup: 'تعذر إنشاء الحساب. تحقق من البريد الإلكتروني ومن أن كلمة المرور 6 أحرف على الأقل، ثم حاول مرة أخرى.', chat105_edited_line: 'تم فتحه في النموذج: راجعه واحفظه من هناك.', c105_fab_label: '✨ إضافة / اسأل', c105_add_expense_btn: '+ إضافة مصروف', c105_new_btn: '+ جديد', c105_subs_btn: '🔁 الاشتراكات', c105_bud_income_hint: 'بدون بنك متصل، اكتبه بنفسك: هو ما تكسبه كل شهر.', c105_bud_detect_btn: 'اكتشفه من بنكي', c105_zero_explain: 'وضع الأساس الصفري: تعطي كل دولار من دخلك مهمة حتى لا يبقى شيء دون تخصيص.', c105_env_explain: 'ظرف مع ترحيل: ما لا تنفقه هذا الشهر يُضاف إلى حد الشهر القادم.', c105_efund_note: 'أي مبلغ تدخره وتسجله يُحتسب في صندوقك.', c105_next_explain: 'هناك 3 خطوات للبدء: ميزانيتك، وأول مصروف لك، وحسابك.', c105_pro_line: '4.99$ شهريًا · 14 يومًا مجانًا · مزامنة البنك مشمولة', c105_cloud_two_lines: '«مسح بياناتي في السحابة» يحذف فقط النسخة المحفوظة في السحابة: يبقى حسابك ولا تُمس بيانات هذا الهاتف. «حذف حسابي» يمحو كل شيء — الحساب والبيانات — إلى الأبد.', c105_cash_to_ph: 'اختر الحساب', c105_plaid_title: 'ربط بنكك', c105_plaid_text: 'ربط بنكك اختياري وآمن (Plaid). سيطلب منك بنكك وبيانات اعتماد بنكك؛ نحن لا نحفظ كلمة مرورك. أو أنشئ حسابًا يدويًا.', c105_plaid_continue: 'المتابعة مع Plaid', c105_plaid_manual: 'إنشاء حساب يدوي', c105_plaid_opening: 'جارٍ فتح Plaid…', c105_afford_ask_amount: 'كم ثمن الشراء؟ اكتب لي المبلغ وسأخبرك إن كان بإمكانك تحمله.', c105_delete_title: 'حذف حسابي', c105_delete_text: 'سيتم مسح حسابك وحركاتك وميزانياتك وأهدافك. لا يمكن التراجع عن هذا.', c105_delete_btn: 'نعم، احذف حسابي',
   cloud_conflict: 'السحابة وهذا الهاتف فيهما بيانات مختلفة. تنزيل بيانات السحابة واستبدال ما في هذا الهاتف؟ (إلغاء = رفع بيانات هذا الهاتف)',
   cloud_wipe_confirm: 'حذف كل بياناتك من السحابة؟ ما في هذا الهاتف يبقى كما هو.',
   cloud_delete: 'حذف حسابي',
@@ -12918,7 +12924,7 @@ function catName(cat) {
   return DEFAULT_CATEGORIES.includes(cat) ? t('cat_' + cat) : cat;
 }
 function applyStaticI18n() {
-  document.querySelectorAll('[data-i18n]').forEach((n) => { const k = n.getAttribute('data-i18n'); n.textContent = k === 'footer' ? t('footer') + ' · ' + buildLabelText() : (k === 'sec_san' ? secLabel('san') : t(k)); });
+  document.querySelectorAll('[data-i18n]').forEach((n) => { const k = n.getAttribute('data-i18n'); n.textContent = k === 'footer' ? t('footer') : (k === 'sec_san' ? secLabel('san') : t(k)); });
   document.querySelectorAll('[data-i18n-ph]').forEach((n) => { n.setAttribute('placeholder', t(n.getAttribute('data-i18n-ph'))); });
   document.querySelectorAll('[data-i18n-aria]').forEach((n) => { n.setAttribute('aria-label', t(n.getAttribute('data-i18n-aria'))); });
   document.documentElement.lang = lang();
@@ -13248,7 +13254,7 @@ function syncAds(navVisible) {
    plugin ni banner ni contenedor de anuncio (Compilación 74), así
    que la misma ruta corre sin efecto y el modal web jamás tiene
    anuncio encima. */
-const MODAL_OVERLAY_IDS = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'bill94-modal', 'cancel94-modal', 'remit94-modal', 'quin94-modal', 'menu-drawer-wrap', 'view-chat', 'perm-explain-modal', 'home87-week-modal', 'share-chooser91', 'efund-quick101'];
+const MODAL_OVERLAY_IDS = ['quick-chooser', 'bio-offer', 'pro-paywall', 'photo-overlay', 'csv-preview', 'bill94-modal', 'cancel94-modal', 'remit94-modal', 'quin94-modal', 'menu-drawer-wrap', 'view-chat', 'perm-explain-modal', 'home87-week-modal', 'share-chooser91', 'efund-quick101', 'delete-sheet105', 'plaid-intro105'];
 let adsModalHeld = false;
 function anyModalOpen() {
   return MODAL_OVERLAY_IDS.some((id) => {
@@ -14805,6 +14811,33 @@ function applySectionsMode(mode) {
 }
 /* Compilación 89 (punto 4): el importador vive en Cuentas; esta
    función navega hasta su tarjeta ahí. */
+/* Compilación 105 (punto 2): el formulario manual «Nuevo gasto»
+   se abre DIRECTO — el mismo formulario que antes solo aparecía
+   vía chat→Editar — desde el botón de Inicio, el «+ Nuevo» de
+   Gastos y la opción «Gasto» del selector rápido. */
+function openNewExpense105() {
+  if (db.settings.sections && db.settings.sections.gastos === false) {
+    db.settings.sections.gastos = true; save();
+  }
+  showView('gastos');
+  resetExpenseForm();
+  openExpenseForm89();
+  const amt = document.getElementById('exp-amount');
+  if (amt) { try { amt.focus(); } catch (e) { /* sin foco en jsdom */ } }
+}
+/* Compilación 105 (punto 6): el Centro de suscripciones se
+   alcanza en un toque desde Inicio (antes vivía enterrado al
+   fondo de Pagos fijos). */
+function goSubscriptions105() {
+  if (db.settings.sections && db.settings.sections.pagos === false) {
+    db.settings.sections.pagos = true; save();
+  }
+  showView('pagos');
+  const card = document.getElementById('recurring-card');
+  if (card && typeof card.scrollIntoView === 'function') {
+    try { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { card.scrollIntoView(); }
+  }
+}
 function scrollToCsvCard() {
   showView('cuentas');
   const card = document.getElementById('csv-card');
@@ -15886,12 +15919,21 @@ function fillSavingsGoalSelect() {
   const none = el('option', null, t('sav_goal_none'));
   none.value = '';
   sel.appendChild(none);
+  /* Compilación 105 (punto 8): el FONDO DE EMERGENCIA es una
+     opción más del desplegable (valor centinela 'efund': el
+     avance del fondo se mide con el ahorro total, así que
+     asignar al fondo es asignar al ahorro general, pero la
+     persona lo elige y lo ve con su nombre). */
+  const efOpt = el('option', null, '🛟 ' + t('efund_title'));
+  efOpt.value = 'efund';
+  sel.appendChild(efOpt);
   for (const g of db.goals) {
     const opt = el('option', null, g.name);
     opt.value = g.id;
     sel.appendChild(opt);
   }
-  if (prev && db.goals.some((g) => g.id === prev)) sel.value = prev;
+  if (prev === 'efund') sel.value = 'efund';
+  else if (prev && db.goals.some((g) => g.id === prev)) sel.value = prev;
 }
 function resetSavingsForm() {
   document.getElementById('savings-form').reset();
@@ -15986,6 +16028,10 @@ function renderEmergencyFund() {
     card.appendChild(el('p', 'muted small', t('efund_no_goal')));
   }
   card.appendChild(el('p', 'muted small', t('efund_month', { amount: fmt(monthSavings(currentMonthKey())) })));
+  /* Compilación 105 (punto 8): la regla del fondo, dicha en la
+     propia tarjeta — el avance se mide con el ahorro total y la
+     persona lo descubre aquí, no por sorpresa. */
+  card.appendChild(el('p', 'muted small', t('c105_efund_note')));
   const lab = el('label', null, t('goal_target_label'));
   lab.setAttribute('for', 'efund-goal-input');
   card.appendChild(lab);
@@ -16064,15 +16110,21 @@ function renderSavings() {
          acciones de la fila); la meta asignada se ve con su 🎯. */
       const assignedGoalInc = item.goalId ? db.goals.find((g) => g.id === item.goalId) : null;
       if (assignedGoalInc) main.appendChild(el('div', 'item-sub', '🎯 ' + assignedGoalInc.name));
+      else if (item.goalId === 'efund') main.appendChild(el('div', 'item-sub', '🛟 ' + t('efund_title')));
       li.appendChild(main);
       li.appendChild(el('span', 'item-amount', fmt(effectiveSavingsOfIncome(item))));
-      if (db.goals.length) {
+      /* Compilación 105: el selector se pinta siempre — aunque no
+         haya metas, el fondo de emergencia es asignable. */
+      {
         const sel = document.createElement('select');
         sel.className = 'goal-assign-sel';
         sel.setAttribute('aria-label', t('sav_goal_label'));
         const noneOpt = el('option', null, t('sav_goal_none'));
         noneOpt.value = '';
         sel.appendChild(noneOpt);
+        const efOpt105 = el('option', null, '🛟 ' + t('efund_title'));
+        efOpt105.value = 'efund';
+        sel.appendChild(efOpt105);
         for (const g of db.goals) {
           const o = el('option', null, g.name);
           o.value = g.id;
@@ -16081,7 +16133,8 @@ function renderSavings() {
         sel.value = item.goalId || '';
         sel.addEventListener('change', () => {
           beginUndo();
-          item.goalId = sel.value && db.goals.some((g) => g.id === sel.value) ? sel.value : null;
+          item.goalId = sel.value === 'efund' ? 'efund'
+            : (sel.value && db.goals.some((g) => g.id === sel.value) ? sel.value : null);
           save(); renderSavings(); showUndoToast();
         });
         acts.appendChild(sel);
@@ -16114,6 +16167,7 @@ function renderSavings() {
       main.appendChild(el('div', 'item-sub', t('sav_manual_sub', { date: prettyDate(item.date) })));
       const assignedGoal = item.goalId ? db.goals.find((g) => g.id === item.goalId) : null;
       if (assignedGoal) main.appendChild(el('div', 'item-sub', '🎯 ' + assignedGoal.name));
+      else if (item.goalId === 'efund') main.appendChild(el('div', 'item-sub', '🛟 ' + t('efund_title')));
       li.appendChild(main);
       li.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
       acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
@@ -16141,7 +16195,8 @@ function onSavingsSubmit(ev) {
   if (db.savings.length >= MAX_ITEMS) { showError('sav-error', t('err_limit_savings')); return; }
   const goalSel = document.getElementById('sav-goal');
   const wantedGoal = goalSel ? goalSel.value : '';
-  const goalId = db.goals.some((g) => g.id === wantedGoal) ? wantedGoal : null;
+  const goalId = wantedGoal === 'efund' ? 'efund'
+    : (db.goals.some((g) => g.id === wantedGoal) ? wantedGoal : null);
   beginUndo();
   db.savings.push({ id: uid(), amountCents: cents, date, note, goalId });
   save(); resetSavingsForm(); renderSavings(); showUndoToast();
@@ -17491,6 +17546,10 @@ function renderZeroStrip() {
   });
   row.appendChild(cb);
   box.appendChild(row);
+  /* Compilación 105 (punto 7): la explicación del modo se ve
+     SIEMPRE, también apagado — antes «Modo base cero» era un
+     nombre sin explicar y nadie sabía qué encendía. */
+  box.appendChild(el('p', 'muted small', t('c105_zero_explain')));
   if (db.settings.zeroBased !== true) return;
   box.appendChild(el('p', 'item-sub', t('env_zero_help')));
   const income = sumCents(monthCountedIncomes(currentMonthKey()));
@@ -17626,12 +17685,22 @@ function renderBudgets() {
        cabecera como botón que abre el editor de la tarjeta.
        Compilación 90 (punto 8): la fila compacta «Sin límite» lleva
        en la misma línea el gastado del mes, sin % ni líneas extra. */
+    /* Compilación 105 (punto 7): las cifras mensuales de la fila
+       se calculan ANTES de la cabecera porque el % de la
+       cabecera las usa (ver abajo). */
+    const spentM90 = spentByCat[cat] || 0;
+    const limitM90 = budgetMonthlyEquivalentCents(cat);
     if (compact90) {
       budHead.appendChild(el('span', 'bud-nolimit-spent90', fmt(spentByCat[cat] || 0)));
     } else {
-      const pctMonth = totalMonthSpent > 0
-        ? Math.round((spentByCat[cat] || 0) / totalMonthSpent * 100) : 0;
-      budHead.appendChild(el('span', 'bud-pct', pctMonth + '%'));
+      /* Compilación 105 (punto 7): el % de la cabecera es el %
+         del PRESUPUESTO usado — la misma cuenta que la barra y
+         que la línea «Gastado X de Y» de la tarjeta. Antes era la
+         parte del gasto del mes (Comp. 75) y convivía con la
+         línea de gasto: «56 %» junto a «Gastado 25 de 400», que
+         se lee como un error (lo correcto era 6 %). */
+      const pctUsed105 = limitM90 > 0 ? Math.round(spentM90 / limitM90 * 100) : 0;
+      budHead.appendChild(el('span', 'bud-pct', pctUsed105 + '%'));
     }
     budHead.appendChild(el('span', 'bud-chev', '▾'));
     budHead.setAttribute('role', 'button');
@@ -17641,9 +17710,8 @@ function renderBudgets() {
          términos MENSUALES (su equivalente mensual) y el gastado es
          el del mes: la misma moneda en que hablan la franja base
          cero y la proyección. En período 'mes' es la cuenta de
-         siempre, centavo a centavo. */
-      const spentM90 = spentByCat[cat] || 0;
-      const limitM90 = budgetMonthlyEquivalentCents(cat);
+         siempre, centavo a centavo. (spentM90/limitM90 se calculan
+         arriba desde la Comp. 105.) */
       main.appendChild(el('div', 'item-sub',
         (spentM90 <= limitM90
           ? t('bud_spent_left', { spent: fmt(spentM90), budget: fmt(limitM90), left: fmt(limitM90 - spentM90) })
@@ -17759,6 +17827,9 @@ function renderBudgets() {
     });
     envRow.appendChild(envCb);
     editor.appendChild(envRow);
+    /* Compilación 105 (punto 7): «Sobre con arrastre» también se
+       explica en su propia línea, junto a su interruptor. */
+    editor.appendChild(el('p', 'muted small', t('c105_env_explain')));
     main.appendChild(editor);
     li.appendChild(main);
     ul.appendChild(li);
@@ -17768,6 +17839,15 @@ function renderBudgets() {
   renderZeroStrip();
   renderBudgetConfig90();
   updateBudgetTotal();
+  /* Compilación 105 (punto 7): bajo el campo de ingreso, la línea
+     que lo explica cuando NO hay banco («escríbelo tú: es lo que
+     ganas al mes») y el botón de detectarlo cuando SÍ lo hay. */
+  const hint105 = document.getElementById('budget-income-hint105');
+  const detBtn105 = document.getElementById('budget-detect-bank105');
+  let hasBank105 = false;
+  try { hasBank105 = bankStoredConns().length > 0; } catch (e) { hasBank105 = false; }
+  if (hint105) hint105.hidden = hasBank105;
+  if (detBtn105) detBtn105.hidden = !hasBank105;
   /* Compilación 102: con banco conectado, el ingreso se detecta
      solo (sugerencia; la función se autolimita a una vez). */
   incomeDetectMaybe102();
@@ -18062,12 +18142,34 @@ function recurringMedian(nums) {
   const s = nums.slice().sort((a, b) => a - b);
   return s[Math.floor(s.length / 2)];
 }
+/* Compilación 105 (punto 6): los candidatos a suscripción son
+   SOLO cargos. Un crédito, una nómina o un depósito NUNCA es una
+   suscripción, aunque el banco lo haya importado con la nota de
+   un abono repetido (la prueba de cliente nuevo vio la nómina
+   «ACH Electronic Credit GUSTO PAY» ofrecida como suscripción
+   con «Guion para cancelar»). El filtro mira el TIPO por el
+   nombre (crédito/depósito/nómina/abono…) y por colisión con las
+   notas de los INGRESOS reales de la app (quien te paga no es un
+   cargo), y ai2SubCandidates añade el filtro por SIGNO antes de
+   enviar nada a la acción del servidor. */
+const SUBS_CREDIT105_RE = /(credit|cr[eé]dito|deposit|dep[oó]sito|payroll|n[oó]mina|abono|salary|salario|direct dep|refund|reembolso|pension|pensi[oó]n)/i;
+function subsNameBlocked105(name) {
+  const n = String(name || '').trim();
+  if (!n) return true;
+  if (SUBS_CREDIT105_RE.test(n)) return true;
+  const low = n.toLowerCase();
+  for (const inc of (db.incomes || [])) {
+    if (String(inc.note || '').trim().toLowerCase() === low) return true;
+  }
+  return false;
+}
 function detectRecurring() {
   const groups = new Map();
   for (const e of db.expenses) {
     if (isTransferMov(e)) continue;
     const name = (e.note || '').trim();
     if (!name) continue;
+    if (subsNameBlocked105(name)) continue;
     const k = name.toLowerCase();
     if (!groups.has(k)) groups.set(k, { name: name, items: [] });
     groups.get(k).items.push(e);
@@ -18128,6 +18230,7 @@ function subscriptionAnalysis() {
     if (isTransferMov(e)) continue;
     const name = (e.note || '').trim();
     if (!name) continue;
+    if (subsNameBlocked105(name)) continue;
     const k = name.toLowerCase();
     if (!groups.has(k)) groups.set(k, { name: name, items: [] });
     groups.get(k).items.push(e);
@@ -18404,17 +18507,23 @@ function renderCashForm() {
   const prevTo = toSel.value;
   clearNode(fromSel);
   clearNode(toSel);
+  /* Compilación 105 (punto 12): «Hacia» nace VACÍO, con su
+     opción fantasma «Elige la cuenta» — antes el repintado
+     elegía solo la cuenta de efectivo y el formulario nacía con
+     Desde=Hacia=Efectivo (la misma cuenta dos veces). Solo se
+     conserva un «Hacia» previo si sigue existiendo y es OTRA
+     cuenta que el «Desde» actual. */
+  const ph105 = el('option', null, t('c105_cash_to_ph'));
+  ph105.value = '';
+  toSel.appendChild(ph105);
   for (const a of db.accounts) {
     const o1 = el('option', null, a.name); o1.value = a.id; fromSel.appendChild(o1);
     const o2 = el('option', null, a.name); o2.value = a.id; toSel.appendChild(o2);
   }
   form.hidden = db.accounts.length === 0;
   if (db.accounts.some((a) => a.id === prevFrom)) fromSel.value = prevFrom;
-  if (db.accounts.some((a) => a.id === prevTo)) toSel.value = prevTo;
-  else {
-    const cashAcc = db.accounts.find((a) => /efectivo|cash/i.test(a.name || ''));
-    if (cashAcc) toSel.value = cashAcc.id;
-  }
+  if (prevTo && prevTo !== fromSel.value && db.accounts.some((a) => a.id === prevTo)) toSel.value = prevTo;
+  else toSel.value = '';
 }
 function onCashSubmit(ev) {
   ev.preventDefault();
@@ -21183,6 +21292,7 @@ async function cloudSignOutLocalOnly() {
 async function wipeLocalDataStartOver(fromLock) {
   await cloudSignOutLocalOnly();
   try { localStorage.removeItem(DB_KEY); } catch (e) { /* sin acceso: se reinicia en memoria */ }
+  try { localStorage.removeItem(OWNER_KEY105); } catch (e) { /* el espejo nuevo nace sin dueño */ }
   db = defaultData();
   try { db.settings.summaryTz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* sin zona detectable */ }
   save();
@@ -23142,6 +23252,61 @@ function supa() {
 function localHasData() {
   return db.expenses.length > 0 || db.incomes.length > 0 || db.savings.length > 0 || db.goals.length > 0;
 }
+/* ---------------- Compilación 105 · Espejo local POR USUARIO ----
+   Punto 1 (el hallazgo más grave de la prueba de cliente nuevo):
+   el espejo local (cgastos.db.v1) no sabía de QUIÉN era. Al salir
+   una cuenta, onCloudSignOut dejaba los datos intactos A PROPÓSITO
+   (para que la misma persona volviera a entrar sin fricción) y
+   reseteaba cloudState.lastRemoteAt — y con eso, la reconciliación
+   de la SIGUIENTE cuenta que entrara en ese navegador trataba la
+   entrada como «primera vez en este teléfono»: si había datos
+   locales, ELLOS mandaban y se SUBÍAN a la cuenta nueva. Una
+   cuenta recién creada heredó así los datos de prueba de Plaid
+   de la cuenta anterior (octubre $13,345.42, la nómina GUSTO PAY
+   como «suscripción»…).
+   La corrección: el espejo tiene DUEÑO (cgastos.owner.v1 = uid).
+   ensureLocalOwner105 corre en TODO nacimiento de sesión (arranque
+   con sesión restaurada, entrar, crear cuenta, puerta web,
+   bienvenida, recuperación) y en los dos cuellos de botella
+   (cloudReconcile y cloudPush):
+   - sin dueño guardado → la cuenta ADOPTA el espejo tal cual
+     (instalaciones heredadas y la misma persona de siempre);
+   - dueño = la misma cuenta → no se toca nada;
+   - dueño = OTRA cuenta → el espejo se borra ENTERO antes de
+     reconciliar o subir nada (datos, hogar compartido y estado
+     de sync), y la reconciliación normal ya trae lo de la cuenta
+     nueva o la deja en ceros: «Sin datos todavía» en todas
+     partes. Salir NO borra el dueño: volver a entrar con la
+     misma cuenta conserva su espejo, como siempre. */
+const OWNER_KEY105 = 'cgastos.owner.v1';
+function localOwner105() {
+  try { return localStorage.getItem(OWNER_KEY105) || ''; } catch (e) { return ''; }
+}
+function wipeLocalMirror105() {
+  for (const k of [DB_KEY, SHARED_KEY, HOUSEHOLD_KEY, BANNER_KEY, BACKUP_BANNER_KEY]) {
+    try { localStorage.removeItem(k); } catch (e) { /* sin almacenamiento */ }
+  }
+  db = defaultData();
+  try { db.settings.summaryTz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* zona por defecto */ }
+  cloudState = { email: cloudUser ? (cloudUser.email || '') : '', lastSyncAt: 0, lastRemoteAt: '', dirty: false };
+  saveCloudState();
+  sharedState = { household: null, members: [] };
+  householdBook = null;
+  householdSync = { householdId: '', lastRemoteAt: '', dirty: false };
+  householdSyncLoaded = false;
+}
+function ensureLocalOwner105(uid) {
+  if (!uid || demoMode) return false;
+  const owner = localOwner105();
+  if (owner === uid) return false;
+  if (!owner) {
+    try { localStorage.setItem(OWNER_KEY105, uid); } catch (e) { /* sin almacenamiento */ }
+    return false;
+  }
+  wipeLocalMirror105();
+  try { localStorage.setItem(OWNER_KEY105, uid); } catch (e) { /* sin almacenamiento */ }
+  return true;
+}
 function noteLocalChange() {
   if (demoMode) return; /* la demo nunca avisa a la nube */
   if (!cloudUser || cloudApplying) return;
@@ -23206,6 +23371,11 @@ async function cloudPush() {
   if (demoMode) return false; /* la demo no sube nada, nunca */
   const sb = supa();
   if (!sb || !cloudUser) return false;
+  /* Compilación 105: si el espejo era de OTRA cuenta, se acaba de
+     borrar — este ciclo no sube nada (la reconciliación trae lo
+     de la cuenta nueva o la deja en ceros). Jamás se sube el
+     espejo de una cuenta a otra. */
+  if (ensureLocalOwner105(cloudUser.id)) return false;
   try {
     const { data, error } = await sb.from('user_data')
       .upsert({ user_id: cloudUser.id, data: db, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
@@ -23240,6 +23410,9 @@ async function cloudReconcile(interactive) {
   if (demoMode) return; /* la demo no reconcilia con la nube */
   const sb = supa();
   if (!sb || !cloudUser) return;
+  /* Compilación 105: el espejo local se amarra a SU cuenta antes
+     de decidir qué manda (ver ensureLocalOwner105). */
+  ensureLocalOwner105(cloudUser.id);
   let row = null;
   try {
     const { data, error } = await sb.from('user_data')
@@ -23321,6 +23494,10 @@ async function onCloudSignUp() {
       cloudUser = { id: data.user.id, email: data.user.email || c.email };
       cloudState.email = cloudUser.email;
       saveCloudState();
+      /* Compilación 105: una cuenta NUEVA en un aparato con el
+         espejo de otra cuenta lo borra ANTES de guardar el nombre
+         o subir la primera copia. */
+      ensureLocalOwner105(cloudUser.id);
       /* Compilación 101: el nombre se pide junto con la creación
          de la cuenta también en esta tarjeta; si viene escrito,
          se guarda ANTES de subir la primera copia a la nube. */
@@ -23401,11 +23578,24 @@ async function onCloudSignOut() {
     showWebGate103();
   }
 }
+/* Compilación 105 (punto 3): cloudSyncNow EXISTE — la puerta web
+   la llamaba desde la Compilación 103 al crear la cuenta, pero la
+   función nunca se definió en la app (la suite la simulaba, por
+   eso las pruebas pasaban): en producción, un registro CORRECTO
+   caía en el catch y enseñaba el error falso «cloud_err_signup»
+   en crudo. Con pushOnly sube la copia local tal cual (el caso
+   del registro: la cuenta nace con lo que la persona escribió);
+   sin él, reconcilia y sube si quedó algo pendiente. */
+async function cloudSyncNow(pushOnly) {
+  if (demoMode || !cloudUser) return;
+  if (pushOnly) { await cloudPush(); return; }
+  await cloudReconcile(true);
+  if (cloudState.dirty) await cloudPush();
+}
 async function onCloudSyncNow() {
   showError('cloud-error', '');
   cloudStatus(t('cloud_working'));
-  await cloudReconcile(true);
-  if (cloudState.dirty) await cloudPush();
+  await cloudSyncNow(false);
   cloudStatus('');
   renderCloudCard();
 }
@@ -23438,11 +23628,35 @@ function cloudDeleteError(error) {
   if (/no autenticado/i.test(msg)) return t('cloud_delete_err_auth');
   return t('cloud_err_generic');
 }
-async function onCloudDeleteAccount() {
+/* Compilación 105 (punto 4): el botón «Eliminar mi cuenta»
+   abre una HOJA de confirmación dentro de la app — antes pedía
+   dos window.confirm y en la web el botón parecía MUERTO (la
+   prueba de cliente nuevo lo pulsó tres veces sin ver nada).
+   La hoja dice lo que se borra, sin rodeos, y su botón ejecuta
+   el borrado verificado del servidor (RPC delete_my_account). */
+function openDeleteSheet105() {
+  try {
+    const o = document.getElementById('delete-sheet105');
+    if (o) o.hidden = false;
+    syncAdsForModals();
+  } catch (e) { /* ventana cerrándose */ }
+}
+function closeDeleteSheet105() {
+  try {
+    const o = document.getElementById('delete-sheet105');
+    if (o) o.hidden = true;
+    syncAdsForModals();
+  } catch (e) { /* ventana cerrándose */ }
+}
+function onCloudDeleteAccount() {
   const sb = supa();
   if (!sb || !cloudUser) return;
-  if (!window.confirm(t('cloud_delete_confirm1'))) return;
-  if (!window.confirm(t('cloud_delete_confirm2'))) return;
+  openDeleteSheet105();
+}
+async function onCloudDeleteConfirm105() {
+  const sb = supa();
+  if (!sb || !cloudUser) { closeDeleteSheet105(); return; }
+  closeDeleteSheet105();
   showError('cloud-error', '');
   cloudStatus(t('cloud_working'));
   try {
@@ -23464,6 +23678,7 @@ async function onCloudDeleteAccount() {
      se arranca de cero en la bienvenida. */
   await cloudSignOutLocalOnly();
   try { localStorage.removeItem(DB_KEY); } catch (e) { /* sin almacenamiento */ }
+  try { localStorage.removeItem(OWNER_KEY105); } catch (e) { /* sin almacenamiento */ }
   try { localStorage.removeItem(DEMO_DB_KEY); localStorage.removeItem(DEMO_FLAG_KEY); } catch (e) { /* sin almacenamiento */ }
   demoMode = false;
   db = defaultData();
@@ -23749,6 +23964,9 @@ async function onGateSubmit103(ev) {
         cloudUser = { id: data.user.id, email: data.user.email || email };
         cloudState.email = cloudUser.email;
         saveCloudState();
+        /* Compilación 105: el espejo de otra cuenta se borra
+           ANTES de escribir el nombre o de sincronizar. */
+        ensureLocalOwner105(cloudUser.id);
         if (!db.settings.name) db.settings.name = name;
         if (!db.settings.onboarded) db.settings.onboarded = true;
         save();
@@ -23756,6 +23974,9 @@ async function onGateSubmit103(ev) {
         renderCloudCard();
         gate103Status('');
         webGateProceed103();
+        /* Compilación 105 (punto 3): el registro con éxito entra
+           directo Y lo confirma a la vista dentro de la app. */
+        showToastMsg(t('cloud_ok_up'));
         return;
       }
       /* Sin sesión inmediata: el proyecto pide confirmar el
@@ -24379,6 +24600,13 @@ function closeAiChat() {
   document.getElementById('app-shell').hidden = false;
   updateBottomNav();
   syncAdsForModals();
+  /* Compilación 105 (punto 9): al VOLVER del chat, la vista que
+     queda detrás se repinta — antes Inicio conservaba las cifras
+     de antes de guardar desde el chat y solo cuadraba recargando
+     la página a mano (prueba de cliente nuevo, A6). showView con
+     la vista actual repinta sin cambiar de pantalla (en Ajustes
+     no cierra la tarjeta abierta: «entering» es falso). */
+  if (typeof currentView === 'string' && currentView) showView(currentView);
 }
 function renderAiChat() {
   const box = document.getElementById('ai-chat-msgs');
@@ -24412,6 +24640,8 @@ function chat88RenderKind(box, m) {
     if (d.note) card.appendChild(el('div', 'chat88-line', d.note));
     if (m.state === 'saved') {
       card.appendChild(el('div', 'chat88-line chat88-ok', t('chat88_saved')));
+    } else if (m.state === 'edited105') {
+      card.appendChild(el('div', 'chat88-line muted', t('chat105_edited_line')));
     } else if (m.state === 'discarded') {
       card.appendChild(el('div', 'chat88-line muted', t('chat88_discarded')));
     } else {
@@ -24581,6 +24811,16 @@ function chat88Classify(text) {
      empezar de cero abren su tarjeta de arranque. */
   if (/(entrevista|interview)/.test(q) ||
       (/(empezar|comenzar|configurar)/.test(q) && /de cero/.test(q))) return 'interview98';
+  /* Compilación 105 (punto 5): la ASEQUIBILIDAD se detecta ANTES
+     de registrar — «¿Me lo puedo permitir gastar $50?» trae verbo
+     de gasto y caía en parse-expense, que lo trataba como un
+     gasto a guardar (prueba de cliente nuevo, A5). La pregunta va
+     a la MISMA lógica can-afford del widget de Inicio. «Puedo
+     comprar/gastar» solo cuenta como asequibilidad si la frase
+     es pregunta (¿…? o ? al final): «puedo gastar 50» a secas
+     sigue siendo un registro. */
+  if (/(me lo puedo permitir|puedo permitirme|puedes permitirte|puedo permitir|me alcanza|alcanza para|can i afford|afford)/.test(q) ||
+      (/(puedo|podria) (comprar|gastar|pagar)/.test(q) && (/^\s*¿/.test(raw) || /\?\s*$/.test(raw)))) return 'afford105';
   const hasAmount = /\d/.test(q);
   const regVerb = /(gaste|gastar|pague|pagar|compre|comprar|cobre|recibi|ingrese|gane|me pagaron|spent|paid|bought|purchased|received|earned|got paid)/.test(q);
   if (hasAmount && regVerb) return 'register';
@@ -24641,6 +24881,54 @@ async function chat88RouteRegister(q) {
     aiChatMsgs.push({ role: 'ai', text: aiErrorText(e) });
     chat88Push('fallback88', null, q);
   }
+}
+/* Compilación 105 (punto 5): la pregunta de asequibilidad del
+   chat usa la MISMA lógica que el widget de Inicio (can-afford):
+   veredicto local primero (canAffordLocal99) y la IA solo lo
+   redacta; sin servidor nuevo que la conozca (ai_bad_action) se
+   responde con el texto local del veredicto, como hace el widget.
+   Como en el resto del chat, no se pasa por requirePro: el nivel
+   gratis recibe ai_pro_required y se le abre el muro. Nada se
+   guarda: es una pregunta, no un movimiento. */
+async function chat105RouteAfford(q) {
+  const mAmt = String(q || '').replace(/,/g, '.').match(/\d+(?:\.\d{1,2})?/);
+  const cents = mAmt ? Math.round(parseFloat(mAmt[0]) * 100) : null;
+  if (!cents || cents <= 0) {
+    aiChatMsgs.push({ role: 'ai', text: t('c105_afford_ask_amount') });
+    renderAiChat();
+    return;
+  }
+  const local = canAffordLocal99(cents);
+  if (!local) {
+    aiChatMsgs.push({ role: 'ai', text: t('c99_afford_nodata') });
+    renderAiChat();
+    return;
+  }
+  const localText = () => t('c99_afford_' + local.verdict, {
+    amount: fmt(local.todaySafe), dip: fmt(local.minWith), date: recurringDateLabel(local.minDate)
+  });
+  chat88Status(t('ai2_chat_thinking'));
+  try {
+    const facts = [
+      'La persona pregunta si puede gastar ' + fmt(cents) + ' ahora.',
+      'Hoy puede gastar sin pasarse: ' + fmt(local.todaySafe) + '. Le queda del período: ' + fmt(local.left) + '.',
+      'Si compra, su punto más bajo previsto sería ' + fmt(local.minWith) + ' el ' + local.minDate + '.',
+      'Veredicto calculado por la app: ' + local.verdict + '.'
+    ].join('\n').slice(0, 1900);
+    const r = await aiFn('can-afford', { facts: facts, amountCents: cents, verdict: local.verdict });
+    chat88Status('');
+    aiChatMsgs.push({ role: 'ai', text: (r && r.text) ? r.text : localText() });
+  } catch (e) {
+    chat88Status('');
+    if (e && e.message === 'ai_bad_action') {
+      aiChatMsgs.push({ role: 'ai', text: localText() });
+      renderAiChat();
+      return;
+    }
+    aiGatePaywall(e);
+    aiChatMsgs.push({ role: 'ai', text: aiErrorText(e) });
+  }
+  renderAiChat();
 }
 async function chat88ReceiptFromDataUrl(dataUrl) {
   if (chat88Offline()) { chat88Push('fallback88', null, ''); return; }
@@ -24721,7 +25009,13 @@ function chat88SaveCard(m) {
 function chat88EditCard(m) {
   if (!m || !m.data) return;
   const d = m.data;
-  m.state = 'discarded';
+  /* Compilación 105 (punto 5): Editar NO es descartar — el
+     historial ya no dice «Descartado. No se guardó nada.» de un
+     movimiento que la persona está guardando por el formulario
+     (prueba de cliente nuevo, B3). El estado propio lo pinta la
+     tarjeta de confirmación. */
+  m.state = 'edited105';
+  renderAiChat();
   closeAiChat();
   if (d.type === 'income') {
     showView('ingresos');
@@ -24775,6 +25069,7 @@ async function onAiChatSubmit(ev) {
      turno de la entrevista, no una intención del chat. */
   if (ob98 && ob98.active) { await ob98Turn98(q); return; }
   const intent = chat88Classify(q);
+  if (intent === 'afford105') { await chat105RouteAfford(q); return; }
   if (intent === 'register') { await chat88RouteRegister(q); return; }
   if (intent === 'search') { chat88RouteSearch(q); return; }
   if (intent === 'place') { chat88Push('places88', chat88FindPlaces(q), q); return; }
@@ -24823,7 +25118,12 @@ function ai2SubCandidates() {
       hike: null, dupCharge: false, inFixed: false, trial: true
     });
   }
-  return out.slice(0, 30);
+  /* Compilación 105 (punto 6): filtro FINAL por signo y tipo
+     antes de que ningún candidato salga hacia la acción del
+     servidor — solo cargos (monto > 0) y ningún nombre de
+     crédito/nómina/depósito ni pagador conocido. */
+  return out.filter((c) => (c.amountCents || 0) > 0 && (c.monthlyCents || 0) > 0 &&
+    !subsNameBlocked105(c.name)).slice(0, 30);
 }
 function renderAiSubsBox() {
   const card = document.getElementById('recurring-card');
@@ -26289,6 +26589,48 @@ function bankConnectEntry() {
   if (!PETO_BANK_ENABLED || bankBusy || demoMode) return;
   if (supa() && cloudUser) { onBankConnect(); return; }
   bankNeedCloudGuide();
+}
+/* Compilación 105 (punto 13): ANTES de Plaid, una pantalla
+   breve que lo explica — conectar el banco es opcional y seguro,
+   las credenciales las pide Plaid y la contraseña no se guarda —
+   con la salida de crear una cuenta manual. Mientras Plaid abre,
+   el botón de continuar queda en estado de carga visible
+   («Abriendo Plaid…»). Sin sesión, Continuar lleva a la guía de
+   la tarjeta del banco en Ajustes, como hacía bankConnectEntry. */
+function openPlaidIntro105() {
+  if (!PETO_BANK_ENABLED || demoMode) return;
+  const o = document.getElementById('plaid-intro105');
+  if (!o) { bankConnectEntry(); return; }
+  const btn = document.getElementById('plaid-intro-go105');
+  if (btn) { btn.disabled = false; btn.textContent = t('c105_plaid_continue'); }
+  o.hidden = false;
+  syncAdsForModals();
+}
+function closePlaidIntro105() {
+  try {
+    const o = document.getElementById('plaid-intro105');
+    if (o) o.hidden = true;
+    syncAdsForModals();
+  } catch (e) { /* ventana cerrándose */ }
+}
+async function onPlaidIntroContinue105() {
+  const btn = document.getElementById('plaid-intro-go105');
+  if (btn) { btn.disabled = true; btn.textContent = t('c105_plaid_opening'); }
+  try {
+    if (supa() && cloudUser) await onBankConnect();
+    else bankConnectEntry();
+  } catch (e) { /* onBankConnect ya avisa en su tarjeta */ }
+  closePlaidIntro105();
+}
+function onPlaidIntroManual105() {
+  closePlaidIntro105();
+  showView('cuentas');
+  const form = document.getElementById('account-form');
+  if (form && typeof form.scrollIntoView === 'function') {
+    try { form.scrollIntoView({ block: 'start' }); } catch (e) { /* sin scroll */ }
+  }
+  const name = document.getElementById('acc-name');
+  if (name) { try { name.focus(); } catch (e) { /* sin foco en jsdom */ } }
 }
 /* Compilación 66 (informe de Sterlin, 6-nov-2026): sin sesión en
    la nube, «Conectar banco» parecía MUERTO — el salto dejaba a la
@@ -28811,6 +29153,12 @@ function renderProPaywall() {
       ? proWallInfo.priceText + ' ' + t('pro_per_month')
       : t('pro_price_line');
   }
+  /* Compilación 105 (punto 11): LA línea de Pro, idéntica en
+     todos los puntos de entrada (muro, tarjeta de Ajustes,
+     tarjeta y barra de Inicio): precio, prueba y sincronización
+     en una sola frase. Sin cambiar precio ni condiciones. */
+  const uni105 = document.getElementById('pro-unified105');
+  if (uni105) uni105.textContent = t('c105_pro_line');
   const ul = document.getElementById('pro-benefits');
   if (ul) {
     clearNode(ul);
@@ -30410,9 +30758,36 @@ function wireEvents() {
     }
   });
   /* Compilación 50: «Agregar banco» en Mis cuentas — el mismo
-     punto de entrada que la tarjeta de Inicio. */
+     punto de entrada que la tarjeta de Inicio.
+     Compilación 105 (punto 13): ahora abre primero la pantalla
+     previa que explica Plaid; Continuar llama al flujo de
+     siempre (bankConnectEntry/onBankConnect). */
   const accAddBankBtn = document.getElementById('acc-add-bank');
-  if (accAddBankBtn) accAddBankBtn.addEventListener('click', bankConnectEntry);
+  if (accAddBankBtn) accAddBankBtn.addEventListener('click', openPlaidIntro105);
+  /* Compilación 105: botones nuevos (Inicio, Gastos, Presupuesto,
+     hojas de borrado y de Plaid). */
+  const homeAddExp105 = document.getElementById('home-add-exp105');
+  if (homeAddExp105) homeAddExp105.addEventListener('click', openNewExpense105);
+  const homeSubs105 = document.getElementById('home-subs105');
+  if (homeSubs105) homeSubs105.addEventListener('click', goSubscriptions105);
+  const gastosNew105 = document.getElementById('gastos-new105');
+  if (gastosNew105) gastosNew105.addEventListener('click', openNewExpense105);
+  const budDetect105 = document.getElementById('budget-detect-bank105');
+  if (budDetect105) budDetect105.addEventListener('click', openPlaidIntro105);
+  const delCancel105 = document.getElementById('delete-cancel105');
+  if (delCancel105) delCancel105.addEventListener('click', closeDeleteSheet105);
+  const delGo105 = document.getElementById('delete-confirm105');
+  if (delGo105) delGo105.addEventListener('click', onCloudDeleteConfirm105);
+  const delSheet105 = document.getElementById('delete-sheet105');
+  if (delSheet105) delSheet105.addEventListener('click', (ev) => { if (ev.target === delSheet105) closeDeleteSheet105(); });
+  const plaidGo105 = document.getElementById('plaid-intro-go105');
+  if (plaidGo105) plaidGo105.addEventListener('click', onPlaidIntroContinue105);
+  const plaidMan105 = document.getElementById('plaid-intro-manual105');
+  if (plaidMan105) plaidMan105.addEventListener('click', onPlaidIntroManual105);
+  const plaidCancel105 = document.getElementById('plaid-intro-cancel105');
+  if (plaidCancel105) plaidCancel105.addEventListener('click', closePlaidIntro105);
+  const plaidSheet105 = document.getElementById('plaid-intro105');
+  if (plaidSheet105) plaidSheet105.addEventListener('click', (ev) => { if (ev.target === plaidSheet105) closePlaidIntro105(); });
   document.getElementById('debt-form').addEventListener('submit', onDebtSubmit);
   document.getElementById('settings-form').addEventListener('submit', onSettingsSubmit);
   /* Compilación 53: la tarjeta de ajustes se guarda sola — el
@@ -30585,7 +30960,7 @@ function wireEvents() {
      Buscar con el campo listo para escribir. */
   /* Compilación 88: sin botón de lupa — la búsqueda vive en el chat. */
   document.getElementById('quick-cancel').addEventListener('click', closeChooser);
-  document.getElementById('quick-expense').addEventListener('click', () => { closeChooser(); showView('gastos'); });
+  document.getElementById('quick-expense').addEventListener('click', () => { closeChooser(); openNewExpense105(); });
   document.getElementById('quick-income').addEventListener('click', () => { closeChooser(); showView('ingresos'); });
   document.getElementById('quick-savings').addEventListener('click', () => { closeChooser(); showView('ahorros'); });
   chooser.addEventListener('click', (ev) => { if (ev.target === chooser) closeChooser(); });

@@ -38,7 +38,6 @@
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden>Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
-    <p class="muted small build-label" id="lock-build-label">Compilación 54</p>
   </div>
 </section>
 
@@ -143,7 +142,7 @@
     </div>
     <form id="gate103-form" autocomplete="off" hidden novalidate>
       <div id="gate103-name-wrap" hidden>
-        <label for="gate103-name" data-i18n="cloud_name">Nombre</label>
+        <label for="gate103-name" data-i18n="cloud_name">Tu nombre</label>
         <input id="gate103-name" type="text" autocomplete="name" maxlength="60">
       </div>
       <label for="gate103-email" data-i18n="cloud_email">Correo electrónico</label>
@@ -201,7 +200,7 @@
     <div id="home-banners"></div>
     <button id="pro-home-bar101" class="pro-bar101" type="button" hidden>
       <span class="pro-bar101-t">⭐ <span data-i18n="pro_home_title">Únete a PETO Pro</span></span>
-      <span class="pro-bar101-d"><span data-i18n="pro_price_line">Solo $4.99 al mes</span> · <span data-i18n="pro_trial_line">Los primeros 14 días son gratis.</span></span>
+      <span class="pro-bar101-d" data-i18n="c105_pro_line">$4.99 al mes · 14 días gratis · Sincronización bancaria incluida</span>
     </button>
 
     <!-- Compilación 76: primero la cuenta, después el banco. -->
@@ -217,6 +216,7 @@
 
     <section id="next-step-card" class="card next-step-card" hidden>
       <h3 id="next-step-title">Tu siguiente paso</h3>
+      <p class="muted small" data-i18n="c105_next_explain">Son 3 pasos para empezar: tu presupuesto, tu primer gasto y tu cuenta.</p>
       <div class="form-actions">
         <button id="next-step-btn" class="btn btn-primary" type="button">Crea tu presupuesto</button>
       </div>
@@ -235,6 +235,7 @@
       <button id="pro-home-close" type="button" class="pro-home-x" data-i18n-aria="photo_close" aria-label="Cerrar">×</button>
       <h3 data-i18n="pro_home_title">Únete a PETO Pro</h3>
       <p class="muted" data-i18n="pro_home_text">Sin anuncios y con todo desbloqueado: sincronización bancaria, presupuestos compartidos y más.</p>
+      <p class="muted small" data-i18n="c105_pro_line">$4.99 al mes · 14 días gratis · Sincronización bancaria incluida</p>
       <div class="form-actions">
         <button id="pro-home-btn" class="btn btn-primary" type="button" data-i18n="pro_btn_see">Ver PETO Pro</button>
       </div>
@@ -289,7 +290,16 @@
       <!-- Compilación 99 · P8: «¿Te lo puedes permitir?» — la
            persona escribe un monto y la IA responde sí/no con sus
            números reales (ritmo seguro de hoy y próximo bajón). -->
-      <div id="afford99" class="afford99">
+          <!-- Compilación 105 (puntos 2 y 6): las dos acciones que un
+         cliente nuevo no encontraba — agregar un gasto SIN pasar
+         por el chat y el Centro de suscripciones sin bajar hasta
+         el fondo de Pagos fijos. -->
+    <div class="form-actions home-actions105">
+      <button id="home-add-exp105" class="btn btn-primary btn-big" type="button" data-i18n="c105_add_expense_btn">+ Agregar gasto</button>
+      <button id="home-subs105" class="btn btn-secondary btn-big" type="button" data-i18n="c105_subs_btn">🔁 Suscripciones</button>
+    </div>
+
+    <div id="afford99" class="afford99">
         <label class="afford99-label" for="afford99-amount" data-i18n="c99_afford_label">¿Te lo puedes permitir?</label>
         <div class="afford99-row">
           <input id="afford99-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
@@ -360,6 +370,11 @@
     </div>
     <p class="total-line"><span data-i18n="exp_total_label">Total del mes:</span> <strong id="exp-total">$0.00</strong></p>
     <p class="muted small" id="exp-total-note89"></p>
+    <!-- Compilación 105 (punto 2): «+ Nuevo» abre DIRECTO el
+         formulario manual «Nuevo gasto». -->
+    <div class="form-actions">
+      <button id="gastos-new105" class="btn btn-primary" type="button" data-i18n="c105_new_btn">+ Nuevo</button>
+    </div>
     <div id="exp-uncat89" class="exp-uncat89" hidden></div>
     <!-- Compilación 99 · P18: aviso de posible cargo duplicado. -->
     <div id="exp-dup99" class="exp-dup99" hidden></div>
@@ -486,6 +501,11 @@
     <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
     <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
 
+<!-- Compilación 105 (punto 8): el fondo de emergencia va ARRIBA,
+         antes de «Crear meta» — era lo último de la pantalla. -->
+    <!-- Compilación 55: fondo de emergencia con meta editable y barra de avance. -->
+    <section id="efund-card" class="card"></section>
+
     <form id="savings-form" class="card form-card sav-add-card" autocomplete="off">
       <h3 data-i18n="sav_form_title">Agregar ahorro</h3>
       <label for="sav-amount" data-i18n="amount_label">Cantidad ($)</label>
@@ -561,8 +581,6 @@
     </section>
 
 
-    <!-- Compilación 55: fondo de emergencia con meta editable y barra de avance. -->
-    <section id="efund-card" class="card"></section>
 
     <section id="sav-bank-wrap" class="card" hidden>
       <h3 data-i18n="bank_from_bank">De tu banco</h3>
@@ -727,6 +745,13 @@
            (la rellena incomeDetectMaybe102; nace oculta y sin
            detección la pantalla queda como siempre). -->
       <p class="muted small" id="budget-income-note102" hidden></p>
+      <!-- Compilación 105 (punto 7): sin banco, la línea que
+           explica el campo; con banco, el botón que lo detecta
+           (renderBudgets enseña uno u otro). -->
+      <p class="muted small" id="budget-income-hint105" data-i18n="c105_bud_income_hint">Sin banco conectado, escríbelo tú: es lo que ganas al mes.</p>
+      <div class="form-actions">
+        <button id="budget-detect-bank105" type="button" class="btn btn-ghost" data-i18n="c105_bud_detect_btn" hidden>Detectar desde mi banco</button>
+      </div>
       <div class="form-actions">
         <button id="budget-split-btn" type="button" class="btn btn-secondary" data-i18n="bud_split_btn">Repartir según mi ingreso</button>
       </div>
@@ -822,6 +847,12 @@
          de Inicio y del menú (una sola fuente de verdad). -->
     <div id="acc-avail99" class="acc-avail99"></div>
 
+<!-- Compilación 105 (punto 13): «Agregar banco» va ENCIMA del
+         formulario de cuenta manual, no debajo. -->
+    <div class="form-actions">
+      <button id="acc-add-bank" class="btn btn-secondary" type="button" data-i18n="acc_add_bank">🏦 Agregar banco</button>
+    </div>
+
     <form id="account-form" class="card form-card" autocomplete="off">
       <h3 id="account-form-title">Nueva cuenta</h3>
       <input type="hidden" id="acc-id">
@@ -864,9 +895,6 @@
       </div>
     </form>
 
-    <div class="form-actions">
-      <button id="acc-add-bank" class="btn btn-secondary" type="button" data-i18n="acc_add_bank">🏦 Agregar banco</button>
-    </div>
 
     <ul id="account-list" class="item-list"></ul>
     <p id="account-empty" class="empty-state" hidden data-i18n="acc_empty">No tienes cuentas todavía. Agrega una para ver tu dinero disponible en el resumen.</p>
@@ -1406,6 +1434,7 @@
               <div class="form-actions">
                 <button id="btn-cloud-delete" type="button" class="btn btn-danger" data-i18n="cloud_delete">Eliminar mi cuenta</button>
               </div>
+              <p class="muted small" data-i18n="c105_cloud_two_lines">«Borrar mis datos de la nube» borra solo la copia guardada en la nube: tu cuenta sigue existiendo y los datos de este teléfono no se tocan. «Eliminar mi cuenta» lo borra TODO —cuenta y datos— para siempre.</p>
             </div>
             <div id="cloud-recovery" hidden>
               <p class="muted small" data-i18n="cloud_recovery_help">Llegaste desde el enlace de tu correo. Escribe una contraseña nueva y quedará guardada para tu cuenta.</p>
@@ -1476,6 +1505,7 @@
         <button id="btn-pro-cancel" type="button" class="btn btn-ghost btn-small" data-i18n="ai4_cancel_btn" hidden>Cancelar Pro</button>
       </div>
       <p id="pro-cancel-note" class="muted small" hidden></p>
+      <p class="muted small" data-i18n="c105_pro_line">$4.99 al mes · 14 días gratis · Sincronización bancaria incluida</p>
     <section class="card form-card" id="shared-card">
       <div class="sections-head" id="setacc-shared-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-shared-body">
         <h3 data-i18n="shared_title">Presupuesto compartido</h3>
@@ -1794,7 +1824,7 @@
   <!-- Compilación 88 · UN SOLO botón flotante de cristal
        (sin verde) que abre DIRECTAMENTE el chat universal. El
        desplegable de tres botones de la Comp. 85 quedó cancelado. -->
-  <button id="fab-universal" class="fab fab-universal88" type="button" data-i18n-aria="chat88_fab_aria" aria-label="Abrir el chat de PETO">✨</button>
+  <button id="fab-universal" class="fab fab-universal88 fab-labeled105" type="button" data-i18n-aria="chat88_fab_aria" aria-label="Abrir el chat de PETO" data-i18n="c105_fab_label">✨ Agregar / Preguntar</button>
   <!-- Compilación 86 · Añadido 10: pantalla de permisos de primer uso. -->
 <section id="view-perms" class="view perms-view" hidden>
   <header class="chat-head">
@@ -1948,6 +1978,7 @@
     <div class="chooser-card">
       <h3 data-i18n="pro_wall_title">Esto es de PETO Pro ⭐</h3>
       <p id="pro-price-line" class="total-line"></p>
+      <p id="pro-unified105" class="muted small"></p>
       <ul id="pro-benefits" class="item-list"></ul>
       <div id="pro-buy-box" hidden>
         <button id="pro-buy-btn" type="button" class="btn btn-primary btn-big"></button>
@@ -1962,6 +1993,28 @@
       <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
       </div>
       <button id="pro-close" type="button" class="btn btn-ghost" data-i18n="pro_close">Ahora no</button>
+    </div>
+  </div>
+
+  <!-- Compilación 105 (punto 4): hoja de confirmación del borrado
+       de cuenta — dentro de la app, sin window.confirm. -->
+  <div id="delete-sheet105" class="chooser" hidden>
+    <div class="chooser-card">
+      <h3 data-i18n="c105_delete_title">Eliminar mi cuenta</h3>
+      <p class="muted" data-i18n="c105_delete_text">Se borrarán tu cuenta, tus movimientos, presupuestos y metas. No se puede deshacer.</p>
+      <button id="delete-confirm105" type="button" class="btn btn-danger btn-big" data-i18n="c105_delete_btn">Sí, eliminar mi cuenta</button>
+      <button id="delete-cancel105" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Compilación 105 (punto 13): pantalla previa a Plaid. -->
+  <div id="plaid-intro105" class="chooser" hidden>
+    <div class="chooser-card">
+      <h3 data-i18n="c105_plaid_title">Conectar tu banco</h3>
+      <p class="muted" data-i18n="c105_plaid_text">Conectar tu banco es opcional y seguro (Plaid). Te pedirá tu banco y tus credenciales del banco; no guardamos tu contraseña. O crea una cuenta manual.</p>
+      <button id="plaid-intro-go105" type="button" class="btn btn-primary btn-big" data-i18n="c105_plaid_continue">Continuar con Plaid</button>
+      <button id="plaid-intro-manual105" type="button" class="btn btn-secondary" data-i18n="c105_plaid_manual">Crear una cuenta manual</button>
+      <button id="plaid-intro-cancel105" type="button" class="btn btn-ghost" data-i18n="btn_cancel">Cancelar</button>
     </div>
   </div>
 
