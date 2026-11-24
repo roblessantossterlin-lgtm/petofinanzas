@@ -47,6 +47,7 @@
      conversación vive solo aquí (no se guarda) y la IA responde
      con el resumen agregado que la app arma en el teléfono. -->
 <section id="view-chat" class="view chat-view" hidden>
+  <button id="ai-chat-back-fab101" class="chat-back-fab101" type="button" data-i18n-aria="ob_signin_back" aria-label="Volver"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
   <button class="btn btn-back" type="button" id="ai-chat-back" data-i18n="back">← Todas las opciones</button>
   <h2 data-i18n="ai2_chat_title">Pregúntale a tu dinero</h2>
   <div id="ai-chat-msgs" class="chat-msgs"></div>
@@ -62,10 +63,10 @@
          piezas sueltas (campo + Dictar + cámara + «Preguntar»). -->
     <div class="chat-pill93">
       <input id="ai-chat-input" type="text" maxlength="300" data-i18n-ph="ai2_chat_ph" placeholder="Ej.: ¿en qué gasté más este mes?">
-      <button id="ai-chat-photo-btn" class="chat-pill-cam93" type="button" data-i18n-aria="chat88_photo_aria" aria-label="Adjuntar la foto de un recibo">📷</button>
+      <button id="ai-chat-photo-btn" class="chat-pill-cam93" type="button" data-i18n-aria="chat88_photo_aria" aria-label="Adjuntar la foto de un recibo"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h2.5l2-2.5h7L17.5 8H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg></button>
       <input id="ai-chat-photo" type="file" accept="image/*" hidden>
     </div>
-    <button id="ai-chat-action93" class="chat-action93" type="submit" data-state="mic" data-i18n-aria="ai3_voice_btn" aria-label="🎤 Dictar"><span class="chat-action-icon93" aria-hidden="true">🎤</span></button>
+    <button id="ai-chat-action93" class="chat-action93" type="submit" data-state="mic" data-i18n-aria="ai3_voice_btn" aria-label="Dictar"><span class="chat-action-icon93" aria-hidden="true"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5"/></svg></span></button>
   </form>
   <div id="ai-reward-box" hidden>
     <div class="form-actions">
@@ -78,24 +79,6 @@
 <!-- ============ BIENVENIDA / PRIMER USO ============ -->
 <section id="view-onboarding" class="view" hidden>
   <div class="onboarding-box welcome-box">
-    <div id="ob-lang-top-wrap" class="ob-lang-top">
-      <label for="ob-lang-top" data-i18n="ob_lang_label">🌐 Idioma</label>
-      <select id="ob-lang-top">
-        <option value="auto" data-i18n="lang_auto">Automático (el de tu teléfono)</option>
-        <option value="es">Español</option>
-        <option value="en">English</option>
-        <option value="it">Italiano</option>
-        <option value="pt">Português</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="zh">中文</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-        <option value="ru">Русский</option>
-        <option value="hi">हिन्दी</option>
-        <option value="ar">العربية</option>
-      </select>
-    </div>
     <img class="ob-logo" src="icons/icon-192.png" alt="PETO Finanzas" width="96" height="96">
     <h2 data-i18n="ob_title">Tu dinero, claro y sin estrés</h2>
     <p class="ob-intro"><span data-i18n="ob_intro_1">Apunta un gasto en segundos.</span><br>
@@ -179,6 +162,10 @@
   <!-- ======= INICIO ======= -->
   <main id="view-home" class="view">
     <div id="home-banners"></div>
+    <button id="pro-home-bar101" class="pro-bar101" type="button" hidden>
+      <span class="pro-bar101-t">⭐ <span data-i18n="pro_home_title">Únete a PETO Pro</span></span>
+      <span class="pro-bar101-d"><span data-i18n="pro_price_line">Solo $4.99 al mes</span> · <span data-i18n="pro_trial_line">Los primeros 14 días son gratis.</span></span>
+    </button>
 
     <!-- Compilación 76: primero la cuenta, después el banco. -->
     <section id="home-account" class="card" hidden>
@@ -1268,7 +1255,6 @@
       <button type="button" class="set92-index-row" data-acc92="split" aria-expanded="false"><span data-i18n="set_group_rules">Reglas de tu dinero</span><span class="set93-index-sum muted small" id="set93-sum-split"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
       <button type="button" class="set92-index-row" data-acc92="security" aria-expanded="false"><span data-i18n="set_group_security">Seguridad y privacidad</span><span class="set93-index-sum muted small" id="set93-sum-security"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
       <button type="button" class="set92-index-row" data-acc92="sections" aria-expanded="false"><span data-i18n="set_group_personalization">Personalización</span><span class="set93-index-sum muted small" id="set93-sum-sections"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
-      <button type="button" class="set92-index-row" data-acc92="news" aria-expanded="false"><span data-i18n="set_news_title">Novedades</span><span class="set93-index-sum muted small" id="set93-sum-news"></span><span class="set92-index-chev" aria-hidden="true">›</span></button>
     </nav>
 
     <!-- Compilación 75: Ajustes en OCHO tarjetas, por importancia:
@@ -1287,26 +1273,8 @@
       </div>
       <div id="setacc-profile-body" hidden>
       <label for="set-name" data-i18n="set_name_label">Tu nombre</label>
-      <input id="set-name" type="text" maxlength="40">
+      <input id="set-name" type="text" maxlength="40" readonly aria-readonly="true">
       
-      <label for="set-lang" data-i18n="set_lang_label">Idioma / Language</label>
-      <select id="set-lang">
-        <option value="auto" data-i18n="lang_auto">Automático (el del teléfono)</option>
-        <option value="es">Español</option>
-        <option value="en">English</option>
-        <option value="it">Italiano</option>
-        <option value="pt">Português</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="zh">中文</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-        <option value="ru">Русский</option>
-        <option value="hi">हिन्दी</option>
-        <option value="ar">العربية</option>
-      </select>
-      <label for="set-country" data-i18n="set_country_label">País</label>
-      <select id="set-country"></select>
       <label for="set-currency" data-i18n="set_currency_label">Moneda</label>
       <select id="set-currency"></select>
       
@@ -1368,6 +1336,8 @@
             <div id="setacc-cloud-body" hidden>
             <p class="muted small set92-oneline" data-i18n="cloud_help">Con una cuenta, tus datos se guardan también en la nube y se sincronizan: si cambias de teléfono, entras con tu correo y todo sigue ahí. Sin cuenta, la app funciona solo en este teléfono, como siempre.</p>
             <div id="cloud-signedout">
+              <label for="cloud-name" data-i18n="set_name_label">Tu nombre</label>
+              <input id="cloud-name" type="text" autocomplete="name" maxlength="40">
               <label for="cloud-email" data-i18n="cloud_email">Correo electrónico</label>
               <input id="cloud-email" type="email" autocomplete="email" maxlength="120">
               <label for="cloud-pass" data-i18n="cloud_pass">Contraseña</label>
@@ -1702,22 +1672,6 @@
       </div>
     </section>
 
-    <section class="card form-card set93-sec" id="settings-news" hidden>
-      <div class="sections-head" id="setacc-news-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-news-body">
-        <h3 data-i18n="set_news_title">Novedades</h3>
-        <span class="sections-summary muted small" id="setacc-news-summary"></span>
-        <span class="sections-chevron" aria-hidden="true">▸</span>
-      </div>
-      <div id="setacc-news-body" hidden>
-      <!-- Novedades (Compilación 56): SOLO la(s) línea(s) de la versión
-           vigente (las de NEWS_CURRENT en app.js). En cada compilación
-           nueva se sustituye el <li> y se borra la clave anterior de
-           los 12 idiomas: nada de historial acumulado. -->
-      <ul class="news-list">
-        <li data-i18n="news_c78_banksync">✨ Nuevo en PETO Finanzas: si sales de tu cuenta, Inicio te avisa que tu banco dejó de sincronizarse y te lleva a entrar de nuevo en dos toques.</li>
-      </ul>
-      </div>
-    </section>
     <!-- Compilación 92 (punto 11): el botón gigante «Salir» se
          va de Ajustes; cerrar/bloquear lo manda el bloqueo (PIN y
          huella, con su fila de bloquear). El pie de Ajustes lleva
@@ -1746,6 +1700,7 @@
       <h4 data-i18n="setup_step1_t">Crea tu cuenta</h4>
       <p class="muted" data-i18n="setup_step1_d">Tu cuenta en la nube guarda tu dinero sincronizado y te deja conectar tu banco.</p>
       <p class="setup-done" id="setup-done-0" hidden>✓ <span data-i18n="setup_done">Listo</span></p>
+      <input id="setup-name" type="text" autocomplete="name" maxlength="40" data-i18n-ph="set_name_label" placeholder="Tu nombre">
       <input id="setup-email" type="email" autocomplete="email" data-i18n-ph="setup_email_ph" placeholder="Tu correo">
       <input id="setup-pass" type="password" autocomplete="new-password" data-i18n-ph="setup_pass_ph" placeholder="Contraseña (mínimo 6)">
       <p id="setup-error" class="error" role="alert" hidden></p>
@@ -1961,6 +1916,18 @@
       <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
       </div>
       <button id="pro-close" type="button" class="btn btn-ghost" data-i18n="pro_close">Ahora no</button>
+    </div>
+  </div>
+
+  <div id="efund-quick101" class="chooser" hidden>
+    <div class="chooser-card">
+      <h3 data-i18n="efund_title">🛟 Fondo de emergencia</h3>
+      <label for="efund-quick-amount101" data-i18n="goal_target_label">Cantidad meta ($)</label>
+      <input id="efund-quick-amount101" type="number" inputmode="decimal" min="0" step="0.01">
+      <p id="efund-quick-sugg101" class="muted small"></p>
+      <p id="efund-quick-error101" class="error" role="alert" hidden></p>
+      <button id="efund-quick-create101" type="button" class="btn btn-primary btn-big" data-i18n="c101_efund_create_btn">Crear fondo</button>
+      <button id="efund-quick-close101" type="button" class="btn btn-ghost" data-i18n="perm10_not_now">Ahora no</button>
     </div>
   </div>
 

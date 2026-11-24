@@ -473,6 +473,11 @@ body.fabs-off .fab{display:none}
   opacity:0;transition:opacity .2s ease;
 }
 #menu-drawer-wrap.open .menu-backdrop{opacity:1}
+/* Compilación 101 · guarda: el fondo del cajón lateral NUNCA captura
+   toques mientras el cajón está cerrado (hoy ya va dentro de un
+   contenedor [hidden]; esto es el cinturón además de los tirantes). */
+.menu-backdrop{pointer-events:none}
+#menu-drawer-wrap.open .menu-backdrop{pointer-events:auto}
 .menu-drawer{
   position:fixed;top:0;left:0;bottom:0;z-index:81;width:min(330px,86vw);
   background:var(--bg);border-right:1px solid var(--line);
@@ -1871,3 +1876,28 @@ button.chip{min-height:38px;padding:.5rem .9rem;font-size:.875rem}
 .flow-hist100{margin-top:.6rem}
 .flow-hist100 .chart-row{margin-top:.35rem}
 .flow-out-fill100{background:var(--danger);opacity:.78}
+
+/* ================= Compilación 101 =================
+   · Chat: UNA sola píldora (el campo ya no dibuja su propio
+     borde/anillo al enfocar: el anillo vive en la píldora con
+     :focus-within), iconos SVG propios en cámara/micrófono/
+     enviar y botón de volver circular siempre visible.
+   · «Pensando» de la IA con vida (pulso + puntos).
+   · Barra Pro permanente de Inicio. */
+.chat-pill93 #ai-chat-input{border:0;background:transparent;box-shadow:none;border-radius:0;-webkit-appearance:none;appearance:none}
+.chat-pill93 #ai-chat-input:focus{border:0;box-shadow:none;outline:none}
+.chat-pill-cam93 svg{width:22px;height:22px}
+.chat-action-icon93 svg{width:24px;height:24px;display:block}
+.chat-back-fab101{position:absolute;top:calc(var(--sat, 0px) + 10px);left:12px;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(14px) saturate(1.7);backdrop-filter:blur(14px) saturate(1.7);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.18);padding:0}
+.chat-back-fab101 svg{width:24px;height:24px}
+.chat-back-fab101:active{transform:scale(.95)}
+html[data-theme="oscuro"] .chat-back-fab101{background:rgba(32,36,40,.55)}
+.chat-view #ai-chat-back{margin-left:64px}
+.ai-working101{animation:aiPulse101 1.1s ease-in-out infinite}
+.ai-working101::after{content:'';animation:aiDots101 1.2s steps(4) infinite}
+@keyframes aiPulse101{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes aiDots101{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.pro-bar101{display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;width:100%;text-align:left;padding:.7rem .9rem;margin:0 0 .8rem;border-radius:14px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);cursor:pointer;font:inherit}
+.pro-bar101-t{font-weight:700}
+.pro-bar101-d{font-size:.85rem;opacity:.85}
+.pro-bar101:active{transform:scale(.99)}
