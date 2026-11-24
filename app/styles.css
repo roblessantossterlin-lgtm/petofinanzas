@@ -1824,6 +1824,12 @@ html[data-theme="oscuro"] .chat-pill93{background:rgba(32,36,40,.30)}
 /* P6: segunda fila del bloque único de resumen. */
 .summary-strip .summary-item{grid-column:span 2}
 .summary-strip #tile-incomes,.summary-strip #tile-expenses{grid-column:span 3}
+/* Compilación 104: con banco, la tarjeta «Dinero disponible» no
+   está (su saldo vive una sola vez, en la tira del banco) y
+   Ahorros/Deudas ocupan la fila completa (3+3, como
+   Ingresos/Gastos), sin hueco a la derecha. */
+.summary-strip.strip-solo104 #tile-savings,
+.summary-strip.strip-solo104 #tile-debts{grid-column:span 3}
 /* P13: disponible total de Mis cuentas, el mismo de Inicio. */
 .acc-avail99{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
 .acc-avail-label99{color:var(--muted);font-size:.9rem}

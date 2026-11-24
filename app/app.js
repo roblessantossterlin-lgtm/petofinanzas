@@ -15168,6 +15168,29 @@ function renderHome() {
   document.getElementById('tile-debts').hidden = db.settings.sections.deudas === false;
   document.getElementById('tile-incomes').hidden = db.settings.sections.ingresos === false;
   document.getElementById('tile-expenses').hidden = db.settings.sections.gastos === false;
+  /* Compilación 104 (pedido de Sterlin con captura, 24-nov-2026):
+     con el banco conectado, la tira del banco y la tarjeta
+     «Dinero disponible» enseñaban EL MISMO saldo (en su SoFi,
+     $4.98 y $4.98): la tira pinta bankDepositTotalCents() y la
+     tarjeta availableMoney(), que con saldos del banco suma ese
+     mismo total de depósito al final; sin cuentas internas ni
+     flujo manual que lo mueva, las dos cifras son idénticas y
+     la tarjeta sobra. Desde la 104, habiendo banco (cualquier
+     estado de bankUiState103 que no sea 'none'), la tarjeta se
+     oculta y Ahorros/Deudas ocupan la fila completa (la clase
+     strip-solo104 de styles.css): la tira queda como el saldo
+     del banco y la entrada a su gestión (goBankSettings), y
+     «Mis cuentas» sigue en el menú ☰ con su disponible total.
+     Sin sesión ('nosession') la tarjeta TAMPOCO se pinta: su
+     cifra saldría del espejo local (bankDepositTotalCents lee
+     bankConns aunque no haya sesión) y sería enseñar el saldo
+     del banco sin estar dentro — lo mismo que la 103 prohibió
+     en la tira. Sin banco ('none', modo manual) todo queda
+     como siempre: sin tira y con su tarjeta de siempre. */
+  const bankHome104 = PETO_BANK_ENABLED && !demoMode && bankUiState103() !== 'none';
+  if (bankHome104) availTile.hidden = true;
+  const strip104 = document.querySelector('.summary-strip');
+  if (strip104) strip104.classList.toggle('strip-solo104', bankHome104);
   const goalLine = document.getElementById('sum-savings-goal');
   if (db.savingsGoal) {
     goalLine.hidden = false;
