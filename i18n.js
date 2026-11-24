@@ -62,6 +62,15 @@
   window.PETO_cambiarIdioma = cambiar;
 
   function iniciar() {
+    var toggles = document.querySelectorAll('.nav-toggle');
+    for (var n = 0; n < toggles.length; n++) {
+      toggles[n].addEventListener('click', function () {
+        var nav = document.getElementById(this.getAttribute('aria-controls'));
+        if (!nav) return;
+        var abierto = nav.classList.toggle('abierto');
+        this.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      });
+    }
     var botones = document.querySelectorAll('[data-lang-btn]');
     for (var b = 0; b < botones.length; b++) {
       botones[b].addEventListener('click', function () {
