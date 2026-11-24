@@ -1820,6 +1820,9 @@ html[data-theme="oscuro"] .chat-pill93{background:rgba(32,36,40,.30)}
 .afford99-row{display:flex;gap:.5rem}
 .afford99-row input{flex:1 1 auto;min-width:0;min-height:var(--tap);padding:.6rem .75rem;font-size:1rem;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
 .afford99-row .btn{flex:0 0 auto}
+.afford99-answer-row{display:flex;align-items:flex-start;gap:.4rem}
+.afford99-answer-row .muted{flex:1 1 auto}
+.afford99-x102{flex:0 0 auto;border:0;background:transparent;color:var(--muted,#888);font-size:1rem;line-height:1.4;padding:.1rem .45rem;cursor:pointer}
 /* P9: plan con IA dentro de la tarjeta del fondo de emergencia. */
 .efund-plan99{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.7rem}
 /* P14: el selector crudo de foto queda oculto (sin display:none,

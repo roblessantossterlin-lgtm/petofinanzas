@@ -258,7 +258,12 @@
           <input id="afford99-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
           <button id="afford99-btn" class="btn btn-secondary" type="button" data-i18n="c99_afford_btn">Preguntar a la IA</button>
         </div>
-        <p id="afford99-answer" class="muted small" aria-live="polite"></p>
+        <div class="afford99-answer-row">
+          <p id="afford99-answer" class="muted small" aria-live="polite"></p>
+          <!-- Comp. 102: la ✕ que descarta el veredicto guardado
+               y limpia el monto (nace oculta). -->
+          <button id="afford99-dismiss102" class="afford99-x102" type="button" hidden aria-label="Descartar">✕</button>
+        </div>
       </div>
     </section>
 
@@ -681,6 +686,10 @@
     <section id="budget-starter" class="card form-card">
       <label for="budget-income" data-i18n="bud_income_label">¿Cuánto entra al mes?</label>
       <input id="budget-income" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <!-- Compilación 102: nota del ingreso detectado del banco
+           (la rellena incomeDetectMaybe102; nace oculta y sin
+           detección la pantalla queda como siempre). -->
+      <p class="muted small" id="budget-income-note102" hidden></p>
       <div class="form-actions">
         <button id="budget-split-btn" type="button" class="btn btn-secondary" data-i18n="bud_split_btn">Repartir según mi ingreso</button>
       </div>
