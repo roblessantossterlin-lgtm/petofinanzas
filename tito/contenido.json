@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-23",
+  "actualizado": "2026-11-24",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -86,6 +86,20 @@
       "titulo": "La canción de cuidar las plantas",
       "archivo": "assets/cancion-2026-11-23-plantas.mp3",
       "fecha": "2026-11-23"
+    },
+    {
+      "id": "dibujo-2026-11-24-tortuga",
+      "tipo": "dibujo",
+      "titulo": "Tito y la tortuga",
+      "archivo": "assets/dibujo-2026-11-24-tortuga.png",
+      "fecha": "2026-11-24"
+    },
+    {
+      "id": "cancion-2026-11-24-frutas",
+      "tipo": "cancion",
+      "titulo": "La canción de las frutas",
+      "archivo": "assets/cancion-2026-11-24-frutas.mp3",
+      "fecha": "2026-11-24"
     }
   ]
 }
