@@ -1339,7 +1339,17 @@ html.plaid-open body{
 .badge-fixed{background:var(--accent-soft,#e2f2ea);color:var(--accent-dark,#1d7a5c);border-radius:999px;padding:1px 8px;font-size:.75em;font-weight:700;white-space:nowrap}
 .pro-home-card{position:relative;border:1px solid var(--accent,#2fae7f)}
 .pro-home-x{position:absolute;top:6px;right:10px;background:none;border:none;font-size:1.3em;line-height:1;color:var(--muted);cursor:pointer;padding:4px}
-.guide-card{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-h,64px) + 22px);z-index:60;background:var(--card);border:1px solid var(--accent,#2fae7f);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.28);padding:16px}
+/* Compilación 103: la tarjeta del tour ya NO es una barra fija
+   de borde a borde pegada abajo (tapaba el contenido y dejaba
+   la navegación cortada en el teléfono): es una tarjeta
+   FLOTANTE centrada, con margen a los lados, flotando SOBRE la
+   navegación inferior y respetando el área segura (--sab). El
+   asistente de configuración comparte la clase y hereda el
+   mismo trato. Mientras el tour vive, body.tour-open103 suma
+   aire al final del contenido (reglas tras la escalera de
+   has-bottomnav) para poder desplazar cualquier tarjeta fuera
+   de la flotante. */
+.guide-card{position:fixed;left:50%;right:auto;transform:translateX(-50%);width:min(430px,calc(100% - 32px));bottom:calc(var(--nav-h,64px) + var(--sab) + 14px);z-index:60;background:var(--card);border:1px solid var(--accent,#2fae7f);border-radius:20px;box-shadow:0 18px 44px rgba(2,20,12,.28);padding:16px}
 .guide-card h3{margin:0 0 6px}
 .guide-card p{margin:0 0 10px}
 .guide-highlight{outline:3px solid var(--accent,#2fae7f) !important;outline-offset:3px;border-radius:12px;position:relative;z-index:55}
@@ -1398,7 +1408,20 @@ body{padding-top:var(--sat)}
 .chooser{padding-top:calc(1rem + var(--sat));padding-bottom:calc(1rem + var(--sab))}
 .photo-overlay{padding-top:calc(1rem + var(--sat));padding-bottom:calc(1rem + var(--sab))}
 .podcast-player{bottom:calc(.6rem + var(--sab))}
-.guide-card{bottom:calc(var(--nav-h,64px) + 22px + var(--sab))}
+.guide-card{bottom:calc(var(--nav-h,64px) + 14px + var(--sab))}
+/* Compilación 103: con el tour abierto, el contenido gana aire
+   al final (la altura de la tarjeta flotante) para que ninguna
+   tarjeta quede atrapada debajo de ella; la navegación inferior
+   sigue intacta y visible. Van DESPUÉS de la escalera
+   has-bottomnav/has-ads para mandar sobre ella mientras el tour
+   vive, y la clase se quita al cerrarlo. */
+body.tour-open103 #app-shell{padding-bottom:calc(13rem + 92px + 235px + var(--sab))}
+body.tour-open103.has-ads #app-shell{padding-bottom:calc(13rem + 92px + 60px + 235px + var(--sab))}
+/* Compilación 103: la puerta de la web — sus dos botones en
+   columna con aire, como la bienvenida. */
+#gate103-choices{display:grid;gap:.6rem}
+#view-gate103{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;box-sizing:border-box}
+#view-gate103[hidden]{display:none}
 body.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + var(--sab))}
 body.has-bottomnav .fab{bottom:calc(1.1rem + 92px + var(--sab))}
 body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + var(--sab))}

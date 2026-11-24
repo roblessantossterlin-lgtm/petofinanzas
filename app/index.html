@@ -37,7 +37,7 @@
     </form>
     <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden>Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
-    <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
+    <p class="muted small" id="lock-note">Tus datos están solo en este teléfono.</p>
     <p class="muted small build-label" id="lock-build-label">Compilación 54</p>
   </div>
 </section>
@@ -82,8 +82,8 @@
     <img class="ob-logo" src="icons/icon-192.png" alt="PETO Finanzas" width="96" height="96">
     <h2 data-i18n="ob_title">Tu dinero, claro y sin estrés</h2>
     <p class="ob-intro"><span data-i18n="ob_intro_1">Apunta un gasto en segundos.</span><br>
-    <span data-i18n="ob_intro_2">Con tu cuenta en la nube.</span><br>
-    <span data-i18n="ob_intro_3">Tus datos se sincronizan con tu teléfono.</span></p>
+    <span data-i18n="ob_intro_2">Funciona sin internet; la cuenta es opcional.</span><br>
+    <span data-i18n="ob_intro_3">Tus datos van cifrados: tu banco y la IA solo leen lo que autorizas.</span></p>
     <div id="ob-start-wrap">
       <button id="ob-start" type="button" class="btn btn-primary btn-big" data-i18n="ob_start">Empezar</button>
     </div>
@@ -121,6 +121,43 @@
       <p><button id="ob-signin-forgot" type="button" class="btn btn-ghost btn-small" data-i18n="cloud_forgot">¿Olvidaste tu contraseña?</button></p>
     </form>
     <p id="ob-note" class="muted small" data-i18n="ob_note">Podrás cambiar el PIN cuando quieras en Ajustes.</p>
+  </div>
+</section>
+
+<!-- ============ PUERTA WEB (Compilación 103) ============
+     Solo existe en la web pública real (dominio público, sin el
+     puente de Capacitor): quien llega SIN sesión ve esta
+     bienvenida con «Crear cuenta» / «Iniciar sesión» y NUNCA el
+     panel con datos. En el teléfono no aparece jamás: ahí manda
+     el arranque local de siempre. El enlace «Iniciar sesión» del
+     sitio (?login=1) abre directo el formulario de entrada. -->
+<section id="view-gate103" class="view" hidden>
+  <div class="onboarding-box welcome-box">
+    <img class="ob-logo" src="icons/icon-192.png" alt="PETO Finanzas" width="96" height="96">
+    <h2 data-i18n="gate103_title">Bienvenido a PETO Finanzas</h2>
+    <p class="ob-intro" data-i18n="gate103_text">Controla tus gastos e ingresos, arma tu presupuesto, lleva tu san y conecta tu banco para que tus movimientos se anoten solos. Tu cuenta sincroniza esta web con la app de tu teléfono.</p>
+    <p id="gate103-checking" class="muted" data-i18n="gate103_checking">Revisando tu sesión…</p>
+    <div id="gate103-choices" hidden>
+      <button id="gate103-open-signup" type="button" class="btn btn-primary btn-big" data-i18n="cloud_signup">Crear cuenta</button>
+      <button id="gate103-open-signin" type="button" class="btn btn-secondary btn-big" data-i18n="gate103_signin">Iniciar sesión</button>
+    </div>
+    <form id="gate103-form" autocomplete="off" hidden novalidate>
+      <div id="gate103-name-wrap" hidden>
+        <label for="gate103-name" data-i18n="cloud_name">Nombre</label>
+        <input id="gate103-name" type="text" autocomplete="name" maxlength="60">
+      </div>
+      <label for="gate103-email" data-i18n="cloud_email">Correo electrónico</label>
+      <input id="gate103-email" type="email" autocomplete="email" maxlength="120">
+      <label for="gate103-pass" data-i18n="cloud_pass">Contraseña</label>
+      <input id="gate103-pass" type="password" autocomplete="new-password" maxlength="72">
+      <p id="gate103-status" class="muted small" aria-live="polite"></p>
+      <p id="gate103-error" class="error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="gate103-submit" type="submit" class="btn btn-primary" data-i18n="gate103_signin">Iniciar sesión</button>
+        <button id="gate103-back" type="button" class="btn btn-ghost" data-i18n="ob_signin_back">Volver</button>
+      </div>
+      <p><button id="gate103-forgot" type="button" class="btn btn-ghost btn-small" data-i18n="cloud_forgot">¿Olvidaste tu contraseña?</button></p>
+    </form>
   </div>
 </section>
 
@@ -260,8 +297,8 @@
         </div>
         <div class="afford99-answer-row">
           <p id="afford99-answer" class="muted small" aria-live="polite"></p>
-          <!-- Comp. 102: la ✕ que descarta el veredicto guardado
-               y limpia el monto (nace oculta). -->
+          <!-- Compilación 102: la ✕ que descarta el veredicto
+               guardado y limpia el monto (nace oculta). -->
           <button id="afford99-dismiss102" class="afford99-x102" type="button" hidden aria-label="Descartar">✕</button>
         </div>
       </div>
@@ -1031,7 +1068,6 @@
       <p class="muted" data-i18n="pod_hosts">con Lucía y Marco</p>
       <p data-i18n="pod_desc">Dinero sin enredos: consejos prácticos para ahorrar, salir de deudas y cuidar tu bolsillo, en episodios cortos.</p>
       <a class="btn btn-secondary" href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener" data-i18n="pod_spotify_btn">Escuchar en Spotify</a>
-      <a class="btn btn-ghost" href="../blog/">📖 Blog del podcast: el resumen de cada episodio</a>
     </div>
     <p id="podcast-status" class="muted" role="status" hidden></p>
     <div id="podcast-list" class="podcast-list"></div>
@@ -1607,7 +1643,7 @@
               <span class="sections-chevron" aria-hidden="true">▸</span>
             </div>
             <div id="setacc-data-body" hidden>
-            <p class="muted small set92-oneline" data-i18n="set_data_help">Tus datos se guardan en este navegador y, si entras con tu cuenta, también en la nube. Exporta una copia si quieres guardarla en otro lugar.</p>
+            <p class="muted small set92-oneline" data-i18n="set_data_help">Todo vive solo en este teléfono. Exporta una copia si quieres guardarla en otro lugar.</p>
             <!-- Compilación 92 (punto 8): las copias viven tras
                  su fila «Copias de seguridad ›»: exportar,
                  importar, la cifrada y el CSV, con sus estados. -->
@@ -1689,7 +1725,8 @@
   </main>
 
   <footer class="app-footer muted small" data-i18n="footer">
-    PETO Web · Con tu cuenta en la nube, tus datos se sincronizan con tu teléfono</footer>
+    PETO Finanzas · Funciona sin internet · La nube es opcional: tus datos, tu decisión · Compilación 56
+  </footer>
 
   <!-- Compilación 65: barra inferior flotante de navegación (cápsula).
        Los botones los genera app.js (BOTTOM_NAV) con los iconos del
@@ -1921,7 +1958,6 @@
       <div id="pro-waitlist-box">
       <p id="pro-coming-text" class="muted"></p>
       <button id="pro-waitlist-btn" type="button" class="btn btn-primary btn-big" data-i18n="pro_waitlist_btn">Anotarme en la lista de espera</button>
-      <a class="btn btn-ghost" href="../precios/">Ver precios y planes de PETO Pro</a>
       <p id="pro-waitlist-done" class="muted" hidden data-i18n="pro_waitlist_done">Ya estás en la lista ✅ Te avisaremos cuando Pro esté disponible.</p>
       </div>
       <button id="pro-close" type="button" class="btn btn-ghost" data-i18n="pro_close">Ahora no</button>
@@ -1992,7 +2028,7 @@
 </section>
 
 <script src="vendor/supabase.js"></script>
-<script src="web.js"></script>
+<script src="vendor/cdv-purchase.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
