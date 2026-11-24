@@ -11,18 +11,21 @@
 <body>
 <div class="wrap">
   <header class="site">
-    <img src="../logo.png" alt="Logo de PETO Finanzas" data-i18n-attr="alt:alt_logo">
-    <a class="brand" href="../">PETO Finanzas</a>
-    <nav>
-      <a href="../#calculadoras" data-i18n="nav_calc">Calculadoras</a>
-      <a href="../precios/" data-i18n="nav_precios">Precios</a>
-      <a href="../blog/" data-i18n="nav_blog">Blog</a>
-      <a href="../privacidad/" data-i18n="nav_priv">Privacidad</a>
+    <img src="/logo.png" alt="Logo de PETO Finanzas" data-i18n-attr="alt:alt_logo">
+    <a class="brand" href="/">PETO Finanzas</a>
+    <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-principal">☰</button>
+    <nav id="nav-principal">
+      <a href="/#calculadoras" data-i18n="nav_calc">Calculadoras</a>
+      <a href="/#podcast" data-i18n="nav_podcast">Podcast</a>
+      <a href="/precios/" data-i18n="nav_precios">Precios</a>
+      <a href="/recursos/" data-i18n="nav_recursos">Recursos</a>
+      <a href="/blog/" data-i18n="nav_blog">Blog</a>
+      <a href="/privacidad/" data-i18n="nav_priv">Privacidad</a>
       <span class="lang-switch" role="group" aria-label="Idioma / Lingua">
         <button type="button" data-lang-btn="es">ES</button>
         <button type="button" data-lang-btn="it">IT</button>
       </span>
-      <a class="btn" href="../app/" data-i18n="btn_probar">Probar gratis</a>
+      <a class="btn" href="/app/" data-i18n="btn_probar">Probar gratis</a>
     </nav>
   </header>
 
@@ -42,7 +45,7 @@
     <div class="card">
       <div class="emoji">🏦</div>
       <h3 data-i18n="sofi_t">SoFi — mi banco de todos los días</h3>
-      <p data-i18n="sofi_p">Es la cuenta que uso para mi dinero del día a día, y la que se sincroniza con PETO Finanzas. Con mi enlace, SoFi ofrece bonos de bienvenida de hasta $325 según el depósito, y $50 extra con SoFi Plus, según sus términos vigentes al registrarte.</p>
+      <p data-i18n="sofi_p">Es la cuenta que uso para mi dinero del día a día, y la que se sincroniza con PETO Finanzas. Con mi enlace, SoFi ofrece un bono de bienvenida según el depósito, según los términos vigentes de SoFi al registrarte.</p>
       <a class="btn" href="https://www.sofi.com/invite/money?gcp=bade134a-a814-4fe6-9831-beafa67bc1b9&isAliasGcp=false&siid=67e7e8a3-b1a7-499c-9283-8803c6f4c885" target="_blank" rel="sponsored noopener" data-i18n="sofi_btn">Abrir mi cuenta en SoFi</a>
       <p class="muted" data-i18n="sofi_nota">Enlace de referido: tú recibes el bono de bienvenida y yo recibo un bono de referido.</p>
     </div>
@@ -57,7 +60,7 @@
     <div class="card">
       <div class="emoji">🌎</div>
       <h3 data-i18n="rem_t">Remitly — remesas con $20 de descuento</h3>
-      <p data-i18n="rem_p">Soy embajador oficial de Remitly (#Ad #RemitlyAmbassador). Si eres cliente nuevo, usa mi código al registrarte y recibes <strong>$20 de descuento</strong> en tu primer envío de $40 o más.</p>
+      <p data-i18n="rem_p">Soy embajador oficial de Remitly. #Anuncio - colaboración pagada #EmbajadorRemitly. Si eres cliente nuevo, escribe mi código al registrarte y recibes <strong>$20 de descuento</strong> en tu primer envío de $40 o más.</p>
       <p data-i18n="rem_code">Código: <strong>AMBTYJP</strong></p>
       <a class="btn" href="https://www.remitly.com" target="_blank" rel="sponsored noopener" data-i18n="rem_btn">Enviar dinero con Remitly</a>
       <p class="muted" data-i18n="rem_nota">Relación pagada: tú recibes el descuento de $20 y yo recibo una comisión por cada cliente nuevo que completa su primer envío.</p>
@@ -92,8 +95,10 @@
   </section>
 
   <footer class="site">
-    <p data-i18n="foot">PETO Finanzas · <a href="../privacidad/">Política de privacidad</a> · <a href="../app/">Abrir la app web</a> · <a href="../blog/">Blog del podcast</a> · <a href="../precios/">Precios</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a></p>
-    <p><a href="https://www.youtube.com/@PetoFinanzas" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/peto_finanzas" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@peto.finanzas" target="_blank" rel="noopener">TikTok</a> · <a href="https://www.facebook.com/profile.php?id=286141488762368" target="_blank" rel="noopener">Facebook</a> · <a href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener">Spotify</a> · <a href="https://play.google.com/store/apps/details?id=app.peto" target="_blank" rel="noopener">Google Play</a> · <a href="https://linktr.ee/petofinanzas" target="_blank" rel="noopener">Linktree</a></p>
+    <p data-i18n="foot_1">PETO Finanzas · <a href="/privacidad/">Política de privacidad</a> · <a href="/terminos/">Términos</a> · <a href="/app/">Abrir la app web</a> · <a href="/precios/">Precios</a> · <a href="/recursos/">Recursos</a> · <a href="/blog/">Blog</a></p>
+    <p data-i18n="foot_2">Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Teléfono: <a href="tel:+13474492484">+1 (347) 449-2484</a></p>
+    <p><a href="https://www.youtube.com/@PetoFinanzas" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.youtube.com/@PETOFinances" target="_blank" rel="noopener">YouTube (inglés)</a> · <a href="https://www.instagram.com/peto_finanzas" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@peto.finanzas" target="_blank" rel="noopener">TikTok</a> · <a href="https://www.facebook.com/share/g/1Eq7WNgLGG/" target="_blank" rel="noopener">Facebook</a> · <a href="https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3" target="_blank" rel="noopener">Spotify</a> · <a href="https://play.google.com/store/apps/details?id=app.peto" target="_blank" rel="noopener">Google Play</a> · <a href="https://linktr.ee/petofinanzas" target="_blank" rel="noopener">Linktree</a></p>
+    <p data-i18n="foot_3">Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin, para que los niños aprendan jugando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro de Tito en Amazon</a></p>
   </footer>
 </div>
 <script>
@@ -103,7 +108,9 @@ window.PETO_TEXTOS = {
     __desc: 'Las herramientas de dinero que usa PETO Finanzas: SoFi para el banco del día a día y Sendwave para enviar remesas a República Dominicana, con su divulgación de afiliados.',
     alt_logo: 'Logo de PETO Finanzas',
     nav_calc: 'Calculadoras',
+    nav_podcast: 'Podcast',
     nav_precios: 'Precios',
+    nav_recursos: 'Recursos',
     nav_blog: 'Blog',
     nav_priv: 'Privacidad',
     btn_probar: 'Probar gratis',
@@ -116,7 +123,7 @@ window.PETO_TEXTOS = {
     disc_3: 'Mi compromiso: solo recomiendo productos que uso personalmente o que revisé con cuidado. La comisión nunca cambia mi opinión, y si un producto deja de convencerme, sale de esta página. Los bonos, tasas y condiciones los fija cada compañía y pueden cambiar sin aviso; verifica siempre los términos vigentes en el sitio oficial antes de registrarte.',
     disc_4: 'Nada en esta página ni en mi contenido es asesoría financiera, legal o de impuestos. Tu situación es tuya: si necesitas decisiones grandes, consulta a un profesional.',
     sofi_t: 'SoFi — mi banco de todos los días',
-    sofi_p: 'Es la cuenta que uso para mi dinero del día a día, y la que se sincroniza con PETO Finanzas. Con mi enlace, SoFi ofrece bonos de bienvenida de hasta $325 según el depósito, y $50 extra con SoFi Plus, según sus términos vigentes al registrarte.',
+    sofi_p: 'Es la cuenta que uso para mi dinero del día a día, y la que se sincroniza con PETO Finanzas. Con mi enlace, SoFi ofrece un bono de bienvenida según el depósito, según los términos vigentes de SoFi al registrarte.',
     sofi_btn: 'Abrir mi cuenta en SoFi',
     sofi_nota: 'Enlace de referido: tú recibes el bono de bienvenida y yo recibo un bono de referido.',
     send_t: 'Sendwave — mis remesas a República Dominicana',
@@ -125,7 +132,7 @@ window.PETO_TEXTOS = {
     send_btn: 'Enviar dinero con Sendwave',
     send_nota: 'Enlace de referido: tú recibes el crédito de $20 y yo recibo crédito para mis envíos.',
     rem_t: 'Remitly — remesas con $20 de descuento',
-    rem_p: 'Soy embajador oficial de Remitly (#Ad #RemitlyAmbassador). Si eres cliente nuevo, usa mi código al registrarte y recibes $20 de descuento en tu primer envío de $40 o más.',
+    rem_p: 'Soy embajador oficial de Remitly. #Anuncio - colaboración pagada #EmbajadorRemitly. Si eres cliente nuevo, escribe mi código al registrarte y recibes $20 de descuento en tu primer envío de $40 o más.',
     rem_code: 'Código: AMBTYJP',
     rem_btn: 'Enviar dinero con Remitly',
     rem_nota: 'Relación pagada: tú recibes el descuento de $20 y yo recibo una comisión por cada cliente nuevo que completa su primer envío.',
@@ -142,14 +149,18 @@ window.PETO_TEXTOS = {
     cierra_p: 'Solo entra aquí lo que uso de verdad. Escucha el podcast «Finanzas Personales» en Spotify y mira los videos en YouTube para ver cómo uso cada herramienta con números reales.',
     btn_spotify: 'Escuchar el podcast',
     btn_youtube: 'Ver los videos',
-    foot: 'PETO Finanzas · <a href="../privacidad/">Política de privacidad</a> · <a href="../app/">Abrir la app web</a> · <a href="../blog/">Blog del podcast</a> · <a href="../precios/">Precios</a> · Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>''
+    foot_1: 'PETO Finanzas · <a href="/privacidad/">Política de privacidad</a> · <a href="/terminos/">Términos</a> · <a href="/app/">Abrir la app web</a> · <a href="/precios/">Precios</a> · <a href="/recursos/">Recursos</a> · <a href="/blog/">Blog</a>',
+    foot_2: 'Contacto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Teléfono: <a href="tel:+13474492484">+1 (347) 449-2484</a>',
+    foot_3: 'Tito el Zorrito es el zorrito de las canciones infantiles en español de Sterlin, para que los niños aprendan jugando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro de Tito en Amazon</a>'
   },
   it: {
     __title: 'Risorse — Gli strumenti che uso · PETO Finanzas',
     __desc: 'Gli strumenti per i soldi che usa PETO Finanzas: SoFi per la banca di tutti i giorni e Sendwave per inviare rimesse nella Repubblica Dominicana, con la sua informativa di affiliazione.',
     alt_logo: 'Logo di PETO Finanzas',
     nav_calc: 'Calcolatori',
+    nav_podcast: 'Podcast',
     nav_precios: 'Prezzi',
+    nav_recursos: 'Risorse',
     nav_blog: 'Blog',
     nav_priv: 'Privacy',
     btn_probar: 'Prova gratis',
@@ -162,7 +173,7 @@ window.PETO_TEXTOS = {
     disc_3: 'Il mio impegno: consiglio solo prodotti che uso personalmente o che ho esaminato con cura. La commissione non cambia mai la mia opinione, e se un prodotto smette di convincermi, esce da questa pagina. Bonus, tassi e condizioni li stabilisce ogni azienda e possono cambiare senza preavviso; verifica sempre i termini vigenti sul sito ufficiale prima di registrarti.',
     disc_4: 'Nulla in questa pagina né nei miei contenuti è consulenza finanziaria, legale o fiscale. La tua situazione è tua: per decisioni importanti, consulta un professionista.',
     sofi_t: 'SoFi — la mia banca di tutti i giorni',
-    sofi_p: 'È il conto che uso per i miei soldi di tutti i giorni, e quello che si sincronizza con PETO Finanzas. Con il mio link, SoFi offre bonus di benvenuto fino a $325 a seconda del deposito, e $50 extra con SoFi Plus, secondo i suoi termini vigenti al momento della registrazione.',
+    sofi_p: 'È il conto che uso per i miei soldi di tutti i giorni, e quello che si sincronizza con PETO Finanzas. Con il mio link, SoFi offre un bonus di benvenuto a seconda del deposito, secondo i termini vigenti di SoFi al momento della registrazione.',
     sofi_btn: 'Apri il mio conto SoFi',
     sofi_nota: 'Link referral: tu ricevi il bonus di benvenuto e io ricevo un bonus referral.',
     send_t: 'Sendwave — le mie rimesse nella Repubblica Dominicana',
@@ -174,7 +185,23 @@ window.PETO_TEXTOS = {
     cierra_p: 'Qui entra solo ciò che uso davvero. Ascolta il podcast «Finanzas Personales» su Spotify e guarda i video su YouTube per vedere come uso ogni strumento con numeri reali.',
     btn_spotify: 'Ascolta il podcast',
     btn_youtube: 'Guarda i video',
-    foot: 'PETO Finanzas · <a href="../privacidad/">Informativa sulla privacy</a> · <a href="../app/">Apri l\'app web</a> · <a href="../blog/">Blog del podcast</a> · <a href="../precios/">Prezzi</a> · Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a>''
+    res_t: 'Usi già PETO Finanzas?',
+    res_p: 'Se l\'app ti sta aiutando, lasciaci la tua recensione onesta su Google Play. Ci vuole meno di un minuto ed è la spinta più grande che puoi darci.',
+    res_btn: 'Lascia la mia recensione',
+    rem_t: 'Remitly — rimesse con $20 di sconto',
+    rem_p: 'Sono ambasciatore ufficiale di Remitly. #Anuncio - colaboración pagada #EmbajadorRemitly. Se sei un cliente nuovo, scrivi il mio codice quando ti registri e ricevi $20 di sconto sul tuo primo invio di $40 o più.',
+    rem_code: 'Codice: AMBTYJP',
+    rem_btn: 'Invia denaro con Remitly',
+    rem_nota: 'Relazione pagata: tu ricevi lo sconto di $20 e io ricevo una commissione per ogni cliente nuovo che completa il suo primo invio.',
+    lt_t: 'Tutti i miei link in un unico posto',
+    lt_p: 'L\'app, il podcast, la newsletter, il libro di Tito e tutti i miei social, riuniti nella mia pagina Linktree. Entra e scegli da dove continuare.',
+    lt_btn: 'Apri il mio Linktree',
+    news_t: 'Dinero en Orden — la mia email settimanale',
+    news_p: 'Un\'email breve ogni settimana: un\'idea chiara di finanza personale per gli ispanici negli Stati Uniti e un\'azione che puoi fare in meno di 20 minuti. Gratis.',
+    news_btn: 'Iscrivimi gratis',
+    foot_1: 'PETO Finanzas · <a href="/privacidad/">Informativa sulla privacy</a> · <a href="/terminos/">Termini</a> · <a href="/app/">Apri l\'app web</a> · <a href="/precios/">Prezzi</a> · <a href="/recursos/">Risorse</a> · <a href="/blog/">Blog</a>',
+    foot_2: 'Contatto: <a href="mailto:roblessantossterlin@gmail.com">roblessantossterlin@gmail.com</a> · Telefono: <a href="tel:+13474492484">+1 (347) 449-2484</a>',
+    foot_3: 'Tito el Zorrito è il volpino delle canzoni per bambini in spagnolo di Sterlin, perché i bambini imparino giocando: <a href="https://www.youtube.com/@TitoElZorritoCanciones" target="_blank" rel="noopener">Tito el Zorrito — YouTube</a> · <a href="https://www.amazon.com/dp/B0HS2ZQG93" target="_blank" rel="noopener">Libro di Tito su Amazon</a>'
   }
 };
 </script>
