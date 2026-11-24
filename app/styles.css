@@ -14,6 +14,17 @@
   --amber-soft:#fff4d6;
   --radius:14px;
   --tap:52px;
+  /* Compilación 99 · P23/P-F1 (guía de diseño): patrón único de
+     frame. Primero las variables que inyecta el plugin SystemBars
+     de Capacitor (--safe-area-inset-*); de respaldo, env(). Todo
+     el layout estructural usa estas variables EN AMBAS
+     plataformas: la regla vieja bajo html.ios no corría en
+     Android (edge-to-edge forzado) y el contenido se montaba
+     sobre la barra de estado y la esquina (capturas 23-nov). */
+  --sat: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --sab: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --sal: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+  --sar: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
 }
 *{box-sizing:border-box}
 /* Compilación 58: el lienzo tras la barra de estado usa el fondo
@@ -59,7 +70,8 @@ h3{font-size:1.1rem}
 /* ---------- Botones ---------- */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:.4rem;
-  min-height:var(--tap);padding:.65rem 1.1rem;border-radius:12px;
+  min-height:var(--tap);padding:.65rem 1.1rem;border-radius:14px;
+  transition:transform .08s ease, box-shadow .15s ease, background .15s ease;
   border:1px solid transparent;font-size:1rem;font-weight:600;cursor:pointer;
   background:var(--card);color:var(--ink);text-decoration:none;
 }
@@ -76,7 +88,7 @@ h3{font-size:1.1rem}
 
 /* ---------- Resumen ---------- */
 .summary-strip{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:.75rem 0 1rem;
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.6rem;margin:.75rem 0 1rem;
 }
 .summary-item{
   position:relative;
@@ -93,7 +105,8 @@ h3{font-size:1.1rem}
   font-size:1.05rem;line-height:1;
 }
 .summary-sub{display:block;font-size:.75rem;font-weight:700;color:var(--accent-dark);margin-top:.15rem}
-.quick-tiles{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.25rem}
+/* Compilación 99 · P6: .quick-tiles ya no existe — sus dos
+   tarjetas viven dentro del bloque único .summary-strip. */
 
 /* ---------- Recordatorios (avisos en Inicio) ---------- */
 .banner{
@@ -167,7 +180,7 @@ h3{font-size:1.1rem}
 }
 .menu-text{flex:1 1 auto;min-width:0}
 .menu-name{display:block;font-weight:700}
-.menu-key{display:block;color:var(--muted);font-size:.87rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-key{display:block;color:var(--muted);font-size:.87rem;white-space:normal}
 .menu-arrow{color:var(--muted);font-size:1.3rem}
 
 /* ---------- Tarjetas y formularios ---------- */
@@ -176,6 +189,12 @@ h3{font-size:1.1rem}
   padding:1rem;margin:0 0 1.1rem;
 }
 .form-card label{display:block;font-weight:600;margin:.75rem 0 .3rem}
+/* Compilación 99 · P13: dentro de .form-card, la etiqueta de un
+   interruptor (display:block, especificidad mayor) rompía la fila
+   flex y la regla genérica de inputs estiraba el checkbox a un
+   círculo gigante que tapaba su texto: se gana la especificidad. */
+.form-card label.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.form-card .toggle-row input[type="checkbox"]{width:50px;height:30px;min-height:0;padding:0;flex:0 0 auto}
 .form-card input,.form-card select{
   width:100%;min-height:var(--tap);padding:.6rem .75rem;font-size:1rem;
   border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
@@ -199,7 +218,7 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .item-amount{font-weight:700;white-space:nowrap}
 .item-actions{display:flex;gap:.4rem;flex:0 0 auto}
 .chip{
-  display:inline-block;padding:.08rem .55rem;border-radius:999px;font-size:.78rem;font-weight:700;
+  display:inline-block;padding:.16rem .62rem;letter-spacing:.01em;border-radius:999px;font-size:.78rem;font-weight:700;
 }
 .chip-pendiente{background:var(--amber-soft);color:var(--amber)}
 .chip-pagada{background:var(--accent-soft);color:var(--accent-dark)}
@@ -321,7 +340,7 @@ hr{border:none;border-top:1px solid var(--line);margin:1.1rem 0}
 .lock-card h1{font-size:1.8rem}
 
 @media (max-width:380px){
-  .summary-strip{grid-template-columns:1fr 1fr 1fr;gap:.4rem}
+  .summary-strip{grid-template-columns:repeat(6,1fr);gap:.4rem}
   .summary-value{font-size:.98rem}
 }
 
@@ -751,7 +770,6 @@ h3{font-weight:700}
 .spend-card .btn-primary{background:#fff;color:#07503a;box-shadow:0 8px 18px rgba(0,0,0,.25)}
 
 /* ---------- Botones ---------- */
-.btn{border-radius:13px;transition:transform .08s ease, box-shadow .15s ease, background .15s ease}
 .btn:active{transform:scale(.975)}
 .btn-primary{
   background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 150%);
@@ -768,7 +786,7 @@ h3{font-weight:700}
 .btn-ghost{background:rgba(140,170,155,.07)}
 .fab{
   background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 150%);
-  box-shadow:0 10px 22px rgba(6,60,40,.42);
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
 }
 .streak-pill{box-shadow:var(--shadow-card)}
 .banner{border-radius:var(--radius);box-shadow:var(--shadow-card)}
@@ -817,7 +835,6 @@ select:focus, textarea:focus{
   background:linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 160%);
   border-radius:999px;
 }
-.chip{padding:.16rem .62rem;letter-spacing:.01em}
 
 /* ---------- Bienvenida renovada ---------- */
 .onboarding-card,.lock-card{
@@ -1360,32 +1377,32 @@ html.plaid-open body{
    como están. */
 /* El relleno del body baja TODAS las vistas en flujo (encabezado,
    bloqueo, bienvenida, visor público…) bajo la isla dinámica. */
-html.ios body{padding-top:env(safe-area-inset-top)}
-html.ios #view-onboarding{min-height:calc(100dvh - env(safe-area-inset-top))}
-html.ios .demo-banner{top:env(safe-area-inset-top)}
-html.ios #ptr-indicator{top:calc(10px + env(safe-area-inset-top))}
-html.ios #san-public-topbar{height:calc(44px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}
-html.ios #san-public.pub-top-on{padding-top:calc(1rem + 44px + env(safe-area-inset-top))}
-html.ios .menu-drawer{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+body{padding-top:var(--sat)}
+#view-onboarding{min-height:calc(100dvh - var(--sat))}
+.demo-banner{top:var(--sat)}
+#ptr-indicator{top:calc(10px + var(--sat))}
+#san-public-topbar{height:calc(44px + var(--sat));padding-top:var(--sat)}
+#san-public.pub-top-on{padding-top:calc(1rem + 44px + var(--sat))}
+.menu-drawer{padding-top:var(--sat);padding-bottom:var(--sab)}
 /* Fijos de abajo: suman el inset de la barra de inicio a su
    posición de siempre, con la misma escalera de clases que usa
    la CSS base (has-bottomnav y has-ads). */
-html.ios #app-shell{padding-bottom:calc(13rem + env(safe-area-inset-bottom))}
-html.ios .fab{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
-html.ios .fab-search{bottom:calc(1.1rem + 76px + env(safe-area-inset-bottom))}
-html.ios .undo-toast{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
-html.ios .chooser{padding-top:calc(1rem + env(safe-area-inset-top));padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
-html.ios .photo-overlay{padding-top:calc(1rem + env(safe-area-inset-top));padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
-html.ios .podcast-player{bottom:calc(.6rem + env(safe-area-inset-bottom))}
-html.ios .guide-card{bottom:calc(var(--nav-h,64px) + 22px + env(safe-area-inset-bottom))}
-html.ios body.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + env(safe-area-inset-bottom))}
-html.ios body.has-bottomnav .fab{bottom:calc(1.1rem + 92px + env(safe-area-inset-bottom))}
-html.ios body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + env(safe-area-inset-bottom))}
-html.ios body.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + env(safe-area-inset-bottom))}
-html.ios body.has-ads.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + 60px + env(safe-area-inset-bottom))}
-html.ios body.has-ads.has-bottomnav .fab{bottom:calc(1.1rem + 92px + 60px + env(safe-area-inset-bottom))}
-html.ios body.has-ads.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + 60px + env(safe-area-inset-bottom))}
-html.ios body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px + env(safe-area-inset-bottom))}
+#app-shell{padding-bottom:calc(13rem + var(--sab))}
+.fab{bottom:calc(1.1rem + var(--sab))}
+.fab-search{bottom:calc(1.1rem + 76px + var(--sab))}
+.undo-toast{bottom:calc(1.1rem + var(--sab))}
+.chooser{padding-top:calc(1rem + var(--sat));padding-bottom:calc(1rem + var(--sab))}
+.photo-overlay{padding-top:calc(1rem + var(--sat));padding-bottom:calc(1rem + var(--sab))}
+.podcast-player{bottom:calc(.6rem + var(--sab))}
+.guide-card{bottom:calc(var(--nav-h,64px) + 22px + var(--sab))}
+body.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + var(--sab))}
+body.has-bottomnav .fab{bottom:calc(1.1rem + 92px + var(--sab))}
+body.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + var(--sab))}
+body.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + var(--sab))}
+body.has-ads.has-bottomnav #app-shell{padding-bottom:calc(13rem + 92px + 60px + var(--sab))}
+body.has-ads.has-bottomnav .fab{bottom:calc(1.1rem + 92px + 60px + var(--sab))}
+body.has-ads.has-bottomnav .fab-search{bottom:calc(1.1rem + 76px + 92px + 60px + var(--sab))}
+body.has-ads.has-bottomnav .undo-toast{bottom:calc(1.1rem + 92px + 60px + var(--sab))}
 
 /* ================= Compilación 80 =================
    Tarjetas de Inicio compactas (la ayuda del disponible vive en
@@ -1505,7 +1522,7 @@ html[data-theme="oscuro"] .fab{background:rgba(32,36,40,.30)}
    flujo dentro de #app-shell, cuyo respiro inferior en iOS ya
    suma el inset — no nace con el defecto. */
 .chat-view{box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom)}
-html.ios .chat-view{padding-top:env(safe-area-inset-top)}
+.chat-view{padding-top:var(--sat)}
 .chat-form{padding-top:.45rem;padding-bottom:.35rem}
 
 /* ================= Compilación 85 (cambio 4) =================
@@ -1520,9 +1537,9 @@ html.ios .chat-view{padding-top:env(safe-area-inset-top)}
 .fab-menu{position:fixed;right:1.1rem;bottom:1.1rem;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:.65rem}
 body.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px)}
 body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px)}
-html.ios .fab-menu{bottom:calc(1.1rem + env(safe-area-inset-bottom))}
-html.ios body.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + env(safe-area-inset-bottom))}
-html.ios body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px + env(safe-area-inset-bottom))}
+.fab-menu{bottom:calc(1.1rem + var(--sab))}
+body.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + var(--sab))}
+body.has-ads.has-bottomnav .fab-menu{bottom:calc(1.1rem + 92px + 60px + var(--sab))}
 #fab-menu .fab{position:relative;right:auto;bottom:auto}
 .fab-menu .fab-item{width:auto;height:52px;border-radius:999px;padding:0 1.05rem;display:flex;align-items:center;gap:.5rem;font-size:1.02rem;font-weight:600;opacity:0;transform:translateY(10px) scale(.94);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
 .fab-menu.open .fab-item{opacity:1;transform:none;pointer-events:auto}
@@ -1764,3 +1781,88 @@ html[data-theme="oscuro"] .chat-pill93{background:rgba(32,36,40,.30)}
   border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);
   margin:.3rem 0}
 .c94-input:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ================= Compilación 99 =================
+   Bloque 2 de las fotos de Sterlin (P1–P20). */
+/* P3: el botón flotante se encoge y se apaga un poco MIENTRAS se
+   desplaza (clase fab-mini99 desde el JS), para no tapar esquinas
+   ni el texto de las tarjetas; al parar vuelve a su tamaño. */
+.fab{transition:width .25s ease,height .25s ease,opacity .25s ease,font-size .25s ease}
+.fab.fab-mini99{width:44px;height:44px;font-size:1.25rem;opacity:.55}
+/* P1: el icono propio del botón biométrico (Face ID / huella). */
+#btn-biometric .bio-ico99 svg{width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:.45rem}
+/* P4: título de tarjeta con icono de trazo (sin fecha inventada). */
+.ico-title99{display:flex;align-items:center;gap:.45rem}
+.ico-title99 svg{width:1.15em;height:1.15em;flex:0 0 auto}
+/* P6: segunda fila del bloque único de resumen. */
+.summary-strip .summary-item{grid-column:span 2}
+.summary-strip #tile-incomes,.summary-strip #tile-expenses{grid-column:span 3}
+/* P13: disponible total de Mis cuentas, el mismo de Inicio. */
+.acc-avail99{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
+.acc-avail-label99{color:var(--muted);font-size:.9rem}
+.acc-avail-amt99{font-size:1.35rem;font-weight:700}
+/* P15: ingresos legibles: la tarjeta se abre en dos filas y el
+   reparto va en chips que se leen de corrido. */
+.inc-item99{flex-wrap:wrap}
+.inc-item99 .item-main{flex:1 1 100%}
+.inc-item99 .item-actions{margin-left:auto}
+.split-chips99{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.4rem}
+.split-chip99{white-space:nowrap}
+/* P18: aviso de posible cargo duplicado en Gastos. */
+.exp-dup99{background:var(--amber-soft);color:var(--amber);border-radius:10px;padding:.6rem .75rem;margin:.6rem 0;font-size:.92rem}
+/* P8: «¿Te lo puedes permitir?» en la tarjeta de gasto de hoy. */
+.afford99{margin-top:.9rem;border-top:1px solid var(--line);padding-top:.8rem}
+.afford99-label{display:block;font-weight:600;margin-bottom:.45rem}
+.afford99-row{display:flex;gap:.5rem}
+.afford99-row input{flex:1 1 auto;min-width:0;min-height:var(--tap);padding:.6rem .75rem;font-size:1rem;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.afford99-row .btn{flex:0 0 auto}
+/* P9: plan con IA dentro de la tarjeta del fondo de emergencia. */
+.efund-plan99{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.7rem}
+/* P14: el selector crudo de foto queda oculto (sin display:none,
+   para que el botón propio pueda abrirlo en todos los navegadores). */
+.sr-only-file99{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.goal-photo-row99{display:flex;align-items:center;gap:.6rem;margin:.4rem 0}
+/* P20: bienvenida con jerarquía clara: selector de idioma arriba
+   y alineado, botones de ancho completo (primario, secundario y
+   terciarios ghost), una línea corta por opción y aire compacto.
+   El área segura la da el patrón único de frame con --sat (P23). */
+.welcome-box{display:flex;flex-direction:column;gap:.65rem}
+.welcome-box .ob-logo{margin:2px auto}
+.welcome-box h2{margin:.1rem 0 0}
+.welcome-box .ob-intro{margin:0;line-height:1.45}
+.welcome-box .btn{width:100%}
+.ob-lang-top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;text-align:left}
+.ob-lang-top label{font-weight:600;white-space:nowrap;margin:0}
+.ob-lang-top select{width:auto;max-width:62%;min-height:var(--tap);padding:.45rem .6rem;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.welcome-box .ob-demo,.welcome-box .ob-signin{margin-top:.1rem}
+.welcome-box .ob-demo p,.welcome-box .ob-signin p,.welcome-box .ob-interview p{margin:.3rem 0 0}
+.welcome-box #ob-note{margin:.35rem 0 0}
+/* P22(a): el panel de Sign in de la bienvenida no vive en una
+   .form-card: etiquetas y campos quedaban EN LÍNEA y desfasados
+   (la etiqueta «Password» empujada a la derecha y su campo en la
+   línea siguiente). Vertical limpio: etiqueta sobre campo y
+   ancho completo, como en el resto de formularios de la app. */
+#ob-signin-panel{text-align:left}
+#ob-signin-panel label{display:block;font-weight:600;margin:.75rem 0 .3rem}
+#ob-signin-panel input{width:100%;min-height:var(--tap);padding:.6rem .75rem;font-size:1rem;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+/* P22(b): la hoja de permisos (vista fija a pantalla completa)
+   no tenía FONDO: se veía a través de ella todo lo de atrás —
+   en la captura de Sterlin, el Inicio en modo demo — y los
+   textos se cruzaban. Fondo sólido del tema: bloquea lo de
+   atrás visual y táctilmente. */
+.perms-view{background:var(--bg)}
+
+/* Compilación 99 · P23/P-B2: alturas únicas del sistema de
+   botones de la guía — primario 52, secundario 48, terciario
+   (ghost) 44 con radio 12, héroe de bienvenida (btn-big) 52. La
+   base .btn ya mide 52 (--tap). Píldora (999) solo en chips, el
+   flotante y donde ya la había. */
+.btn-primary{min-height:52px}
+.btn-secondary{min-height:48px}
+.btn-ghost{min-height:44px;border-radius:12px}
+.btn-big{min-height:52px}
+/* P-B1: un chip que es <button> es TOCABLE: sube al estándar de
+   chip de filtro de la guía (38 px, 14/600). Los .chip de solo
+   lectura (estado: «Pagada»/«Pendiente», repartos) se quedan en
+   su medida de chip de estado (26 px). */
+button.chip{min-height:38px;padding:.5rem .9rem;font-size:.875rem}

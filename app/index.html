@@ -35,7 +35,7 @@
       <p id="lock-error" class="error" role="alert" hidden data-i18n="lock_err">PIN incorrecto. Inténtalo de nuevo.</p>
       <button type="submit" class="btn btn-primary btn-big" data-i18n="lock_enter">Entrar</button>
     </form>
-    <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden data-i18n="bio_btn">👆 Entrar con huella</button>
+    <button id="btn-biometric" class="btn btn-secondary btn-big" type="button" hidden>Entrar con huella</button>
     <button id="btn-lock-forgot" class="btn btn-ghost" type="button" data-i18n="lock_forgot">¿Olvidaste tu PIN?</button>
     <p class="muted small" id="lock-note">Tus datos están protegidos con tu PIN.</p>
     <p class="muted small build-label" id="lock-build-label">Compilación 54</p>
@@ -109,11 +109,11 @@
          «Empezar» y deja abierta su tarjeta en el chat; nada se
          guarda sin la confirmación de la tarjeta final. -->
     <div class="ob-interview">
-      <button id="ob-interview-btn" type="button" class="btn btn-secondary" data-i18n="c98_ob_btn">✨ Empezar con la entrevista de IA</button>
+      <button id="ob-interview-btn" type="button" class="btn btn-secondary btn-big" data-i18n="c98_ob_btn">✨ Empezar con la entrevista de IA</button>
       <p class="muted small" data-i18n="c98_ob_hint">La IA te pregunta y arma tus datos iniciales: ingreso, pagos fijos, deudas y categorías. Nada se guarda sin que lo confirmes.</p>
     </div>
     <div class="ob-demo">
-      <button id="ob-demo-btn" type="button" class="btn btn-secondary" data-i18n="demo_btn">Ver una demo</button>
+      <button id="ob-demo-btn" type="button" class="btn btn-ghost" data-i18n="demo_btn">Ver una demo</button>
       <p class="muted small" data-i18n="demo_help">Explora la app con datos de ejemplo. Nunca toca tus datos reales ni tu cuenta.</p>
     </div>
     <!-- Compilación 62: iniciar sesión desde la bienvenida, para
@@ -236,9 +236,9 @@
         <span id="sum-debts" class="summary-value">$0.00</span>
         <span class="summary-go" aria-hidden="true">›</span>
       </button>
-    </section>
-
-    <div class="quick-tiles">
+      <!-- Compilación 99 · P6: ingresos y gastos viven en el
+           MISMO bloque de resumen (antes era otra fila aparte que
+           repetía los mismos números por tercera vez). -->
       <button id="tile-incomes" class="summary-item" type="button" data-i18n-aria="tile_incomes_aria" aria-label="Ingresos: ir a Ingresos semanales">
         <span class="summary-label" data-i18n="tile_incomes">Ingresos</span>
         <span id="sum-incomes" class="summary-value">$0.00</span>
@@ -250,7 +250,7 @@
         <span id="sum-expenses-note89" class="summary-sub" data-i18n="c89_no_transfers">sin transferencias</span>
         <span class="summary-go" aria-hidden="true">›</span>
       </button>
-    </div>
+    </section>
 
     <section id="spend-card" class="card spend-card">
       <span class="summary-label" data-i18n="spend_title">¿Cuánto puedes gastar hoy?</span>
@@ -262,6 +262,17 @@
       <button id="spend-how-btn" class="btn btn-ghost" type="button" hidden data-i18n="spend_how_btn">¿Cómo sale este número?</button>
       <div id="spend-explain" hidden></div>
       <button id="spend-create-btn" class="btn btn-primary" type="button" hidden data-i18n="spend_create_btn">Crear mi presupuesto</button>
+      <!-- Compilación 99 · P8: «¿Te lo puedes permitir?» — la
+           persona escribe un monto y la IA responde sí/no con sus
+           números reales (ritmo seguro de hoy y próximo bajón). -->
+      <div id="afford99" class="afford99">
+        <label class="afford99-label" for="afford99-amount" data-i18n="c99_afford_label">¿Te lo puedes permitir?</label>
+        <div class="afford99-row">
+          <input id="afford99-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+          <button id="afford99-btn" class="btn btn-secondary" type="button" data-i18n="c99_afford_btn">Preguntar a la IA</button>
+        </div>
+        <p id="afford99-answer" class="muted small" aria-live="polite"></p>
+      </div>
     </section>
 
     <section id="home-today" class="card"></section>
@@ -321,6 +332,8 @@
     <p class="total-line"><span data-i18n="exp_total_label">Total del mes:</span> <strong id="exp-total">$0.00</strong></p>
     <p class="muted small" id="exp-total-note89"></p>
     <div id="exp-uncat89" class="exp-uncat89" hidden></div>
+    <!-- Compilación 99 · P18: aviso de posible cargo duplicado. -->
+    <div id="exp-dup99" class="exp-dup99" hidden></div>
 
 
 
@@ -376,6 +389,7 @@
     <div id="exp-detail-actions89" class="form-actions" hidden>
       <button id="exp-act-repeat89" type="button" class="btn btn-secondary" data-i18n="btn_repeat">Repetir</button>
       <button id="exp-act-suggest89" type="button" class="btn btn-secondary" data-i18n="ai_suggest_btn" hidden>✨ Sugerir con IA</button>
+      <button id="exp-act-explain99" type="button" class="btn btn-secondary" data-i18n="c99_explain_btn">✨ Explícame este cargo</button>
       <button id="exp-act-delete89" type="button" class="btn btn-danger" data-i18n="btn_delete">Borrar</button>
     </div>
     <div id="exp-ai-box89"></div>
@@ -438,6 +452,11 @@
     <h2 data-i18n="sec_ahorros">Ahorros</h2>
     <p class="muted"><span data-i18n="sav_intro_1">Aquí ves cada cantidad que ahorraste, una por una. También puedes agregar un ahorro suelto,</span> <strong data-i18n="sav_intro_2">sin que venga de un ingreso</strong><span data-i18n="sav_intro_3">, con el formulario de abajo. Si borras un ahorro, solo se borra esa cantidad:</span> <strong data-i18n="sav_intro_4">el ingreso se queda igual</strong><span data-i18n="sav_intro_5">.</span></p>
 
+    <!-- Compilación 99 · P14: los totales van ARRIBA (antes
+         quedaban al final de una pantalla larguísima). -->
+    <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
+    <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
+
     <form id="savings-form" class="card form-card sav-add-card" autocomplete="off">
       <h3 data-i18n="sav_form_title">Agregar ahorro</h3>
       <label for="sav-amount" data-i18n="amount_label">Cantidad ($)</label>
@@ -462,10 +481,23 @@
       <input id="goal-name" type="text" maxlength="60" data-i18n-ph="goal_name_ph" placeholder="Ej.: Fondo de emergencia">
       <label for="goal-target" data-i18n="goal_target_label">Cantidad meta ($)</label>
       <input id="goal-target" type="number" inputmode="decimal" min="0.01" max="9999999" step="0.01" placeholder="0.00">
+      <!-- Compilación 99 · P19: la IA pre-llena la sugerencia con
+           tus números; tú confirmas o ajustas antes de guardar. -->
+      <div class="form-actions">
+        <button id="goal-plan-btn99" type="button" class="btn btn-ghost" data-i18n="c99_plan_btn">✨ Sugerir plan con IA</button>
+      </div>
+      <p id="goal-plan-status99" class="muted small" aria-live="polite"></p>
       <label data-i18n="goal_icon_label">Icono (opcional)</label>
       <div id="goal-icons" class="goal-icons"></div>
       <label for="goal-photo" data-i18n="goal_photo_label">Foto (opcional)</label>
-      <input id="goal-photo" type="file" accept="image/*">
+      <!-- Compilación 99 · P14: botón PROPIO de foto; el selector
+           crudo del navegador («Choose File / no file selected»)
+           queda oculto y solo lo abre este botón. -->
+      <input id="goal-photo" class="sr-only-file99" type="file" accept="image/*" tabindex="-1">
+      <div class="goal-photo-row99">
+        <button id="goal-photo-btn99" type="button" class="btn btn-secondary" data-i18n="c99_photo_btn">Elegir foto</button>
+        <span id="goal-photo-name99" class="muted small"></span>
+      </div>
       <img id="goal-photo-preview" class="receipt-preview" alt="" hidden>
       <div class="form-actions">
         <button id="goal-photo-remove" type="button" class="btn btn-ghost btn-small" hidden data-i18n="goal_photo_remove">Quitar foto</button>
@@ -479,7 +511,7 @@
 
     <h3 data-i18n="goals_title">Otras metas</h3>
     <div id="goals-list"></div>
-    <p id="goals-empty" class="empty-state" hidden></p>
+    <div id="goals-empty" class="empty-state" hidden></div>
 
     <section class="card form-card">
       <label class="toggle-row">
@@ -499,8 +531,6 @@
       </div>
     </section>
 
-    <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
-    <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
 
     <!-- Compilación 55: fondo de emergencia con meta editable y barra de avance. -->
     <section id="efund-card" class="card"></section>
@@ -755,6 +785,9 @@
   <main id="view-cuentas" class="view" hidden>
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_cuentas">Mis cuentas</h2>
+    <!-- Compilación 99 · P13: el disponible TOTAL, el mismo número
+         de Inicio y del menú (una sola fuente de verdad). -->
+    <div id="acc-avail99" class="acc-avail99"></div>
 
     <form id="account-form" class="card form-card" autocomplete="off">
       <h3 id="account-form-title">Nueva cuenta</h3>
@@ -877,6 +910,12 @@
       <input id="debt-minpay" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
       <label for="debt-planpay" data-i18n="debt_planpay_label">Pago mensual planeado $ (opcional)</label>
       <input id="debt-planpay" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
+      <!-- Compilación 99 · P19: la IA sugiere el pago planeado con
+           tus números; tú confirmas o ajustas antes de guardar. -->
+      <div class="form-actions">
+        <button id="debt-plan-btn99" type="button" class="btn btn-ghost" data-i18n="c99_plan_btn">✨ Sugerir plan con IA</button>
+      </div>
+      <p id="debt-plan-status99" class="muted small" aria-live="polite"></p>
       <label for="debt-status" data-i18n="debt_status_label">Estado</label>
       <select id="debt-status">
         <option value="pendiente" data-i18n="debt_status_pending">Pendiente</option>
