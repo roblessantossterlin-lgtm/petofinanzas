@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-24",
+  "actualizado": "2026-11-25",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -100,6 +100,20 @@
       "titulo": "La canción de las frutas",
       "archivo": "assets/cancion-2026-11-24-frutas.mp3",
       "fecha": "2026-11-24"
+    },
+    {
+      "id": "dibujo-2026-11-25-elefante",
+      "tipo": "dibujo",
+      "titulo": "Tito y el elefante",
+      "archivo": "assets/dibujo-2026-11-25-elefante.png",
+      "fecha": "2026-11-25"
+    },
+    {
+      "id": "cancion-2026-11-25-saludar",
+      "tipo": "cancion",
+      "titulo": "La canción de saludar",
+      "archivo": "assets/cancion-2026-11-25-saludar.mp3",
+      "fecha": "2026-11-25"
     }
   ]
 }
