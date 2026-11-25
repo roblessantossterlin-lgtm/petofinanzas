@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 108';
-const BUILD_NUM = 108;
+const BUILD_LABEL = 'Compilación 109';
+const BUILD_NUM = 109;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -253,6 +253,10 @@ const DEMO_DB_KEY = 'cgastos.db.demo.v1';
 const DEMO_FLAG_KEY = 'cgastos.demo.v1';
 let demoMode = false;
 let expMonth = currentMonthKey();
+/* Compilación 109 (punto 1): el filtro de la lista de Gastos —
+   'gastos' (solo lo contado), 'transferencias' o 'todo'. Abre en
+   'gastos': las transferencias ya no se mezclan con el gasto. */
+let expFilter109 = 'gastos';
 let hiddenAt = 0;
 
 function defaultData() {
@@ -1777,7 +1781,7 @@ es: {
   goal_delete_confirm: '¿Borrar la meta "{name}"? Tus ahorros no se tocan: solo se borra la meta.',
   err_goal_name: 'Escribe un nombre para tu meta.', err_goal_zero: 'La cantidad de la meta debe ser mayor que 0.',
   res_cats_title: 'Gastos por categoría', res_summary_title: 'Ingresos vs Gastos vs Ahorros',
-  chart_income: 'Ingresos', income_ytd_label: 'Ingreso anual hasta la fecha', fixed_badge: 'Fijo', bud_fixed_title: 'Pagos fijos de este mes', pro_home_title: 'Únete a PETO Pro', pro_home_text: 'Sin anuncios y con todo desbloqueado: sincronización bancaria, presupuestos compartidos y más.', guide_1_title: 'Tu dinero de hoy', guide_1_text: 'Aquí ves cuánto puedes gastar hoy sin pasarte de tu presupuesto.', guide_2_title: 'Registra en segundos', guide_2_text: 'Toca el botón + para anotar un gasto o un ingreso al momento.', guide_3_title: 'Tu presupuesto', guide_3_text: 'Aquí pones un tope a cada categoría y ves cuánto llevas gastado.', guide_4_title: 'Tu resumen', guide_4_text: 'Gráficas claras de tus ingresos, gastos y ahorros, mes a mes.', guide_5_title: 'Conecta tu banco', guide_5_text: 'Si quieres, conecta tu banco y tus gastos se anotan solos.', guide_done: 'Listo', tour100_1_title: 'Tu Inicio, de un vistazo', tour100_1_text: 'Aquí ves cuánto puedes gastar hoy sin pasarte de tu presupuesto y cuánto te queda del mes. Si dudas con una compra, escribe el monto en «¿Te lo puedes permitir?» y la IA te responde con tus números reales.', tour100_2_title: 'Agregar en segundos', tour100_2_text: 'El botón ✨ de abajo abre el chat de PETO Finanzas. Desde ahí anotas un gasto o un ingreso escribiéndolo tal como lo dirías («gasté 20 en gasolina ayer»), dictándolo con el micrófono o con la foto de un recibo: la app lo entiende y te lo deja listo para confirmar.', tour100_3_title: 'Tus cuentas y tu banco', tour100_3_text: 'Aquí viven tus cuentas y tus tarjetas, con el mismo saldo disponible que ves en Inicio. Si quieres, conecta tu banco y tus movimientos se anotan solos.', tour100_4_title: 'Metas y Ahorros', tour100_4_text: 'Crea tus metas y tu fondo de emergencia. La IA te puede sugerir un plan, pero el ahorro que cuenta es el que TÚ anotas: nunca se guarda solo.', tour100_5_title: 'Chat con tu dinero', tour100_5_text: 'El mismo botón ✨ abre el chat: pregúntale cosas como «¿en qué gasté más este mes?» y responde con tus números. ¡Ya está! Puedes repetir este tour cuando quieras desde Ajustes.', tour100_count: 'Paso {n} de {total}', c101_ask_name: '¡Hola! Antes de empezar, ¿cómo te llamas?', c101_efund_sugg: 'Sugerencia según tus gastos del mes: {amount}. Puedes editarla antes de crear.', c101_efund_create_btn: 'Crear fondo', inc_detect_note102: 'Detectado de tu banco: ~{amount}/mes (nómina de {source}). Edítalo si quieres.', inc_detect_note_nosrc102: 'Detectado de tu banco: ~{amount}/mes. Edítalo si quieres.', home_ai_dismiss102: 'Descartar esta respuesta', gate103_title: 'Bienvenido a PETO Finanzas', gate103_text: 'Controla tus gastos e ingresos, arma tu presupuesto, lleva tu san y conecta tu banco para que tus movimientos se anoten solos. Tu cuenta sincroniza esta web con la app de tu teléfono.', gate103_checking: 'Revisando tu sesión…', gate103_signin: 'Iniciar sesión', bank_paused103: 'sin sincronizar', tour100_settings_btn: 'Ver el tour', set_group_account: 'Cuenta', set_group_rules: 'Reglas de tu dinero', set_group_security: 'Seguridad y privacidad', set_group_personalization: 'Personalización', c108_bank_auto_label: 'Ahorro en tu banco (automático)', c108_manual_label: 'Ahorro manual', c108_note_disconnected: 'Banco desconectado: el ahorro automático quedó en {amount}. Tu ahorro manual no se tocó.', c108_note_no_savings: 'Tu banco está conectado, pero no trae cuenta de ahorros: el ahorro automático es {amount}.',  chart_expenses: 'Gastos', chart_savings: 'Ahorros',
+  chart_income: 'Ingresos', income_ytd_label: 'Ingreso anual hasta la fecha', fixed_badge: 'Fijo', bud_fixed_title: 'Pagos fijos de este mes', pro_home_title: 'Únete a PETO Pro', pro_home_text: 'Sin anuncios y con todo desbloqueado: sincronización bancaria, presupuestos compartidos y más.', guide_1_title: 'Tu dinero de hoy', guide_1_text: 'Aquí ves cuánto puedes gastar hoy sin pasarte de tu presupuesto.', guide_2_title: 'Registra en segundos', guide_2_text: 'Toca el botón + para anotar un gasto o un ingreso al momento.', guide_3_title: 'Tu presupuesto', guide_3_text: 'Aquí pones un tope a cada categoría y ves cuánto llevas gastado.', guide_4_title: 'Tu resumen', guide_4_text: 'Gráficas claras de tus ingresos, gastos y ahorros, mes a mes.', guide_5_title: 'Conecta tu banco', guide_5_text: 'Si quieres, conecta tu banco y tus gastos se anotan solos.', guide_done: 'Listo', tour100_1_title: 'Tu Inicio, de un vistazo', tour100_1_text: 'Aquí ves cuánto puedes gastar hoy sin pasarte de tu presupuesto y cuánto te queda del mes. Si dudas con una compra, escribe el monto en «¿Te lo puedes permitir?» y la IA te responde con tus números reales.', tour100_2_title: 'Agregar en segundos', tour100_2_text: 'El botón ✨ de abajo abre el chat de PETO Finanzas. Desde ahí anotas un gasto o un ingreso escribiéndolo tal como lo dirías («gasté 20 en gasolina ayer»), dictándolo con el micrófono o con la foto de un recibo: la app lo entiende y te lo deja listo para confirmar.', tour100_3_title: 'Tus cuentas y tu banco', tour100_3_text: 'Aquí viven tus cuentas y tus tarjetas, con el mismo saldo disponible que ves en Inicio. Si quieres, conecta tu banco y tus movimientos se anotan solos.', tour100_4_title: 'Metas y Ahorros', tour100_4_text: 'Crea tus metas y tu fondo de emergencia. La IA te puede sugerir un plan, pero el ahorro que cuenta es el que TÚ anotas: nunca se guarda solo.', tour100_5_title: 'Chat con tu dinero', tour100_5_text: 'El mismo botón ✨ abre el chat: pregúntale cosas como «¿en qué gasté más este mes?» y responde con tus números. ¡Ya está! Puedes repetir este tour cuando quieras desde Ajustes.', tour100_count: 'Paso {n} de {total}', c101_ask_name: '¡Hola! Antes de empezar, ¿cómo te llamas?', c101_efund_sugg: 'Sugerencia según tus gastos del mes: {amount}. Puedes editarla antes de crear.', c101_efund_create_btn: 'Crear fondo', inc_detect_note102: 'Detectado de tu banco: ~{amount}/mes (nómina de {source}). Edítalo si quieres.', inc_detect_note_nosrc102: 'Detectado de tu banco: ~{amount}/mes. Edítalo si quieres.', home_ai_dismiss102: 'Descartar esta respuesta', gate103_title: 'Bienvenido a PETO Finanzas', gate103_text: 'Controla tus gastos e ingresos, arma tu presupuesto, lleva tu san y conecta tu banco para que tus movimientos se anoten solos. Tu cuenta sincroniza esta web con la app de tu teléfono.', gate103_checking: 'Revisando tu sesión…', gate103_signin: 'Iniciar sesión', bank_paused103: 'sin sincronizar', tour100_settings_btn: 'Ver el tour', set_group_account: 'Cuenta', set_group_rules: 'Reglas de tu dinero', set_group_security: 'Seguridad y privacidad', set_group_personalization: 'Personalización', c109_filter_expenses: 'Gastos', c109_filter_transfers: 'Transferencias', c109_filter_all: 'Todo', c109_spent_in: 'Gastado en {month}', c109_transfers_line: 'Transferencias: {amount}', c109_reports_title: 'Informes', c109_pod_more: '¿Quieres escuchar más? Todos los episodios están en Spotify', c109_group_business: 'Negocio', c109_danger_title: 'Zona delicada', c109_danger_help: 'Aquí están las dos acciones con más peso: cerrar tu sesión y eliminar tu cuenta con todos sus datos. No se pueden deshacer.', c109_mode_all: 'Todo', c109_mode_essential: 'Esencial', c109_mode_custom: 'Personalizado', c109_appearance_title: 'Apariencia', c109_help_label: 'Ayuda', c109_autocat_help: 'Las categorías se aplican solas: al sincronizar tu banco, cada cargo entra ya categorizado — primero el comercio conocido, después lo que la app aprendió cuando corregiste un cargo, y la IA resuelve lo que nadie conoce. Si corriges un cargo, la app aprende en silencio para la próxima vez.', c109_flowai_line: 'La IA toma tu proyección y te dice el saldo esperado en las fechas clave, los días de riesgo y qué mover para evitarlos.', c109_secdesc_gastos: 'Anota y revisa lo que gastas', c109_secdesc_ingresos: 'Tu dinero que entra', c109_secdesc_ahorros: 'Metas y fondo de emergencia', c109_secdesc_buscar: 'Encuentra cualquier movimiento', c109_secdesc_resumen: 'Tu mes en gráficas y tu Score', c109_secdesc_presupuesto: 'Topes por categoría', c109_secdesc_pagos: 'Pagos fijos y suscripciones', c109_secdesc_cuentas: 'Tus cuentas y tarjetas', c109_secdesc_deudas: 'Lo que debes y tu plan de pago', c109_secdesc_remesas: 'Dinero que envías a tu familia', c109_secdesc_san: 'Ahorro en grupo, por turnos', c109_secdesc_podcast: 'Episodios de Finanzas Personales',  c108_bank_auto_label: 'Ahorro en tu banco (automático)', c108_manual_label: 'Ahorro manual', c108_note_disconnected: 'Banco desconectado: el ahorro automático quedó en {amount}. Tu ahorro manual no se tocó.', c108_note_no_savings: 'Tu banco está conectado, pero no trae cuenta de ahorros: el ahorro automático es {amount}.',  chart_expenses: 'Gastos', chart_savings: 'Ahorros',
   res_cats_empty: 'No hay gastos en este mes.', res_summary_empty: 'Todavía no hay movimientos en este mes.',
   bud_intro: 'Pon un límite mensual por categoría y mira cuánto llevas gastado.',
   bud_income_label: '¿Cuánto entra al mes?', bud_split_btn: 'Repartir según mi ingreso', bud_split_help: 'Repartimos la parte de Gastos de tu reparto sugerido ({pct}% de tu ingreso) entre tus categorías. Ajusta lo que quieras y guarda todo de una vez.',
@@ -1862,7 +1866,7 @@ es: {
   ob_err_name: 'Escribe tu nombre para empezar.', ob_err_pin_format: 'El PIN debe tener de 4 a 6 números.',
   ob_err_pin_mismatch: 'Los dos PIN no coinciden.',
   set_theme_label: 'Tema', theme_light: 'Claro', theme_dark: 'Oscuro', theme_auto: 'Automático (según el sistema)',
-  set_accent_label: 'Color principal', accent_verde: 'Verde', accent_azul: 'Azul', accent_morado: 'Morado', accent_naranja: 'Naranja',
+  set_accent_label: 'Color principal', accent_verde: 'Ámbar', accent_azul: 'Azul', accent_morado: 'Morado', accent_naranja: 'Naranja',
   undo_done: 'Hecho', undo_btn: 'Deshacer', btn_repeat: 'Repetir',
   fab_aria: 'Agregar rápido', quick_title: '¿Qué quieres agregar?',
   quick_expense: 'Gasto', quick_income: '💵 Ingreso', quick_savings: '🐷 Ahorro',
@@ -2538,7 +2542,7 @@ en: {
   goal_delete_confirm: 'Delete the goal "{name}"? Your savings are not touched: only the goal is deleted.',
   err_goal_name: 'Enter a name for your goal.', err_goal_zero: 'The goal amount must be greater than 0.',
   res_cats_title: 'Expenses by category', res_summary_title: 'Income vs Expenses vs Savings',
-  chart_income: 'Income', income_ytd_label: 'Year-to-date income', fixed_badge: 'Fixed', bud_fixed_title: 'This month\'s fixed payments', pro_home_title: 'Join PETO Pro', pro_home_text: 'No ads and everything unlocked: bank sync, shared budgets and more.', guide_1_title: 'Your money today', guide_1_text: 'Here you see how much you can spend today without going over your budget.', guide_2_title: 'Log in seconds', guide_2_text: 'Tap the + button to log an expense or income right away.', guide_3_title: 'Your budget', guide_3_text: 'Here you set a limit for each category and see how much you have spent.', guide_4_title: 'Your summary', guide_4_text: 'Clear charts of your income, expenses and savings, month by month.', guide_5_title: 'Connect your bank', guide_5_text: 'If you want, connect your bank and your spending is logged automatically.', guide_done: 'Done', tour100_1_title: 'Your Home, at a glance', tour100_1_text: 'Here you see how much you can spend today without going over your budget, and how much is left for the month. Unsure about a purchase? Type the amount in “Can I afford this?” and the AI answers with your real numbers.', tour100_2_title: 'Add in seconds', tour100_2_text: 'The ✨ button below opens the PETO Finanzas chat. From there you record an expense or income by typing it the way you would say it (“spent 20 on gas yesterday”), dictating it with the microphone, or with a photo of a receipt: the app understands it and leaves it ready for you to confirm.', tour100_3_title: 'Your accounts and your bank', tour100_3_text: 'Your accounts and cards live here, with the same available balance you see on Home. If you want, connect your bank and your transactions are logged on their own.', tour100_4_title: 'Goals and Savings', tour100_4_text: 'Create your goals and your emergency fund. The AI can suggest a plan, but the savings that count are the ones YOU log: they are never saved on their own.', tour100_5_title: 'Chat with your money', tour100_5_text: 'The same ✨ button opens the chat: ask it things like «what did I spend the most on this month?» and it answers with your numbers. That’s it! You can replay this tour anytime from Settings.', tour100_count: 'Step {n} of {total}', c101_ask_name: 'Hi there! Before we start, what’s your name?', c101_efund_sugg: 'Suggested from your monthly spending: {amount}. You can edit it before creating.', c101_efund_create_btn: 'Create fund', inc_detect_note102: 'Detected from your bank: ~{amount}/month (payroll from {source}). Edit it if you like.', inc_detect_note_nosrc102: 'Detected from your bank: ~{amount}/month. Edit it if you like.', home_ai_dismiss102: 'Dismiss this answer', gate103_title: 'Welcome to PETO Finanzas', gate103_text: 'Track your spending and income, build your budget, run your san (rotating savings) and connect your bank so transactions record themselves. Your account syncs this website with the app on your phone.', gate103_checking: 'Checking your session…', gate103_signin: 'Log in', bank_paused103: 'not synced', tour100_settings_btn: 'See the tour', set_group_account: 'Account', set_group_rules: 'Your money rules', set_group_security: 'Security and privacy', set_group_personalization: 'Personalization', c108_bank_auto_label: 'Savings at your bank (automatic)', c108_manual_label: 'Manual savings', c108_note_disconnected: 'Bank disconnected: automatic savings are back to {amount}. Your manual savings were not touched.', c108_note_no_savings: 'Your bank is connected, but it has no savings account: automatic savings are {amount}.',  chart_expenses: 'Expenses', chart_savings: 'Savings',
+  chart_income: 'Income', income_ytd_label: 'Year-to-date income', fixed_badge: 'Fixed', bud_fixed_title: 'This month\'s fixed payments', pro_home_title: 'Join PETO Pro', pro_home_text: 'No ads and everything unlocked: bank sync, shared budgets and more.', guide_1_title: 'Your money today', guide_1_text: 'Here you see how much you can spend today without going over your budget.', guide_2_title: 'Log in seconds', guide_2_text: 'Tap the + button to log an expense or income right away.', guide_3_title: 'Your budget', guide_3_text: 'Here you set a limit for each category and see how much you have spent.', guide_4_title: 'Your summary', guide_4_text: 'Clear charts of your income, expenses and savings, month by month.', guide_5_title: 'Connect your bank', guide_5_text: 'If you want, connect your bank and your spending is logged automatically.', guide_done: 'Done', tour100_1_title: 'Your Home, at a glance', tour100_1_text: 'Here you see how much you can spend today without going over your budget, and how much is left for the month. Unsure about a purchase? Type the amount in “Can I afford this?” and the AI answers with your real numbers.', tour100_2_title: 'Add in seconds', tour100_2_text: 'The ✨ button below opens the PETO Finanzas chat. From there you record an expense or income by typing it the way you would say it (“spent 20 on gas yesterday”), dictating it with the microphone, or with a photo of a receipt: the app understands it and leaves it ready for you to confirm.', tour100_3_title: 'Your accounts and your bank', tour100_3_text: 'Your accounts and cards live here, with the same available balance you see on Home. If you want, connect your bank and your transactions are logged on their own.', tour100_4_title: 'Goals and Savings', tour100_4_text: 'Create your goals and your emergency fund. The AI can suggest a plan, but the savings that count are the ones YOU log: they are never saved on their own.', tour100_5_title: 'Chat with your money', tour100_5_text: 'The same ✨ button opens the chat: ask it things like «what did I spend the most on this month?» and it answers with your numbers. That’s it! You can replay this tour anytime from Settings.', tour100_count: 'Step {n} of {total}', c101_ask_name: 'Hi there! Before we start, what’s your name?', c101_efund_sugg: 'Suggested from your monthly spending: {amount}. You can edit it before creating.', c101_efund_create_btn: 'Create fund', inc_detect_note102: 'Detected from your bank: ~{amount}/month (payroll from {source}). Edit it if you like.', inc_detect_note_nosrc102: 'Detected from your bank: ~{amount}/month. Edit it if you like.', home_ai_dismiss102: 'Dismiss this answer', gate103_title: 'Welcome to PETO Finanzas', gate103_text: 'Track your spending and income, build your budget, run your san (rotating savings) and connect your bank so transactions record themselves. Your account syncs this website with the app on your phone.', gate103_checking: 'Checking your session…', gate103_signin: 'Log in', bank_paused103: 'not synced', tour100_settings_btn: 'See the tour', set_group_account: 'Account', set_group_rules: 'Your money rules', set_group_security: 'Security and privacy', set_group_personalization: 'Personalization', c109_filter_expenses: 'Expenses', c109_filter_transfers: 'Transfers', c109_filter_all: 'All', c109_spent_in: 'Spent in {month}', c109_transfers_line: 'Transfers: {amount}', c109_reports_title: 'Reports', c109_pod_more: 'Want to hear more? Every episode is on Spotify', c109_group_business: 'Business', c109_danger_title: 'Danger zone', c109_danger_help: 'The two heaviest actions live here: signing out and deleting your account with all its data. They cannot be undone.', c109_mode_all: 'All', c109_mode_essential: 'Essential', c109_mode_custom: 'Custom', c109_appearance_title: 'Appearance', c109_help_label: 'Help', c109_autocat_help: 'Categories apply themselves: when your bank syncs, every charge arrives already categorized — first the known merchant, then what the app learned when you fixed a charge, and AI resolves what nobody knows. If you fix a charge, the app quietly learns for next time.', c109_flowai_line: 'AI takes your projection and tells you the expected balance on the key dates, the risky days and what to move to avoid them.', c109_secdesc_gastos: 'Log and review what you spend', c109_secdesc_ingresos: 'The money coming in', c109_secdesc_ahorros: 'Goals and emergency fund', c109_secdesc_buscar: 'Find any transaction', c109_secdesc_resumen: 'Your month in charts and your Score', c109_secdesc_presupuesto: 'Limits per category', c109_secdesc_pagos: 'Fixed payments and subscriptions', c109_secdesc_cuentas: 'Your accounts and cards', c109_secdesc_deudas: 'What you owe and your payoff plan', c109_secdesc_remesas: 'Money you send to your family', c109_secdesc_san: 'Group savings, in turns', c109_secdesc_podcast: 'Personal Finance episodes',  c108_bank_auto_label: 'Savings at your bank (automatic)', c108_manual_label: 'Manual savings', c108_note_disconnected: 'Bank disconnected: automatic savings are back to {amount}. Your manual savings were not touched.', c108_note_no_savings: 'Your bank is connected, but it has no savings account: automatic savings are {amount}.',  chart_expenses: 'Expenses', chart_savings: 'Savings',
   res_cats_empty: 'No expenses this month.', res_summary_empty: 'No activity this month yet.',
   bud_intro: 'Set a monthly limit per category and see how much you have spent.',
   bud_income_label: 'How much comes in each month?', bud_split_btn: 'Split it by my income', bud_split_help: 'We spread the Expenses part of your suggested split ({pct}% of your income) across your categories. Adjust whatever you want and save everything at once.',
@@ -2623,7 +2627,7 @@ en: {
   ob_err_name: 'Enter your name to get started.', ob_err_pin_format: 'The PIN must be 4 to 6 digits.',
   ob_err_pin_mismatch: 'The two PINs do not match.',
   set_theme_label: 'Theme', theme_light: 'Light', theme_dark: 'Dark', theme_auto: 'Automatic (system)',
-  set_accent_label: 'Main color', accent_verde: 'Green', accent_azul: 'Blue', accent_morado: 'Purple', accent_naranja: 'Orange',
+  set_accent_label: 'Main color', accent_verde: 'Amber', accent_azul: 'Blue', accent_morado: 'Purple', accent_naranja: 'Orange',
   undo_done: 'Done', undo_btn: 'Undo', btn_repeat: 'Repeat',
   fab_aria: 'Quick add', quick_title: 'What do you want to add?',
   quick_expense: 'Expense', quick_income: '💵 Income', quick_savings: '🐷 Saving',
@@ -3421,7 +3425,7 @@ it: {
   err_goal_name: 'Scrivi un nome per il tuo obiettivo.', err_goal_zero: 'L’importo dell’obiettivo deve essere maggiore di 0.',
   res_cats_title: 'Spese per categoria',
   res_summary_title: 'Entrate vs Spese vs Risparmi',
-  chart_income: 'Entrate', income_ytd_label: 'Reddito annuale a oggi', fixed_badge: 'Fisso', bud_fixed_title: 'Pagamenti fissi di questo mese', pro_home_title: 'Passa a PETO Pro', pro_home_text: 'Niente annunci e tutto sbloccato: sincronizzazione bancaria, budget condivisi e altro.', guide_1_title: 'I tuoi soldi di oggi', guide_1_text: 'Qui vedi quanto puoi spendere oggi senza superare il budget.', guide_2_title: 'Registra in pochi secondi', guide_2_text: 'Tocca il pulsante + per registrare subito una spesa o un\'entrata.', guide_3_title: 'Il tuo budget', guide_3_text: 'Qui imposti un limite per ogni categoria e vedi quanto hai speso.', guide_4_title: 'Il tuo riepilogo', guide_4_text: 'Grafici chiari di entrate, spese e risparmi, mese per mese.', guide_5_title: 'Collega la tua banca', guide_5_text: 'Se vuoi, collega la tua banca e le spese si registrano da sole.', guide_done: 'Fatto', tour100_1_title: 'La tua Home, a colpo d’occhio', tour100_1_text: 'Qui vedi quanto puoi spendere oggi senza superare il tuo budget e quanto ti resta per il mese. Dubbi su un acquisto? Scrivi l’importo in «Posso permettermelo?» e l’IA ti risponde con i tuoi numeri reali.', tour100_2_title: 'Aggiungi in pochi secondi', tour100_2_text: 'Il pulsante ✨ qui sotto apre la chat di PETO Finanzas. Da lì registri una spesa o un’entrata scrivendola come la diresti («ho speso 20 di benzina ieri»), dettandola con il microfono o con la foto di uno scontrino: l’app la capisce e te la lascia pronta da confermare.', tour100_3_title: 'I tuoi conti e la tua banca', tour100_3_text: 'Qui vivono i tuoi conti e le tue carte, con lo stesso saldo disponibile che vedi nella Home. Se vuoi, collega la tua banca e i movimenti si annotano da soli.', tour100_4_title: 'Obiettivi e Risparmi', tour100_4_text: 'Crea i tuoi obiettivi e il tuo fondo di emergenza. L’IA può suggerirti un piano, ma il risparmio che conta è quello che annoti TU: non si salva mai da solo.', tour100_5_title: 'Chat con i tuoi soldi', tour100_5_text: 'Lo stesso pulsante ✨ apre la chat: chiedile cose come «in cosa ho speso di più questo mese?» e risponde con i tuoi numeri. Fatto! Puoi ripetere questo tour quando vuoi dalle Impostazioni.', tour100_count: 'Passo {n} di {total}', c101_ask_name: 'Ciao! Prima di iniziare, come ti chiami?', c101_efund_sugg: 'Suggerimento dalle tue spese mensili: {amount}. Puoi modificarlo prima di creare.', c101_efund_create_btn: 'Crea fondo', inc_detect_note102: 'Rilevato dalla tua banca: ~{amount}/mese (stipendio da {source}). Modificalo se vuoi.', inc_detect_note_nosrc102: 'Rilevato dalla tua banca: ~{amount}/mese. Modificalo se vuoi.', home_ai_dismiss102: 'Ignora questa risposta', gate103_title: 'Benvenuto in PETO Finanzas', gate103_text: 'Controlla spese ed entrate, crea il tuo budget, gestisci il tuo san e collega la tua banca perché i movimenti si registrino da soli. Il tuo account sincronizza questo sito con l’app del tuo telefono.', gate103_checking: 'Controllo della sessione…', gate103_signin: 'Accedi', bank_paused103: 'non sincronizzato', tour100_settings_btn: 'Vedi il tour', set_group_account: 'Account', set_group_rules: 'Regole dei tuoi soldi', set_group_security: 'Sicurezza e privacy', set_group_personalization: 'Personalizzazione', c108_bank_auto_label: 'Risparmi in banca (automatici)', c108_manual_label: 'Risparmi manuali', c108_note_disconnected: 'Banca scollegata: i risparmi automatici sono tornati a {amount}. I tuoi risparmi manuali non sono stati toccati.', c108_note_no_savings: 'La tua banca è collegata, ma non ha un conto di risparmio: i risparmi automatici sono {amount}.', 
+  chart_income: 'Entrate', income_ytd_label: 'Reddito annuale a oggi', fixed_badge: 'Fisso', bud_fixed_title: 'Pagamenti fissi di questo mese', pro_home_title: 'Passa a PETO Pro', pro_home_text: 'Niente annunci e tutto sbloccato: sincronizzazione bancaria, budget condivisi e altro.', guide_1_title: 'I tuoi soldi di oggi', guide_1_text: 'Qui vedi quanto puoi spendere oggi senza superare il budget.', guide_2_title: 'Registra in pochi secondi', guide_2_text: 'Tocca il pulsante + per registrare subito una spesa o un\'entrata.', guide_3_title: 'Il tuo budget', guide_3_text: 'Qui imposti un limite per ogni categoria e vedi quanto hai speso.', guide_4_title: 'Il tuo riepilogo', guide_4_text: 'Grafici chiari di entrate, spese e risparmi, mese per mese.', guide_5_title: 'Collega la tua banca', guide_5_text: 'Se vuoi, collega la tua banca e le spese si registrano da sole.', guide_done: 'Fatto', tour100_1_title: 'La tua Home, a colpo d’occhio', tour100_1_text: 'Qui vedi quanto puoi spendere oggi senza superare il tuo budget e quanto ti resta per il mese. Dubbi su un acquisto? Scrivi l’importo in «Posso permettermelo?» e l’IA ti risponde con i tuoi numeri reali.', tour100_2_title: 'Aggiungi in pochi secondi', tour100_2_text: 'Il pulsante ✨ qui sotto apre la chat di PETO Finanzas. Da lì registri una spesa o un’entrata scrivendola come la diresti («ho speso 20 di benzina ieri»), dettandola con il microfono o con la foto di uno scontrino: l’app la capisce e te la lascia pronta da confermare.', tour100_3_title: 'I tuoi conti e la tua banca', tour100_3_text: 'Qui vivono i tuoi conti e le tue carte, con lo stesso saldo disponibile che vedi nella Home. Se vuoi, collega la tua banca e i movimenti si annotano da soli.', tour100_4_title: 'Obiettivi e Risparmi', tour100_4_text: 'Crea i tuoi obiettivi e il tuo fondo di emergenza. L’IA può suggerirti un piano, ma il risparmio che conta è quello che annoti TU: non si salva mai da solo.', tour100_5_title: 'Chat con i tuoi soldi', tour100_5_text: 'Lo stesso pulsante ✨ apre la chat: chiedile cose come «in cosa ho speso di più questo mese?» e risponde con i tuoi numeri. Fatto! Puoi ripetere questo tour quando vuoi dalle Impostazioni.', tour100_count: 'Passo {n} di {total}', c101_ask_name: 'Ciao! Prima di iniziare, come ti chiami?', c101_efund_sugg: 'Suggerimento dalle tue spese mensili: {amount}. Puoi modificarlo prima di creare.', c101_efund_create_btn: 'Crea fondo', inc_detect_note102: 'Rilevato dalla tua banca: ~{amount}/mese (stipendio da {source}). Modificalo se vuoi.', inc_detect_note_nosrc102: 'Rilevato dalla tua banca: ~{amount}/mese. Modificalo se vuoi.', home_ai_dismiss102: 'Ignora questa risposta', gate103_title: 'Benvenuto in PETO Finanzas', gate103_text: 'Controlla spese ed entrate, crea il tuo budget, gestisci il tuo san e collega la tua banca perché i movimenti si registrino da soli. Il tuo account sincronizza questo sito con l’app del tuo telefono.', gate103_checking: 'Controllo della sessione…', gate103_signin: 'Accedi', bank_paused103: 'non sincronizzato', tour100_settings_btn: 'Vedi il tour', set_group_account: 'Account', set_group_rules: 'Regole dei tuoi soldi', set_group_security: 'Sicurezza e privacy', set_group_personalization: 'Personalizzazione', c109_filter_expenses: 'Spese', c109_filter_transfers: 'Trasferimenti', c109_filter_all: 'Tutto', c109_spent_in: 'Speso a {month}', c109_transfers_line: 'Trasferimenti: {amount}', c109_reports_title: 'Report', c109_pod_more: 'Vuoi ascoltare di più? Tutti gli episodi sono su Spotify', c109_group_business: 'Attività', c109_danger_title: 'Zona delicata', c109_danger_help: 'Qui ci sono le due azioni più pesanti: uscire e eliminare il tuo account con tutti i suoi dati. Non si possono annullare.', c109_mode_all: 'Tutto', c109_mode_essential: 'Essenziale', c109_mode_custom: 'Personalizzato', c109_appearance_title: 'Aspetto', c109_help_label: 'Aiuto', c109_autocat_help: 'Le categorie si applicano da sole: quando la banca si sincronizza, ogni addebito arriva già categorizzato — prima il negozio conosciuto, poi ciò che l’app ha imparato quando hai corretto un addebito, e l’IA risolve ciò che nessuno conosce. Se correggi un addebito, l’app impara in silenzio per la prossima volta.', c109_flowai_line: 'L’IA prende la tua proiezione e ti dice il saldo atteso nelle date chiave, i giorni a rischio e cosa spostare per evitarli.', c109_secdesc_gastos: 'Annota e rivedi ciò che spendi', c109_secdesc_ingresos: 'I soldi che entrano', c109_secdesc_ahorros: 'Obiettivi e fondo di emergenza', c109_secdesc_buscar: 'Trova qualsiasi movimento', c109_secdesc_resumen: 'Il tuo mese in grafici e il tuo Score', c109_secdesc_presupuesto: 'Limiti per categoria', c109_secdesc_pagos: 'Pagamenti fissi e abbonamenti', c109_secdesc_cuentas: 'I tuoi conti e le tue carte', c109_secdesc_deudas: 'Ciò che devi e il tuo piano di pagamento', c109_secdesc_remesas: 'Soldi che invii alla tua famiglia', c109_secdesc_san: 'Risparmio di gruppo, a turni', c109_secdesc_podcast: 'Episodi di Finanzas Personales',  c108_bank_auto_label: 'Risparmi in banca (automatici)', c108_manual_label: 'Risparmi manuali', c108_note_disconnected: 'Banca scollegata: i risparmi automatici sono tornati a {amount}. I tuoi risparmi manuali non sono stati toccati.', c108_note_no_savings: 'La tua banca è collegata, ma non ha un conto di risparmio: i risparmi automatici sono {amount}.', 
   chart_expenses: 'Spese',
   chart_savings: 'Risparmi',
   res_cats_empty: 'Non ci sono spese in questo mese.',
@@ -3592,7 +3596,7 @@ it: {
   theme_dark: 'Scuro',
   theme_auto: 'Automatico (in base al sistema)',
   set_accent_label: 'Colore principale',
-  accent_verde: 'Verde',
+  accent_verde: 'Ambra',
   accent_azul: 'Blu',
   accent_morado: 'Viola',
   accent_naranja: 'Arancione',
@@ -4425,7 +4429,7 @@ pt: {
   err_goal_name: 'Digite um nome para a sua meta.', err_goal_zero: 'O valor da meta deve ser maior que 0.',
   res_cats_title: 'Gastos por categoria',
   res_summary_title: 'Renda vs Gastos vs Poupança',
-  chart_income: 'Renda', income_ytd_label: 'Renda anual até hoje', fixed_badge: 'Fixo', bud_fixed_title: 'Pagamentos fixos deste mês', pro_home_title: 'Assine o PETO Pro', pro_home_text: 'Sem anúncios e tudo desbloqueado: sincronização bancária, orçamentos compartilhados e mais.', guide_1_title: 'Seu dinheiro de hoje', guide_1_text: 'Aqui você vê quanto pode gastar hoje sem estourar o orçamento.', guide_2_title: 'Registre em segundos', guide_2_text: 'Toque no botão + para anotar uma despesa ou renda na hora.', guide_3_title: 'Seu orçamento', guide_3_text: 'Aqui você define um limite para cada categoria e vê quanto já gastou.', guide_4_title: 'Seu resumo', guide_4_text: 'Gráficos claros de suas rendas, despesas e economias, mês a mês.', guide_5_title: 'Conecte seu banco', guide_5_text: 'Se quiser, conecte seu banco e seus gastos são anotados automaticamente.', guide_done: 'Pronto', tour100_1_title: 'Seu Início, num relance', tour100_1_text: 'Aqui você vê quanto pode gastar hoje sem passar do orçamento e quanto ainda resta no mês. Na dúvida sobre uma compra, digite o valor em “Posso pagar isso?” e a IA responde com seus números reais.', tour100_2_title: 'Adicionar em segundos', tour100_2_text: 'O botão ✨ abaixo abre o chat do PETO Finanzas. Por lá você registra um gasto ou uma renda escrevendo do jeito que falaria (“gastei 20 em gasolina ontem”), ditando com o microfone ou com a foto de um recibo: o app entende e deixa tudo pronto para você confirmar.', tour100_3_title: 'Suas contas e seu banco', tour100_3_text: 'Aqui ficam suas contas e seus cartões, com o mesmo saldo disponível que você vê no Início. Se quiser, conecte seu banco e seus lançamentos são anotados sozinhos.', tour100_4_title: 'Metas e Economias', tour100_4_text: 'Crie suas metas e seu fundo de emergência. A IA pode sugerir um plano, mas a economia que conta é a que VOCÊ anota: nunca é salva sozinha.', tour100_5_title: 'Chat com seu dinheiro', tour100_5_text: 'O mesmo botão ✨ abre o chat: pergunte coisas como «com o que gastei mais este mês?» e ele responde com seus números. Pronto! Você pode repetir este tour quando quiser em Ajustes.', tour100_count: 'Passo {n} de {total}', c101_ask_name: 'Olá! Antes de começar, como você se chama?', c101_efund_sugg: 'Sugestão pelos seus gastos mensais: {amount}. Você pode editar antes de criar.', c101_efund_create_btn: 'Criar fundo', inc_detect_note102: 'Detectado do seu banco: ~{amount}/mês (salário de {source}). Edite se quiser.', inc_detect_note_nosrc102: 'Detectado do seu banco: ~{amount}/mês. Edite se quiser.', home_ai_dismiss102: 'Dispensar esta resposta', gate103_title: 'Bem-vindo ao PETO Finanzas', gate103_text: 'Controle seus gastos e rendas, monte seu orçamento, cuide do seu san e conecte seu banco para que as movimentações se registrem sozinhas. Sua conta sincroniza este site com o app do seu telefone.', gate103_checking: 'Verificando sua sessão…', gate103_signin: 'Entrar na conta', bank_paused103: 'sem sincronizar', tour100_settings_btn: 'Ver o tour', set_group_account: 'Conta', set_group_rules: 'Regras do seu dinheiro', set_group_security: 'Segurança e privacidade', set_group_personalization: 'Personalização', c108_bank_auto_label: 'Poupança no seu banco (automática)', c108_manual_label: 'Poupança manual', c108_note_disconnected: 'Banco desconectado: a poupança automática voltou a {amount}. Sua poupança manual não foi tocada.', c108_note_no_savings: 'Seu banco está conectado, mas não tem conta poupança: a poupança automática é {amount}.', 
+  chart_income: 'Renda', income_ytd_label: 'Renda anual até hoje', fixed_badge: 'Fixo', bud_fixed_title: 'Pagamentos fixos deste mês', pro_home_title: 'Assine o PETO Pro', pro_home_text: 'Sem anúncios e tudo desbloqueado: sincronização bancária, orçamentos compartilhados e mais.', guide_1_title: 'Seu dinheiro de hoje', guide_1_text: 'Aqui você vê quanto pode gastar hoje sem estourar o orçamento.', guide_2_title: 'Registre em segundos', guide_2_text: 'Toque no botão + para anotar uma despesa ou renda na hora.', guide_3_title: 'Seu orçamento', guide_3_text: 'Aqui você define um limite para cada categoria e vê quanto já gastou.', guide_4_title: 'Seu resumo', guide_4_text: 'Gráficos claros de suas rendas, despesas e economias, mês a mês.', guide_5_title: 'Conecte seu banco', guide_5_text: 'Se quiser, conecte seu banco e seus gastos são anotados automaticamente.', guide_done: 'Pronto', tour100_1_title: 'Seu Início, num relance', tour100_1_text: 'Aqui você vê quanto pode gastar hoje sem passar do orçamento e quanto ainda resta no mês. Na dúvida sobre uma compra, digite o valor em “Posso pagar isso?” e a IA responde com seus números reais.', tour100_2_title: 'Adicionar em segundos', tour100_2_text: 'O botão ✨ abaixo abre o chat do PETO Finanzas. Por lá você registra um gasto ou uma renda escrevendo do jeito que falaria (“gastei 20 em gasolina ontem”), ditando com o microfone ou com a foto de um recibo: o app entende e deixa tudo pronto para você confirmar.', tour100_3_title: 'Suas contas e seu banco', tour100_3_text: 'Aqui ficam suas contas e seus cartões, com o mesmo saldo disponível que você vê no Início. Se quiser, conecte seu banco e seus lançamentos são anotados sozinhos.', tour100_4_title: 'Metas e Economias', tour100_4_text: 'Crie suas metas e seu fundo de emergência. A IA pode sugerir um plano, mas a economia que conta é a que VOCÊ anota: nunca é salva sozinha.', tour100_5_title: 'Chat com seu dinheiro', tour100_5_text: 'O mesmo botão ✨ abre o chat: pergunte coisas como «com o que gastei mais este mês?» e ele responde com seus números. Pronto! Você pode repetir este tour quando quiser em Ajustes.', tour100_count: 'Passo {n} de {total}', c101_ask_name: 'Olá! Antes de começar, como você se chama?', c101_efund_sugg: 'Sugestão pelos seus gastos mensais: {amount}. Você pode editar antes de criar.', c101_efund_create_btn: 'Criar fundo', inc_detect_note102: 'Detectado do seu banco: ~{amount}/mês (salário de {source}). Edite se quiser.', inc_detect_note_nosrc102: 'Detectado do seu banco: ~{amount}/mês. Edite se quiser.', home_ai_dismiss102: 'Dispensar esta resposta', gate103_title: 'Bem-vindo ao PETO Finanzas', gate103_text: 'Controle seus gastos e rendas, monte seu orçamento, cuide do seu san e conecte seu banco para que as movimentações se registrem sozinhas. Sua conta sincroniza este site com o app do seu telefone.', gate103_checking: 'Verificando sua sessão…', gate103_signin: 'Entrar na conta', bank_paused103: 'sem sincronizar', tour100_settings_btn: 'Ver o tour', set_group_account: 'Conta', set_group_rules: 'Regras do seu dinheiro', set_group_security: 'Segurança e privacidade', set_group_personalization: 'Personalização', c109_filter_expenses: 'Despesas', c109_filter_transfers: 'Transferências', c109_filter_all: 'Tudo', c109_spent_in: 'Gasto em {month}', c109_transfers_line: 'Transferências: {amount}', c109_reports_title: 'Relatórios', c109_pod_more: 'Quer ouvir mais? Todos os episódios estão no Spotify', c109_group_business: 'Negócio', c109_danger_title: 'Zona delicada', c109_danger_help: 'Aqui estão as duas ações mais pesadas: sair e excluir sua conta com todos os seus dados. Não podem ser desfeitas.', c109_mode_all: 'Tudo', c109_mode_essential: 'Essencial', c109_mode_custom: 'Personalizado', c109_appearance_title: 'Aparência', c109_help_label: 'Ajuda', c109_autocat_help: 'As categorias se aplicam sozinhas: ao sincronizar seu banco, cada lançamento chega já categorizado — primeiro a loja conhecida, depois o que o app aprendeu quando você corrigiu um lançamento, e a IA resolve o que ninguém conhece. Se você corrigir um lançamento, o app aprende em silêncio para a próxima vez.', c109_flowai_line: 'A IA pega sua projeção e diz o saldo esperado nas datas-chave, os dias de risco e o que mover para evitá-los.', c109_secdesc_gastos: 'Anote e revise o que você gasta', c109_secdesc_ingresos: 'O dinheiro que entra', c109_secdesc_ahorros: 'Metas e fundo de emergência', c109_secdesc_buscar: 'Encontre qualquer lançamento', c109_secdesc_resumen: 'Seu mês em gráficos e seu Score', c109_secdesc_presupuesto: 'Limites por categoria', c109_secdesc_pagos: 'Pagamentos fixos e assinaturas', c109_secdesc_cuentas: 'Suas contas e cartões', c109_secdesc_deudas: 'O que você deve e seu plano de pagamento', c109_secdesc_remesas: 'Dinheiro que você envia à sua família', c109_secdesc_san: 'Economia em grupo, por turnos', c109_secdesc_podcast: 'Episódios de Finanzas Personales',  c108_bank_auto_label: 'Poupança no seu banco (automática)', c108_manual_label: 'Poupança manual', c108_note_disconnected: 'Banco desconectado: a poupança automática voltou a {amount}. Sua poupança manual não foi tocada.', c108_note_no_savings: 'Seu banco está conectado, mas não tem conta poupança: a poupança automática é {amount}.', 
   chart_expenses: 'Gastos',
   chart_savings: 'Poupança',
   res_cats_empty: 'Nenhum gasto este mês.',
@@ -4596,7 +4600,7 @@ pt: {
   theme_dark: 'Escuro',
   theme_auto: 'Automático (sistema)',
   set_accent_label: 'Cor principal',
-  accent_verde: 'Verde',
+  accent_verde: 'Âmbar',
   accent_azul: 'Azul',
   accent_morado: 'Roxo',
   accent_naranja: 'Laranja',
@@ -5429,7 +5433,7 @@ fr: {
   err_goal_name: 'Donne un nom à ton objectif.', err_goal_zero: 'Le montant de l’objectif doit être supérieur à 0.',
   res_cats_title: 'Dépenses par catégorie',
   res_summary_title: 'Revenus vs Dépenses vs Épargne',
-  chart_income: 'Revenus', income_ytd_label: 'Revenu annuel à ce jour', fixed_badge: 'Fixe', bud_fixed_title: 'Paiements fixes de ce mois', pro_home_title: 'Passe à PETO Pro', pro_home_text: 'Sans pubs et tout débloqué : synchronisation bancaire, budgets partagés et plus.', guide_1_title: 'Ton argent du jour', guide_1_text: 'Ici, tu vois combien tu peux dépenser aujourd\'hui sans dépasser ton budget.', guide_2_title: 'Enregistre en quelques secondes', guide_2_text: 'Touche le bouton + pour noter une dépense ou un revenu tout de suite.', guide_3_title: 'Ton budget', guide_3_text: 'Ici, tu fixes une limite par catégorie et tu vois ce que tu as dépensé.', guide_4_title: 'Ton résumé', guide_4_text: 'Des graphiques clairs de tes revenus, dépenses et économies, mois par mois.', guide_5_title: 'Connecte ta banque', guide_5_text: 'Si tu veux, connecte ta banque et tes dépenses se notent toutes seules.', guide_done: 'Terminé', tour100_1_title: 'Votre Accueil, en un coup d’œil', tour100_1_text: 'Ici, vous voyez combien vous pouvez dépenser aujourd’hui sans dépasser votre budget, et ce qu’il vous reste pour le mois. Un doute sur un achat ? Tapez le montant dans « Puis-je me le permettre ? » et l’IA répond avec vos chiffres réels.', tour100_2_title: 'Ajouter en quelques secondes', tour100_2_text: 'Le bouton ✨ ci-dessous ouvre le chat de PETO Finanzas. De là, vous enregistrez une dépense ou un revenu en l’écrivant comme vous le diriez (« j’ai dépensé 20 en essence hier »), en le dictant au micro ou avec la photo d’un reçu : l’application comprend et vous laisse tout prêt à confirmer.', tour100_3_title: 'Vos comptes et votre banque', tour100_3_text: 'Vos comptes et vos cartes vivent ici, avec le même solde disponible que sur l’Accueil. Si vous voulez, connectez votre banque et vos mouvements se notent tout seuls.', tour100_4_title: 'Objectifs et Épargne', tour100_4_text: 'Créez vos objectifs et votre fonds d’urgence. L’IA peut vous suggérer un plan, mais l’épargne qui compte est celle que VOUS notez : elle ne s’enregistre jamais toute seule.', tour100_5_title: 'Chat avec votre argent', tour100_5_text: 'Le même bouton ✨ ouvre le chat : demandez-lui des choses comme «où ai-je le plus dépensé ce mois-ci ?» et il répond avec vos chiffres. C’est tout ! Vous pouvez refaire ce tour quand vous voulez depuis les Réglages.', tour100_count: 'Étape {n} sur {total}', c101_ask_name: 'Salut ! Avant de commencer, comment t’appelles-tu ?', c101_efund_sugg: 'Suggestion selon tes dépenses mensuelles : {amount}. Tu peux la modifier avant de créer.', c101_efund_create_btn: 'Créer le fonds', inc_detect_note102: 'Détecté depuis votre banque : ~{amount}/mois (salaire de {source}). Modifiez-le si vous voulez.', inc_detect_note_nosrc102: 'Détecté depuis votre banque : ~{amount}/mois. Modifiez-le si vous voulez.', home_ai_dismiss102: 'Ignorer cette réponse', gate103_title: 'Bienvenue sur PETO Finanzas', gate103_text: 'Suivez vos dépenses et vos revenus, créez votre budget, gérez votre san et connectez votre banque pour que vos opérations s’enregistrent toutes seules. Votre compte synchronise ce site avec l’application de votre téléphone.', gate103_checking: 'Vérification de votre session…', gate103_signin: 'Se connecter', bank_paused103: 'non synchronisé', tour100_settings_btn: 'Voir le tour', set_group_account: 'Compte', set_group_rules: 'Règles de ton argent', set_group_security: 'Sécurité et confidentialité', set_group_personalization: 'Personnalisation', c108_bank_auto_label: 'Épargne dans votre banque (automatique)', c108_manual_label: 'Épargne manuelle', c108_note_disconnected: 'Banque déconnectée: l’épargne automatique est revenue à {amount}. Votre épargne manuelle n’a pas été touchée.', c108_note_no_savings: 'Votre banque est connectée, mais sans compte d’épargne: l’épargne automatique est de {amount}.', 
+  chart_income: 'Revenus', income_ytd_label: 'Revenu annuel à ce jour', fixed_badge: 'Fixe', bud_fixed_title: 'Paiements fixes de ce mois', pro_home_title: 'Passe à PETO Pro', pro_home_text: 'Sans pubs et tout débloqué : synchronisation bancaire, budgets partagés et plus.', guide_1_title: 'Ton argent du jour', guide_1_text: 'Ici, tu vois combien tu peux dépenser aujourd\'hui sans dépasser ton budget.', guide_2_title: 'Enregistre en quelques secondes', guide_2_text: 'Touche le bouton + pour noter une dépense ou un revenu tout de suite.', guide_3_title: 'Ton budget', guide_3_text: 'Ici, tu fixes une limite par catégorie et tu vois ce que tu as dépensé.', guide_4_title: 'Ton résumé', guide_4_text: 'Des graphiques clairs de tes revenus, dépenses et économies, mois par mois.', guide_5_title: 'Connecte ta banque', guide_5_text: 'Si tu veux, connecte ta banque et tes dépenses se notent toutes seules.', guide_done: 'Terminé', tour100_1_title: 'Votre Accueil, en un coup d’œil', tour100_1_text: 'Ici, vous voyez combien vous pouvez dépenser aujourd’hui sans dépasser votre budget, et ce qu’il vous reste pour le mois. Un doute sur un achat ? Tapez le montant dans « Puis-je me le permettre ? » et l’IA répond avec vos chiffres réels.', tour100_2_title: 'Ajouter en quelques secondes', tour100_2_text: 'Le bouton ✨ ci-dessous ouvre le chat de PETO Finanzas. De là, vous enregistrez une dépense ou un revenu en l’écrivant comme vous le diriez (« j’ai dépensé 20 en essence hier »), en le dictant au micro ou avec la photo d’un reçu : l’application comprend et vous laisse tout prêt à confirmer.', tour100_3_title: 'Vos comptes et votre banque', tour100_3_text: 'Vos comptes et vos cartes vivent ici, avec le même solde disponible que sur l’Accueil. Si vous voulez, connectez votre banque et vos mouvements se notent tout seuls.', tour100_4_title: 'Objectifs et Épargne', tour100_4_text: 'Créez vos objectifs et votre fonds d’urgence. L’IA peut vous suggérer un plan, mais l’épargne qui compte est celle que VOUS notez : elle ne s’enregistre jamais toute seule.', tour100_5_title: 'Chat avec votre argent', tour100_5_text: 'Le même bouton ✨ ouvre le chat : demandez-lui des choses comme «où ai-je le plus dépensé ce mois-ci ?» et il répond avec vos chiffres. C’est tout ! Vous pouvez refaire ce tour quand vous voulez depuis les Réglages.', tour100_count: 'Étape {n} sur {total}', c101_ask_name: 'Salut ! Avant de commencer, comment t’appelles-tu ?', c101_efund_sugg: 'Suggestion selon tes dépenses mensuelles : {amount}. Tu peux la modifier avant de créer.', c101_efund_create_btn: 'Créer le fonds', inc_detect_note102: 'Détecté depuis votre banque : ~{amount}/mois (salaire de {source}). Modifiez-le si vous voulez.', inc_detect_note_nosrc102: 'Détecté depuis votre banque : ~{amount}/mois. Modifiez-le si vous voulez.', home_ai_dismiss102: 'Ignorer cette réponse', gate103_title: 'Bienvenue sur PETO Finanzas', gate103_text: 'Suivez vos dépenses et vos revenus, créez votre budget, gérez votre san et connectez votre banque pour que vos opérations s’enregistrent toutes seules. Votre compte synchronise ce site avec l’application de votre téléphone.', gate103_checking: 'Vérification de votre session…', gate103_signin: 'Se connecter', bank_paused103: 'non synchronisé', tour100_settings_btn: 'Voir le tour', set_group_account: 'Compte', set_group_rules: 'Règles de ton argent', set_group_security: 'Sécurité et confidentialité', set_group_personalization: 'Personnalisation', c109_filter_expenses: 'Dépenses', c109_filter_transfers: 'Virements', c109_filter_all: 'Tout', c109_spent_in: 'Dépensé en {month}', c109_transfers_line: 'Virements : {amount}', c109_reports_title: 'Rapports', c109_pod_more: 'Envie d’écouter plus ? Tous les épisodes sont sur Spotify', c109_group_business: 'Entreprise', c109_danger_title: 'Zone sensible', c109_danger_help: 'Les deux actions les plus lourdes sont ici : fermer votre session et supprimer votre compte avec toutes ses données. Elles sont irréversibles.', c109_mode_all: 'Tout', c109_mode_essential: 'Essentiel', c109_mode_custom: 'Personnalisé', c109_appearance_title: 'Apparence', c109_help_label: 'Aide', c109_autocat_help: 'Les catégories s’appliquent toutes seules : quand votre banque se synchronise, chaque opération arrive déjà catégorisée — d’abord le commerce connu, puis ce que l’app a appris quand vous avez corrigé une opération, et l’IA résout ce que personne ne connaît. Si vous corrigez une opération, l’app apprend en silence pour la fois suivante.', c109_flowai_line: 'L’IA prend votre projection et vous dit le solde attendu aux dates clés, les jours à risque et quoi déplacer pour les éviter.', c109_secdesc_gastos: 'Notez et revoyez vos dépenses', c109_secdesc_ingresos: 'L’argent qui rentre', c109_secdesc_ahorros: 'Objectifs et fonds d’urgence', c109_secdesc_buscar: 'Trouvez n’importe quelle opération', c109_secdesc_resumen: 'Votre mois en graphiques et votre Score', c109_secdesc_presupuesto: 'Limites par catégorie', c109_secdesc_pagos: 'Paiements fixes et abonnements', c109_secdesc_cuentas: 'Vos comptes et vos cartes', c109_secdesc_deudas: 'Ce que vous devez et votre plan de paiement', c109_secdesc_remesas: 'L’argent que vous envoyez à votre famille', c109_secdesc_san: 'Épargne de groupe, à tour de rôle', c109_secdesc_podcast: 'Épisodes de Finanzas Personales',  c108_bank_auto_label: 'Épargne dans votre banque (automatique)', c108_manual_label: 'Épargne manuelle', c108_note_disconnected: 'Banque déconnectée: l’épargne automatique est revenue à {amount}. Votre épargne manuelle n’a pas été touchée.', c108_note_no_savings: 'Votre banque est connectée, mais sans compte d’épargne: l’épargne automatique est de {amount}.', 
   chart_expenses: 'Dépenses',
   chart_savings: 'Épargne',
   res_cats_empty: 'Aucune dépense ce mois-ci.',
@@ -5600,7 +5604,7 @@ fr: {
   theme_dark: 'Sombre',
   theme_auto: 'Automatique (système)',
   set_accent_label: 'Couleur principale',
-  accent_verde: 'Vert',
+  accent_verde: 'Ambre',
   accent_azul: 'Bleu',
   accent_morado: 'Violet',
   accent_naranja: 'Orange',
@@ -6433,7 +6437,7 @@ de: {
   err_goal_name: 'Gib einen Namen für dein Ziel ein.', err_goal_zero: 'Der Zielbetrag muss größer als 0 sein.',
   res_cats_title: 'Ausgaben nach Kategorie',
   res_summary_title: 'Einnahmen vs. Ausgaben vs. Ersparnisse',
-  chart_income: 'Einnahmen', income_ytd_label: 'Jahreseinkommen bis heute', fixed_badge: 'Fest', bud_fixed_title: 'Fixe Zahlungen in diesem Monat', pro_home_title: 'Werde PETO Pro', pro_home_text: 'Keine Werbung und alles freigeschaltet: Bankabgleich, geteilte Budgets und mehr.', guide_1_title: 'Dein Geld heute', guide_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, ohne dein Budget zu sprengen.', guide_2_title: 'In Sekunden erfassen', guide_2_text: 'Tippe auf die Schaltfläche +, um eine Ausgabe oder Einnahme sofort zu erfassen.', guide_3_title: 'Dein Budget', guide_3_text: 'Hier legst du für jede Kategorie ein Limit fest und siehst, wie viel du ausgegeben hast.', guide_4_title: 'Deine Übersicht', guide_4_text: 'Klare Grafiken zu Einnahmen, Ausgaben und Ersparnissen, Monat für Monat.', guide_5_title: 'Verbinde deine Bank', guide_5_text: 'Wenn du möchtest, verbinde deine Bank und deine Ausgaben werden automatisch erfasst.', guide_done: 'Fertig', tour100_1_title: 'Dein Start auf einen Blick', tour100_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, ohne dein Budget zu sprengen, und wie viel dir für den Monat bleibt. Unsicher bei einem Kauf? Tippe den Betrag in „Kann ich mir das leisten?“ ein und die KI antwortet mit deinen echten Zahlen.', tour100_2_title: 'In Sekunden hinzufügen', tour100_2_text: 'Die Schaltfläche ✨ unten öffnet den Chat von PETO Finanzas. Dort trägst du eine Ausgabe oder Einnahme so ein, wie du sie sagen würdest („gestern 20 für Benzin ausgegeben“), diktierst sie per Mikrofon oder mit dem Foto eines Belegs: Die App versteht es und legt es dir zur Bestätigung bereit.', tour100_3_title: 'Deine Konten und deine Bank', tour100_3_text: 'Hier leben deine Konten und Karten, mit demselben verfügbaren Saldo wie auf dem Startbildschirm. Wenn du willst, verbinde deine Bank und deine Einträge werden von selbst erfasst.', tour100_4_title: 'Ziele und Sparen', tour100_4_text: 'Erstelle deine Ziele und deinen Notfallfonds. Die KI kann dir einen Plan vorschlagen, aber das Sparen, das zählt, ist das, das DU einträgst: Es wird nie von allein gespeichert.', tour100_5_title: 'Chat mit deinem Geld', tour100_5_text: 'Dieselbe Schaltfläche ✨ öffnet den Chat: Frag sie Dinge wie «Wofür habe ich diesen Monat am meisten ausgegeben?» und sie antwortet mit deinen Zahlen. Fertig! Du kannst diese Tour jederzeit in den Einstellungen wiederholen.', tour100_count: 'Schritt {n} von {total}', c101_ask_name: 'Hallo! Bevor wir anfangen: Wie heißt du?', c101_efund_sugg: 'Vorschlag nach deinen monatlichen Ausgaben: {amount}. Du kannst ihn vor dem Erstellen ändern.', c101_efund_create_btn: 'Fonds erstellen', inc_detect_note102: 'Von deiner Bank erkannt: ~{amount}/Monat (Gehalt von {source}). Ändere es, wenn du willst.', inc_detect_note_nosrc102: 'Von deiner Bank erkannt: ~{amount}/Monat. Ändere es, wenn du willst.', home_ai_dismiss102: 'Diese Antwort verwerfen', gate103_title: 'Willkommen bei PETO Finanzas', gate103_text: 'Behalte Ausgaben und Einnahmen im Blick, erstelle dein Budget, verwalte deinen San und verbinde deine Bank, damit sich deine Buchungen von selbst eintragen. Dein Konto synchronisiert diese Website mit der App auf deinem Handy.', gate103_checking: 'Ihre Sitzung wird geprüft…', gate103_signin: 'Anmelden', bank_paused103: 'nicht synchronisiert', tour100_settings_btn: 'Tour ansehen', set_group_account: 'Konto', set_group_rules: 'Regeln für dein Geld', set_group_security: 'Sicherheit und Datenschutz', set_group_personalization: 'Personalisierung', c108_bank_auto_label: 'Ersparnisse bei deiner Bank (automatisch)', c108_manual_label: 'Manuelle Ersparnisse', c108_note_disconnected: 'Bank getrennt: Die automatischen Ersparnisse sind wieder bei {amount}. Deine manuellen Ersparnisse wurden nicht angetastet.', c108_note_no_savings: 'Deine Bank ist verbunden, hat aber kein Sparkonto: Die automatischen Ersparnisse sind {amount}.', 
+  chart_income: 'Einnahmen', income_ytd_label: 'Jahreseinkommen bis heute', fixed_badge: 'Fest', bud_fixed_title: 'Fixe Zahlungen in diesem Monat', pro_home_title: 'Werde PETO Pro', pro_home_text: 'Keine Werbung und alles freigeschaltet: Bankabgleich, geteilte Budgets und mehr.', guide_1_title: 'Dein Geld heute', guide_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, ohne dein Budget zu sprengen.', guide_2_title: 'In Sekunden erfassen', guide_2_text: 'Tippe auf die Schaltfläche +, um eine Ausgabe oder Einnahme sofort zu erfassen.', guide_3_title: 'Dein Budget', guide_3_text: 'Hier legst du für jede Kategorie ein Limit fest und siehst, wie viel du ausgegeben hast.', guide_4_title: 'Deine Übersicht', guide_4_text: 'Klare Grafiken zu Einnahmen, Ausgaben und Ersparnissen, Monat für Monat.', guide_5_title: 'Verbinde deine Bank', guide_5_text: 'Wenn du möchtest, verbinde deine Bank und deine Ausgaben werden automatisch erfasst.', guide_done: 'Fertig', tour100_1_title: 'Dein Start auf einen Blick', tour100_1_text: 'Hier siehst du, wie viel du heute ausgeben kannst, ohne dein Budget zu sprengen, und wie viel dir für den Monat bleibt. Unsicher bei einem Kauf? Tippe den Betrag in „Kann ich mir das leisten?“ ein und die KI antwortet mit deinen echten Zahlen.', tour100_2_title: 'In Sekunden hinzufügen', tour100_2_text: 'Die Schaltfläche ✨ unten öffnet den Chat von PETO Finanzas. Dort trägst du eine Ausgabe oder Einnahme so ein, wie du sie sagen würdest („gestern 20 für Benzin ausgegeben“), diktierst sie per Mikrofon oder mit dem Foto eines Belegs: Die App versteht es und legt es dir zur Bestätigung bereit.', tour100_3_title: 'Deine Konten und deine Bank', tour100_3_text: 'Hier leben deine Konten und Karten, mit demselben verfügbaren Saldo wie auf dem Startbildschirm. Wenn du willst, verbinde deine Bank und deine Einträge werden von selbst erfasst.', tour100_4_title: 'Ziele und Sparen', tour100_4_text: 'Erstelle deine Ziele und deinen Notfallfonds. Die KI kann dir einen Plan vorschlagen, aber das Sparen, das zählt, ist das, das DU einträgst: Es wird nie von allein gespeichert.', tour100_5_title: 'Chat mit deinem Geld', tour100_5_text: 'Dieselbe Schaltfläche ✨ öffnet den Chat: Frag sie Dinge wie «Wofür habe ich diesen Monat am meisten ausgegeben?» und sie antwortet mit deinen Zahlen. Fertig! Du kannst diese Tour jederzeit in den Einstellungen wiederholen.', tour100_count: 'Schritt {n} von {total}', c101_ask_name: 'Hallo! Bevor wir anfangen: Wie heißt du?', c101_efund_sugg: 'Vorschlag nach deinen monatlichen Ausgaben: {amount}. Du kannst ihn vor dem Erstellen ändern.', c101_efund_create_btn: 'Fonds erstellen', inc_detect_note102: 'Von deiner Bank erkannt: ~{amount}/Monat (Gehalt von {source}). Ändere es, wenn du willst.', inc_detect_note_nosrc102: 'Von deiner Bank erkannt: ~{amount}/Monat. Ändere es, wenn du willst.', home_ai_dismiss102: 'Diese Antwort verwerfen', gate103_title: 'Willkommen bei PETO Finanzas', gate103_text: 'Behalte Ausgaben und Einnahmen im Blick, erstelle dein Budget, verwalte deinen San und verbinde deine Bank, damit sich deine Buchungen von selbst eintragen. Dein Konto synchronisiert diese Website mit der App auf deinem Handy.', gate103_checking: 'Ihre Sitzung wird geprüft…', gate103_signin: 'Anmelden', bank_paused103: 'nicht synchronisiert', tour100_settings_btn: 'Tour ansehen', set_group_account: 'Konto', set_group_rules: 'Regeln für dein Geld', set_group_security: 'Sicherheit und Datenschutz', set_group_personalization: 'Personalisierung', c109_filter_expenses: 'Ausgaben', c109_filter_transfers: 'Überweisungen', c109_filter_all: 'Alle', c109_spent_in: 'Ausgegeben im {month}', c109_transfers_line: 'Überweisungen: {amount}', c109_reports_title: 'Berichte', c109_pod_more: 'Willst du mehr hören? Alle Folgen sind auf Spotify', c109_group_business: 'Geschäft', c109_danger_title: 'Empfindlicher Bereich', c109_danger_help: 'Hier sind die zwei schwersten Aktionen: Abmelden und dein Konto mit allen Daten löschen. Sie lassen sich nicht rückgängig machen.', c109_mode_all: 'Alle', c109_mode_essential: 'Wichtigste', c109_mode_custom: 'Benutzerdefiniert', c109_appearance_title: 'Darstellung', c109_help_label: 'Hilfe', c109_autocat_help: 'Kategorien werden von selbst angewendet: Wenn deine Bank synchronisiert, kommt jede Buchung schon kategorisiert an — zuerst der bekannte Händler, dann das, was die App gelernt hat, als du eine Buchung korrigiert hast, und die KI löst, was niemand kennt. Wenn du eine Buchung korrigierst, lernt die App leise für das nächste Mal dazu.', c109_flowai_line: 'Die KI nimmt deine Prognose und sagt dir den erwarteten Stand an den wichtigen Tagen, die Risikotage und was du verschieben kannst, um sie zu vermeiden.', c109_secdesc_gastos: 'Erfasse und prüfe deine Ausgaben', c109_secdesc_ingresos: 'Das Geld, das hereinkommt', c109_secdesc_ahorros: 'Ziele und Notfallfonds', c109_secdesc_buscar: 'Finde jede Buchung', c109_secdesc_resumen: 'Dein Monat in Grafiken und dein Score', c109_secdesc_presupuesto: 'Limits pro Kategorie', c109_secdesc_pagos: 'Fixe Zahlungen und Abos', c109_secdesc_cuentas: 'Deine Konten und Karten', c109_secdesc_deudas: 'Deine Schulden und dein Tilgungsplan', c109_secdesc_remesas: 'Geld, das du deiner Familie schickst', c109_secdesc_san: 'Gruppensparen im Wechsel', c109_secdesc_podcast: 'Folgen von Finanzas Personales',  c108_bank_auto_label: 'Ersparnisse bei deiner Bank (automatisch)', c108_manual_label: 'Manuelle Ersparnisse', c108_note_disconnected: 'Bank getrennt: Die automatischen Ersparnisse sind wieder bei {amount}. Deine manuellen Ersparnisse wurden nicht angetastet.', c108_note_no_savings: 'Deine Bank ist verbunden, hat aber kein Sparkonto: Die automatischen Ersparnisse sind {amount}.', 
   chart_expenses: 'Ausgaben',
   chart_savings: 'Ersparnisse',
   res_cats_empty: 'Keine Ausgaben in diesem Monat.',
@@ -6604,7 +6608,7 @@ de: {
   theme_dark: 'Dunkel',
   theme_auto: 'Automatisch (System)',
   set_accent_label: 'Hauptfarbe',
-  accent_verde: 'Grün',
+  accent_verde: 'Bernstein',
   accent_azul: 'Blau',
   accent_morado: 'Lila',
   accent_naranja: 'Orange',
@@ -7437,7 +7441,7 @@ zh: {
   err_goal_name: '请输入目标名称。', err_goal_zero: '目标金额必须大于 0。',
   res_cats_title: '按类别支出',
   res_summary_title: '收入 vs 支出 vs 储蓄',
-  chart_income: '收入', income_ytd_label: '今年至今收入', fixed_badge: '固定', bud_fixed_title: '本月固定支出', pro_home_title: '加入 PETO Pro', pro_home_text: '无广告，全部解锁：银行同步、共享预算等。', guide_1_title: '你今天的钱', guide_1_text: '这里显示你今天在不超预算的情况下可以花多少钱。', guide_2_title: '几秒钟记录', guide_2_text: '点 + 按钮即可立即记录支出或收入。', guide_3_title: '你的预算', guide_3_text: '在这里为每个类别设定上限，并查看已花费金额。', guide_4_title: '你的汇总', guide_4_text: '按月清晰展示你的收入、支出和储蓄图表。', guide_5_title: '连接你的银行', guide_5_text: '如果愿意，可以连接银行，支出会自动记录。', guide_done: '完成', tour100_1_title: '你的首页，一目了然', tour100_1_text: '这里可以看到你今天在不超预算的情况下能花多少，以及本月还剩多少。对一笔购买拿不定主意？在“这笔我买得起吗？”中输入金额，AI 会用你的真实数字回答你。', tour100_2_title: '几秒钟添加', tour100_2_text: '下方的 ✨ 按钮会打开 PETO Finanzas 聊天。在那里，你可以像说话一样打字记录支出或收入（“昨天加油花了20”），用麦克风口述，或拍一张小票照片：应用能理解并准备好让你确认。', tour100_3_title: '你的账户和银行', tour100_3_text: '你的账户和银行卡都在这里，可用余额与首页显示的一致。如果你愿意，连接你的银行，交易会自动记录。', tour100_4_title: '目标和储蓄', tour100_4_text: '创建你的目标和应急基金。AI 可以为你建议一个计划，但真正算数的是你自己记录的储蓄：它永远不会自动保存。', tour100_5_title: '与你的钱聊天', tour100_5_text: '同一个 ✨ 按钮打开聊天：问它「这个月我在哪方面花得最多？」它会用你的数字回答。就这样！你可以随时在设置中重看本导览。', tour100_count: '第 {n} 步，共 {total} 步', c101_ask_name: '你好！在开始之前，你叫什么名字？', c101_efund_sugg: '根据你每月支出的建议：{amount}。创建前可以修改。', c101_efund_create_btn: '创建基金', inc_detect_note102: '从你的银行检测到：约 {amount}/月（来自 {source} 的工资）。可以修改。', inc_detect_note_nosrc102: '从你的银行检测到：约 {amount}/月。可以修改。', home_ai_dismiss102: '忽略此回答', gate103_title: '欢迎来到 PETO Finanzas', gate103_text: '记录你的支出和收入、制定预算、管理你的合存会，并连接银行让交易自动记账。你的账户会将本网站与手机上的应用同步。', gate103_checking: '正在检查你的会话…', gate103_signin: '登录', bank_paused103: '未同步', tour100_settings_btn: '查看导览', set_group_account: '账户', set_group_rules: '你的资金规则', set_group_security: '安全与隐私', set_group_personalization: '个性化', c108_bank_auto_label: '银行里的储蓄（自动）', c108_manual_label: '手动储蓄', c108_note_disconnected: '银行已断开：自动储蓄已回到 {amount}。你的手动储蓄没有被动过。', c108_note_no_savings: '你的银行已连接，但没有储蓄账户：自动储蓄为 {amount}。', 
+  chart_income: '收入', income_ytd_label: '今年至今收入', fixed_badge: '固定', bud_fixed_title: '本月固定支出', pro_home_title: '加入 PETO Pro', pro_home_text: '无广告，全部解锁：银行同步、共享预算等。', guide_1_title: '你今天的钱', guide_1_text: '这里显示你今天在不超预算的情况下可以花多少钱。', guide_2_title: '几秒钟记录', guide_2_text: '点 + 按钮即可立即记录支出或收入。', guide_3_title: '你的预算', guide_3_text: '在这里为每个类别设定上限，并查看已花费金额。', guide_4_title: '你的汇总', guide_4_text: '按月清晰展示你的收入、支出和储蓄图表。', guide_5_title: '连接你的银行', guide_5_text: '如果愿意，可以连接银行，支出会自动记录。', guide_done: '完成', tour100_1_title: '你的首页，一目了然', tour100_1_text: '这里可以看到你今天在不超预算的情况下能花多少，以及本月还剩多少。对一笔购买拿不定主意？在“这笔我买得起吗？”中输入金额，AI 会用你的真实数字回答你。', tour100_2_title: '几秒钟添加', tour100_2_text: '下方的 ✨ 按钮会打开 PETO Finanzas 聊天。在那里，你可以像说话一样打字记录支出或收入（“昨天加油花了20”），用麦克风口述，或拍一张小票照片：应用能理解并准备好让你确认。', tour100_3_title: '你的账户和银行', tour100_3_text: '你的账户和银行卡都在这里，可用余额与首页显示的一致。如果你愿意，连接你的银行，交易会自动记录。', tour100_4_title: '目标和储蓄', tour100_4_text: '创建你的目标和应急基金。AI 可以为你建议一个计划，但真正算数的是你自己记录的储蓄：它永远不会自动保存。', tour100_5_title: '与你的钱聊天', tour100_5_text: '同一个 ✨ 按钮打开聊天：问它「这个月我在哪方面花得最多？」它会用你的数字回答。就这样！你可以随时在设置中重看本导览。', tour100_count: '第 {n} 步，共 {total} 步', c101_ask_name: '你好！在开始之前，你叫什么名字？', c101_efund_sugg: '根据你每月支出的建议：{amount}。创建前可以修改。', c101_efund_create_btn: '创建基金', inc_detect_note102: '从你的银行检测到：约 {amount}/月（来自 {source} 的工资）。可以修改。', inc_detect_note_nosrc102: '从你的银行检测到：约 {amount}/月。可以修改。', home_ai_dismiss102: '忽略此回答', gate103_title: '欢迎来到 PETO Finanzas', gate103_text: '记录你的支出和收入、制定预算、管理你的合存会，并连接银行让交易自动记账。你的账户会将本网站与手机上的应用同步。', gate103_checking: '正在检查你的会话…', gate103_signin: '登录', bank_paused103: '未同步', tour100_settings_btn: '查看导览', set_group_account: '账户', set_group_rules: '你的资金规则', set_group_security: '安全与隐私', set_group_personalization: '个性化', c109_filter_expenses: '支出', c109_filter_transfers: '转账', c109_filter_all: '全部', c109_spent_in: '{month}已支出', c109_transfers_line: '转账：{amount}', c109_reports_title: '报告', c109_pod_more: '想听更多？所有节目都在 Spotify', c109_group_business: '生意', c109_danger_title: '危险区', c109_danger_help: '这里是两个最重要的操作：退出登录，以及删除你的账户和全部数据。它们无法撤销。', c109_mode_all: '全部', c109_mode_essential: '精简', c109_mode_custom: '自定义', c109_appearance_title: '外观', c109_help_label: '帮助', c109_autocat_help: '类别会自动应用：银行同步时，每笔消费都已经分好类——先按已知商家，再按你更正消费时应用学到的规则，AI 负责谁都不认识的。如果你更正一笔消费，应用会默默学习，下次自动应用。', c109_flowai_line: 'AI 会根据你的预测，告诉你关键日期的预计余额、风险日，以及该挪动什么来避开它们。', c109_secdesc_gastos: '记录并查看你的支出', c109_secdesc_ingresos: '进入的钱', c109_secdesc_ahorros: '目标和应急基金', c109_secdesc_buscar: '查找任何一笔记录', c109_secdesc_resumen: '你的月度图表和分数', c109_secdesc_presupuesto: '每个类别的上限', c109_secdesc_pagos: '固定支出和订阅', c109_secdesc_cuentas: '你的账户和银行卡', c109_secdesc_deudas: '你的欠款和还款计划', c109_secdesc_remesas: '你寄给家人的钱', c109_secdesc_san: '轮流合存', c109_secdesc_podcast: 'Finanzas Personales 节目',  c108_bank_auto_label: '银行里的储蓄（自动）', c108_manual_label: '手动储蓄', c108_note_disconnected: '银行已断开：自动储蓄已回到 {amount}。你的手动储蓄没有被动过。', c108_note_no_savings: '你的银行已连接，但没有储蓄账户：自动储蓄为 {amount}。', 
   chart_expenses: '支出',
   chart_savings: '储蓄',
   res_cats_empty: '本月没有支出。',
@@ -7608,7 +7612,7 @@ zh: {
   theme_dark: '深色',
   theme_auto: '自动（系统）',
   set_accent_label: '主色',
-  accent_verde: '绿色',
+  accent_verde: '琥珀色',
   accent_azul: '蓝色',
   accent_morado: '紫色',
   accent_naranja: '橙色',
@@ -8441,7 +8445,7 @@ ja: {
   err_goal_name: '目標の名前を入力してください。', err_goal_zero: '目標金額は 0 より大きくしてください。',
   res_cats_title: 'カテゴリ別支出',
   res_summary_title: '収入 vs 支出 vs 貯蓄',
-  chart_income: '収入', income_ytd_label: '今年これまでの収入', fixed_badge: '固定', bud_fixed_title: '今月の固定費', pro_home_title: 'PETO Pro に参加', pro_home_text: '広告なしで全機能が使えます：銀行同期、共有予算など。', guide_1_title: '今日のお金', guide_1_text: '予算を超えずに今日使える金額がここに表示されます。', guide_2_title: '数秒で記録', guide_2_text: '+ ボタンをタップすると、支出や収入をすぐに記録できます。', guide_3_title: 'あなたの予算', guide_3_text: 'ここでカテゴリごとに上限を設定し、使った金額を確認できます。', guide_4_title: 'あなたのサマリー', guide_4_text: '月ごとの収入、支出、貯蓄がわかりやすいグラフで表示されます。', guide_5_title: '銀行を接続', guide_5_text: 'よければ銀行を接続すると、支出が自動で記録されます。', guide_done: '完了', tour100_1_title: 'ホームをひと目で', tour100_1_text: 'ここでは、予算を超えずに今日いくら使えるか、そして月末までいくら残っているかが分かります。買い物に迷ったら「これは買える？」に金額を入力すると、AI があなたの実際の数字で答えます。', tour100_2_title: '数秒で追加', tour100_2_text: '下の ✨ ボタンを押すと PETO Finanzas チャットが開きます。そこでは、話すように入力して（「昨日ガソリンに20使った」）支出や収入を記録したり、マイクで音声入力したり、レシートの写真で記録したりできます。アプリが理解して、確認できる状態にしてくれます。', tour100_3_title: 'あなたの口座と銀行', tour100_3_text: 'あなたの口座とカードはここにあり、利用可能残高はホームと同じです。よければ銀行を連携すると、取引が自動で記録されます。', tour100_4_title: '目標と貯蓄', tour100_4_text: '目標と緊急資金を作りましょう。AI がプランを提案できますが、実際に数えられるのはあなた自身が記録した貯蓄です：自動で保存されることはありません。', tour100_5_title: 'あなたのお金とチャット', tour100_5_text: '同じ ✨ ボタンでチャットが開きます：「今月いちばんお金を使ったのは何？」と聞くと、あなたの数字で答えます。以上です！このツアーは設定からいつでも再生できます。', tour100_count: '{total} ステップ中の {n}', c101_ask_name: 'こんにちは！始める前に、お名前を教えてください。', c101_efund_sugg: '毎月の支出からの提案：{amount}。作成前に変更できます。', c101_efund_create_btn: '基金を作成', inc_detect_note102: '銀行から検出：約{amount}/月（{source} からの給与）。編集できます。', inc_detect_note_nosrc102: '銀行から検出：約{amount}/月。編集できます。', home_ai_dismiss102: 'この回答を閉じる', gate103_title: 'PETO Finanzas へようこそ', gate103_text: '支出と収入を記録し、予算を組み、サンを管理し、銀行をつないで取引を自動で記録しましょう。アカウントにより、このウェブサイトとスマホのアプリが同期します。', gate103_checking: 'セッションを確認しています…', gate103_signin: 'ログイン', bank_paused103: '未同期', tour100_settings_btn: 'ツアーを見る', set_group_account: 'アカウント', set_group_rules: 'お金のルール', set_group_security: 'セキュリティとプライバシー', set_group_personalization: 'カスタマイズ', c108_bank_auto_label: '銀行の貯蓄（自動）', c108_manual_label: '手動の貯蓄', c108_note_disconnected: '銀行の接続が切れました：自動貯蓄は {amount} に戻りました。手動の貯蓄には触れていません。', c108_note_no_savings: '銀行は接続されていますが、貯蓄口座がありません：自動貯蓄は {amount} です。', 
+  chart_income: '収入', income_ytd_label: '今年これまでの収入', fixed_badge: '固定', bud_fixed_title: '今月の固定費', pro_home_title: 'PETO Pro に参加', pro_home_text: '広告なしで全機能が使えます：銀行同期、共有予算など。', guide_1_title: '今日のお金', guide_1_text: '予算を超えずに今日使える金額がここに表示されます。', guide_2_title: '数秒で記録', guide_2_text: '+ ボタンをタップすると、支出や収入をすぐに記録できます。', guide_3_title: 'あなたの予算', guide_3_text: 'ここでカテゴリごとに上限を設定し、使った金額を確認できます。', guide_4_title: 'あなたのサマリー', guide_4_text: '月ごとの収入、支出、貯蓄がわかりやすいグラフで表示されます。', guide_5_title: '銀行を接続', guide_5_text: 'よければ銀行を接続すると、支出が自動で記録されます。', guide_done: '完了', tour100_1_title: 'ホームをひと目で', tour100_1_text: 'ここでは、予算を超えずに今日いくら使えるか、そして月末までいくら残っているかが分かります。買い物に迷ったら「これは買える？」に金額を入力すると、AI があなたの実際の数字で答えます。', tour100_2_title: '数秒で追加', tour100_2_text: '下の ✨ ボタンを押すと PETO Finanzas チャットが開きます。そこでは、話すように入力して（「昨日ガソリンに20使った」）支出や収入を記録したり、マイクで音声入力したり、レシートの写真で記録したりできます。アプリが理解して、確認できる状態にしてくれます。', tour100_3_title: 'あなたの口座と銀行', tour100_3_text: 'あなたの口座とカードはここにあり、利用可能残高はホームと同じです。よければ銀行を連携すると、取引が自動で記録されます。', tour100_4_title: '目標と貯蓄', tour100_4_text: '目標と緊急資金を作りましょう。AI がプランを提案できますが、実際に数えられるのはあなた自身が記録した貯蓄です：自動で保存されることはありません。', tour100_5_title: 'あなたのお金とチャット', tour100_5_text: '同じ ✨ ボタンでチャットが開きます：「今月いちばんお金を使ったのは何？」と聞くと、あなたの数字で答えます。以上です！このツアーは設定からいつでも再生できます。', tour100_count: '{total} ステップ中の {n}', c101_ask_name: 'こんにちは！始める前に、お名前を教えてください。', c101_efund_sugg: '毎月の支出からの提案：{amount}。作成前に変更できます。', c101_efund_create_btn: '基金を作成', inc_detect_note102: '銀行から検出：約{amount}/月（{source} からの給与）。編集できます。', inc_detect_note_nosrc102: '銀行から検出：約{amount}/月。編集できます。', home_ai_dismiss102: 'この回答を閉じる', gate103_title: 'PETO Finanzas へようこそ', gate103_text: '支出と収入を記録し、予算を組み、サンを管理し、銀行をつないで取引を自動で記録しましょう。アカウントにより、このウェブサイトとスマホのアプリが同期します。', gate103_checking: 'セッションを確認しています…', gate103_signin: 'ログイン', bank_paused103: '未同期', tour100_settings_btn: 'ツアーを見る', set_group_account: 'アカウント', set_group_rules: 'お金のルール', set_group_security: 'セキュリティとプライバシー', set_group_personalization: 'カスタマイズ', c109_filter_expenses: '支出', c109_filter_transfers: '振替', c109_filter_all: 'すべて', c109_spent_in: '{month}の支出', c109_transfers_line: '振替：{amount}', c109_reports_title: 'レポート', c109_pod_more: 'もっと聞きたい？全エピソードは Spotify で', c109_group_business: 'ビジネス', c109_danger_title: '注意ゾーン', c109_danger_help: 'ここには最も重要な2つの操作があります：ログアウトと、アカウントと全データの削除です。元に戻せません。', c109_mode_all: 'すべて', c109_mode_essential: '基本', c109_mode_custom: 'カスタム', c109_appearance_title: '外観', c109_help_label: 'ヘルプ', c109_autocat_help: 'カテゴリーは自動で適用されます：銀行が同期すると、すべての取引がすでに分類されて届きます。まず知っているお店、次にあなたが取引を修正したときにアプリが学んだこと、そして誰も知らないものはAIが解決します。取引を修正すると、アプリは次回のために静かに学習します。', c109_flowai_line: 'AIがあなたの予測をもとに、重要な日の予想残高、リスクのある日、そしてそれを避けるために何を動かすべきかを教えてくれます。', c109_secdesc_gastos: '支出を記録して確認', c109_secdesc_ingresos: '入ってくるお金', c109_secdesc_ahorros: '目標と緊急資金', c109_secdesc_buscar: 'あらゆる取引を検索', c109_secdesc_resumen: 'グラフで見るあなたの月とスコア', c109_secdesc_presupuesto: 'カテゴリーごとの上限', c109_secdesc_pagos: '固定費とサブスク', c109_secdesc_cuentas: 'あなたのアカウントとカード', c109_secdesc_deudas: '借金と返済プラン', c109_secdesc_remesas: '家族への送金', c109_secdesc_san: '順番制のグループ貯金', c109_secdesc_podcast: 'Finanzas Personales のエピソード',  c108_bank_auto_label: '銀行の貯蓄（自動）', c108_manual_label: '手動の貯蓄', c108_note_disconnected: '銀行の接続が切れました：自動貯蓄は {amount} に戻りました。手動の貯蓄には触れていません。', c108_note_no_savings: '銀行は接続されていますが、貯蓄口座がありません：自動貯蓄は {amount} です。', 
   chart_expenses: '支出',
   chart_savings: '貯蓄',
   res_cats_empty: '今月は支出がありません。',
@@ -8612,7 +8616,7 @@ ja: {
   theme_dark: 'ダーク',
   theme_auto: '自動（システム）',
   set_accent_label: 'メインカラー',
-  accent_verde: '緑',
+  accent_verde: '琥珀色',
   accent_azul: '青',
   accent_morado: '紫',
   accent_naranja: 'オレンジ',
@@ -9445,7 +9449,7 @@ ko: {
   err_goal_name: '목표의 이름을 입력하세요.', err_goal_zero: '목표 금액은 0보다 커야 합니다.',
   res_cats_title: '카테고리별 지출',
   res_summary_title: '수입 vs 지출 vs 저축',
-  chart_income: '수입', income_ytd_label: '올해 누적 수입', fixed_badge: '고정', bud_fixed_title: '이번 달 고정 지출', pro_home_title: 'PETO Pro 가입', pro_home_text: '광고 없이 모든 기능 잠금 해제: 은행 동기화, 공유 예산 등.', guide_1_title: '오늘의 돈', guide_1_text: '예산을 초과하지 않고 오늘 쓸 수 있는 금액을 여기서 확인하세요.', guide_2_title: '몇 초 만에 기록', guide_2_text: '+ 버튼을 눌러 지출이나 수입을 바로 기록하세요.', guide_3_title: '내 예산', guide_3_text: '여기서 카테고리별 한도를 정하고 지출 금액을 확인하세요.', guide_4_title: '내 요약', guide_4_text: '월별 수입, 지출, 저축을 한눈에 보여주는 그래프입니다.', guide_5_title: '은행 연결하기', guide_5_text: '원하시면 은행을 연결해 지출이 자동으로 기록됩니다.', guide_done: '완료', tour100_1_title: '한눈에 보는 홈', tour100_1_text: '여기서는 예산을 넘기지 않고 오늘 얼마까지 쓸 수 있는지, 그리고 이번 달에 얼마가 남았는지 볼 수 있어요. 구매가 망설여지면 "이거 사도 될까?"에 금액을 입력하세요. AI가 실제 숫자로 답해 드립니다.', tour100_2_title: '몇 초 만에 추가', tour100_2_text: '아래 ✨ 버튼을 누르면 PETO Finanzas 채팅이 열립니다. 거기서 말하듯이 입력하거나("어제 주유에 20 썼어"), 마이크로 받아쓰거나, 영수증 사진으로 지출이나 수입을 기록할 수 있어요. 앱이 이해하고 확인만 하면 되도록 준비해 드립니다.', tour100_3_title: '내 계좌와 은행', tour100_3_text: '내 계좌와 카드가 여기에 있고, 사용 가능 잔액은 홈에서 보는 것과 같아요. 원하면 은행을 연결하세요. 거래가 자동으로 기록됩니다.', tour100_4_title: '목표와 저축', tour100_4_text: '목표와 비상금을 만들어 보세요. AI가 계획을 제안할 수 있지만, 실제로 인정되는 저축은 당신이 직접 기록한 것입니다: 절대 자동으로 저장되지 않아요.', tour100_5_title: '내 돈과 채팅', tour100_5_text: '같은 ✨ 버튼으로 채팅이 열립니다: «이번 달에 어디에 가장 많이 썼어?»라고 물으면 당신의 숫자로 답해요. 끝이에요! 이 투어는 설정에서 언제든 다시 볼 수 있어요.', tour100_count: '{total}단계 중 {n}단계', c101_ask_name: '안녕하세요! 시작하기 전에, 이름이 어떻게 되세요?', c101_efund_sugg: '월 지출 기준 제안: {amount}. 만들기 전에 수정할 수 있습니다.', c101_efund_create_btn: '기금 만들기', inc_detect_note102: '은행에서 감지됨: 약 {amount}/월 ({source}의 급여). 원하면 수정하세요.', inc_detect_note_nosrc102: '은행에서 감지됨: 약 {amount}/월. 원하면 수정하세요.', home_ai_dismiss102: '이 답변 닫기', gate103_title: 'PETO Finanzas에 오신 것을 환영합니다', gate103_text: '지출과 수입을 기록하고, 예산을 세우고, 계를 관리하고, 은행을 연결해 거래가 자동으로 기록되게 하세요. 계정은 이 웹사이트와 휴대폰 앱을 동기화합니다.', gate103_checking: '세션을 확인하는 중…', gate103_signin: '로그인', bank_paused103: '동기화 안 됨', tour100_settings_btn: '투어 보기', set_group_account: '계정', set_group_rules: '내 돈 규칙', set_group_security: '보안 및 개인정보', set_group_personalization: '개인 설정', c108_bank_auto_label: '은행 저축 (자동)', c108_manual_label: '수동 저축', c108_note_disconnected: '은행 연결이 끊겼습니다: 자동 저축이 {amount}로 돌아갔습니다. 수동 저축은 건드리지 않았습니다.', c108_note_no_savings: '은행이 연결되어 있지만 저축 계좌가 없습니다: 자동 저축은 {amount}입니다.', 
+  chart_income: '수입', income_ytd_label: '올해 누적 수입', fixed_badge: '고정', bud_fixed_title: '이번 달 고정 지출', pro_home_title: 'PETO Pro 가입', pro_home_text: '광고 없이 모든 기능 잠금 해제: 은행 동기화, 공유 예산 등.', guide_1_title: '오늘의 돈', guide_1_text: '예산을 초과하지 않고 오늘 쓸 수 있는 금액을 여기서 확인하세요.', guide_2_title: '몇 초 만에 기록', guide_2_text: '+ 버튼을 눌러 지출이나 수입을 바로 기록하세요.', guide_3_title: '내 예산', guide_3_text: '여기서 카테고리별 한도를 정하고 지출 금액을 확인하세요.', guide_4_title: '내 요약', guide_4_text: '월별 수입, 지출, 저축을 한눈에 보여주는 그래프입니다.', guide_5_title: '은행 연결하기', guide_5_text: '원하시면 은행을 연결해 지출이 자동으로 기록됩니다.', guide_done: '완료', tour100_1_title: '한눈에 보는 홈', tour100_1_text: '여기서는 예산을 넘기지 않고 오늘 얼마까지 쓸 수 있는지, 그리고 이번 달에 얼마가 남았는지 볼 수 있어요. 구매가 망설여지면 "이거 사도 될까?"에 금액을 입력하세요. AI가 실제 숫자로 답해 드립니다.', tour100_2_title: '몇 초 만에 추가', tour100_2_text: '아래 ✨ 버튼을 누르면 PETO Finanzas 채팅이 열립니다. 거기서 말하듯이 입력하거나("어제 주유에 20 썼어"), 마이크로 받아쓰거나, 영수증 사진으로 지출이나 수입을 기록할 수 있어요. 앱이 이해하고 확인만 하면 되도록 준비해 드립니다.', tour100_3_title: '내 계좌와 은행', tour100_3_text: '내 계좌와 카드가 여기에 있고, 사용 가능 잔액은 홈에서 보는 것과 같아요. 원하면 은행을 연결하세요. 거래가 자동으로 기록됩니다.', tour100_4_title: '목표와 저축', tour100_4_text: '목표와 비상금을 만들어 보세요. AI가 계획을 제안할 수 있지만, 실제로 인정되는 저축은 당신이 직접 기록한 것입니다: 절대 자동으로 저장되지 않아요.', tour100_5_title: '내 돈과 채팅', tour100_5_text: '같은 ✨ 버튼으로 채팅이 열립니다: «이번 달에 어디에 가장 많이 썼어?»라고 물으면 당신의 숫자로 답해요. 끝이에요! 이 투어는 설정에서 언제든 다시 볼 수 있어요.', tour100_count: '{total}단계 중 {n}단계', c101_ask_name: '안녕하세요! 시작하기 전에, 이름이 어떻게 되세요?', c101_efund_sugg: '월 지출 기준 제안: {amount}. 만들기 전에 수정할 수 있습니다.', c101_efund_create_btn: '기금 만들기', inc_detect_note102: '은행에서 감지됨: 약 {amount}/월 ({source}의 급여). 원하면 수정하세요.', inc_detect_note_nosrc102: '은행에서 감지됨: 약 {amount}/월. 원하면 수정하세요.', home_ai_dismiss102: '이 답변 닫기', gate103_title: 'PETO Finanzas에 오신 것을 환영합니다', gate103_text: '지출과 수입을 기록하고, 예산을 세우고, 계를 관리하고, 은행을 연결해 거래가 자동으로 기록되게 하세요. 계정은 이 웹사이트와 휴대폰 앱을 동기화합니다.', gate103_checking: '세션을 확인하는 중…', gate103_signin: '로그인', bank_paused103: '동기화 안 됨', tour100_settings_btn: '투어 보기', set_group_account: '계정', set_group_rules: '내 돈 규칙', set_group_security: '보안 및 개인정보', set_group_personalization: '개인 설정', c109_filter_expenses: '지출', c109_filter_transfers: '이체', c109_filter_all: '전체', c109_spent_in: '{month} 지출', c109_transfers_line: '이체: {amount}', c109_reports_title: '보고서', c109_pod_more: '더 듣고 싶나요? 모든 에피소드는 Spotify에 있어요', c109_group_business: '사업', c109_danger_title: '주의 구역', c109_danger_help: '가장 중요한 두 가지 작업이 여기에 있습니다: 로그아웃과 계정 및 모든 데이터 삭제. 되돌릴 수 없습니다.', c109_mode_all: '전체', c109_mode_essential: '필수', c109_mode_custom: '맞춤', c109_appearance_title: '모양', c109_help_label: '도움말', c109_autocat_help: '카테고리는 자동으로 적용됩니다: 은행이 동기화되면 모든 거래가 이미 분류되어 도착합니다. 먼저 알려진 가게, 다음으로 거래를 수정했을 때 앱이 배운 것, 그리고 아무도 모르는 것은 AI가 해결합니다. 거래를 수정하면 앱은 다음을 위해 조용히 배웁니다.', c109_flowai_line: 'AI가 당신의 예측을 바탕으로 중요한 날짜의 예상 잔액, 위험한 날, 그리고 이를 피하기 위해 무엇을 옮겨야 할지 알려줍니다.', c109_secdesc_gastos: '지출을 기록하고 확인', c109_secdesc_ingresos: '들어오는 돈', c109_secdesc_ahorros: '목표와 비상금', c109_secdesc_buscar: '모든 거래 찾기', c109_secdesc_resumen: '차트로 보는 이번 달과 점수', c109_secdesc_presupuesto: '카테고리별 한도', c109_secdesc_pagos: '고정 지출과 구독', c109_secdesc_cuentas: '내 계좌와 카드', c109_secdesc_deudas: '빚과 상환 계획', c109_secdesc_remesas: '가족에게 보내는 돈', c109_secdesc_san: '차례로 모으는 그룹 저축', c109_secdesc_podcast: 'Finanzas Personales 에피소드',  c108_bank_auto_label: '은행 저축 (자동)', c108_manual_label: '수동 저축', c108_note_disconnected: '은행 연결이 끊겼습니다: 자동 저축이 {amount}로 돌아갔습니다. 수동 저축은 건드리지 않았습니다.', c108_note_no_savings: '은행이 연결되어 있지만 저축 계좌가 없습니다: 자동 저축은 {amount}입니다.', 
   chart_expenses: '지출',
   chart_savings: '저축',
   res_cats_empty: '이번 달 지출이 없습니다.',
@@ -9616,7 +9620,7 @@ ko: {
   theme_dark: '어둡게',
   theme_auto: '자동(시스템)',
   set_accent_label: '메인 색상',
-  accent_verde: '초록',
+  accent_verde: '호박색',
   accent_azul: '파랑',
   accent_morado: '보라',
   accent_naranja: '주황',
@@ -10449,7 +10453,7 @@ ru: {
   err_goal_name: 'Введите название для вашей цели.', err_goal_zero: 'Сумма цели должна быть больше 0.',
   res_cats_title: 'Расходы по категориям',
   res_summary_title: 'Доходы против расходов против сбережений',
-  chart_income: 'Доходы', income_ytd_label: 'Доход за год на сегодня', fixed_badge: 'Фикс.', bud_fixed_title: 'Фиксированные платежи этого месяца', pro_home_title: 'Переходите на PETO Pro', pro_home_text: 'Без рекламы и со всем разблокированным: синхронизация с банком, общие бюджеты и др.', guide_1_title: 'Ваши деньги на сегодня', guide_1_text: 'Здесь видно, сколько можно потратить сегодня, не выходя за бюджет.', guide_2_title: 'Запись за секунды', guide_2_text: 'Нажмите кнопку +, чтобы сразу записать расход или доход.', guide_3_title: 'Ваш бюджет', guide_3_text: 'Здесь вы задаёте лимит для каждой категории и видите, сколько потрачено.', guide_4_title: 'Ваша сводка', guide_4_text: 'Понятные графики ваших доходов, расходов и сбережений по месяцам.', guide_5_title: 'Подключите ваш банк', guide_5_text: 'При желании подключите банк, и расходы будут записываться сами.', guide_done: 'Готово', tour100_1_title: 'Ваш главный экран с одного взгляда', tour100_1_text: 'Здесь видно, сколько можно потратить сегодня, не выходя за бюджет, и сколько осталось на месяц. Сомневаетесь в покупке? Введите сумму в «Могу ли я это себе позволить?» — ИИ ответит вашими реальными цифрами.', tour100_2_title: 'Добавить за секунды', tour100_2_text: 'Кнопка ✨ внизу открывает чат PETO Finanzas. Там вы записываете расход или доход так, как сказали бы («вчера потратил 20 на бензин»), диктуете через микрофон или по фото чека: приложение поймёт и подготовит всё к подтверждению.', tour100_3_title: 'Ваши счета и ваш банк', tour100_3_text: 'Здесь живут ваши счета и карты, с тем же доступным остатком, что и на главном экране. Если хотите, подключите банк, и операции будут записываться сами.', tour100_4_title: 'Цели и сбережения', tour100_4_text: 'Создавайте цели и резервный фонд. ИИ может предложить план, но сбережения, которые засчитываются, — это те, что записываете ВЫ: они никогда не сохраняются сами.', tour100_5_title: 'Чат с вашими деньгами', tour100_5_text: 'Та же кнопка ✨ открывает чат: спросите что-то вроде «на что я потратил больше всего в этом месяце?» — и он ответит вашими цифрами. Вот и всё! Этот тур можно повторить в любое время в настройках.', tour100_count: 'Шаг {n} из {total}', c101_ask_name: 'Привет! Прежде чем начать, как тебя зовут?', c101_efund_sugg: 'Предложение по вашим ежемесячным расходам: {amount}. Можно изменить перед созданием.', c101_efund_create_btn: 'Создать фонд', inc_detect_note102: 'Определено из вашего банка: ~{amount}/мес (зарплата от {source}). Можно изменить.', inc_detect_note_nosrc102: 'Определено из вашего банка: ~{amount}/мес. Можно изменить.', home_ai_dismiss102: 'Скрыть этот ответ', gate103_title: 'Добро пожаловать в PETO Finanzas', gate103_text: 'Учитывайте расходы и доходы, составляйте бюджет, ведите свой сан и подключите банк, чтобы операции записывались сами. Ваш аккаунт синхронизирует этот сайт с приложением на телефоне.', gate103_checking: 'Проверяем вашу сессию…', gate103_signin: 'Войти', bank_paused103: 'не синхронизировано', tour100_settings_btn: 'Смотреть тур', set_group_account: 'Аккаунт', set_group_rules: 'Правила ваших денег', set_group_security: 'Безопасность и конфиденциальность', set_group_personalization: 'Персонализация', c108_bank_auto_label: 'Сбережения в вашем банке (автоматически)', c108_manual_label: 'Сбережения вручную', c108_note_disconnected: 'Банк отключён: автоматические сбережения вернулись к {amount}. Ваши ручные сбережения не тронуты.', c108_note_no_savings: 'Ваш банк подключён, но без сберегательного счёта: автоматические сбережения — {amount}.', 
+  chart_income: 'Доходы', income_ytd_label: 'Доход за год на сегодня', fixed_badge: 'Фикс.', bud_fixed_title: 'Фиксированные платежи этого месяца', pro_home_title: 'Переходите на PETO Pro', pro_home_text: 'Без рекламы и со всем разблокированным: синхронизация с банком, общие бюджеты и др.', guide_1_title: 'Ваши деньги на сегодня', guide_1_text: 'Здесь видно, сколько можно потратить сегодня, не выходя за бюджет.', guide_2_title: 'Запись за секунды', guide_2_text: 'Нажмите кнопку +, чтобы сразу записать расход или доход.', guide_3_title: 'Ваш бюджет', guide_3_text: 'Здесь вы задаёте лимит для каждой категории и видите, сколько потрачено.', guide_4_title: 'Ваша сводка', guide_4_text: 'Понятные графики ваших доходов, расходов и сбережений по месяцам.', guide_5_title: 'Подключите ваш банк', guide_5_text: 'При желании подключите банк, и расходы будут записываться сами.', guide_done: 'Готово', tour100_1_title: 'Ваш главный экран с одного взгляда', tour100_1_text: 'Здесь видно, сколько можно потратить сегодня, не выходя за бюджет, и сколько осталось на месяц. Сомневаетесь в покупке? Введите сумму в «Могу ли я это себе позволить?» — ИИ ответит вашими реальными цифрами.', tour100_2_title: 'Добавить за секунды', tour100_2_text: 'Кнопка ✨ внизу открывает чат PETO Finanzas. Там вы записываете расход или доход так, как сказали бы («вчера потратил 20 на бензин»), диктуете через микрофон или по фото чека: приложение поймёт и подготовит всё к подтверждению.', tour100_3_title: 'Ваши счета и ваш банк', tour100_3_text: 'Здесь живут ваши счета и карты, с тем же доступным остатком, что и на главном экране. Если хотите, подключите банк, и операции будут записываться сами.', tour100_4_title: 'Цели и сбережения', tour100_4_text: 'Создавайте цели и резервный фонд. ИИ может предложить план, но сбережения, которые засчитываются, — это те, что записываете ВЫ: они никогда не сохраняются сами.', tour100_5_title: 'Чат с вашими деньгами', tour100_5_text: 'Та же кнопка ✨ открывает чат: спросите что-то вроде «на что я потратил больше всего в этом месяце?» — и он ответит вашими цифрами. Вот и всё! Этот тур можно повторить в любое время в настройках.', tour100_count: 'Шаг {n} из {total}', c101_ask_name: 'Привет! Прежде чем начать, как тебя зовут?', c101_efund_sugg: 'Предложение по вашим ежемесячным расходам: {amount}. Можно изменить перед созданием.', c101_efund_create_btn: 'Создать фонд', inc_detect_note102: 'Определено из вашего банка: ~{amount}/мес (зарплата от {source}). Можно изменить.', inc_detect_note_nosrc102: 'Определено из вашего банка: ~{amount}/мес. Можно изменить.', home_ai_dismiss102: 'Скрыть этот ответ', gate103_title: 'Добро пожаловать в PETO Finanzas', gate103_text: 'Учитывайте расходы и доходы, составляйте бюджет, ведите свой сан и подключите банк, чтобы операции записывались сами. Ваш аккаунт синхронизирует этот сайт с приложением на телефоне.', gate103_checking: 'Проверяем вашу сессию…', gate103_signin: 'Войти', bank_paused103: 'не синхронизировано', tour100_settings_btn: 'Смотреть тур', set_group_account: 'Аккаунт', set_group_rules: 'Правила ваших денег', set_group_security: 'Безопасность и конфиденциальность', set_group_personalization: 'Персонализация', c109_filter_expenses: 'Расходы', c109_filter_transfers: 'Переводы', c109_filter_all: 'Все', c109_spent_in: 'Расходы за {month}', c109_transfers_line: 'Переводы: {amount}', c109_reports_title: 'Отчёты', c109_pod_more: 'Хотите слушать дальше? Все выпуски — на Spotify', c109_group_business: 'Бизнес', c109_danger_title: 'Опасная зона', c109_danger_help: 'Здесь два самых весомых действия: выход из аккаунта и удаление аккаунта со всеми данными. Их нельзя отменить.', c109_mode_all: 'Все', c109_mode_essential: 'Основное', c109_mode_custom: 'Свой выбор', c109_appearance_title: 'Внешний вид', c109_help_label: 'Помощь', c109_autocat_help: 'Категории применяются сами: при синхронизации банка каждая операция приходит уже с категорией — сначала известный магазин, затем то, чему приложение научилось, когда вы исправляли операцию, а ИИ решает то, что никто не знает. Если вы исправите операцию, приложение тихо научится на следующий раз.', c109_flowai_line: 'ИИ берёт ваш прогноз и говорит ожидаемый остаток на ключевые даты, дни риска и что передвинуть, чтобы их избежать.', c109_secdesc_gastos: 'Записывайте и проверяйте расходы', c109_secdesc_ingresos: 'Поступающие деньги', c109_secdesc_ahorros: 'Цели и резервный фонд', c109_secdesc_buscar: 'Найдите любую операцию', c109_secdesc_resumen: 'Ваш месяц в графиках и ваш Score', c109_secdesc_presupuesto: 'Лимиты по категориям', c109_secdesc_pagos: 'Фиксированные платежи и подписки', c109_secdesc_cuentas: 'Ваши счета и карты', c109_secdesc_deudas: 'Ваши долги и план выплат', c109_secdesc_remesas: 'Деньги, которые вы отправляете семье', c109_secdesc_san: 'Групповые сбережения по очереди', c109_secdesc_podcast: 'Выпуски Finanzas Personales',  c108_bank_auto_label: 'Сбережения в вашем банке (автоматически)', c108_manual_label: 'Сбережения вручную', c108_note_disconnected: 'Банк отключён: автоматические сбережения вернулись к {amount}. Ваши ручные сбережения не тронуты.', c108_note_no_savings: 'Ваш банк подключён, но без сберегательного счёта: автоматические сбережения — {amount}.', 
   chart_expenses: 'Расходы',
   chart_savings: 'Сбережения',
   res_cats_empty: 'В этом месяце нет расходов.',
@@ -10620,7 +10624,7 @@ ru: {
   theme_dark: 'Тёмная',
   theme_auto: 'Автоматически (система)',
   set_accent_label: 'Основной цвет',
-  accent_verde: 'Зелёный',
+  accent_verde: 'Янтарный',
   accent_azul: 'Синий',
   accent_morado: 'Фиолетовый',
   accent_naranja: 'Оранжевый',
@@ -11453,7 +11457,7 @@ hi: {
   err_goal_name: 'अपने लक्ष्य का नाम लिखें।', err_goal_zero: 'लक्ष्य राशि 0 से अधिक होनी चाहिए।',
   res_cats_title: 'श्रेणी अनुसार खर्च',
   res_summary_title: 'आय बनाम खर्च बनाम बचत',
-  chart_income: 'आय', income_ytd_label: 'आज तक की वार्षिक आय', fixed_badge: 'निश्चित', bud_fixed_title: 'इस महीने के निश्चित भुगतान', pro_home_title: 'PETO Pro से जुड़ें', pro_home_text: 'कोई विज्ञापन नहीं और सब कुछ अनलॉक: बैंक सिंक, साझा बजट और अधिक।', guide_1_title: 'आज का आपका पैसा', guide_1_text: 'यहाँ आप देख सकते हैं कि बजट से बाहर गए बिना आज कितना खर्च कर सकते हैं।', guide_2_title: 'सेकंडों में दर्ज करें', guide_2_text: '+ बटन दबाकर खर्च या आय तुरंत दर्ज करें।', guide_3_title: 'आपका बजट', guide_3_text: 'यहाँ आप हर श्रेणी के लिए सीमा तय करते हैं और देखते हैं कि कितना खर्च हुआ।', guide_4_title: 'आपका सारांश', guide_4_text: 'आपकी आय, खर्च और बचत के स्पष्ट ग्राफ़, महीने दर महीने।', guide_5_title: 'अपना बैंक जोड़ें', guide_5_text: 'चाहें तो अपना बैंक जोड़ें और आपके खर्च अपने आप दर्ज हो जाएँगे।', guide_done: 'हो गया', tour100_1_title: 'आपका होम, एक नज़र में', tour100_1_text: 'यहाँ आप देख सकते हैं कि बजट से बाहर जाए बिना आज कितना खर्च कर सकते हैं और महीने के लिए कितना बचा है। किसी खरीदारी पर संदेह है? "क्या मैं यह खरीद सकता हूँ?" में राशि लिखें और AI आपके असली आँकड़ों से जवाब देगा।', tour100_2_title: 'सेकंडों में जोड़ें', tour100_2_text: 'नीचे वाला ✨ बटन PETO Finanzas चैट खोलता है। वहाँ से आप खर्च या आय ऐसे लिखकर दर्ज कर सकते हैं जैसे बोलते हैं ("कल पेट्रोल पर 20 खर्च किए"), माइक से बोलकर, या रसीद की फ़ोटो से: ऐप समझ जाता है और पुष्टि के लिए तैयार रखता है।', tour100_3_title: 'आपके खाते और आपका बैंक', tour100_3_text: 'आपके खाते और कार्ड यहाँ रहते हैं, उपलब्ध शेष वही जो होम पर दिखता है. चाहें तो अपना बैंक जोड़ें और आपके लेन-देन अपने आप दर्ज हो जाएँगे.', tour100_4_title: 'लक्ष्य और बचत', tour100_4_text: 'अपने लक्ष्य और आपातकालीन कोष बनाएँ. AI एक योजना सुझा सकता है, लेकिन जो बचत गिनी जाती है वह वही है जो आप दर्ज करते हैं: वह कभी अपने आप सहेजी नहीं जाती.', tour100_5_title: 'अपने पैसे से चैट', tour100_5_text: 'वही ✨ बटन चैट खोलता है: पूछें «इस महीने मैंने सबसे ज़्यादा किस पर खर्च किया?» और वह आपके आँकड़ों से जवाब देता है. बस इतना ही! आप सेटिंग्स से यह टूर कभी भी दोबारा देख सकते हैं.', tour100_count: 'चरण {n} / {total}', c101_ask_name: 'नमस्ते! शुरू करने से पहले, आपका नाम क्या है?', c101_efund_sugg: 'आपके मासिक खर्च के अनुसार सुझाव: {amount}। बनाने से पहले बदल सकते हैं।', c101_efund_create_btn: 'फ़ंड बनाएँ', inc_detect_note102: 'आपके बैंक से पता चला: ~{amount}/माह ({source} से वेतन)। चाहें तो बदलें।', inc_detect_note_nosrc102: 'आपके बैंक से पता चला: ~{amount}/माह। चाहें तो बदलें।', home_ai_dismiss102: 'यह उत्तर हटाएँ', gate103_title: 'PETO Finanzas में आपका स्वागत है', gate103_text: 'अपने खर्च और आय पर नज़र रखें, बजट बनाएँ, अपना सन चलाएँ और बैंक जोड़ें ताकि लेन-देन अपने आप दर्ज हो जाएँ। आपका खाता इस वेबसाइट को आपके फ़ोन के ऐप से सिंक करता है।', gate103_checking: 'आपका सत्र जाँच रहे हैं…', gate103_signin: 'लॉग इन करें', bank_paused103: 'सिंक नहीं है', tour100_settings_btn: 'टूर देखें', set_group_account: 'खाता', set_group_rules: 'आपके पैसे के नियम', set_group_security: 'सुरक्षा और गोपनीयता', set_group_personalization: 'निजीकरण', c108_bank_auto_label: 'आपके बैंक में बचत (स्वचालित)', c108_manual_label: 'मैन्युअल बचत', c108_note_disconnected: 'बैंक डिस्कनेक्ट हो गया: स्वचालित बचत वापस {amount} हो गई। आपकी मैन्युअल बचत को नहीं छुआ गया।', c108_note_no_savings: 'आपका बैंक जुड़ा है, लेकिन बचत खाता नहीं है: स्वचालित बचत {amount} है।', 
+  chart_income: 'आय', income_ytd_label: 'आज तक की वार्षिक आय', fixed_badge: 'निश्चित', bud_fixed_title: 'इस महीने के निश्चित भुगतान', pro_home_title: 'PETO Pro से जुड़ें', pro_home_text: 'कोई विज्ञापन नहीं और सब कुछ अनलॉक: बैंक सिंक, साझा बजट और अधिक।', guide_1_title: 'आज का आपका पैसा', guide_1_text: 'यहाँ आप देख सकते हैं कि बजट से बाहर गए बिना आज कितना खर्च कर सकते हैं।', guide_2_title: 'सेकंडों में दर्ज करें', guide_2_text: '+ बटन दबाकर खर्च या आय तुरंत दर्ज करें।', guide_3_title: 'आपका बजट', guide_3_text: 'यहाँ आप हर श्रेणी के लिए सीमा तय करते हैं और देखते हैं कि कितना खर्च हुआ।', guide_4_title: 'आपका सारांश', guide_4_text: 'आपकी आय, खर्च और बचत के स्पष्ट ग्राफ़, महीने दर महीने।', guide_5_title: 'अपना बैंक जोड़ें', guide_5_text: 'चाहें तो अपना बैंक जोड़ें और आपके खर्च अपने आप दर्ज हो जाएँगे।', guide_done: 'हो गया', tour100_1_title: 'आपका होम, एक नज़र में', tour100_1_text: 'यहाँ आप देख सकते हैं कि बजट से बाहर जाए बिना आज कितना खर्च कर सकते हैं और महीने के लिए कितना बचा है। किसी खरीदारी पर संदेह है? "क्या मैं यह खरीद सकता हूँ?" में राशि लिखें और AI आपके असली आँकड़ों से जवाब देगा।', tour100_2_title: 'सेकंडों में जोड़ें', tour100_2_text: 'नीचे वाला ✨ बटन PETO Finanzas चैट खोलता है। वहाँ से आप खर्च या आय ऐसे लिखकर दर्ज कर सकते हैं जैसे बोलते हैं ("कल पेट्रोल पर 20 खर्च किए"), माइक से बोलकर, या रसीद की फ़ोटो से: ऐप समझ जाता है और पुष्टि के लिए तैयार रखता है।', tour100_3_title: 'आपके खाते और आपका बैंक', tour100_3_text: 'आपके खाते और कार्ड यहाँ रहते हैं, उपलब्ध शेष वही जो होम पर दिखता है. चाहें तो अपना बैंक जोड़ें और आपके लेन-देन अपने आप दर्ज हो जाएँगे.', tour100_4_title: 'लक्ष्य और बचत', tour100_4_text: 'अपने लक्ष्य और आपातकालीन कोष बनाएँ. AI एक योजना सुझा सकता है, लेकिन जो बचत गिनी जाती है वह वही है जो आप दर्ज करते हैं: वह कभी अपने आप सहेजी नहीं जाती.', tour100_5_title: 'अपने पैसे से चैट', tour100_5_text: 'वही ✨ बटन चैट खोलता है: पूछें «इस महीने मैंने सबसे ज़्यादा किस पर खर्च किया?» और वह आपके आँकड़ों से जवाब देता है. बस इतना ही! आप सेटिंग्स से यह टूर कभी भी दोबारा देख सकते हैं.', tour100_count: 'चरण {n} / {total}', c101_ask_name: 'नमस्ते! शुरू करने से पहले, आपका नाम क्या है?', c101_efund_sugg: 'आपके मासिक खर्च के अनुसार सुझाव: {amount}। बनाने से पहले बदल सकते हैं।', c101_efund_create_btn: 'फ़ंड बनाएँ', inc_detect_note102: 'आपके बैंक से पता चला: ~{amount}/माह ({source} से वेतन)। चाहें तो बदलें।', inc_detect_note_nosrc102: 'आपके बैंक से पता चला: ~{amount}/माह। चाहें तो बदलें।', home_ai_dismiss102: 'यह उत्तर हटाएँ', gate103_title: 'PETO Finanzas में आपका स्वागत है', gate103_text: 'अपने खर्च और आय पर नज़र रखें, बजट बनाएँ, अपना सन चलाएँ और बैंक जोड़ें ताकि लेन-देन अपने आप दर्ज हो जाएँ। आपका खाता इस वेबसाइट को आपके फ़ोन के ऐप से सिंक करता है।', gate103_checking: 'आपका सत्र जाँच रहे हैं…', gate103_signin: 'लॉग इन करें', bank_paused103: 'सिंक नहीं है', tour100_settings_btn: 'टूर देखें', set_group_account: 'खाता', set_group_rules: 'आपके पैसे के नियम', set_group_security: 'सुरक्षा और गोपनीयता', set_group_personalization: 'निजीकरण', c109_filter_expenses: 'खर्च', c109_filter_transfers: 'स्थानांतरण', c109_filter_all: 'सभी', c109_spent_in: '{month} में खर्च', c109_transfers_line: 'स्थानांतरण: {amount}', c109_reports_title: 'रिपोर्ट', c109_pod_more: 'और सुनना चाहते हैं? सभी एपिसोड Spotify पर हैं', c109_group_business: 'व्यवसाय', c109_danger_title: 'संवेदनशील क्षेत्र', c109_danger_help: 'दो सबसे भारी कार्रवाइयाँ यहाँ हैं: साइन आउट करना और अपने खाते को सारे डेटा के साथ हटाना। इन्हें वापस नहीं किया जा सकता।', c109_mode_all: 'सभी', c109_mode_essential: 'ज़रूरी', c109_mode_custom: 'कस्टम', c109_appearance_title: 'दिखावट', c109_help_label: 'मदद', c109_autocat_help: 'श्रेणियाँ अपने आप लागू होती हैं: जब आपका बैंक सिंक होता है, तो हर खर्च पहले से श्रेणी के साथ आता है — पहले जानी-पहचानी दुकान, फिर जो ऐप ने तब सीखा जब आपने कोई खर्च ठीक किया, और जिसे कोई नहीं जानता उसे AI सुलझाता है। अगर आप कोई खर्च ठीक करते हैं, तो ऐप अगली बार के लिए चुपचाप सीख लेता है।', c109_flowai_line: 'AI आपका अनुमान लेकर आपको मुख्य तारीखों पर अपेक्षित शेष, जोखिम वाले दिन और उनसे बचने के लिए क्या बदलना है, यह बताता है।', c109_secdesc_gastos: 'अपने खर्च लिखें और देखें', c109_secdesc_ingresos: 'आने वाला पैसा', c109_secdesc_ahorros: 'लक्ष्य और आपातकालीन फंड', c109_secdesc_buscar: 'कोई भी लेन-देन खोजें', c109_secdesc_resumen: 'आपका महीना चार्ट में और आपका स्कोर', c109_secdesc_presupuesto: 'हर श्रेणी की सीमा', c109_secdesc_pagos: 'निश्चित भुगतान और सदस्यताएँ', c109_secdesc_cuentas: 'आपके खाते और कार्ड', c109_secdesc_deudas: 'आपका कर्ज़ और भुगतान योजना', c109_secdesc_remesas: 'परिवार को भेजा गया पैसा', c109_secdesc_san: 'समूह बचत, बारी-बारी से', c109_secdesc_podcast: 'Finanzas Personales के एपिसोड',  c108_bank_auto_label: 'आपके बैंक में बचत (स्वचालित)', c108_manual_label: 'मैन्युअल बचत', c108_note_disconnected: 'बैंक डिस्कनेक्ट हो गया: स्वचालित बचत वापस {amount} हो गई। आपकी मैन्युअल बचत को नहीं छुआ गया।', c108_note_no_savings: 'आपका बैंक जुड़ा है, लेकिन बचत खाता नहीं है: स्वचालित बचत {amount} है।', 
   chart_expenses: 'खर्च',
   chart_savings: 'बचत',
   res_cats_empty: 'इस माह कोई खर्च नहीं।',
@@ -11624,7 +11628,7 @@ hi: {
   theme_dark: 'गहरा',
   theme_auto: 'स्वचालित (सिस्टम)',
   set_accent_label: 'मुख्य रंग',
-  accent_verde: 'हरा',
+  accent_verde: 'एम्बर',
   accent_azul: 'नीला',
   accent_morado: 'बैंगनी',
   accent_naranja: 'नारंगी',
@@ -12457,7 +12461,7 @@ ar: {
   err_goal_name: 'اكتب اسمًا لهدفك.', err_goal_zero: 'يجب أن يكون مبلغ الهدف أكبر من 0.',
   res_cats_title: 'المصروفات حسب الفئة',
   res_summary_title: 'الدخل مقابل المصروفات مقابل المدّخرات',
-  chart_income: 'الدخل', income_ytd_label: 'الدخل السنوي حتى اليوم', fixed_badge: 'ثابت', bud_fixed_title: 'مدفوعات هذا الشهر الثابتة', pro_home_title: 'انضم إلى PETO Pro', pro_home_text: 'بدون إعلانات وكل شيء مفتوح: مزامنة البنك والميزانيات المشتركة والمزيد.', guide_1_title: 'أموالك اليوم', guide_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم دون تجاوز ميزانيتك.', guide_2_title: 'سجّل في ثوانٍ', guide_2_text: 'اضغط زر + لتسجيل مصروف أو دخل على الفور.', guide_3_title: 'ميزانيتك', guide_3_text: 'هنا تضع حدًا لكل فئة وترى كم أنفقت.', guide_4_title: 'ملخصك', guide_4_text: 'رسوم واضحة لدخلك ومصاريفك ومدخراتك، شهرًا بعد شهر.', guide_5_title: 'اربط بنكك', guide_5_text: 'إذا أردت، اربط بنكك وستُسجَّل مصاريفك تلقائيًا.', guide_done: 'تم', tour100_1_title: 'شاشتك الرئيسية في لمحة', tour100_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم دون تجاوز ميزانيتك، وكم تبقّى لك حتى نهاية الشهر. متردد في شراء شيء؟ اكتب المبلغ في «هل أستطيع تحمل هذا؟» وسيجيبك الذكاء الاصطناعي بأرقامك الحقيقية.', tour100_2_title: 'أضف في ثوانٍ', tour100_2_text: 'زر ✨ بالأسفل يفتح محادثة PETO Finanzas. من هناك تسجّل مصروفًا أو دخلًا بكتابة ما تقوله حرفيًا («صرفت 20 على البنزين أمس»)، أو بالإملاء عبر الميكروفون، أو بصورة إيصال: التطبيق يفهمك ويجهّز كل شيء لتؤكّده.', tour100_3_title: 'حساباتك وبنكك', tour100_3_text: 'تعيش حساباتك وبطاقاتك هنا، بنفس الرصيد المتاح الذي تراه في الرئيسية. إذا أردت، اربط بنكك وستُسجَّل حركاتك تلقائيًا.', tour100_4_title: 'الأهداف والادخار', tour100_4_text: 'أنشئ أهدافك وصندوق الطوارئ. يمكن للذكاء الاصطناعي أن يقترح خطة، لكن الادخار الذي يُحتسب هو ما تسجّله أنت: لا يُحفظ أبدًا من تلقاء نفسه.', tour100_5_title: 'محادثة مع أموالك', tour100_5_text: 'يفتح الزر نفسه ✨ المحادثة: اسأله أشياء مثل «على ماذا أنفقت أكثر هذا الشهر؟» فيجيب بأرقامك. هذا كل شيء! يمكنك إعادة هذه الجولة متى شئت من الإعدادات.', tour100_count: 'الخطوة {n} من {total}', c101_ask_name: 'مرحبًا! قبل أن نبدأ، ما اسمك؟', c101_efund_sugg: 'اقتراح حسب مصروفك الشهري: {amount}. يمكنك تعديله قبل الإنشاء.', c101_efund_create_btn: 'إنشاء الصندوق', inc_detect_note102: 'تم اكتشافه من بنكك: ~{amount}/شهر (راتب من {source}). عدّله إن أردت.', inc_detect_note_nosrc102: 'تم اكتشافه من بنكك: ~{amount}/شهر. عدّله إن أردت.', home_ai_dismiss102: 'تجاهل هذه الإجابة', gate103_title: 'مرحبًا بك في PETO Finanzas', gate103_text: 'تابع مصروفاتك ودخلك، وأنشئ ميزانيتك، وأدر صندوق التوفير الجماعي، واربط حسابك البنكي لتُسجَّل حركاتك تلقائيًا. حسابك يزامن هذا الموقع مع التطبيق على هاتفك.', gate103_checking: 'جارٍ التحقق من جلستك…', gate103_signin: 'تسجيل الدخول', bank_paused103: 'غير متزامن', tour100_settings_btn: 'عرض الجولة', set_group_account: 'الحساب', set_group_rules: 'قواعد أموالك', set_group_security: 'الأمان والخصوصية', set_group_personalization: 'التخصيص', c108_bank_auto_label: 'الادخار في بنكك (تلقائي)', c108_manual_label: 'الادخار اليدوي', c108_note_disconnected: 'تم فصل البنك: عاد الادخار التلقائي إلى {amount}. لم يتم المساس بادخارك اليدوي.', c108_note_no_savings: 'بنكك متصل، لكن لا يوجد حساب توفير: الادخار التلقائي هو {amount}.', 
+  chart_income: 'الدخل', income_ytd_label: 'الدخل السنوي حتى اليوم', fixed_badge: 'ثابت', bud_fixed_title: 'مدفوعات هذا الشهر الثابتة', pro_home_title: 'انضم إلى PETO Pro', pro_home_text: 'بدون إعلانات وكل شيء مفتوح: مزامنة البنك والميزانيات المشتركة والمزيد.', guide_1_title: 'أموالك اليوم', guide_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم دون تجاوز ميزانيتك.', guide_2_title: 'سجّل في ثوانٍ', guide_2_text: 'اضغط زر + لتسجيل مصروف أو دخل على الفور.', guide_3_title: 'ميزانيتك', guide_3_text: 'هنا تضع حدًا لكل فئة وترى كم أنفقت.', guide_4_title: 'ملخصك', guide_4_text: 'رسوم واضحة لدخلك ومصاريفك ومدخراتك، شهرًا بعد شهر.', guide_5_title: 'اربط بنكك', guide_5_text: 'إذا أردت، اربط بنكك وستُسجَّل مصاريفك تلقائيًا.', guide_done: 'تم', tour100_1_title: 'شاشتك الرئيسية في لمحة', tour100_1_text: 'هنا ترى كم يمكنك أن تنفق اليوم دون تجاوز ميزانيتك، وكم تبقّى لك حتى نهاية الشهر. متردد في شراء شيء؟ اكتب المبلغ في «هل أستطيع تحمل هذا؟» وسيجيبك الذكاء الاصطناعي بأرقامك الحقيقية.', tour100_2_title: 'أضف في ثوانٍ', tour100_2_text: 'زر ✨ بالأسفل يفتح محادثة PETO Finanzas. من هناك تسجّل مصروفًا أو دخلًا بكتابة ما تقوله حرفيًا («صرفت 20 على البنزين أمس»)، أو بالإملاء عبر الميكروفون، أو بصورة إيصال: التطبيق يفهمك ويجهّز كل شيء لتؤكّده.', tour100_3_title: 'حساباتك وبنكك', tour100_3_text: 'تعيش حساباتك وبطاقاتك هنا، بنفس الرصيد المتاح الذي تراه في الرئيسية. إذا أردت، اربط بنكك وستُسجَّل حركاتك تلقائيًا.', tour100_4_title: 'الأهداف والادخار', tour100_4_text: 'أنشئ أهدافك وصندوق الطوارئ. يمكن للذكاء الاصطناعي أن يقترح خطة، لكن الادخار الذي يُحتسب هو ما تسجّله أنت: لا يُحفظ أبدًا من تلقاء نفسه.', tour100_5_title: 'محادثة مع أموالك', tour100_5_text: 'يفتح الزر نفسه ✨ المحادثة: اسأله أشياء مثل «على ماذا أنفقت أكثر هذا الشهر؟» فيجيب بأرقامك. هذا كل شيء! يمكنك إعادة هذه الجولة متى شئت من الإعدادات.', tour100_count: 'الخطوة {n} من {total}', c101_ask_name: 'مرحبًا! قبل أن نبدأ، ما اسمك؟', c101_efund_sugg: 'اقتراح حسب مصروفك الشهري: {amount}. يمكنك تعديله قبل الإنشاء.', c101_efund_create_btn: 'إنشاء الصندوق', inc_detect_note102: 'تم اكتشافه من بنكك: ~{amount}/شهر (راتب من {source}). عدّله إن أردت.', inc_detect_note_nosrc102: 'تم اكتشافه من بنكك: ~{amount}/شهر. عدّله إن أردت.', home_ai_dismiss102: 'تجاهل هذه الإجابة', gate103_title: 'مرحبًا بك في PETO Finanzas', gate103_text: 'تابع مصروفاتك ودخلك، وأنشئ ميزانيتك، وأدر صندوق التوفير الجماعي، واربط حسابك البنكي لتُسجَّل حركاتك تلقائيًا. حسابك يزامن هذا الموقع مع التطبيق على هاتفك.', gate103_checking: 'جارٍ التحقق من جلستك…', gate103_signin: 'تسجيل الدخول', bank_paused103: 'غير متزامن', tour100_settings_btn: 'عرض الجولة', set_group_account: 'الحساب', set_group_rules: 'قواعد أموالك', set_group_security: 'الأمان والخصوصية', set_group_personalization: 'التخصيص', c109_filter_expenses: 'المصروفات', c109_filter_transfers: 'التحويلات', c109_filter_all: 'الكل', c109_spent_in: 'أُنفق في {month}', c109_transfers_line: 'التحويلات: {amount}', c109_reports_title: 'التقارير', c109_pod_more: 'هل تريد الاستماع أكثر؟ كل الحلقات على Spotify', c109_group_business: 'العمل', c109_danger_title: 'منطقة حساسة', c109_danger_help: 'هنا توجد أثقل عمليتين: تسجيل الخروج وحذف حسابك بكل بياناته. لا يمكن التراجع عنهما.', c109_mode_all: 'الكل', c109_mode_essential: 'الأساسي', c109_mode_custom: 'مخصص', c109_appearance_title: 'المظهر', c109_help_label: 'مساعدة', c109_autocat_help: 'تُطبق الفئات من تلقاء نفسها: عند مزامنة بنكك، تصل كل عملية مصنفة بالفعل — أولاً المتجر المعروف، ثم ما تعلمته التطبيق عندما صححت عملية، والذكاء الاصطناعي يحل ما لا يعرفه أحد. إذا صححت عملية، يتعلم التطبيق بصمت للمرة القادمة.', c109_flowai_line: 'يأخذ الذكاء الاصطناعي توقعك ويخبرك بالرصيد المتوقع في التواريخ المهمة وأيام الخطر وما يجب نقله لتجنبها.', c109_secdesc_gastos: 'سجّل وراجع ما تنفقه', c109_secdesc_ingresos: 'الأموال الداخلة', c109_secdesc_ahorros: 'الأهداف وصندوق الطوارئ', c109_secdesc_buscar: 'ابحث عن أي عملية', c109_secdesc_resumen: 'شهرك في رسوم ودرجتك', c109_secdesc_presupuesto: 'حدود لكل فئة', c109_secdesc_pagos: 'المدفوعات الثابتة والاشتراكات', c109_secdesc_cuentas: 'حساباتك وبطاقاتك', c109_secdesc_deudas: 'ديونك وخطة سدادك', c109_secdesc_remesas: 'الأموال التي ترسلها لعائلتك', c109_secdesc_san: 'ادخار جماعي بالتناوب', c109_secdesc_podcast: 'حلقات Finanzas Personales',  c108_bank_auto_label: 'الادخار في بنكك (تلقائي)', c108_manual_label: 'الادخار اليدوي', c108_note_disconnected: 'تم فصل البنك: عاد الادخار التلقائي إلى {amount}. لم يتم المساس بادخارك اليدوي.', c108_note_no_savings: 'بنكك متصل، لكن لا يوجد حساب توفير: الادخار التلقائي هو {amount}.', 
   chart_expenses: 'المصروفات',
   chart_savings: 'المدّخرات',
   res_cats_empty: 'لا توجد مصروفات هذا الشهر.',
@@ -12628,7 +12632,7 @@ ar: {
   theme_dark: 'داكن',
   theme_auto: 'تلقائي (النظام)',
   set_accent_label: 'اللون الرئيسي',
-  accent_verde: 'أخضر',
+  accent_verde: 'كهرماني',
   accent_azul: 'أزرق',
   accent_morado: 'بنفسجي',
   accent_naranja: 'برتقالي',
@@ -14985,9 +14989,13 @@ function renderPanelVs() {
   sec.hidden = false;
   sec.appendChild(el('h3', null, t('panel_vs_title')));
   sec.appendChild(vsLegend(t('panel_vs_cur'), t('panel_vs_prev'), 'cur', 'prev'));
+  /* Compilación 109 (punto 3): solo DOS semanas — la actual y la
+     anterior. Los totales del mes y el aviso de ritmo de abajo
+     no cambian. */
+  const firstWeek109 = Math.max(0, info.lastWeek - 1);
   let max = 0;
-  for (let w = 0; w <= info.lastWeek; w++) max = Math.max(max, info.curW[w], info.prevW[w]);
-  for (let w = 0; w <= info.lastWeek; w++) {
+  for (let w = firstWeek109; w <= info.lastWeek; w++) max = Math.max(max, info.curW[w], info.prevW[w]);
+  for (let w = firstWeek109; w <= info.lastWeek; w++) {
     const wrap = el('div', 'vs-week');
     wrap.appendChild(el('div', 'vs-week-label', t('panel_week', { n: w + 1 })));
     wrap.appendChild(vsBarLine('cur', info.curW[w], max));
@@ -15613,6 +15621,11 @@ function renderExpenses() {
   if (titleEl) titleEl.textContent =
     document.getElementById('exp-id').value ? t('exp_edit') : t('exp_new');
   document.getElementById('exp-month-label').textContent = monthLabel(expMonth);
+  const expTotalLabel109 = document.getElementById('exp-total-label109');
+  if (expTotalLabel109) expTotalLabel109.textContent = t('c109_spent_in', { month: monthLabel(expMonth) });
+  document.querySelectorAll('[data-expfilter109]').forEach((b109) => {
+    b109.classList.toggle('active', b109.getAttribute('data-expfilter109') === expFilter109);
+  });
   document.getElementById('exp-next').disabled = expMonth >= currentMonthKey();
   const list = monthExpenses(expMonth).slice().sort((a, b) => (a.date < b.date ? 1 : (a.date > b.date ? -1 : 0)));
   /* Compilación 89 · punto 6: el total de Gastos es el CONTADO (sin
@@ -15623,18 +15636,27 @@ function renderExpenses() {
   const countedCents = sumCents(counted);
   document.getElementById('exp-total').textContent = fmt(countedCents);
   const note89 = document.getElementById('exp-total-note89');
+  /* Compilación 109 (punto 1): las transferencias son UNA línea
+     pequeña aparte con su total; el total grande es solo el gasto
+     contado («Gastado en <mes>»). */
   if (note89) note89.textContent = transfers.length
-    ? t('c89_total_note', { counted: fmt(countedCents), all: fmt(sumCents(list)) })
-    : t('c89_no_transfers');
+    ? t('c109_transfers_line', { amount: fmt(sumCents(transfers)) })
+    : '';
   const ul = document.getElementById('expense-list');
   clearNode(ul);
-  document.getElementById('expense-empty').hidden = list.length > 0;
+  /* Compilación 109 (punto 1): lo que se VE manda en el vacío y
+     en el aviso de sin-categoría: con el filtro en
+     «Transferencias», ni el aviso ni los gastos cuentan. */
+  const showCounted109 = expFilter109 !== 'transferencias';
+  const showTransfers109 = expFilter109 !== 'gastos';
+  document.getElementById('expense-empty').hidden =
+    (showCounted109 ? counted.length : 0) + (showTransfers109 ? transfers.length : 0) > 0;
   /* Compilación 89 · punto 1: aviso ÚNICO de sin-categoría arriba de
      la lista (nada de botones grandes repetidos por fila). */
   const uncat = counted.filter((e) => !e.category || e.category === 'Otros');
   const banner89 = document.getElementById('exp-uncat89');
   if (banner89) {
-    banner89.hidden = uncat.length === 0;
+    banner89.hidden = !showCounted109 || uncat.length === 0;
     banner89.textContent = uncat.length ? t('c89_uncat', { n: uncat.length }) : '';
   }
   const today89 = todayStr();
@@ -15650,7 +15672,7 @@ function renderExpenses() {
     line1.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
     li.appendChild(line1);
     const srcTag89 = movementSourceTag(item, false);
-    const sub = prettyDate(item.date) + ' · ' + catName(item.category) + ((item.note && item.note.trim()) ? ' · ' + item.note.trim() : '') + (srcTag89 ? ' · ' + srcTag89 : '');
+    const sub = catName(item.category) + ' · ' + prettyDate(item.date) + (srcTag89 ? ' · ' + srcTag89 : '');
     li.appendChild(el('div', 'item-sub exp-line2', sub));
     if (item.photo) {
       const thumb = document.createElement('img');
@@ -15664,7 +15686,9 @@ function renderExpenses() {
     ul.appendChild(li);
   };
   const byDay = new Map();
-  for (const item of counted) { if (!byDay.has(item.date)) byDay.set(item.date, []); byDay.get(item.date).push(item); }
+  if (showCounted109) {
+    for (const item of counted) { if (!byDay.has(item.date)) byDay.set(item.date, []); byDay.get(item.date).push(item); }
+  }
   for (const [date, items] of byDay) {
     const head = el('li', 'exp-day-head89');
     head.appendChild(el('span', 'exp-day-name', dayLabel89(date)));
@@ -15672,7 +15696,7 @@ function renderExpenses() {
     ul.appendChild(head);
     for (const item of items) addRow89(item);
   }
-  if (transfers.length) {
+  if (showTransfers109 && transfers.length) {
     const head = el('li', 'exp-day-head89');
     head.appendChild(el('span', 'exp-day-name', t('c89_transfers_group')));
     head.appendChild(el('span', 'exp-day-total89', fmt(sumCents(transfers))));
@@ -16476,6 +16500,11 @@ function chartBarRow(label, amountText, pct) {
   return row;
 }
 function renderResumen() {
+  /* Compilación 109 (punto 2): al abrir, solo tres bloques — el
+     mes, el Score y las ideas. Todo lo demás vive plegado y
+     CERRADO: cada apertura de la vista lo vuelve a cerrar. */
+  document.querySelectorAll('#view-resumen .fold109-body').forEach((fb109) => { fb109.hidden = true; });
+  document.querySelectorAll('#view-resumen .fold109-head').forEach((fh109) => { fh109.setAttribute('aria-expanded', 'false'); });
   renderInsights();
   renderScoreCard();
   document.getElementById('res-month-label').textContent = monthLabel(chartMonth);
@@ -20822,7 +20851,11 @@ const SET_ACC_CARDS = [
   ['pro', 'setacc-pro-head', 'setacc-pro-body'],
   ['privacy', 'setacc-privacy-head', 'setacc-privacy-body'],
   ['trust', 'setacc-trust-head', 'setacc-trust-body'],
-  ['rules', 'setacc-rules-head', 'setacc-rules-body']
+  /* Compilación 109 (puntos 8 y 9): la tarjeta «Mis reglas de
+     categorías» ya no existe (las categorías son automáticas);
+     su hueco en el acordeón lo ocupa la tarjeta «Apariencia»
+     de Personalización. */
+  ['appearance', 'setacc-appearance-head', 'setacc-appearance-body']
 ];
 let setAccSession = null;
 function setAccState() {
@@ -21029,6 +21062,30 @@ function toggleSectionsBody() {
   const chevron = head.querySelector('.sections-chevron');
   if (chevron) chevron.textContent = open ? '▾' : '▸';
 }
+/* Compilación 109 (punto 8): UN solo control de modos —
+   Todo · Esencial · Personalizado. El modo NO se guarda: se
+   DEDUCE de los interruptores (todo encendido → Todo; el patrón
+   esencial exacto → Esencial; cualquier otra mezcla →
+   Personalizado), así el control siempre dice la verdad y tocar
+   un interruptor a mano lleva solo a «Personalizado». */
+function sectionsMode109() {
+  if (!db || !db.settings || !db.settings.sections) return 'custom';
+  let all109 = true;
+  let ess109 = true;
+  for (const def of SECTION_DEFS) {
+    const on109 = db.settings.sections[def.id] !== false;
+    if (!on109) all109 = false;
+    if (on109 !== ESSENTIAL_SECTIONS.includes(def.id)) ess109 = false;
+  }
+  return all109 ? 'all' : (ess109 ? 'essential' : 'custom');
+}
+function renderMode109() {
+  const mode109 = sectionsMode109();
+  document.querySelectorAll('[data-mode109]').forEach((b109) => {
+    b109.classList.toggle('active', b109.getAttribute('data-mode109') === mode109);
+  });
+}
+
 function renderSettings() {
   renderPerms86();
   renderRules();
@@ -21086,6 +21143,11 @@ function renderSettings() {
   if (setSummaryEmailEl) setSummaryEmailEl.checked = db.settings.summaryEmail === true;
   const summaryEmailRowEl = document.getElementById('summary-email-row');
   if (summaryEmailRowEl) summaryEmailRowEl.hidden = !cloudUser;
+  /* Compilación 109 (punto 5): el Resumen diario tiene interruptor
+     MAESTRO — apagado, la hora y el correo ni se enseñan (opciones
+     dependientes ocultas si no aplican). */
+  const summaryDeps109 = document.getElementById('summary-deps109');
+  if (summaryDeps109) summaryDeps109.hidden = !(setSummaryEl && setSummaryEl.checked);
   document.getElementById('set-biometric').checked = db.settings.biometric === true;
   const setBizEl = document.getElementById('set-biz');
   if (setBizEl) setBizEl.checked = bizModeOn();
@@ -21106,7 +21168,12 @@ function renderSettings() {
   clearNode(wrap);
   for (const def of SECTION_DEFS) {
     const row = el('label', 'toggle-row');
-    row.appendChild(el('span', null, secLabel(def.id)));
+    /* Compilación 109 (punto 8): cada interruptor lleva su
+       descripción de UNA línea bajo el nombre. */
+    const main109 = el('span', 'sec109-main');
+    main109.appendChild(el('span', null, secLabel(def.id)));
+    main109.appendChild(el('span', 'sec109-desc', t('c109_secdesc_' + def.id)));
+    row.appendChild(main109);
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = db.settings.sections[def.id] !== false;
@@ -21114,10 +21181,12 @@ function renderSettings() {
       db.settings.sections[def.id] = cb.checked;
       save();
       updateSectionsSummary();
+      renderMode109();
     });
     row.appendChild(cb);
     wrap.appendChild(row);
   }
+  renderMode109();
   applyBizModeUI();
   updateSectionsSummary();
   /* Compilación 56/60: se aplica el estado de apertura de la
@@ -23421,6 +23490,11 @@ function renderCloudCard() {
   }
   out.hidden = !!cloudUser;
   inn.hidden = !cloudUser;
+  /* Compilación 109 (punto 5): la zona delicada del fondo de
+     Ajustes (cerrar sesión y eliminar cuenta) solo existe con
+     sesión iniciada, como la tarjeta de la que salieron. */
+  const danger109 = document.getElementById('danger-zone109');
+  if (danger109) danger109.hidden = !cloudUser;
   if (cloudUser) {
     /* Compilación 49: con sesión viva, este es el punto por el que
        pasan el arranque y el inicio de sesión — buen momento para
@@ -27020,6 +27094,18 @@ function renderHomeBank() {
   wrap.appendChild(strip);
 }
 
+/* Compilación 109 (punto 6): con banco conectado, el botón
+   «Conectar banco» sobra — quedan «Sincronizar» y el «Desconectar»
+   de cada conexión. «Conectar» solo se ve sin ninguna conexión,
+   ni guardada en el espejo local ni cargada del servidor. */
+function bankSyncConnectBtn109() {
+  const btn109 = document.getElementById('btn-bank-connect');
+  if (!btn109) return;
+  const stored109 = (db && db.settings && Array.isArray(db.settings.bankConns)) ? db.settings.bankConns.length : 0;
+  const loaded109 = (typeof bankConnections !== 'undefined' && Array.isArray(bankConnections)) ? bankConnections.length : 0;
+  btn109.hidden = stored109 > 0 || loaded109 > 0;
+}
+
 function renderBankCard() {
   const sec = document.getElementById('settings-bank');
   if (!sec) return;
@@ -27074,6 +27160,7 @@ function renderBankCard() {
   /* Compilación 56: la cabecera de la tarjeta del banco (nombre
      del banco o «Sin conectar») se refresca con cada pintado,
      también con el cuerpo retraído. */
+  bankSyncConnectBtn109();
   updateSetAccSummaries();
   if (!has) { bankConnections = null; bankLoadedFor = null; return; }
   if (bankLoadedFor !== cloudUser.id) bankLoadConnections();
@@ -27120,6 +27207,7 @@ function bankRenderList() {
   const wrap = document.getElementById('bank-list');
   if (!wrap) return;
   clearNode(wrap);
+  bankSyncConnectBtn109();
   if (!bankConnections) return;
   if (!bankConnections.length) {
     wrap.appendChild(el('p', 'muted small', t('bank_none')));
@@ -27454,6 +27542,43 @@ async function bankExchange(publicToken, metadata) {
    vuelve a pedir la próxima vez. Sin conexiones no pasa nada:
    la completa no trae nada y la marca avanza igual, porque no
    hay nada viejo que re-ordenar. */
+/* Compilación 109 (punto 9): la última pieza de la cadena de
+   categorías AL SINCRONIZAR el banco. Lo que el servidor sugiere
+   y las reglas aprendidas ya ordenaron en bankImportTransactions;
+   lo que SIGUE en «Otros» tras importar lo resuelve la IA en el
+   momento (acción 'categorize'), con el contexto aprendido, y lo
+   aprendido se anota en silencio (learnCategory96) para que la
+   próxima vez ni haga falta preguntar. Degradación con gracia:
+   sin sesión, sin IA o con la acción aún solo-Pro en el servidor
+   (la apertura a todos los niveles va preparada en deploy/ de
+   esta compilación), el cargo se queda en «Otros» como siempre y
+   la sincronización NO se entera: esta función nunca lanza. */
+async function bankAiCategorize109(out) {
+  try {
+    if (!db || demoMode || !out || !Array.isArray(out.transactions)) return;
+    const ids109 = new Set(out.transactions.map((tx) => tx && tx.id).filter((x) => typeof x === 'string'));
+    if (!ids109.size) return;
+    const pending109 = db.expenses.filter((e) => e && ids109.has(e.id) && !e.transfer &&
+      (!e.category || e.category === 'Otros') && e.note && e.note.trim());
+    let changed109 = false;
+    for (const mov109 of pending109.slice(0, 8)) {
+      try {
+        const result109 = await aiFn('categorize', {
+          merchant: mov109.note || '', amountCents: mov109.amountCents,
+          categories: allCategories(db), learned: learnedRules96()
+        });
+        const cat109 = result109 && result109.category;
+        if (cat109 && cat109 !== 'Otros' && allCategories(db).includes(cat109)) {
+          mov109.category = cat109;
+          learnCategory96(mov109.note, cat109);
+          changed109 = true;
+        }
+      } catch (e) { /* ese cargo se queda en «Otros»: la persona lo puede corregir y la app aprende */ }
+    }
+    if (changed109) { save(); renderExpenses(); }
+  } catch (e) { /* la categorización con IA nunca rompe la sincronización */ }
+}
+
 async function bankRunSync(opts) {
   const silent = !!(opts && opts.silent);
   const wantFull = !!db && !!db.settings &&
@@ -27474,6 +27599,10 @@ async function bankRunSync(opts) {
   } else if (fullDone) {
     save(); // aunque nada se moviera, la marca tiene que persistir
   }
+  /* Compilación 109 (punto 9): lo que entró nuevo y sigue en
+     «Otros» lo resuelve la IA en el momento (sin bloquear la
+     sincronización: va en segundo plano y nunca lanza). */
+  if (r.added > 0) bankAiCategorize109(out);
   bankConnections = null;
   bankLoadedFor = null;
   await bankLoadConnections();
@@ -29264,7 +29393,13 @@ function renderPerms86() {
       btn.className = 'btn primary perm-allow';
       btn.id = cid + '-allow-' + def.kind;
       btn.textContent = t('perm10_allow');
-      btn.addEventListener('click', () => onPermAllow86(def.kind));
+      btn.addEventListener('click', () => {
+        /* Compilación 109 (punto 7): ya denegado, el botón ES
+           «Abrir los ajustes del sistema»; en cualquier otro
+           estado pide el permiso del sistema ahí mismo. */
+        if (btn.dataset.permDenied109 === '1') { openSystemSettings86(); return; }
+        onPermAllow86(def.kind);
+      });
       row.appendChild(icon); row.appendChild(mid); row.appendChild(btn);
       box.appendChild(row);
       permStatus86(def.kind).then((state) => {
@@ -29275,29 +29410,29 @@ function renderPerms86() {
           st.textContent = state === 'granted' ? t('perm10_granted')
             : ((state === 'denied' || state === 'prompt') ? t('perm10_not_granted') : '');
           btn.hidden = state === 'granted';
+          /* Compilación 109 (punto 7): «Abrir los ajustes del
+             sistema» SOLO si el permiso ya fue denegado. */
+          if (state === 'denied') { btn.dataset.permDenied109 = '1'; btn.textContent = t('perm10_open_settings'); }
+          else { btn.dataset.permDenied109 = ''; btn.textContent = t('perm10_allow'); }
         } catch (e) { /* vista ya desmontada */ }
       });
     });
   });
 }
 async function onPermAllow86(kind) {
-  /* Compilación 101 (pedido de Sterlin): «Permitir» pide el
-     permiso AHÍ MISMO llamando a la API de solicitud del sistema
-     — nunca manda directo a los Ajustes. Sin determinar, el
-     sistema muestra su diálogo; denegado antes, la plataforma
-     decide (Android puede volver a mostrarlo; iOS no muestra
-     nada). Solo si TRAS el intento el permiso sigue denegado (o
-     no hay puente con el que pedir, como en la web) se ofrece
-     abrir los Ajustes del sistema, con el texto breve que lo
-     explica (permExplain86). Si quedó en 'prompt' (diálogo
-     descartado sin elegir), no se enseña nada: «Permitir» se
-     puede tocar otra vez. */
-  const ok = await permRequest86(kind);
+  /* Compilación 109 (punto 7): «Permitir» pide el permiso del
+     sistema AHÍ MISMO y sin ninguna ventana explicativa. Al
+     volver, la fila se repinta con su estado real: concedido →
+     «Permitido ✓»; denegado → el botón pasa a «Abrir los ajustes
+     del sistema» (la única vía que queda); sin determinar (el
+     diálogo se descartó) → «Permitir» sigue ahí para reintentar.
+     La explicación en contexto (permExplain86) solo sale cuando
+     una FUNCIÓN concreta choca con el permiso denegado, nunca
+     desde esta lista. */
+  await permRequest86(kind);
   renderPerms86();
-  if (ok) return;
-  const after = await permStatus86(kind);
-  if (after === 'denied' || after === 'unknown') permExplain86(kind);
 }
+
 let permExplainKind86 = null;
 function permExplain86(kind) {
   const def = PERMS_KINDS_86.find((d) => d.kind === kind);
@@ -30809,7 +30944,17 @@ function podcastRenderList(eps) {
   const list = document.getElementById('podcast-list');
   if (!list) return;
   clearNode(list);
-  for (const ep of eps) {
+  /* Compilación 109 (punto 4): solo los episodios de los ÚLTIMOS
+     3 DÍAS; si no hay ninguno tan reciente, se enseña el más
+     reciente solo (la lista no queda vacía nunca). Al final, la
+     invitación a Spotify con el resto del catálogo. */
+  const now109 = Date.now();
+  const recent109 = (eps || []).filter((ep) => {
+    const d = new Date(ep && ep.date);
+    return !isNaN(d.getTime()) && (now109 - d.getTime()) <= 3 * 24 * 3600 * 1000;
+  });
+  const visible109 = recent109.length ? recent109 : (eps || []).slice(0, 1);
+  for (const ep of visible109) {
     const row = el('button', 'pod-ep');
     row.type = 'button';
     row.dataset.url = ep.url;
@@ -30822,8 +30967,23 @@ function podcastRenderList(eps) {
     row.addEventListener('click', () => podcastPlayEpisode(ep));
     list.appendChild(row);
   }
+  const more109 = document.getElementById('podcast-more109');
+  if (more109) {
+    clearNode(more109);
+    more109.hidden = !(eps && eps.length);
+    if (eps && eps.length) {
+      more109.appendChild(el('p', 'muted', t('c109_pod_more')));
+      const link109 = el('a', 'btn btn-secondary');
+      link109.href = 'https://open.spotify.com/show/5w84Exlg8CP02lRueF1Sc3';
+      link109.target = '_blank';
+      link109.rel = 'noopener';
+      link109.textContent = t('pod_spotify_btn');
+      more109.appendChild(link109);
+    }
+  }
   podcastMarkRow();
 }
+
 function podcastMarkRow() {
   const list = document.getElementById('podcast-list');
   if (!list) return;
@@ -31037,6 +31197,18 @@ function wireEvents() {
   document.getElementById('pin-form').addEventListener('submit', onPinSubmit);
   /* Tarjeta «Secciones visibles» plegable: clic o Enter/espacio en la
      cabecera abre/cierra el cuerpo (cerrado por defecto). */
+  /* Compilación 109 (punto 2): las cabeceras de los pliegues de
+     Resumen abren/cierran su cuerpo; el estado no se guarda. */
+  document.querySelectorAll('.fold109-head').forEach((fh109) => {
+    fh109.addEventListener('click', () => {
+      const fb109 = fh109.parentElement ? fh109.parentElement.querySelector('.fold109-body') : null;
+      if (!fb109) return;
+      fb109.hidden = !fb109.hidden;
+      fh109.setAttribute('aria-expanded', fb109.hidden ? 'false' : 'true');
+      const ch109 = fh109.querySelector('.fold109-chev');
+      if (ch109) ch109.textContent = fb109.hidden ? '›' : '▾';
+    });
+  });
   const sectionsToggleEl = document.getElementById('sections-toggle');
   if (sectionsToggleEl) {
     sectionsToggleEl.addEventListener('click', toggleSectionsBody);
@@ -31419,7 +31591,11 @@ function wireEvents() {
   document.getElementById('inc-voice').addEventListener('click', () => startVoice('income'));
   /* Compilación 55 · Mis reglas: añadir regla y sugerencia al
      escribir la nota del gasto. */
-  document.getElementById('rule-add').addEventListener('click', onRuleAdd);
+  /* Compilación 109 (punto 9): el formulario manual de reglas ya
+     no existe en Ajustes (las categorías son automáticas); el
+     cableado queda protegido por si una copia vieja lo trajera. */
+  const ruleAddBtn109 = document.getElementById('rule-add');
+  if (ruleAddBtn109) ruleAddBtn109.addEventListener('click', onRuleAdd);
   document.getElementById('exp-category').addEventListener('change', () => { expCatTouched = true; });
   document.getElementById('exp-note').addEventListener('input', () => {
     if (expCatTouched) return;
@@ -31667,10 +31843,22 @@ function wireEvents() {
     saveSettingsFromForm();
     showView(currentView);
   });
-  const setModeEssential = document.getElementById('set-mode-essential');
-  if (setModeEssential) setModeEssential.addEventListener('click', () => { applySectionsMode('essential'); save(); renderSettings(); });
-  const setModeAll = document.getElementById('set-mode-all');
-  if (setModeAll) setModeAll.addEventListener('click', () => { applySectionsMode('all'); save(); renderSettings(); });
+  const setSummaryMaster109 = document.getElementById('set-summary');
+  if (setSummaryMaster109) setSummaryMaster109.addEventListener('change', () => {
+    const deps109 = document.getElementById('summary-deps109');
+    if (deps109) deps109.hidden = !setSummaryMaster109.checked;
+  });
+  /* Compilación 109 (punto 8): el control segmentado de modos —
+     Todo y Esencial aplican su patrón; Personalizado no toca
+     nada (es donde caes al mover un interruptor a mano). Los
+     botones viejos ya no existen en el HTML. */
+  document.querySelectorAll('[data-mode109]').forEach((mb109) => {
+    mb109.addEventListener('click', () => {
+      const m109 = mb109.getAttribute('data-mode109');
+      if (m109 === 'all' || m109 === 'essential') { applySectionsMode(m109); save(); }
+      renderSettings();
+    });
+  });
   const chalMore = document.getElementById('chal-more');
   if (chalMore) chalMore.addEventListener('change', () => {
     document.getElementById('chal-more-box').hidden = !chalMore.checked;
@@ -31711,6 +31899,9 @@ function wireEvents() {
   document.getElementById('btn-reset').addEventListener('click', onReset);
   document.getElementById('file-import').addEventListener('change', onImportFile);
 
+  document.querySelectorAll('[data-expfilter109]').forEach((bf109) => {
+    bf109.addEventListener('click', () => { expFilter109 = bf109.getAttribute('data-expfilter109') || 'gastos'; renderExpenses(); });
+  });
   document.getElementById('exp-prev').addEventListener('click', () => { expMonth = shiftMonth(expMonth, -1); renderExpenses(); });
   document.getElementById('exp-next').addEventListener('click', () => { expMonth = shiftMonth(expMonth, 1); renderExpenses(); });
   document.getElementById('exp-cancel-edit').addEventListener('click', resetExpenseForm);

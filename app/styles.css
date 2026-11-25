@@ -1721,7 +1721,7 @@ input[type="date"], input[type="time"] { max-width: 100%; min-width: 0; -webkit-
 .score-row91{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem;padding:.32rem 0;border-top:1px solid var(--line)}
 .score-main91{display:flex;align-items:baseline;gap:.55rem;min-width:0}
 .score-name91{font-weight:600;white-space:nowrap}
-.score-hint91{color:var(--muted);font-size:.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score-hint91{color:var(--muted);font-size:.85em;white-space:normal;overflow:visible;text-overflow:clip}
 .score-pts91{font-weight:700;white-space:nowrap}
 .score-dim91{opacity:.45}
 
@@ -1734,7 +1734,7 @@ input[type="date"], input[type="time"] { max-width: 100%; min-width: 0; -webkit-
 .set92-index-chev{opacity:.6}
 /* Punto 4: explicaciones a UNA línea (el texto completo sigue en
    el DOM; se corta visualmente con puntos suspensivos). */
-.set92-oneline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set92-oneline{white-space:normal;overflow:visible;text-overflow:clip}
 /* Puntos 7 y 8: filas de navegación («Cambiar PIN ›», «Copias de
    seguridad ›») con su estado a la derecha. */
 .set92-navrow{display:flex;align-items:center;gap:.6rem;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:.62rem 0;font:inherit;color:inherit;text-align:left;cursor:pointer}
@@ -1976,3 +1976,42 @@ html[data-accent="verde"] .chat-action93{color:#1A1A3E}
 .chat-head107{display:flex;align-items:center;gap:.75rem;margin:0 0 .35rem}
 .chat-head107 h2{margin:0;flex:1 1 auto;min-width:0}
 .safe-top107{position:fixed;top:0;left:0;right:0;height:var(--sat);z-index:64;pointer-events:none;background:radial-gradient(640px 320px at 88% -4%, rgba(245,166,35,.13), rgba(245,166,35,0) 62%),radial-gradient(760px 420px at -12% 0%, rgba(70,70,180,.14), rgba(70,70,180,0) 58%),var(--bg);background-attachment:fixed}
+
+/* ===== Compilación 109 · «Orden» ===== */
+/* Resumen: una columna flexible para ORDENAR los tres bloques de
+   arriba (mes, Score, ideas) y empujar el resto, plegado, debajo.
+   [hidden] sigue mandando (display:none !important global). */
+#view-resumen{display:flex;flex-direction:column}
+#view-resumen .month-nav{order:1}
+#view-resumen #month-card91{order:2}
+#view-resumen #score-card{order:3}
+#view-resumen #resumen-insights{order:4}
+#view-resumen .fold109{order:5}
+#view-resumen #review-card{order:6}
+.fold109{margin:0 0 12px}
+.fold109-head{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink,#fff);font:inherit;font-weight:600;cursor:pointer}
+.fold109-head .fold109-chev{margin-left:auto;color:var(--muted)}
+.fold109-body{padding-top:10px}
+.fold109-body>.card:first-child{margin-top:0}
+/* Gastos: cabecera compacta con el filtro pegado al título */
+.exp-head109{flex-wrap:wrap;gap:8px}
+.exp-filter109{display:flex;gap:6px;margin-left:auto}
+.exp-filter109-btn{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:6px 12px;font:inherit;font-size:.85rem;cursor:pointer}
+.exp-filter109-btn.active{background:var(--accent);border-color:var(--accent);color:#13132B;font-weight:700}
+.total109{font-size:1.05rem}
+/* Ajustes: grupos por tema dentro de la tarjeta de la cuenta */
+.set109-group{border-top:1px solid var(--line);margin-top:14px;padding-top:10px}
+.set109-group>h3{margin:0 0 8px}
+.danger109{border-color:var(--danger)}
+.autocat109{margin:10px 0 0}
+/* Personalización: control segmentado de modos y descripciones */
+.mode109{display:flex;gap:6px;margin:0 0 10px}
+.mode109-btn{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:10px;padding:9px 6px;font:inherit;font-size:.9rem;cursor:pointer}
+.mode109-btn.active{background:var(--accent);border-color:var(--accent);color:#13132B;font-weight:700}
+.sec109-main{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sec109-desc{font-size:.78rem;color:var(--muted);white-space:normal}
+.help109-row{display:flex;align-items:center;gap:10px;margin:10px 0 4px}
+.help109-row .btn{margin-left:auto}
+/* Podcast: la invitación a Spotify al final de la lista */
+.pod109-more{margin-top:12px;text-align:center}
+.pod109-more p{margin:0 0 8px}

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Compilación 109 · «Orden» -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -48,7 +49,6 @@
      con el resumen agregado que la app arma en el teléfono. -->
 <section id="view-chat" class="view chat-view" hidden>
   <div class="chat-head107">
-    <button id="ai-chat-back-fab101" class="chat-back-fab101" type="button" data-i18n-aria="ob_signin_back" aria-label="Volver"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <h2 data-i18n="ai2_chat_title">Pregúntale a tu dinero</h2>
   </div>
   <button class="btn btn-back" type="button" id="ai-chat-back" data-i18n="back">← Todas las opciones</button>
@@ -366,12 +366,17 @@
   <main id="view-gastos" class="view" hidden>
     <button class="btn btn-back" type="button" data-nav="home" data-i18n="back">← Todas las opciones</button>
     <h2 data-i18n="sec_gastos">Gastos del mes</h2>
+    <div class="exp-filter109" role="group">
+      <button type="button" class="exp-filter109-btn active" data-expfilter109="gastos" data-i18n="c109_filter_expenses">Gastos</button>
+      <button type="button" class="exp-filter109-btn" data-expfilter109="transferencias" data-i18n="c109_filter_transfers">Transferencias</button>
+      <button type="button" class="exp-filter109-btn" data-expfilter109="todo" data-i18n="c109_filter_all">Todo</button>
+    </div>
     <div class="month-nav">
       <button id="exp-prev" class="btn btn-ghost" type="button" data-i18n-aria="month_prev_aria" aria-label="Mes anterior">‹</button>
       <span id="exp-month-label" class="month-label"></span>
       <button id="exp-next" class="btn btn-ghost" type="button" data-i18n-aria="month_next_aria" aria-label="Mes siguiente">›</button>
     </div>
-    <p class="total-line"><span data-i18n="exp_total_label">Total del mes:</span> <strong id="exp-total">$0.00</strong></p>
+    <p class="total-line total109"><span id="exp-total-label109">Gastado en el mes</span> <strong id="exp-total">$0.00</strong></p>
     <p class="muted small" id="exp-total-note89"></p>
     <!-- Compilación 105 (punto 2): «+ Nuevo» abre DIRECTO el
          formulario manual «Nuevo gasto». -->
@@ -631,31 +636,28 @@
          presentación de ingresos/gastos/ahorro del mes en toda
          la vista (la pinta renderMonthCard91 con reportData). -->
     <section id="month-card91" class="card report-card"></section>
-    <h3 data-i18n="trend_title">Tendencia de gasto</h3>
-    <canvas id="trend-canvas" width="640" height="200"></canvas>
+    <div class="fold109"><button type="button" class="fold109-head" aria-expanded="false"><span data-i18n="trend_title">Tendencia de gasto</span><span class="fold109-chev" aria-hidden="true">›</span></button><div class="fold109-body" hidden><canvas id="trend-canvas" width="640" height="200"></canvas>
     <p id="trend-empty" class="empty-state" hidden data-i18n="trend_empty">Todavía no hay gastos para mostrar la tendencia.</p>
     <h3 id="trend-weeks-h" data-i18n="trend_weeks">Semanas de este mes</h3>
     <div id="trend-weeks"></div>
-    <div id="biz-card" class="card report-card" hidden></div>
+    </div></div><div class="fold109"><button type="button" class="fold109-head" aria-expanded="false"><span data-i18n="c109_group_business">Negocio</span><span class="fold109-chev" aria-hidden="true">›</span></button><div class="fold109-body" hidden><div id="biz-card" class="card report-card" hidden></div>
     <!-- Compilación 91 (puntos 1 y 2): la tabla del informe ya no
          se pinta aparte (es la tarjeta del mes, arriba) y queda
          UN solo botón «Compartir» en la vista: abre el selector
          con texto, imagen del mes, imagen del año y descarga. -->
-    <button id="btn-share-report" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button>
-    <!-- Compilación 91 (punto 1): la tarjeta del año conserva
+    </div></div>    <!-- Compilación 91 (punto 1): la tarjeta del año conserva
          solo su dato propio (el mejor mes) y se oculta cuando no
          hay mejor mes; las acciones y el estado de «Compartir mi
          año» viven fuera para seguir visibles al compartir. -->
-    <div id="year-card" class="card report-card">
+    <div class="fold109"><button type="button" class="fold109-head" aria-expanded="false"><span data-i18n="year_title">Tu año en dinero</span><span class="fold109-chev" aria-hidden="true">›</span></button><div class="fold109-body" hidden><div id="year-card" class="card report-card">
       <h3 id="year-title"></h3>
       <div id="year-body"></div>
     </div>
     <div id="year-actions"></div>
     <p id="year-status" class="muted small" aria-live="polite"></p>
-    <div id="review-card" class="card" hidden></div>
+    </div></div><div id="review-card" class="card" hidden></div>
     <!-- Compilación 76: flujo de caja futuro 30/60/90 días. -->
-    <section id="flow-card" class="card">
-      <h3 data-i18n="flow_title">Flujo de caja futuro</h3>
+    <div class="fold109"><button type="button" class="fold109-head" aria-expanded="false"><span data-i18n="flow_title">Flujo de caja próximo</span><span class="fold109-chev" aria-hidden="true">›</span></button><div class="fold109-body" hidden><section id="flow-card" class="card">
       <div class="form-actions">
         <button type="button" class="btn btn-ghost active" data-flow-days="30" data-i18n="flow_d30">30 días</button>
         <button type="button" class="btn btn-ghost" data-flow-days="60" data-i18n="flow_d60">60 días</button>
@@ -671,7 +673,7 @@
          motor ni mueve nada. -->
     <section id="flow-ai98-card" class="card">
       <h3 data-i18n="c98_fc_title">🔮 Tu flujo, predicho con IA</h3>
-      <p class="muted small" data-i18n="c98_fc_note">La IA toma la proyección que la app ya calcula —tu ritmo de cobro, tus pagos fijos y tu ritmo de gasto— y te dice el saldo esperado en las fechas clave, los días de riesgo y qué mover para evitarlos. Es un texto para ti: no mueve nada.</p>
+      <p class="muted small" data-i18n="c109_flowai_line">La IA toma tu proyección y te dice el saldo esperado en las fechas clave, los días de riesgo y qué mover para evitarlos.</p>
       <div class="form-actions">
         <button id="flow-ai98-btn" type="button" class="btn btn-secondary" data-i18n="c98_fc_btn">✨ Predecir mi flujo</button>
       </div>
@@ -679,8 +681,7 @@
       <div id="flow-ai98-results"></div>
     </section>
     <!-- Compilación 76: detector de gastos hormiga anualizado. -->
-    <section id="ants-card" class="card">
-      <h3 data-i18n="ants_title">Gastos hormiga</h3>
+    </div></div><div class="fold109"><button type="button" class="fold109-head" aria-expanded="false"><span data-i18n="ants_title">Gastos hormiga</span><span class="fold109-chev" aria-hidden="true">›</span></button><div class="fold109-body" hidden><section id="ants-card" class="card">
       <label for="ants-max" data-i18n="ants_max_label">Compras de hasta</label>
       <select id="ants-max">
         <option value="1000">$10</option>
@@ -689,7 +690,8 @@
       </select>
       <div id="ants-body"></div>
     </section>
-    <h3 data-i18n="adv_title">Informe avanzado</h3>
+    </div></div><div class="fold109"><button type="button" class="fold109-head" aria-expanded="false"><span data-i18n="c109_reports_title">Informes</span><span class="fold109-chev" aria-hidden="true">›</span></button><div class="fold109-body" hidden>
+    <button id="btn-share-report" type="button" class="btn btn-secondary" data-i18n="share_btn">Compartir resumen</button><h3 data-i18n="adv_title">Informe avanzado</h3>
     <p class="muted small" data-i18n="adv_note">Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.</p>
     <div id="adv-card" class="card report-card" hidden></div>
     <button id="btn-adv-open" type="button" class="btn btn-secondary" data-i18n="adv_open_btn">Ver informe avanzado</button>
@@ -714,7 +716,7 @@
         <p id="mr-status" class="muted small" aria-live="polite"></p>
       </div>
     </section>
-  </main>
+  </div></div></main>
 
   <!-- ======= BUSCAR ======= -->
   <main id="view-buscar" class="view" hidden>
@@ -1112,6 +1114,7 @@
     </div>
     <p id="podcast-status" class="muted" role="status" hidden></p>
     <div id="podcast-list" class="podcast-list"></div>
+    <div id="podcast-more109" class="pod109-more" hidden></div>
     <div class="podcast-player" id="podcast-player">
       <button type="button" class="btn btn-primary podcast-toggle" id="podcast-toggle" aria-label="Reproducir">▶</button>
       <div class="podcast-player-main">
@@ -1366,8 +1369,7 @@
       
       
 
-      <h3 data-i18n="set_reminders_title">Recordatorios</h3>
-      <label for="set-payfreq" data-i18n="payfreq_label">Frecuencia de cobro</label>
+      <section class="set109-group"><h3 data-i18n="set_reminders_title">Recordatorios</h3><label for="set-payfreq" data-i18n="payfreq_label">Frecuencia de cobro</label>
       <select id="set-payfreq">
         <option value="semanal" data-i18n="payfreq_semanal">Semanal</option>
         <option value="quincenal" data-i18n="payfreq_quincenal">Quincenal</option>
@@ -1396,24 +1398,23 @@
       </label>
       <p class="muted small set92-oneline" data-i18n="set_autofixed_help">Al vencer un pago fijo, el gasto se anota solo. Puedes deshacerlo al momento.</p>
 
-      <h3 data-i18n="summary_title">Resumen diario</h3>
-      <p class="muted small set92-oneline" data-i18n="summary_help">Un aviso con lo que gastaste ayer y lo que puedes gastar hoy, a la hora que elijas.</p>
+      </section>      <section class="set109-group"><h3 data-i18n="summary_title">Resumen diario</h3><p class="muted small set92-oneline" data-i18n="summary_help">Un aviso con lo que gastaste ayer y lo que puedes gastar hoy, a la hora que elijas.</p>
       <label class="toggle-row"><span data-i18n="summary_notif_label">Resumen por notificación</span><input type="checkbox" id="set-summary"></label>
-      <label for="set-summary-time" data-i18n="summary_time_label">Hora del resumen</label>
+      <div id="summary-deps109"><label for="set-summary-time" data-i18n="summary_time_label">Hora del resumen</label>
       <input id="set-summary-time" type="time">
       <div id="summary-email-row" hidden>
         <label class="toggle-row"><span data-i18n="summary_email_label">Recibir también por correo</span><input type="checkbox" id="set-summary-email"></label>
         <p class="muted small set92-oneline" data-i18n="summary_email_help">Solo con tu cuenta en la nube activa: el mismo resumen llega también a tu correo.</p>
       </div>
 
-      <label class="toggle-row">
+      </div></section><section class="set109-group"><h3 data-i18n="c109_group_business">Negocio</h3><label class="toggle-row">
         <span data-i18n="set_biz_label">Tengo un negocio</span>
         <input type="checkbox" id="set-biz">
       </label>
       <p class="muted small set92-oneline" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</p>
 
       
-      <section class="card form-card setacc-nested" id="settings-cloud">
+      </section><section class="card form-card setacc-nested" id="settings-cloud">
             <div class="sections-head" id="setacc-cloud-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-cloud-body">
               <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
               <span class="sections-summary muted small" id="setacc-cloud-summary"></span>
@@ -1440,11 +1441,7 @@
               <p class="muted small" id="cloud-sync-status"></p>
               <div class="form-actions">
                 <button id="btn-cloud-sync" type="button" class="btn btn-secondary" data-i18n="cloud_sync_now">Sincronizar ahora</button>
-                <button id="btn-cloud-signout" type="button" class="btn btn-ghost" data-i18n="cloud_signout">Cerrar sesión</button>
                 <button id="btn-cloud-wipe" type="button" class="btn btn-ghost" data-i18n="cloud_wipe">Borrar mis datos de la nube</button>
-              </div>
-              <div class="form-actions">
-                <button id="btn-cloud-delete" type="button" class="btn btn-danger" data-i18n="cloud_delete">Eliminar mi cuenta</button>
               </div>
               <p class="muted small" data-i18n="c105_cloud_two_lines">«Borrar mis datos de la nube» borra solo la copia guardada en la nube: tu cuenta sigue existiendo y los datos de este teléfono no se tocan. «Eliminar mi cuenta» lo borra TODO —cuenta y datos— para siempre.</p>
             </div>
@@ -1596,28 +1593,7 @@
            resto de campos al cambiar). El renglón de arriba es el
            aviso en vivo de la suma del reparto. -->
       
-      <section class="card form-card setacc-nested" id="settings-rules">
-            <div class="sections-head" id="setacc-rules-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-rules-body">
-              <h3 data-i18n="rules_title">Mis reglas de categorías</h3>
-              <span class="sections-summary muted small" id="setacc-rules-summary"></span>
-              <span class="sections-chevron" aria-hidden="true">▸</span>
-            </div>
-            <div id="setacc-rules-body" hidden>
-            <p class="muted small set92-oneline" data-i18n="rules_help">Si la nota o el comercio contiene el texto, el gasto va a la categoría que elijas. Se aplican a lo que trae tu banco y al escribir la nota de un gasto nuevo.</p>
-            <p class="muted small set92-oneline" data-i18n="c96_rules_learned_help">PETO Finanzas también aprende solo: cuando corriges la categoría de un gasto, guarda la regla y la aplica la próxima vez. Las reglas aprendidas se marcan como «aprendida sola».</p>
-            <ul id="rules-list" class="item-list"></ul>
-            <p id="rules-empty" class="empty-state" data-i18n="rules_empty">Todavía no tienes reglas.</p>
-            <label for="rule-match" data-i18n="rules_match_label">Texto que contiene la nota o el comercio</label>
-            <input id="rule-match" type="text" maxlength="40" data-i18n-ph="rules_match_ph" placeholder="Contiene… (ej.: Shell)">
-            <label for="rule-category" data-i18n="category_label">Categoría</label>
-            <select id="rule-category"></select>
-            <p id="rules-error" class="error" role="alert" hidden></p>
-            <div class="form-actions">
-              <button id="rule-add" type="button" class="btn btn-secondary" data-i18n="rules_add">Añadir regla</button>
-            </div>
-            </div>
-          </section>
-      
+      <p class="muted small autocat109" data-i18n="c109_autocat_help">Las categorías se aplican solas: al sincronizar tu banco, cada cargo entra ya categorizado — primero el comercio conocido, después lo que la app aprendió cuando corregiste un cargo, y la IA resuelve lo que nadie conoce. Si corriges un cargo, la app aprende en silencio para la próxima vez.</p>
       </div>
     </section>
 
@@ -1731,14 +1707,21 @@
       </div>
       <div id="sections-body" hidden>
         <p class="muted small set92-oneline" data-i18n="set_sections_help">Apaga las que no uses para tener una lista más corta.</p>
-        <div class="form-actions">
-          <button id="set-mode-essential" type="button" class="btn btn-secondary" data-i18n="set_mode_essential_btn">Modo Lo esencial</button>
-          <button id="set-mode-all" type="button" class="btn btn-ghost" data-i18n="set_mode_all_btn">Mostrar todo</button>
-          <button id="btn-open-tour100" type="button" class="btn btn-secondary" data-i18n="tour100_settings_btn">Ver el tour</button>
+        <div class="mode109" id="mode109" role="group">
+          <button type="button" class="mode109-btn" data-mode109="all" data-i18n="c109_mode_all">Todo</button>
+          <button type="button" class="mode109-btn" data-mode109="essential" data-i18n="c109_mode_essential">Esencial</button>
+          <button type="button" class="mode109-btn" data-mode109="custom" data-i18n="c109_mode_custom">Personalizado</button>
         </div>
         <div id="section-toggles"></div>
       
-      <label for="set-textsize" data-i18n="set_textsize_label">Tamaño del texto</label>
+      <section class="card form-card nested-card" id="settings-appearance109">
+          <button type="button" class="setacc-head" id="setacc-appearance-head" aria-expanded="false">
+            <span class="setacc-title" data-i18n="c109_appearance_title">Apariencia</span>
+            <span class="setacc-summary" id="setacc-appearance-summary"></span>
+            <span class="setacc-chev" aria-hidden="true">›</span>
+          </button>
+          <div class="setacc-body" id="setacc-appearance-body" hidden>
+            <label for="set-textsize" data-i18n="set_textsize_label">Tamaño del texto</label>
       <select id="set-textsize">
         <option value="normal" data-i18n="textsize_normal">Normal</option>
         <option value="grande" data-i18n="textsize_large">Grande</option>
@@ -1756,6 +1739,9 @@
         <option value="morado" data-i18n="accent_morado">Morado</option>
         <option value="naranja" data-i18n="accent_naranja">Naranja</option>
       </select>
+          </div>
+        </section>
+        <div class="help109-row"><span class="muted small" data-i18n="c109_help_label">Ayuda</span><button type="button" class="btn btn-secondary" id="btn-open-tour100" data-i18n="tour100_settings_btn">Ver el tour</button></div>
       
       </div>
     </section>
@@ -1764,6 +1750,14 @@
          va de Ajustes; cerrar/bloquear lo manda el bloqueo (PIN y
          huella, con su fila de bloquear). El pie de Ajustes lleva
          la compilación UNA sola vez (punto 12). -->
+        <section class="card form-card danger109" id="danger-zone109" hidden>
+          <h3 data-i18n="c109_danger_title">Zona delicada</h3>
+          <p class="muted small" data-i18n="c109_danger_help">Aquí están las dos acciones con más peso: cerrar tu sesión y eliminar tu cuenta con todos sus datos. No se pueden deshacer.</p>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="btn-cloud-signout" data-i18n="cloud_signout">Cerrar sesión</button>
+            <button type="button" class="btn btn-danger" id="btn-cloud-delete" data-i18n="cloud_delete">Eliminar mi cuenta</button>
+          </div>
+        </section>
     <p class="muted small build-label" id="settings-build-label">Compilación 57</p>
   </main>
 
