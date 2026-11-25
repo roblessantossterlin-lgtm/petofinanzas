@@ -1,5 +1,5 @@
-/* PETO — idioma del sitio público petofinanzas: español por defecto, italiano opcional.
-   Patrón: cada página define window.PETO_TEXTOS = { es: {...}, it: {...} } en un
+/* PETO — idioma del sitio público petofinanzas: español por defecto, inglés opcional.
+   Patrón: cada página define window.PETO_TEXTOS = { es: {...}, en: {...} } en un
    script en línea ANTES de cargar este archivo, y marca sus textos con
    data-i18n="clave" (contenido) y data-i18n-attr="placeholder:clave;alt:clave2"
    (atributos). Las claves especiales __title y __desc traducen el <title> y la
@@ -13,7 +13,7 @@
 
   function idiomaGuardado() {
     try {
-      return localStorage.getItem(CLAVE) === 'it' ? 'it' : 'es';
+      return localStorage.getItem(CLAVE) === 'en' ? 'en' : 'es';
     } catch (e) {
       return 'es';
     }
@@ -53,7 +53,7 @@
   }
 
   function cambiar(lang) {
-    var l = lang === 'it' ? 'it' : 'es';
+    var l = lang === 'en' ? 'en' : 'es';
     try { localStorage.setItem(CLAVE, l); } catch (e) { /* sin almacenamiento: se aplica igual */ }
     aplicar(l);
   }
