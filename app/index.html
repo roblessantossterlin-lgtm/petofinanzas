@@ -290,16 +290,7 @@
       <!-- Compilación 99 · P8: «¿Te lo puedes permitir?» — la
            persona escribe un monto y la IA responde sí/no con sus
            números reales (ritmo seguro de hoy y próximo bajón). -->
-          <!-- Compilación 105 (puntos 2 y 6): las dos acciones que un
-         cliente nuevo no encontraba — agregar un gasto SIN pasar
-         por el chat y el Centro de suscripciones sin bajar hasta
-         el fondo de Pagos fijos. -->
-    <div class="form-actions home-actions105">
-      <button id="home-add-exp105" class="btn btn-primary btn-big" type="button" data-i18n="c105_add_expense_btn">+ Agregar gasto</button>
-      <button id="home-subs105" class="btn btn-secondary btn-big" type="button" data-i18n="c105_subs_btn">🔁 Suscripciones</button>
-    </div>
-
-    <div id="afford99" class="afford99">
+      <div id="afford99" class="afford99">
         <label class="afford99-label" for="afford99-amount" data-i18n="c99_afford_label">¿Te lo puedes permitir?</label>
         <div class="afford99-row">
           <input id="afford99-amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
@@ -313,6 +304,15 @@
         </div>
       </div>
     </section>
+
+    <!-- Compilación 106 (punto 2): las dos acciones de la 105
+         («+ Agregar gasto» y «Suscripciones») salen de la tarjeta
+         verde — la hacían crecer — y viven en una fila compacta
+         DEBAJO de ella, fuera de la tarjeta. -->
+    <div class="home-actions106">
+      <button id="home-add-exp105" class="btn btn-primary" type="button" data-i18n="c105_add_expense_btn">+ Agregar gasto</button>
+      <button id="home-subs105" class="btn btn-secondary" type="button" data-i18n="c105_subs_btn">🔁 Suscripciones</button>
+    </div>
 
     <section id="home-today" class="card"></section>
 
@@ -1347,7 +1347,7 @@
       </div>
       <div id="setacc-profile-body" hidden>
       <label for="set-name" data-i18n="set_name_label">Tu nombre</label>
-      <input id="set-name" type="text" maxlength="40" readonly aria-readonly="true">
+      <input id="set-name" type="text" maxlength="40" autocomplete="name">
       
       <label for="set-currency" data-i18n="set_currency_label">Moneda</label>
       <select id="set-currency"></select>
@@ -1824,7 +1824,7 @@
   <!-- Compilación 88 · UN SOLO botón flotante de cristal
        (sin verde) que abre DIRECTAMENTE el chat universal. El
        desplegable de tres botones de la Comp. 85 quedó cancelado. -->
-  <button id="fab-universal" class="fab fab-universal88 fab-labeled105" type="button" data-i18n-aria="chat88_fab_aria" aria-label="Abrir el chat de PETO" data-i18n="c105_fab_label">✨ Agregar / Preguntar</button>
+  <button id="fab-universal" class="fab fab-universal88" type="button" data-i18n-aria="chat88_fab_aria" aria-label="Abrir el chat de PETO">✨</button>
   <!-- Compilación 86 · Añadido 10: pantalla de permisos de primer uso. -->
 <section id="view-perms" class="view perms-view" hidden>
   <header class="chat-head">
