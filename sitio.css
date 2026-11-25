@@ -67,3 +67,6 @@ footer.site a{color:#B9B9D9}
   header.site nav .btn{text-align:center;margin-top:.35rem}
   header.site nav .lang-switch{padding:.45rem 0}
 }
+
+/* Botón dentro de la navegación: el texto va marino oscuro sobre el ámbar (la regla de enlaces del nav no debe pisarlo) */
+header.site nav a.btn,header.site nav a.btn:hover{color:#13132B}
