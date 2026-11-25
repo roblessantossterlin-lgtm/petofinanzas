@@ -1,63 +1,63 @@
-/* PETO — sitio público petofinanzas. Marca: verde #35c184 sobre negro #0a0f0d. */
+/* PETO — sitio público petofinanzas. Marca: ámbar #F5A623 sobre marino #1A1A3E. */
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#0a0f0d;color:#e8f0ec;line-height:1.6}
-a{color:#35c184}
+body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#1A1A3E;color:#FFFFFF;line-height:1.6}
+a{color:#F5A623}
 .wrap{max-width:920px;margin:0 auto;padding:0 1.2rem 3rem}
 header.site{display:flex;align-items:center;gap:.8rem;padding:1.1rem 0;flex-wrap:nowrap}
 header.site img{width:48px;height:48px;border-radius:12px}
-header.site .brand{font-size:1.22rem;font-weight:800;letter-spacing:.02em;color:#e8f0ec;text-decoration:none;white-space:nowrap}
+header.site .brand{font-size:1.22rem;font-weight:800;letter-spacing:.02em;color:#FFFFFF;text-decoration:none;white-space:nowrap}
 header.site nav{margin-left:auto;display:flex;gap:.65rem;flex-wrap:nowrap;align-items:center}
-header.site nav a{color:#cfe3d8;text-decoration:none;font-size:.93rem;white-space:nowrap}
-header.site nav a:hover{color:#35c184}
-.btn{display:inline-block;background:#35c184;color:#06231a;font-weight:700;text-decoration:none;padding:.7rem 1.3rem;border-radius:12px;border:none;cursor:pointer;font-size:1rem}
-.btn:hover{background:#2cab73}
-.btn.ghost{background:transparent;color:#35c184;border:1.5px solid #35c184}
+header.site nav a{color:#B9B9D9;text-decoration:none;font-size:.93rem;white-space:nowrap}
+header.site nav a:hover{color:#F5A623}
+.btn{display:inline-block;background:#F5A623;color:#13132B;font-weight:700;text-decoration:none;padding:.7rem 1.3rem;border-radius:12px;border:none;cursor:pointer;font-size:1rem}
+.btn:hover{background:#FFB93E}
+.btn.ghost{background:transparent;color:#F5A623;border:1.5px solid #F5A623}
 .hero{padding:1.6rem 0 1rem;text-align:left}
 .hero h1{font-size:2.2rem;line-height:1.15;margin:.4rem 0 .8rem}
-.hero h1 .verde{color:#35c184}
-.hero p.sub{font-size:1.12rem;color:#c4d8cc;max-width:640px}
-.hero img.banner{width:100%;border-radius:16px;margin:1.4rem 0 .4rem;border:1px solid #22332b}
+.hero h1 .verde{color:#F5A623}
+.hero p.sub{font-size:1.12rem;color:#B9B9D9;max-width:640px}
+.hero img.banner{width:100%;border-radius:16px;margin:1.4rem 0 .4rem;border:1px solid #34346B}
 .cta-row{display:flex;gap:.8rem;flex-wrap:wrap;margin:1.2rem 0}
 section{margin-top:2.6rem}
-h2{color:#35c184;font-size:1.45rem;margin:.2rem 0 1rem}
+h2{color:#F5A623;font-size:1.45rem;margin:.2rem 0 1rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
-.card{background:#101915;border:1px solid #22332b;border-radius:16px;padding:1.2rem 1.1rem}
+.card{background:#26265A;border:1px solid #34346B;border-radius:16px;padding:1.2rem 1.1rem}
 .card h3{margin:.2rem 0 .5rem;font-size:1.08rem}
-.card p{color:#c4d8cc;margin:.2rem 0 .8rem;font-size:.97rem}
+.card p{color:#B9B9D9;margin:.2rem 0 .8rem;font-size:.97rem}
 .card .emoji{font-size:1.6rem}
-.muted{color:#9db4a9}
-.big{font-size:2rem;font-weight:800;color:#35c184}
-form.calc{background:#101915;border:1px solid #22332b;border-radius:16px;padding:1.3rem 1.2rem;max-width:560px}
+.muted{color:#B9B9D9}
+.big{font-size:2rem;font-weight:800;color:#F5A623}
+form.calc{background:#26265A;border:1px solid #34346B;border-radius:16px;padding:1.3rem 1.2rem;max-width:560px}
 form.calc label{display:block;margin:.9rem 0 .3rem;font-weight:600}
-form.calc input,form.calc select{width:100%;padding:.65rem .7rem;border-radius:10px;border:1px solid #2c463a;background:#0a0f0d;color:#e8f0ec;font-size:1rem}
+form.calc input,form.calc select{width:100%;padding:.65rem .7rem;border-radius:10px;border:1px solid #34346B;background:#13132B;color:#FFFFFF;font-size:1rem}
 form.calc .btn{margin-top:1.2rem;width:100%}
-.resultado{margin-top:1.3rem;background:#0e2019;border:1px solid #2c463a;border-radius:12px;padding:1rem 1.1rem;display:none;max-width:560px}
+.resultado{margin-top:1.3rem;background:#23234F;border:1px solid #34346B;border-radius:12px;padding:1rem 1.1rem;display:none;max-width:560px}
 .resultado.visible{display:block}
-.resultado .cifra{font-size:1.7rem;font-weight:800;color:#35c184}
+.resultado .cifra{font-size:1.7rem;font-weight:800;color:#F5A623}
 .error{color:#ff9c9c;font-weight:600}
 table.turnos{border-collapse:collapse;margin-top:.8rem;width:100%;max-width:560px}
-table.turnos th,table.turnos td{border:1px solid #2c463a;padding:.45rem .7rem;text-align:left}
-table.turnos th{color:#35c184}
-footer.site{border-top:1px solid #22332b;margin-top:3.2rem;padding:1.4rem 0 .4rem;color:#9db4a9;font-size:.95rem}
-footer.site a{color:#cfe3d8}
+table.turnos th,table.turnos td{border:1px solid #34346B;padding:.45rem .7rem;text-align:left}
+table.turnos th{color:#F5A623}
+footer.site{border-top:1px solid #34346B;margin-top:3.2rem;padding:1.4rem 0 .4rem;color:#B9B9D9;font-size:.95rem}
+footer.site a{color:#B9B9D9}
 .crumb{font-size:.95rem;margin-top:1rem}
 .lang-switch{display:inline-flex;gap:.3rem;align-items:center}
-.lang-switch button{background:transparent;border:1px solid #2c463a;color:#cfe3d8;border-radius:8px;padding:.32rem .6rem;cursor:pointer;font-size:.88rem;font-weight:600}
-.lang-switch button:hover{border-color:#35c184;color:#35c184}
-.lang-switch button.activo{background:#35c184;border-color:#35c184;color:#06231a}
-.lang-switch button.activo:hover{color:#06231a}
+.lang-switch button{background:transparent;border:1px solid #34346B;color:#B9B9D9;border-radius:8px;padding:.32rem .6rem;cursor:pointer;font-size:.88rem;font-weight:600}
+.lang-switch button:hover{border-color:#F5A623;color:#F5A623}
+.lang-switch button.activo{background:#F5A623;border-color:#F5A623;color:#13132B}
+.lang-switch button.activo:hover{color:#13132B}
 .pila{display:grid;gap:1rem}
-.ep-fecha{color:#9db4a9;font-size:.9rem;margin:0}
-.precio{font-size:2rem;font-weight:800;color:#35c184;margin:.3rem 0;line-height:1.2}
-.precio small{font-size:.95rem;color:#9db4a9;font-weight:600}
-.card ul{margin:.4rem 0 .8rem;padding-left:1.15rem;color:#c4d8cc}
+.ep-fecha{color:#B9B9D9;font-size:.9rem;margin:0}
+.precio{font-size:2rem;font-weight:800;color:#F5A623;margin:.3rem 0;line-height:1.2}
+.precio small{font-size:.95rem;color:#B9B9D9;font-weight:600}
+.card ul{margin:.4rem 0 .8rem;padding-left:1.15rem;color:#B9B9D9}
 .card li{margin:.32rem 0}
-.card.destacado{border-color:#35c184}
+.card.destacado{border-color:#F5A623}
 
 /* Menú hamburguesa (24-nov-2026): la barra cabe en UNA línea en escritorio
    y se colapsa a botón ☰ en pantallas estrechas. */
-.nav-toggle{display:none;background:transparent;border:1.5px solid #35c184;color:#35c184;border-radius:10px;font-size:1.3rem;line-height:1;padding:.45rem .75rem;cursor:pointer;margin-left:auto}
-.hero-tag{font-size:1.3rem;font-weight:700;color:#e8f0ec;margin:.2rem 0 .4rem}
+.nav-toggle{display:none;background:transparent;border:1.5px solid #F5A623;color:#F5A623;border-radius:10px;font-size:1.3rem;line-height:1;padding:.45rem .75rem;cursor:pointer;margin-left:auto}
+.hero-tag{font-size:1.3rem;font-weight:700;color:#FFFFFF;margin:.2rem 0 .4rem}
 @media (max-width:980px){
   header.site{flex-wrap:wrap}
   .nav-toggle{display:inline-block}
