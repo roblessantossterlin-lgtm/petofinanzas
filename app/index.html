@@ -503,6 +503,15 @@
          quedaban al final de una pantalla larguísima). -->
     <p class="total-line"><span data-i18n="sav_total_label">Total ahorrado:</span> <strong id="sav-total">$0.00</strong></p>
     <p class="total-line"><span data-i18n="sav_month_label">Ahorrado este mes:</span> <strong id="sav-month-total">$0.00</strong></p>
+    <!-- Compilación 108: desglose del total — lo que viene solo
+         del banco (saldo real de las cuentas de ahorro) y lo
+         manual, con su nota si el banco no trae cuenta de
+         ahorros o se desconectó. -->
+    <div id="sav-breakdown108" hidden>
+      <p class="total-line" id="sav-bank-auto108"><span data-i18n="c108_bank_auto_label">Ahorro en tu banco (automático)</span>: <strong>$0.00</strong></p>
+      <p class="total-line" id="sav-manual108"><span data-i18n="c108_manual_label">Ahorro manual</span>: <strong>$0.00</strong></p>
+      <p class="muted small" id="sav-bank-note108" hidden></p>
+    </div>
 
 <!-- Compilación 105 (punto 8): el fondo de emergencia va ARRIBA,
          antes de «Crear meta» — era lo último de la pantalla. -->
