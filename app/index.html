@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#00421C">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#1A1A3E">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13132B">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.plaid.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://muse.ai https://cdn.plaid.com; frame-src https://cdn.plaid.com; media-src 'self' https://muse.ai https://*.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="description" content="PETO Finanzas: organiza tus gastos, ingresos, presupuesto, cuentas y deudas desde el navegador. Entra con tu cuenta en la nube y tus datos se sincronizan con tu teléfono.">
 <meta property="og:type" content="website">
@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="web.css">
 </head>
 <body>
+<div class="safe-top107" aria-hidden="true"></div>
 
 <!-- ============ PANTALLA DE BLOQUEO (PIN) ============ -->
 <section id="view-lock" class="view lock-view" hidden>
@@ -46,9 +47,11 @@
      conversación vive solo aquí (no se guarda) y la IA responde
      con el resumen agregado que la app arma en el teléfono. -->
 <section id="view-chat" class="view chat-view" hidden>
-  <button id="ai-chat-back-fab101" class="chat-back-fab101" type="button" data-i18n-aria="ob_signin_back" aria-label="Volver"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+  <div class="chat-head107">
+    <button id="ai-chat-back-fab101" class="chat-back-fab101" type="button" data-i18n-aria="ob_signin_back" aria-label="Volver"><svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h2 data-i18n="ai2_chat_title">Pregúntale a tu dinero</h2>
+  </div>
   <button class="btn btn-back" type="button" id="ai-chat-back" data-i18n="back">← Todas las opciones</button>
-  <h2 data-i18n="ai2_chat_title">Pregúntale a tu dinero</h2>
   <div id="ai-chat-msgs" class="chat-msgs"></div>
   <p id="ai-chat-status" class="muted small" aria-live="polite"></p>
   <p id="ai-usage-line" class="muted small" aria-live="polite"></p>

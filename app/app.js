@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 106';
-const BUILD_NUM = 106;
+const BUILD_LABEL = 'Compilación 107';
+const BUILD_NUM = 107;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -780,7 +780,8 @@ function cleanHomeAi101(v) {
     out.afford = {
       text: a.text.slice(0, 900),
       cents: (typeof a.cents === 'number' && Number.isFinite(a.cents)) ? Math.trunc(a.cents) : 0,
-      date: date102(a.date)
+      date: date102(a.date),
+      sig: (typeof a.sig === 'string') ? a.sig.slice(0, 40) : ''
     };
   }
   const f = v.flow;
@@ -902,7 +903,9 @@ function validateData(raw) {
     ? { week: String(s.aiWeekly.week),
         lines: s.aiWeekly.lines.filter((x) => typeof x === 'string' && x.trim())
           .map((x) => x.slice(0, 240)).slice(0, 6),
-        at: (typeof s.aiWeekly.at === 'string') ? s.aiWeekly.at.slice(0, 40) : null }
+        at: (typeof s.aiWeekly.at === 'string') ? s.aiWeekly.at.slice(0, 40) : null,
+        day: /^\d{4}-\d{2}-\d{2}$/.test(String(s.aiWeekly.day || '')) ? String(s.aiWeekly.day) : '',
+        sig: (typeof s.aiWeekly.sig === 'string') ? s.aiWeekly.sig.slice(0, 40) : '' }
     : null;
   if (d.settings.aiWeekly && !d.settings.aiWeekly.lines.length) d.settings.aiWeekly = null;
   d.settings.homeAi101 = cleanHomeAi101(s.homeAi101);
@@ -15331,7 +15334,7 @@ function renderHomeSan() {
    tema claro/oscuro ya resuelto por canvasPalette): el segmento
    mayor va en el color pleno, los siguientes en tintes del mismo
    color y luego los neutros pizarra; «Otros» siempre en su gris.
-   Con el verde de marca se usa la paleta exacta de la guía. */
+   Con el ámbar de marca se usa la paleta exacta de la guía. */
 function hexToRgb100(hex) {
   const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
   if (!m) return null;
@@ -15348,7 +15351,7 @@ function hexMix100(hex, hex2, f) {
 const CHART_OTHERS_COLOR100 = '#d8dee3';
 function chartSegPalette100() {
   const base = canvasPalette().header;
-  if (String(base).toLowerCase() === '#0b6e4f') return ['#0b6e4f', '#35a37d', '#8fc1ae', '#5d6b7a', '#b9c4ce'];
+  if (String(base).toLowerCase() === '#f5a623') return ['#f5a623', '#ffb93e', '#ffd88a', '#6c6c9c', '#b9b9d9'];
   return [base, hexMix100(base, '#ffffff', 0.30), hexMix100(base, '#ffffff', 0.58), '#5d6b7a', '#b9c4ce'];
 }
 function chartColor(cat) {
@@ -25245,12 +25248,30 @@ function ai2HasWeekData() {
   return db.expenses.some((e) => e.date >= start && e.date <= end) ||
     db.incomes.some((i) => i.date >= start && i.date <= end);
 }
+/* Compilación 107 · «Frase del día renovada» (reporte de Sterlin:
+   «la frase del día no cambia, siempre da la misma»): el resumen
+   semanal también caduca — solo vale si es de ESTA semana, de HOY
+   y con la misma firma de hechos que lo generó; un movimiento
+   nuevo o una sincronización cambian los hechos y la firma deja
+   de cuadrar. Los registros anteriores a la 107 (sin día ni
+   firma) caducan al primer pintado. */
+function ai107Hash(str) {
+  let h = 5381;
+  const s = String(str || '');
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+function ai107WeekSig() { return ai107Hash(ai2WeekFacts()); }
+function ai107WeeklyValid(cache) {
+  return !!cache && cache.week === ai2WeekStartStr() &&
+    cache.day === todayStr() && !!cache.sig && cache.sig === ai107WeekSig();
+}
 function renderAiWeeklyCard() {
   const body = document.getElementById('ai2-weekly-body');
   if (!body || !db) return;
   clearNode(body);
   const cache = db.settings.aiWeekly;
-  if (cache && cache.week === ai2WeekStartStr() && cache.lines && cache.lines.length) {
+  if (cache && ai107WeeklyValid(cache) && cache.lines && cache.lines.length) {
     /* Compilación 87 (punto 4): en Inicio SOLO van las primeras 2
        líneas; el texto completo vive en su vista (el modal
        #home87-week-modal, que abre «Ver más») y el botón Refresh
@@ -25281,7 +25302,7 @@ function openHome87WeekModal() {
   if (!modal || !box) return;
   clearNode(box);
   const cache = db.settings && db.settings.aiWeekly;
-  const lines = (cache && Array.isArray(cache.lines)) ? cache.lines : [];
+  const lines = (cache && ai107WeeklyValid(cache) && Array.isArray(cache.lines)) ? cache.lines : [];
   for (const ln of lines) box.appendChild(el('p', 'ai-week-line', ln));
   modal.hidden = false;
   if (typeof syncAdsForModals === 'function') syncAdsForModals();
@@ -25299,7 +25320,7 @@ async function onAiWeeklyGenerate() {
     const lines = (Array.isArray(r && r.lines) ? r.lines : [])
       .filter((x) => typeof x === 'string' && x.trim()).slice(0, 6);
     if (!lines.length) throw new Error('ai_generic');
-    db.settings.aiWeekly = { week: ai2WeekStartStr(), lines: lines, at: new Date().toISOString() };
+    db.settings.aiWeekly = { week: ai2WeekStartStr(), lines: lines, at: new Date().toISOString(), day: todayStr(), sig: ai107WeekSig() };
     save();
   } catch (e) {
     if (status) status.textContent = aiErrorText(e);
@@ -25348,7 +25369,19 @@ function ai2FlowProjection() {
     nextStr: nextStr, short: proj.minCents < 0
   };
 }
-function ai2FlowSig(p) { return p.minDate + '|' + p.minCents + '|' + p.nextStr; }
+function ai2FlowSig(p) {
+  /* Compilación 107: la firma cubre todo lo que alimenta la frase
+     (saldo de hoy, pagos antes del cobro, ingresos recientes y
+     frecuencia): cualquier movimiento nuevo o sincronización la
+     cambia y la frase guardada deja de mostrarse. Resumen con
+     hash para que quepa en el saneado (300 caracteres). */
+  const inc = (db.incomes || []).slice()
+    .sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 8)
+    .map((i) => i.date + ':' + i.amountCents).join(',');
+  const evs = (p.events || []).map((e) => e.date + ':' + e.name + ':' + e.cents).join(',');
+  return p.minDate + '|' + p.minCents + '|' + p.nextStr + '|' +
+    ai107Hash(p.startCents + '|' + payFreqOf() + '|' + inc + '|' + evs);
+}
 function renderAiFlowCard() {
   const body = document.getElementById('ai2-flow-body');
   if (!body || !db) return;
@@ -25367,6 +25400,16 @@ function renderAiFlowCard() {
     if (db.settings.homeAi101.flow.date === todayStr()) {
       aiFlowState = db.settings.homeAi101.flow;
     } else {
+      db.settings.homeAi101 = { afford: db.settings.homeAi101.afford || null, flow: null };
+    }
+  }
+  /* Compilación 107: el estado EN MEMORIA también es de hoy — con
+     la app abierta de un día para otro (WebView reanudada), la
+     frase generada ayer se seguía enseñando indefinidamente:
+     era la causa de «siempre da la misma». */
+  if (aiFlowState && aiFlowState.date !== todayStr()) {
+    aiFlowState = null;
+    if (db.settings && db.settings.homeAi101 && db.settings.homeAi101.flow) {
       db.settings.homeAi101 = { afford: db.settings.homeAi101.afford || null, flow: null };
     }
   }
@@ -25435,7 +25478,7 @@ async function onAiFlowExplain() {
   try {
     const r = await aiFn('cashflow', { facts: facts, dailyPhrase: true });
     if (!r || !r.alert) throw new Error('ai_generic');
-    aiFlowState = { sig: ai2FlowSig(p), alert: r.alert };
+    aiFlowState = { sig: ai2FlowSig(p), alert: r.alert, date: todayStr() };
     if (db && db.settings) {
       const cur101 = (db.settings.homeAi101 && typeof db.settings.homeAi101 === 'object')
         ? db.settings.homeAi101 : {};
@@ -25587,12 +25630,20 @@ function canAffordLocal99(amountCents) {
    datos (settings.homeAi101, saneado en validateData) y se
    restauran al pintar Inicio, como ya hacía el resumen semanal
    con settings.aiWeekly. */
+/* Compilación 107: firma del veredicto «¿Me lo puedo permitir?»
+   desde el MISMO cálculo que lo alimentó: si los datos cambian,
+   el cálculo cambia y el veredicto guardado caduca. */
+function affordSig107(cents) {
+  const l = canAffordLocal99(cents);
+  if (!l) return '';
+  return ai107Hash([cents, l.verdict, l.todaySafe, l.minWith, l.minDate, l.left].join('|'));
+}
 function saveAfford101(text, cents) {
   if (!db || !db.settings) return;
   const cur = (db.settings.homeAi101 && typeof db.settings.homeAi101 === 'object')
     ? db.settings.homeAi101 : {};
   db.settings.homeAi101 = {
-    afford: { text: String(text).slice(0, 900), cents: cents, date: todayStr() },
+    afford: { text: String(text).slice(0, 900), cents: cents, date: todayStr(), sig: affordSig107(cents) },
     flow: cur.flow || null
   };
   save();
@@ -25606,6 +25657,14 @@ function restoreAfford101() {
      limpia, para que no quede fijo para siempre (reporte de
      Sterlin: «se queda ahí y no se borra nunca»). */
   if (!saved.date || saved.date !== todayStr()) { clearAfford102(false); return; }
+  /* Compilación 107: y también caduca si los datos cambiaron
+     desde que se generó (la firma ya no cuadra), aunque sea el
+     mismo día. Los registros sin firma (anteriores a la 107) se
+     muestran solo dentro de su día, como hasta ahora. */
+  if (saved.sig) {
+    const sig107 = affordSig107(saved.cents);
+    if (!sig107 || sig107 !== saved.sig) { clearAfford102(false); return; }
+  }
   const out = document.getElementById('afford99-answer');
   if (out && !out.textContent) out.textContent = saved.text;
   const inp = document.getElementById('afford99-amount');
@@ -28167,7 +28226,7 @@ function applyTheme() {
       (theme !== 'claro' && typeof window !== 'undefined' && window.matchMedia &&
         window.matchMedia('(prefers-color-scheme: dark)').matches);
     document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
-      m.setAttribute('content', dark ? '#000000' : '#00421C');
+      m.setAttribute('content', dark ? '#13132B' : '#1A1A3E');
     });
   } catch (e) { /* sin metas o sin matchMedia: quedan las del HTML */ }
 }
@@ -28189,12 +28248,12 @@ try {
    que la imagen compartida se vea como la app. Si las variables no se
    pueden leer, respalda con la paleta clara de siempre. */
 function canvasPalette() {
-  const p = { bg: '#ffffff', header: '#0b6e4f', headerText: '#ffffff', ink: '#1c2733', muted: '#5d6b7a', accent: '#0b6e4f', green: '#0b6e4f', red: '#b3261e', amber: '#9a6a00' };
+  const p = { bg: '#26265A', header: '#F5A623', headerText: '#1A1A3E', ink: '#FFFFFF', muted: '#B9B9D9', accent: '#F5A623', green: '#F5A623', red: '#FF7A6B', amber: '#FFC44D' };
   try {
     const cs = window.getComputedStyle(document.documentElement);
     const read = (name) => (cs.getPropertyValue(name) || '').trim();
     if (read('--card')) p.bg = read('--card');
-    if (read('--accent')) { p.header = read('--accent'); p.accent = read('--accent'); p.green = read('--accent'); }
+    if (read('--accent')) { p.header = read('--accent'); p.accent = read('--accent'); p.green = read('--accent'); if (String(p.accent).toLowerCase() === '#f5a623') p.headerText = '#1A1A3E'; }
     if (read('--ink')) p.ink = read('--ink');
     if (read('--muted')) p.muted = read('--muted');
     /* Compilación 100: los colores funcionales de los lienzos salen
@@ -28481,10 +28540,10 @@ function buildReportCanvas() {
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
   const P = canvasPalette();
-  const BRAND_GREEN = '#0b6e4f';
+  const BRAND_AMBER107 = '#F5A623';
   ctx.fillStyle = P.bg; ctx.fillRect(0, 0, 800, height);
-  ctx.fillStyle = BRAND_GREEN; ctx.fillRect(0, 0, 800, 96);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 34px sans-serif';
+  ctx.fillStyle = BRAND_AMBER107; ctx.fillRect(0, 0, 800, 96);
+  ctx.fillStyle = P.headerText; ctx.font = 'bold 34px sans-serif';
   ctx.fillText(t('app_title'), 40, 58);
   ctx.fillStyle = P.ink; ctx.font = 'bold 30px sans-serif';
   ctx.fillText(d.month, 40, 150);
@@ -28533,7 +28592,7 @@ function buildReportCanvas() {
       y += 66;
     });
   }
-  ctx.fillStyle = BRAND_GREEN; ctx.fillRect(0, height - 64, 800, 64);
+  ctx.fillStyle = BRAND_AMBER107; ctx.fillRect(0, height - 64, 800, 64);
   ctx.fillStyle = '#ffffff'; ctx.font = 'bold 24px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(t('rep_promo_footer'), 400, height - 24);
