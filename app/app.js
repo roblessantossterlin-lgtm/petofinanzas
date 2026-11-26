@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 109';
-const BUILD_NUM = 109;
+const BUILD_LABEL = 'Compilación 110';
+const BUILD_NUM = 110;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -13240,10 +13240,23 @@ function syncAds(navVisible) {
      usuario gratis, se precargan en segundo plano el intersticial
      y el recompensado (con Pro, adsPreloadFormats86 no pide nada). */
   if (show) adsPreloadFormats86();
+  /* Compilación 110: si el plugin de anuncios devuelve un error
+     (la promesa rechazada o una excepción al llamarlo), el fallo
+     queda registrado en la consola en vez de tragarse en silencio:
+     la app sigue igual, sin anuncios, pero el error deja rastro
+     para poder diagnosticarlo (y en nativo el banner además
+     reintenta solo, con su respiro de 30 s — ver PetoAdsPlugin). */
   try {
-    if (show && typeof ads.show === 'function') ads.show();
-    else if (!show && typeof ads.hide === 'function') ads.hide();
-  } catch (e) { /* si el plugin falla, la app sigue sin anuncios */ }
+    const adsResult110 = show && typeof ads.show === 'function' ? ads.show()
+      : (!show && typeof ads.hide === 'function' ? ads.hide() : null);
+    if (adsResult110 && typeof adsResult110.catch === 'function') {
+      adsResult110.catch((e110) => {
+        try { console.warn('PetoAds: error del plugin de anuncios', e110); } catch (e) {}
+      });
+    }
+  } catch (e) {
+    try { console.warn('PetoAds: error del plugin de anuncios', e); } catch (e2) {}
+  }
 }
 
 /* ---------------- Compilación 84 · Ningún anuncio sobre un modal --
