@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 110';
-const BUILD_NUM = 110;
+const BUILD_LABEL = 'Compilación 111';
+const BUILD_NUM = 111;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -24396,6 +24396,16 @@ async function aiFn(action, payload) {
     token = data && data.session ? data.session.access_token : null;
   } catch (e) { token = null; }
   if (!token) throw new Error('ai_login');
+  /* Compilación 111 · «La IA responde en tu idioma»: el idioma
+     que aiFn inyecta aquí (el de la app, con su locale) es el
+     que manda en las acciones donde la IA redacta sola desde
+     los datos (can-afford, el resumen semanal, el detector de
+     suscripciones…). En las acciones con texto de la persona
+     (el chat, el gasto en lenguaje libre, la entrevista), el
+     servidor responde en el idioma de ESE texto: si le escriben
+     en inglés, responde en inglés. La decisión vive
+     centralizada en el servidor (langDirective111); aquí solo
+     viaja el idioma de la app, como desde la Comp. 99. */
   /* Compilación 99 · P2: TODA llamada lleva el idioma de la app y
      el locale del teléfono; el servidor ordena responder solo en
      ese idioma y copiar los montos tal como vienen formateados
