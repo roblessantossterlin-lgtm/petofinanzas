@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-25",
+  "actualizado": "2026-11-26",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -114,6 +114,20 @@
       "titulo": "La canción de saludar",
       "archivo": "assets/cancion-2026-11-25-saludar.mp3",
       "fecha": "2026-11-25"
+    },
+    {
+      "id": "dibujo-2026-11-26-estrellas",
+      "tipo": "dibujo",
+      "titulo": "Tito y la luna y las estrellas",
+      "archivo": "assets/dibujo-2026-11-26-estrellas.png",
+      "fecha": "2026-11-26"
+    },
+    {
+      "id": "cancion-2026-11-26-dormir",
+      "tipo": "cancion",
+      "titulo": "La canción de dormir temprano",
+      "archivo": "assets/cancion-2026-11-26-dormir.mp3",
+      "fecha": "2026-11-26"
     }
   ]
 }
