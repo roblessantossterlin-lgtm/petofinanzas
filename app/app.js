@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 115';
-const BUILD_NUM = 115;
+const BUILD_LABEL = 'Compilación 116';
+const BUILD_NUM = 116;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -296,6 +296,10 @@ function defaultData() {
          tarjeta ofrece generarlo. */
       aiWeekly: null,
   homeAi101: null,
+  /* Compilación 116: el redondeo que ahorra nace APAGADO
+     (solo corre si la persona lo enciende en Ajustes) y la
+     tasa USD/RD$ guardada empieza en 60.00. */
+  roundUp116: false, fxRate116: 60,
       /* Compilación 85 (Fase A): contador LOCAL orientativo de
          usos gratis de IA del mes ({month, counts} saneado en
          validateData); el conteo que manda es el del servidor. */
@@ -791,6 +795,15 @@ function cleanGoalPlan115(v) {
   }
   return n ? out : null;
 }
+/* Compilación 116: la tasa USD/RD$ guardada es un número de
+   pesos por dólar entre 0 y 10,000 con dos decimales; cualquier
+   otra cosa vuelve al valor inicial 60.00. NO es una tasa en
+   vivo: es la que la persona deja guardada en Ajustes. */
+function cleanFxRate116(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0 || n > 10000) return 60;
+  return Math.round(n * 100) / 100;
+}
 function cleanHomeAi101(v) {
   if (!v || typeof v !== 'object') return null;
   const out = { afford: null, flow: null };
@@ -936,6 +949,9 @@ function validateData(raw) {
   d.settings.homeAi101 = cleanHomeAi101(s.homeAi101);
   /* Compilación 115: el plan semanal del copiloto de metas. */
   d.settings.goalPlan115 = cleanGoalPlan115(s.goalPlan115);
+  /* Compilación 116: el interruptor del redondeo y la tasa. */
+  d.settings.roundUp116 = s.roundUp116 === true;
+  d.settings.fxRate116 = cleanFxRate116(s.fxRate116);
   /* Compilación 85 (Fase A): el contador local de IA gratis solo
      acepta su forma exacta: mes YYYY-MM y conteos numéricos por
      acción (máx. 9999); cualquier otra cosa vuelve a null. */
@@ -1039,7 +1055,23 @@ function validateData(raw) {
        a la 43 no la traen y quedan en null = SIN CLASIFICAR: el
        saneado NO se la inventa, porque de ella depende la regla
        nueva de availableMoney() con cuentas. */
-    src: (x.src === 'avail' || x.src === 'savings' || x.src === 'account') ? x.src : null
+    src: (x.src === 'avail' || x.src === 'savings' || x.src === 'account') ? x.src : null,
+    /* Compilación 116: multimoneda y redondeo. currency,
+       origCents y rate116 guardan el monto TAL como se escribió
+       (en su moneda) y la tasa aplicada al guardarlo;
+       amountCents queda SIEMPRE en USD (convertido al guardar),
+       así que ningún total existente cambia. roundUpCents es el
+       redondeo que este gasto apartó en Ahorros (0 = ninguno). */
+    currency: x.currency === 'DOP' ? 'DOP' : 'USD',
+    origCents: (typeof x.origCents === 'number' && Number.isFinite(x.origCents)) ? cleanCents(x.origCents, false) : cleanCents(x.amountCents, false),
+    rate116: (typeof x.rate116 === 'number' && Number.isFinite(x.rate116) && x.rate116 > 0) ? Math.round(x.rate116 * 100) / 100 : null,
+    roundUpCents: cleanCents(x.roundUpCents, false),
+    /* El autor SOLO existe en los movimientos del libro
+       compartido del hogar (householdAddMovement lo estampa);
+       el saneado lo conserva para que la pareja vea quién
+       anotó cada movimiento compartido. */
+    author_id: (typeof x.author_id === 'string' && x.author_id) ? cleanText(x.author_id, 60) : null,
+    author_name: (typeof x.author_name === 'string' && x.author_name) ? cleanText(x.author_name, 60) : null
   }));
   d.incomes = arr(raw.incomes).filter((x) => x && typeof x === 'object').map((x) => {
     const amount = cleanCents(x.amountCents, false);
@@ -1066,7 +1098,15 @@ function validateData(raw) {
          puede asignarse a una meta de la lista; la limpieza contra
          las metas vivas va al final de esta función, como con los
          ahorros sueltos. */
-      goalId: (typeof x.goalId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.goalId)) ? x.goalId : null
+      goalId: (typeof x.goalId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.goalId)) ? x.goalId : null,
+      /* Compilación 116: multimoneda, como en los gastos:
+         amountCents y savingsCents quedan SIEMPRE en USD. */
+      currency: x.currency === 'DOP' ? 'DOP' : 'USD',
+      origCents: (typeof x.origCents === 'number' && Number.isFinite(x.origCents)) ? cleanCents(x.origCents, false) : cleanCents(x.amountCents, false),
+      rate116: (typeof x.rate116 === 'number' && Number.isFinite(x.rate116) && x.rate116 > 0) ? Math.round(x.rate116 * 100) / 100 : null,
+      /* El autor del libro compartido, como en los gastos. */
+      author_id: (typeof x.author_id === 'string' && x.author_id) ? cleanText(x.author_id, 60) : null,
+      author_name: (typeof x.author_name === 'string' && x.author_name) ? cleanText(x.author_name, 60) : null
     };
   });
   d.savings = arr(raw.savings).filter((x) => x && typeof x === 'object').map((x) => ({
@@ -1076,7 +1116,12 @@ function validateData(raw) {
        viejos no traen goalId: quedan en null = ahorro general. La
        limpieza contra las metas existentes va al final de esta
        función, cuando d.goals ya está saneado. */
-    goalId: (typeof x.goalId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.goalId)) ? x.goalId : null
+    goalId: (typeof x.goalId === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.goalId)) ? x.goalId : null,
+    /* Compilación 116: si esta entrada es el REDONDEO de un
+       gasto, guarda el id de ese gasto. El redondeo es dinero
+       real del propio gasto, activado por la persona y visible
+       centavo a centavo; no es el porcentaje sugerido. */
+    roundUpOf: (typeof x.roundUpOf === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x.roundUpOf)) ? x.roundUpOf : null
   }));
   d.savingsGoal = cleanSavingsGoal(raw.savingsGoal);
   d.san = cleanSan(raw.san);
@@ -1188,7 +1233,11 @@ function validateData(raw) {
   d.accounts = arr(raw.accounts).filter((x) => x && typeof x === 'object').map((x) => {
     const acc76 = {
       id: cleanId(x.id), name: cleanText(x.name, 60) || 'Cuenta',
-      balanceCents: cleanCents(x.balanceCents, true)
+      balanceCents: cleanCents(x.balanceCents, true),
+      /* Compilación 116: la cuenta puede estar en pesos (DOP);
+         su balanceCents queda EN SU MONEDA y los totales
+         combinados lo convierten a USD con la tasa guardada. */
+      currency: x.currency === 'DOP' ? 'DOP' : 'USD'
     };
     /* Compilación 76: una cuenta manual puede ser tarjeta de
        crédito: límite y días de corte y de pago, opcionales. */
@@ -1234,6 +1283,11 @@ function validateData(raw) {
      Lo mismo para la porción de ahorro de un ingreso (Compilación 45). */
   const goalIds = new Set(d.goals.map((g) => g.id));
   for (const s of d.savings) if (s.goalId && !goalIds.has(s.goalId)) s.goalId = null;
+  /* Compilación 116: un redondeo cuyo gasto ya no existe pierde
+     su enlace (la entrada de ahorro SE QUEDA: el dinero apartado
+     no se pierde, solo la etiqueta de redondeo). */
+  const expenseIds116 = new Set(d.expenses.map((e) => e.id));
+  for (const s of d.savings) if (s.roundUpOf && !expenseIds116.has(s.roundUpOf)) s.roundUpOf = null;
   for (const i of d.incomes) if (i.goalId && !goalIds.has(i.goalId)) i.goalId = null;
   /* Compilación 41: un movimiento enlazado a una cuenta que ya no
      existe queda sin enlazar (deja de mover saldos), nunca se pierde
@@ -1958,6 +2012,7 @@ es: {
   c115_debt_title: '🏁 Tu plan de salida de deudas con IA', c115_debt_note: 'Con lo que ya pagas al mes, la app simula las dos rutas y la IA te explica cuál te conviene y por qué, con tus números.', c115_debt_empty: 'Anota primero una deuda pendiente: el plan se arma con tus deudas reales y lo que pagas al mes.', c115_paying_line: 'Pagando {pay} al mes en total:', c115_route_avalanche: 'Avalancha · mayor interés primero', c115_route_snowball: 'Bola de nieve · menor saldo primero', c115_free_when: 'Libre de deudas: {when} · {months}', c115_interest_total: 'Interés total: {amount}', c115_recommended: '★ La recomendada', c115_saves_line: 'Ahorras {amount} de interés frente a la otra ruta.', c115_tie_line: 'Las dos rutas cuestan casi lo mismo en interés: aquí manda la motivación.', c115_route_blocked: 'Con ese pago total, esta ruta no hace bajar el saldo.', c115_ai_btn: '✨ Que la IA me lo explique', c115_ai_working: 'La IA está comparando tus rutas…', c115_ai_none: 'La IA no trajo la explicación esta vez. La comparación de arriba sigue siendo tu plan.',
   c115_bill_title: '🤝 Negociador de facturas con IA', c115_bill_note: 'Elige uno de tus cargos fijos o suscripciones y la IA te redacta un mensaje listo para copiar y enviar pidiendo una rebaja. Tú lo envías: la app no contacta a nadie por ti.', c115_bill_empty: 'Cuando tengas pagos fijos o suscripciones detectadas, podrás redactar tu mensaje de rebaja desde aquí.', c115_bill_btn: 'Redactar texto', c115_bill_working: 'Redactando tu mensaje…', c115_bill_none: 'La IA no trajo el mensaje esta vez. Prueba de nuevo en un momento.', c115_bill_text_title: 'Tu mensaje, listo para enviar:', c115_copy: 'Copiar texto', c115_cat_internet: 'Internet', c115_cat_phone: 'Teléfono', c115_cat_insurance: 'Seguro', c115_cat_other: 'Otro servicio', c115_monthly: '{amount}/mes',
   c115_goals_title: '🧭 Copiloto de metas con IA', c115_goals_note: 'La IA mira tu flujo real y tus metas, y te propone cuánto guardar por semana en cada una y en qué orden. Es solo una propuesta: nada se mueve ni se guarda sin que la apruebes.', c115_goals_btn: '✨ Revisar mis metas', c115_goals_working: 'Revisando tu flujo y tus metas…', c115_goals_empty: 'Crea primero una meta: el copiloto trabaja con tus metas reales.', c115_goals_none: 'La IA no trajo propuesta esta vez. Tus metas quedan como están.', c115_prop_title: 'La propuesta del copiloto', c115_prop_weekly: '{amount} por semana', c115_prop_priority: 'Orden sugerido: {list}', c115_apply_btn: 'Aplicar este plan', c115_ignore_btn: 'Ignorar', c115_applied: 'Plan aplicado: quedó anotado en tus metas. No se movió dinero.', c115_plan_line: 'Plan del copiloto: {amount}/semana', c115_plan_clear: 'Quitar el plan del copiloto', c115_plan_active: 'Plan semanal del copiloto activo',
+    c116_group_title: 'Dinero en equipo', c116_round_label: 'Redondeo que ahorra', c116_round_help: 'Solo Pro. Con esto encendido, cada gasto se redondea al dólar siguiente y la diferencia se anota como ahorro tuyo, a la vista, en Ahorros → «Redondeos». Es dinero real de tu propio gasto, que tú activas y ves centavo a centavo: el porcentaje sugerido nunca crea ahorro. Apágalo cuando quieras.', c116_fx_label: 'Tasa USD/RD$ (pesos por 1 dólar)', c116_fx_help: 'La tasa con la que la app pasa los montos en pesos dominicanos (RD$) a dólares en tus totales. Es la tasa que tú dejas guardada aquí; no es una tasa en vivo. Valor inicial: 60.00.', c116_roundups_label: 'Redondeos', c116_roundup_title: 'Redondeo', c116_roundup_line: 'Redondeo: +{amount} a Ahorros', c116_roundup_sub: 'Del gasto del {date}', c116_fx_equiv: '≈ {amount} en dólares', c116_cur_label: 'Moneda', c116_cur_usd: 'USD · Dólares ($)', c116_cur_dop: 'RD$ · Pesos dominicanos', c116_acc_currency_label: 'Moneda de la cuenta', c116_pair_title: '👫 Modo pareja', c116_pair_note: 'El espacio de la pareja dentro de tu hogar: los dos ven y anotan los gastos e ingresos compartidos del mes y comparten un presupuesto mensual. Lo personal de cada cuenta (sus gastos propios, cuentas y metas) no se comparte.', c116_pair_locked: 'El Modo pareja es de PETO Pro: actívalo para anotar y ver el dinero compartido.', c116_pair_pro_btn: 'Ver PETO Pro', c116_pair_loading: 'Cargando el libro compartido…', c116_pair_month_inc: 'Ingresos compartidos del mes', c116_pair_month_exp: 'Gastos compartidos del mes', c116_pair_balance: 'Balance compartido del mes', c116_pair_budget_label: 'Presupuesto mensual compartido', c116_pair_budget_none: 'Sin presupuesto fijado todavía.', c116_pair_budget_of: '{spent} gastados de {limit}', c116_pair_budget_over: 'Se pasaron del presupuesto por {amount}.', c116_pair_budget_set: 'Fijar', c116_pair_budget_clear: 'Quitar', c116_pair_add_title: 'Anotar en pareja', c116_pair_kind_exp: 'Gasto', c116_pair_kind_inc: 'Ingreso', c116_pair_add_btn: 'Anotar', c116_pair_list_title: 'Movimientos compartidos de este mes', c116_pair_empty: 'Todavía no hay movimientos compartidos este mes.', c116_pair_by: 'por {name}', c116_pair_del_confirm: '¿Borrar este movimiento compartido de {amount}? Lo verán los dos.',
   pro_tag: 'PRO',
   adv_title: 'Informe avanzado',
   adv_note: 'Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.',
@@ -2723,6 +2778,7 @@ en: {
   c115_debt_title: '🏁 Your debt exit plan with AI', c115_debt_note: 'With what you already pay each month, the app simulates both routes and the AI explains which one fits you and why, with your numbers.', c115_debt_empty: 'Add a pending debt first: the plan is built from your real debts and what you pay each month.', c115_paying_line: 'Paying {pay} a month in total:', c115_route_avalanche: 'Avalanche · highest interest first', c115_route_snowball: 'Snowball · smallest balance first', c115_free_when: 'Debt-free: {when} · {months}', c115_interest_total: 'Total interest: {amount}', c115_recommended: '★ The recommended one', c115_saves_line: 'You save {amount} in interest versus the other route.', c115_tie_line: 'Both routes cost about the same in interest: here motivation rules.', c115_route_blocked: 'With that total payment, this route does not bring the balance down.', c115_ai_btn: '✨ Have the AI explain it', c115_ai_working: 'The AI is comparing your routes…', c115_ai_none: 'The AI brought no explanation this time. The comparison above is still your plan.',
   c115_bill_title: '🤝 Bill negotiator with AI', c115_bill_note: 'Pick one of your fixed charges or subscriptions and the AI drafts a message, ready to copy and send, asking for a lower price. You send it: the app contacts no one for you.', c115_bill_empty: 'Once you have fixed payments or detected subscriptions, you can draft your discount message here.', c115_bill_btn: 'Draft message', c115_bill_working: 'Drafting your message…', c115_bill_none: 'The AI brought no message this time. Try again in a moment.', c115_bill_text_title: 'Your message, ready to send:', c115_copy: 'Copy text', c115_cat_internet: 'Internet', c115_cat_phone: 'Phone', c115_cat_insurance: 'Insurance', c115_cat_other: 'Other service', c115_monthly: '{amount}/mo',
   c115_goals_title: '🧭 Goals copilot with AI', c115_goals_note: 'The AI looks at your real cash flow and your goals, and proposes how much to save each week toward each one and in what order. It is only a proposal: nothing moves or gets saved unless you approve it.', c115_goals_btn: '✨ Review my goals', c115_goals_working: 'Reviewing your flow and your goals…', c115_goals_empty: 'Create a goal first: the copilot works with your real goals.', c115_goals_none: 'The AI brought no proposal this time. Your goals stay as they are.', c115_prop_title: 'The copilot proposal', c115_prop_weekly: '{amount} per week', c115_prop_priority: 'Suggested order: {list}', c115_apply_btn: 'Apply this plan', c115_ignore_btn: 'Ignore', c115_applied: 'Plan applied: it is noted on your goals. No money was moved.', c115_plan_line: 'Copilot plan: {amount}/week', c115_plan_clear: 'Remove the copilot plan', c115_plan_active: 'Copilot weekly plan active',
+    c116_group_title: 'Money as a team', c116_round_label: 'Round-up savings', c116_round_help: 'Pro only. With this on, every expense rounds up to the next dollar and the difference is recorded as your savings, in plain sight, under Savings → “Round-ups”. It is real money from your own expense, switched on by you and visible cent by cent: the suggested percentage never creates savings. Turn it off anytime.', c116_fx_label: 'USD/DOP rate (pesos per 1 dollar)', c116_fx_help: 'The rate the app uses to convert Dominican peso (DOP) amounts into dollars in your totals. It is the rate you save here; it is not a live rate. Starting value: 60.00.', c116_roundups_label: 'Round-ups', c116_roundup_title: 'Round-up', c116_roundup_line: 'Round-up: +{amount} to Savings', c116_roundup_sub: 'From the {date} expense', c116_fx_equiv: '≈ {amount} in dollars', c116_cur_label: 'Currency', c116_cur_usd: 'USD · Dollars ($)', c116_cur_dop: 'DOP · Dominican pesos', c116_acc_currency_label: 'Account currency', c116_pair_title: '👫 Couple mode', c116_pair_note: 'The couple space inside your household: both of you see and record this month’s shared expenses and income and share a monthly budget. Each account’s personal data (own expenses, accounts and goals) is not shared.', c116_pair_locked: 'Couple mode is a PETO Pro feature: turn it on to record and see the shared money.', c116_pair_pro_btn: 'See PETO Pro', c116_pair_loading: 'Loading the shared book…', c116_pair_month_inc: 'Shared income this month', c116_pair_month_exp: 'Shared expenses this month', c116_pair_balance: 'Shared balance this month', c116_pair_budget_label: 'Shared monthly budget', c116_pair_budget_none: 'No budget set yet.', c116_pair_budget_of: '{spent} spent of {limit}', c116_pair_budget_over: 'You went over the budget by {amount}.', c116_pair_budget_set: 'Set', c116_pair_budget_clear: 'Clear', c116_pair_add_title: 'Add together', c116_pair_kind_exp: 'Expense', c116_pair_kind_inc: 'Income', c116_pair_add_btn: 'Add', c116_pair_list_title: 'Shared movements this month', c116_pair_empty: 'No shared movements yet this month.', c116_pair_by: 'by {name}', c116_pair_del_confirm: 'Delete this shared movement of {amount}? Both of you will see it.',
   pro_tag: 'PRO',
   adv_title: 'Advanced report',
   adv_note: 'A PETO Pro feature: this month vs the previous one, every category and a CSV export of the month.',
@@ -3731,6 +3787,7 @@ it: {
   c115_debt_title: '🏁 Il tuo piano per uscire dai debiti con l’IA', c115_debt_note: 'Con quello che già paghi ogni mese, l’app simula i due percorsi e l’IA ti spiega quale ti conviene e perché, con i tuoi numeri.', c115_debt_empty: 'Prima annota un debito in sospeso: il piano si costruisce con i tuoi debiti reali e con quanto paghi al mese.', c115_paying_line: 'Pagando {pay} al mese in totale:', c115_route_avalanche: 'Valanga · prima l’interesse più alto', c115_route_snowball: 'Palla di neve · prima il saldo più piccolo', c115_free_when: 'Senza debiti: {when} · {months}', c115_interest_total: 'Interessi totali: {amount}', c115_recommended: '★ La consigliata', c115_saves_line: 'Risparmi {amount} di interessi rispetto all’altro percorso.', c115_tie_line: 'I due percorsi costano quasi uguale in interessi: qui conta la motivazione.', c115_route_blocked: 'Con quel pagamento totale, questo percorso non fa scendere il saldo.', c115_ai_btn: '✨ Fatti spiegare dall’IA', c115_ai_working: 'L’IA sta confrontando i tuoi percorsi…', c115_ai_none: 'L’IA non ha portato la spiegazione questa volta. Il confronto qui sopra resta il tuo piano.',
   c115_bill_title: '🤝 Negozia bollette con l’IA', c115_bill_note: 'Scegli una delle tue spese fisse o abbonamenti e l’IA ti scrive un messaggio pronto da copiare e inviare per chiedere uno sconto. Lo invii tu: l’app non contatta nessuno per te.', c115_bill_empty: 'Quando avrai pagamenti fissi o abbonamenti rilevati, potrai scrivere qui il tuo messaggio di sconto.', c115_bill_btn: 'Scrivi il messaggio', c115_bill_working: 'Sto scrivendo il tuo messaggio…', c115_bill_none: 'L’IA non ha portato il messaggio questa volta. Riprova tra un momento.', c115_bill_text_title: 'Il tuo messaggio, pronto da inviare:', c115_copy: 'Copia il testo', c115_cat_internet: 'Internet', c115_cat_phone: 'Telefono', c115_cat_insurance: 'Assicurazione', c115_cat_other: 'Altro servizio', c115_monthly: '{amount}/mese',
   c115_goals_title: '🧭 Copilota degli obiettivi con l’IA', c115_goals_note: 'L’IA guarda il tuo flusso reale e i tuoi obiettivi, e ti propone quanto mettere da parte ogni settimana per ciascuno e in che ordine. È solo una proposta: nulla si muove né si risparmia senza la tua approvazione.', c115_goals_btn: '✨ Rivedi i miei obiettivi', c115_goals_working: 'Sto rivedendo flusso e obiettivi…', c115_goals_empty: 'Prima crea un obiettivo: il copilota lavora con i tuoi obiettivi reali.', c115_goals_none: 'L’IA non ha portato una proposta questa volta. I tuoi obiettivi restano come sono.', c115_prop_title: 'La proposta del copilota', c115_prop_weekly: '{amount} a settimana', c115_prop_priority: 'Ordine suggerito: {list}', c115_apply_btn: 'Applica questo piano', c115_ignore_btn: 'Ignora', c115_applied: 'Piano applicato: è annotato sui tuoi obiettivi. Non è stato mosso denaro.', c115_plan_line: 'Piano del copilota: {amount}/settimana', c115_plan_clear: 'Togli il piano del copilota', c115_plan_active: 'Piano settimanale del copilota attivo',
+    c116_group_title: 'Denaro in squadra', c116_round_label: 'Arrotondamento che fa risparmiare', c116_round_help: 'Solo Pro. Con questa opzione attiva, ogni spesa viene arrotondata al dollaro successivo e la differenza viene registrata come tuo risparmio, in bella vista, in Risparmi → «Arrotondamenti». È denaro reale della tua spesa, attivato da te e visibile centesimo per centesimo: la percentuale suggerita non crea mai risparmio. Disattivala quando vuoi.', c116_fx_label: 'Tasso USD/DOP (pesos per 1 dollaro)', c116_fx_help: 'Il tasso con cui l’app converte gli importi in pesos dominicani (DOP) in dollari nei tuoi totali. È il tasso che salvi qui; non è un tasso in tempo reale. Valore iniziale: 60.00.', c116_roundups_label: 'Arrotondamenti', c116_roundup_title: 'Arrotondamento', c116_roundup_line: 'Arrotondamento: +{amount} ai Risparmi', c116_roundup_sub: 'Dalla spesa del {date}', c116_fx_equiv: '≈ {amount} in dollari', c116_cur_label: 'Valuta', c116_cur_usd: 'USD · Dollari ($)', c116_cur_dop: 'DOP · Pesos dominicani', c116_acc_currency_label: 'Valuta del conto', c116_pair_title: '👫 Modalità coppia', c116_pair_note: 'Lo spazio della coppia dentro la tua casa: entrambi vedete e registrate le spese e le entrate condivise del mese e condividete un budget mensile. I dati personali di ciascun account (spese proprie, conti e obiettivi) non vengono condivisi.', c116_pair_locked: 'La modalità coppia è di PETO Pro: attivala per registrare e vedere il denaro condiviso.', c116_pair_pro_btn: 'Vedi PETO Pro', c116_pair_loading: 'Caricamento del libro condiviso…', c116_pair_month_inc: 'Entrate condivise del mese', c116_pair_month_exp: 'Spese condivise del mese', c116_pair_balance: 'Saldo condiviso del mese', c116_pair_budget_label: 'Budget mensile condiviso', c116_pair_budget_none: 'Nessun budget impostato.', c116_pair_budget_of: '{spent} spesi di {limit}', c116_pair_budget_over: 'Avete superato il budget di {amount}.', c116_pair_budget_set: 'Imposta', c116_pair_budget_clear: 'Rimuovi', c116_pair_add_title: 'Registra in coppia', c116_pair_kind_exp: 'Spesa', c116_pair_kind_inc: 'Entrata', c116_pair_add_btn: 'Registra', c116_pair_list_title: 'Movimenti condivisi di questo mese', c116_pair_empty: 'Nessun movimento condiviso questo mese.', c116_pair_by: 'di {name}', c116_pair_del_confirm: 'Eliminare questo movimento condiviso di {amount}? Lo vedrete entrambi.',
   pro_tag: 'PRO',
   adv_title: 'Resoconto avanzato',
   adv_note: 'Funzione di PETO Pro: questo mese a confronto con il precedente, tutte le categorie ed esportazione del mese in CSV.',
@@ -4738,6 +4795,7 @@ pt: {
   c115_debt_title: '🏁 Seu plano para sair das dívidas com IA', c115_debt_note: 'Com o que você já paga por mês, o app simula as duas rotas e a IA explica qual combina com você e por quê, com os seus números.', c115_debt_empty: 'Anote primeiro uma dívida pendente: o plano é montado com suas dívidas reais e o que você paga por mês.', c115_paying_line: 'Pagando {pay} por mês no total:', c115_route_avalanche: 'Avalanche · maior juro primeiro', c115_route_snowball: 'Bola de neve · menor saldo primeiro', c115_free_when: 'Livre de dívidas: {when} · {months}', c115_interest_total: 'Juros totais: {amount}', c115_recommended: '★ A recomendada', c115_saves_line: 'Você economiza {amount} de juros em relação à outra rota.', c115_tie_line: 'As duas rotas custam quase o mesmo em juros: aqui manda a motivação.', c115_route_blocked: 'Com esse pagamento total, esta rota não faz o saldo baixar.', c115_ai_btn: '✨ Que a IA me explique', c115_ai_working: 'A IA está comparando suas rotas…', c115_ai_none: 'A IA não trouxe a explicação desta vez. A comparação acima continua sendo o seu plano.',
   c115_bill_title: '🤝 Negociador de contas com IA', c115_bill_note: 'Escolha uma das suas cobranças fixas ou assinaturas e a IA escreve uma mensagem pronta para copiar e enviar pedindo um desconto. Você envia: o app não contata ninguém por você.', c115_bill_empty: 'Quando você tiver pagamentos fixos ou assinaturas detectadas, poderá escrever sua mensagem de desconto aqui.', c115_bill_btn: 'Escrever mensagem', c115_bill_working: 'Escrevendo sua mensagem…', c115_bill_none: 'A IA não trouxe a mensagem desta vez. Tente de novo em um momento.', c115_bill_text_title: 'Sua mensagem, pronta para enviar:', c115_copy: 'Copiar texto', c115_cat_internet: 'Internet', c115_cat_phone: 'Telefone', c115_cat_insurance: 'Seguro', c115_cat_other: 'Outro serviço', c115_monthly: '{amount}/mês',
   c115_goals_title: '🧭 Copiloto de metas com IA', c115_goals_note: 'A IA olha seu fluxo real e suas metas, e propõe quanto guardar por semana em cada uma e em que ordem. É só uma proposta: nada se move nem se guarda sem a sua aprovação.', c115_goals_btn: '✨ Revisar minhas metas', c115_goals_working: 'Revisando seu fluxo e suas metas…', c115_goals_empty: 'Crie primeiro uma meta: o copiloto trabalha com suas metas reais.', c115_goals_none: 'A IA não trouxe proposta desta vez. Suas metas ficam como estão.', c115_prop_title: 'A proposta do copiloto', c115_prop_weekly: '{amount} por semana', c115_prop_priority: 'Ordem sugerida: {list}', c115_apply_btn: 'Aplicar este plano', c115_ignore_btn: 'Ignorar', c115_applied: 'Plano aplicado: ficou anotado nas suas metas. Nenhum dinheiro foi movido.', c115_plan_line: 'Plano do copiloto: {amount}/semana', c115_plan_clear: 'Remover o plano do copiloto', c115_plan_active: 'Plano semanal do copiloto ativo',
+    c116_group_title: 'Dinheiro em equipe', c116_round_label: 'Arredondamento que poupa', c116_round_help: 'Somente Pro. Com isso ligado, cada gasto é arredondado para o dólar seguinte e a diferença é registrada como sua poupança, à vista, em Poupança → «Arredondamentos». É dinheiro real do seu próprio gasto, ativado por você e visível centavo a centavo: a porcentagem sugerida nunca cria poupança. Desligue quando quiser.', c116_fx_label: 'Taxa USD/DOP (pesos por 1 dólar)', c116_fx_help: 'A taxa com que o app converte os valores em pesos dominicanos (DOP) para dólares nos seus totais. É a taxa que você salva aqui; não é uma taxa ao vivo. Valor inicial: 60.00.', c116_roundups_label: 'Arredondamentos', c116_roundup_title: 'Arredondamento', c116_roundup_line: 'Arredondamento: +{amount} para a Poupança', c116_roundup_sub: 'Do gasto de {date}', c116_fx_equiv: '≈ {amount} em dólares', c116_cur_label: 'Moeda', c116_cur_usd: 'USD · Dólares ($)', c116_cur_dop: 'DOP · Pesos dominicanos', c116_acc_currency_label: 'Moeda da conta', c116_pair_title: '👫 Modo casal', c116_pair_note: 'O espaço do casal dentro da sua casa: os dois veem e registram os gastos e receitas compartilhados do mês e dividem um orçamento mensal. Os dados pessoais de cada conta (gastos próprios, contas e metas) não são compartilhados.', c116_pair_locked: 'O Modo casal é do PETO Pro: ative para registrar e ver o dinheiro compartilhado.', c116_pair_pro_btn: 'Ver o PETO Pro', c116_pair_loading: 'Carregando o livro compartilhado…', c116_pair_month_inc: 'Receitas compartilhadas do mês', c116_pair_month_exp: 'Gastos compartilhados do mês', c116_pair_balance: 'Saldo compartilhado do mês', c116_pair_budget_label: 'Orçamento mensal compartilhado', c116_pair_budget_none: 'Nenhum orçamento definido ainda.', c116_pair_budget_of: '{spent} gastos de {limit}', c116_pair_budget_over: 'Vocês passaram do orçamento em {amount}.', c116_pair_budget_set: 'Definir', c116_pair_budget_clear: 'Remover', c116_pair_add_title: 'Registrar em casal', c116_pair_kind_exp: 'Gasto', c116_pair_kind_inc: 'Receita', c116_pair_add_btn: 'Registrar', c116_pair_list_title: 'Movimentos compartilhados deste mês', c116_pair_empty: 'Ainda não há movimentos compartilhados neste mês.', c116_pair_by: 'por {name}', c116_pair_del_confirm: 'Excluir este movimento compartilhado de {amount}? Os dois verão.',
   pro_tag: 'PRO',
   adv_title: 'Relatório avançado',
   adv_note: 'Uma função do PETO Pro: este mês vs o anterior, cada categoria e uma exportação CSV do mês.',
@@ -5746,6 +5804,7 @@ fr: {
   c115_debt_title: '🏁 Ton plan de sortie de dettes avec l’IA', c115_debt_note: 'Avec ce que tu paies déjà chaque mois, l’appli simule les deux routes et l’IA t’explique laquelle te convient et pourquoi, avec tes chiffres.', c115_debt_empty: 'Note d’abord une dette en attente : le plan se construit avec tes dettes réelles et ce que tu paies par mois.', c115_paying_line: 'En payant {pay} par mois au total :', c115_route_avalanche: 'Avalanche · l’intérêt le plus élevé d’abord', c115_route_snowball: 'Boule de neige · le plus petit solde d’abord', c115_free_when: 'Sans dettes : {when} · {months}', c115_interest_total: 'Intérêts totaux : {amount}', c115_recommended: '★ La recommandée', c115_saves_line: 'Tu économises {amount} d’intérêts par rapport à l’autre route.', c115_tie_line: 'Les deux routes coûtent presque pareil en intérêts : ici, c’est la motivation qui compte.', c115_route_blocked: 'Avec ce paiement total, cette route ne fait pas baisser le solde.', c115_ai_btn: '✨ Que l’IA m’explique', c115_ai_working: 'L’IA compare tes routes…', c115_ai_none: 'L’IA n’a pas apporté l’explication cette fois. La comparaison ci-dessus reste ton plan.',
   c115_bill_title: '🤝 Négociateur de factures avec l’IA', c115_bill_note: 'Choisis un de tes frais fixes ou abonnements et l’IA te rédige un message prêt à copier et à envoyer pour demander une réduction. C’est toi qui l’envoies : l’appli ne contacte personne pour toi.', c115_bill_empty: 'Quand tu auras des paiements fixes ou des abonnements détectés, tu pourras rédiger ton message de réduction ici.', c115_bill_btn: 'Rédiger le message', c115_bill_working: 'Rédaction de ton message…', c115_bill_none: 'L’IA n’a pas apporté le message cette fois. Réessaie dans un moment.', c115_bill_text_title: 'Ton message, prêt à envoyer :', c115_copy: 'Copier le texte', c115_cat_internet: 'Internet', c115_cat_phone: 'Téléphone', c115_cat_insurance: 'Assurance', c115_cat_other: 'Autre service', c115_monthly: '{amount}/mois',
   c115_goals_title: '🧭 Copilote d’objectifs avec l’IA', c115_goals_note: 'L’IA regarde ton flux réel et tes objectifs, et te propose combien mettre de côté chaque semaine pour chacun et dans quel ordre. Ce n’est qu’une proposition : rien ne bouge ni ne s’épargne sans ton accord.', c115_goals_btn: '✨ Revoir mes objectifs', c115_goals_working: 'Analyse de ton flux et de tes objectifs…', c115_goals_empty: 'Crée d’abord un objectif : le copilote travaille avec tes objectifs réels.', c115_goals_none: 'L’IA n’a pas apporté de proposition cette fois. Tes objectifs restent comme ils sont.', c115_prop_title: 'La proposition du copilote', c115_prop_weekly: '{amount} par semaine', c115_prop_priority: 'Ordre suggéré : {list}', c115_apply_btn: 'Appliquer ce plan', c115_ignore_btn: 'Ignorer', c115_applied: 'Plan appliqué : il est noté sur tes objectifs. Aucun argent n’a bougé.', c115_plan_line: 'Plan du copilote : {amount}/semaine', c115_plan_clear: 'Retirer le plan du copilote', c115_plan_active: 'Plan hebdomadaire du copilote actif',
+    c116_group_title: 'L’argent en équipe', c116_round_label: 'Arrondi qui épargne', c116_round_help: 'Pro uniquement. Une fois activé, chaque dépense est arrondie au dollar supérieur et la différence est notée comme votre épargne, en toute visibilité, dans Épargne → « Arrondis ». C’est l’argent réel de votre propre dépense, activé par vous et visible centime par centime : le pourcentage suggéré ne crée jamais d’épargne. Désactivez-le quand vous voulez.', c116_fx_label: 'Taux USD/DOP (pesos pour 1 dollar)', c116_fx_help: 'Le taux avec lequel l’app convertit les montants en pesos dominicains (DOP) en dollars dans vos totaux. C’est le taux que vous enregistrez ici ; ce n’est pas un taux en direct. Valeur initiale : 60.00.', c116_roundups_label: 'Arrondis', c116_roundup_title: 'Arrondi', c116_roundup_line: 'Arrondi : +{amount} vers l’Épargne', c116_roundup_sub: 'De la dépense du {date}', c116_fx_equiv: '≈ {amount} en dollars', c116_cur_label: 'Devise', c116_cur_usd: 'USD · Dollars ($)', c116_cur_dop: 'DOP · Pesos dominicains', c116_acc_currency_label: 'Devise du compte', c116_pair_title: '👫 Mode couple', c116_pair_note: 'L’espace du couple dans votre foyer : vous voyez et notez tous les deux les dépenses et revenus partagés du mois et vous partagez un budget mensuel. Les données personnelles de chaque compte (dépenses propres, comptes et objectifs) ne sont pas partagées.', c116_pair_locked: 'Le Mode couple est réservé à PETO Pro : activez-le pour noter et voir l’argent partagé.', c116_pair_pro_btn: 'Voir PETO Pro', c116_pair_loading: 'Chargement du livre partagé…', c116_pair_month_inc: 'Revenus partagés du mois', c116_pair_month_exp: 'Dépenses partagées du mois', c116_pair_balance: 'Solde partagé du mois', c116_pair_budget_label: 'Budget mensuel partagé', c116_pair_budget_none: 'Aucun budget défini pour le moment.', c116_pair_budget_of: '{spent} dépensés sur {limit}', c116_pair_budget_over: 'Vous avez dépassé le budget de {amount}.', c116_pair_budget_set: 'Définir', c116_pair_budget_clear: 'Retirer', c116_pair_add_title: 'Noter en couple', c116_pair_kind_exp: 'Dépense', c116_pair_kind_inc: 'Revenu', c116_pair_add_btn: 'Noter', c116_pair_list_title: 'Mouvements partagés de ce mois', c116_pair_empty: 'Aucun mouvement partagé ce mois-ci pour le moment.', c116_pair_by: 'par {name}', c116_pair_del_confirm: 'Supprimer ce mouvement partagé de {amount} ? Vous le verrez tous les deux.',
   pro_tag: 'PRO',
   adv_title: 'Rapport avancé',
   adv_note: 'Une fonction PETO Pro : ce mois-ci contre le mois précédent, chaque catégorie et un export CSV du mois.',
@@ -6754,6 +6813,7 @@ de: {
   c115_debt_title: '🏁 Dein Schulden-Ausstiegsplan mit KI', c115_debt_note: 'Mit dem, was du schon jeden Monat zahlst, simuliert die App beide Wege und die KI erklärt dir, welcher zu dir passt und warum – mit deinen Zahlen.', c115_debt_empty: 'Trage zuerst eine offene Schuld ein: Der Plan entsteht aus deinen echten Schulden und dem, was du monatlich zahlst.', c115_paying_line: 'Bei insgesamt {pay} pro Monat:', c115_route_avalanche: 'Lawine · höchste Zinsen zuerst', c115_route_snowball: 'Schneeball · kleinster Saldo zuerst', c115_free_when: 'Schuldenfrei: {when} · {months}', c115_interest_total: 'Zinsen gesamt: {amount}', c115_recommended: '★ Die empfohlene', c115_saves_line: 'Du sparst {amount} Zinsen gegenüber dem anderen Weg.', c115_tie_line: 'Beide Wege kosten fast gleich viel Zinsen: Hier zählt die Motivation.', c115_route_blocked: 'Mit dieser Gesamtzahlung lässt dieser Weg den Saldo nicht sinken.', c115_ai_btn: '✨ Von der KI erklären lassen', c115_ai_working: 'Die KI vergleicht deine Wege…', c115_ai_none: 'Die KI hat diesmal keine Erklärung gebracht. Der Vergleich oben bleibt dein Plan.',
   c115_bill_title: '🤝 Rechnungs-Verhandler mit KI', c115_bill_note: 'Wähle eine deiner festen Kosten oder Abos und die KI schreibt dir eine Nachricht, fertig zum Kopieren und Senden, um einen Rabatt zu bitten. Du sendest sie: Die App kontaktiert niemanden für dich.', c115_bill_empty: 'Sobald du feste Zahlungen oder erkannte Abos hast, kannst du hier deine Rabatt-Nachricht schreiben lassen.', c115_bill_btn: 'Nachricht schreiben', c115_bill_working: 'Deine Nachricht wird geschrieben…', c115_bill_none: 'Die KI hat diesmal keine Nachricht gebracht. Versuche es gleich noch einmal.', c115_bill_text_title: 'Deine Nachricht, bereit zum Senden:', c115_copy: 'Text kopieren', c115_cat_internet: 'Internet', c115_cat_phone: 'Telefon', c115_cat_insurance: 'Versicherung', c115_cat_other: 'Anderer Dienst', c115_monthly: '{amount}/Monat',
   c115_goals_title: '🧭 Ziel-Copilot mit KI', c115_goals_note: 'Die KI schaut auf deinen echten Geldfluss und deine Ziele und schlägt vor, wie viel du pro Woche für jedes Ziel zurücklegen solltest und in welcher Reihenfolge. Es ist nur ein Vorschlag: Nichts bewegt oder spart sich ohne deine Zustimmung.', c115_goals_btn: '✨ Meine Ziele prüfen', c115_goals_working: 'Dein Fluss und deine Ziele werden geprüft…', c115_goals_empty: 'Erstelle zuerst ein Ziel: Der Copilot arbeitet mit deinen echten Zielen.', c115_goals_none: 'Die KI hat diesmal keinen Vorschlag gebracht. Deine Ziele bleiben, wie sie sind.', c115_prop_title: 'Der Vorschlag des Copiloten', c115_prop_weekly: '{amount} pro Woche', c115_prop_priority: 'Vorgeschlagene Reihenfolge: {list}', c115_apply_btn: 'Diesen Plan übernehmen', c115_ignore_btn: 'Ignorieren', c115_applied: 'Plan übernommen: Er steht jetzt bei deinen Zielen. Es wurde kein Geld bewegt.', c115_plan_line: 'Copilot-Plan: {amount}/Woche', c115_plan_clear: 'Copilot-Plan entfernen', c115_plan_active: 'Copilot-Wochenplan aktiv',
+    c116_group_title: 'Geld im Team', c116_round_label: 'Aufrunden, das spart', c116_round_help: 'Nur Pro. Ist das an, wird jede Ausgabe auf den nächsten Dollar aufgerundet und die Differenz als dein Erspartes vermerkt, offen sichtbar unter Sparen → „Aufrundungen“. Das ist echtes Geld aus deiner eigenen Ausgabe, von dir eingeschaltet und Cent für Cent sichtbar: Der vorgeschlagene Prozentsatz erzeugt nie Ersparnisse. Schalte es jederzeit wieder aus.', c116_fx_label: 'USD/DOP-Kurs (Pesos pro 1 Dollar)', c116_fx_help: 'Der Kurs, mit dem die App Beträge in dominikanischen Pesos (DOP) in deinen Summen in Dollar umrechnet. Es ist der Kurs, den du hier speicherst; kein Live-Kurs. Startwert: 60.00.', c116_roundups_label: 'Aufrundungen', c116_roundup_title: 'Aufrundung', c116_roundup_line: 'Aufrundung: +{amount} zum Sparen', c116_roundup_sub: 'Von der Ausgabe vom {date}', c116_fx_equiv: '≈ {amount} in Dollar', c116_cur_label: 'Währung', c116_cur_usd: 'USD · Dollar ($)', c116_cur_dop: 'DOP · Dominikanische Pesos', c116_acc_currency_label: 'Währung des Kontos', c116_pair_title: '👫 Paar-Modus', c116_pair_note: 'Der Paar-Bereich in eurem Haushalt: Ihr seht und tragt beide die gemeinsamen Ausgaben und Einnahmen des Monats ein und teilt ein Monatsbudget. Die persönlichen Daten jedes Kontos (eigene Ausgaben, Konten und Ziele) werden nicht geteilt.', c116_pair_locked: 'Der Paar-Modus ist Teil von PETO Pro: Aktiviere ihn, um das gemeinsame Geld einzutragen und zu sehen.', c116_pair_pro_btn: 'PETO Pro ansehen', c116_pair_loading: 'Gemeinsames Buch wird geladen…', c116_pair_month_inc: 'Gemeinsame Einnahmen des Monats', c116_pair_month_exp: 'Gemeinsame Ausgaben des Monats', c116_pair_balance: 'Gemeinsamer Saldo des Monats', c116_pair_budget_label: 'Gemeinsames Monatsbudget', c116_pair_budget_none: 'Noch kein Budget festgelegt.', c116_pair_budget_of: '{spent} von {limit} ausgegeben', c116_pair_budget_over: 'Ihr seid {amount} über dem Budget.', c116_pair_budget_set: 'Festlegen', c116_pair_budget_clear: 'Entfernen', c116_pair_add_title: 'Gemeinsam eintragen', c116_pair_kind_exp: 'Ausgabe', c116_pair_kind_inc: 'Einnahme', c116_pair_add_btn: 'Eintragen', c116_pair_list_title: 'Gemeinsame Bewegungen dieses Monats', c116_pair_empty: 'Diesen Monat noch keine gemeinsamen Bewegungen.', c116_pair_by: 'von {name}', c116_pair_del_confirm: 'Diese gemeinsame Bewegung über {amount} löschen? Ihr seht es beide.',
   pro_tag: 'PRO',
   adv_title: 'Erweiterter Bericht',
   adv_note: 'Eine PETO-Pro-Funktion: dieser Monat gegen den vorigen, jede Kategorie und ein CSV-Export des Monats.',
@@ -7762,6 +7822,7 @@ zh: {
   c115_debt_title: '🏁 AI 债务脱困计划', c115_debt_note: '根据你每月已经在还的金额，应用会模拟两条路线，AI 会用你的数字向你解释哪条更适合你、为什么。', c115_debt_empty: '先记下一笔待还债务：计划会根据你的真实债务和每月还款额来制定。', c115_paying_line: '每月总共还款 {pay}：', c115_route_avalanche: '雪崩法 · 先还利息最高的', c115_route_snowball: '滚雪球法 · 先还余额最小的', c115_free_when: '还清债务：{when} · {months}', c115_interest_total: '总利息：{amount}', c115_recommended: '★ 推荐路线', c115_saves_line: '与另一条路线相比，你能省下 {amount} 利息。', c115_tie_line: '两条路线的利息差不多：这时动力更重要。', c115_route_blocked: '以这个总还款额，这条路线无法让余额下降。', c115_ai_btn: '✨ 让 AI 解释一下', c115_ai_working: 'AI 正在比较你的两条路线…', c115_ai_none: 'AI 这次没有给出解释。上面的比较仍然是你的计划。',
   c115_bill_title: '🤝 AI 账单谈判助手', c115_bill_note: '从你的固定支出或订阅中选一项，AI 会为你写好一条可直接复制发送的消息，向对方申请降价。由你来发送：应用不会替你联系任何人。', c115_bill_empty: '当你有了固定付款或检测到的订阅，就可以在这里起草你的降价消息。', c115_bill_btn: '起草消息', c115_bill_working: '正在起草你的消息…', c115_bill_none: 'AI 这次没有写出消息。请稍后再试。', c115_bill_text_title: '你的消息，已可发送：', c115_copy: '复制文本', c115_cat_internet: '互联网', c115_cat_phone: '电话', c115_cat_insurance: '保险', c115_cat_other: '其他服务', c115_monthly: '{amount}/月',
   c115_goals_title: '🧭 AI 目标副驾驶', c115_goals_note: 'AI 会查看你的真实收支和目标，建议你每周为每个目标存多少、按什么顺序。这只是一个建议：未经你批准，不会有任何资金被移动或存入。', c115_goals_btn: '✨ 查看我的目标', c115_goals_working: '正在查看你的收支和目标…', c115_goals_empty: '先创建一个目标：副驾驶会根据你的真实目标工作。', c115_goals_none: 'AI 这次没有给出建议。你的目标保持不变。', c115_prop_title: '副驾驶的建议', c115_prop_weekly: '每周 {amount}', c115_prop_priority: '建议顺序：{list}', c115_apply_btn: '应用此计划', c115_ignore_btn: '忽略', c115_applied: '计划已应用：已记录在你的目标上。没有移动任何资金。', c115_plan_line: '副驾驶计划：{amount}/周', c115_plan_clear: '移除副驾驶计划', c115_plan_active: '副驾驶每周计划已启用',
+    c116_group_title: '团队理财', c116_round_label: '凑整储蓄', c116_round_help: '仅限 Pro。开启后，每笔支出都会向上凑整到下一个整美元，差额会作为你的储蓄记录下来，在「储蓄 → 凑整」中一目了然。这是你自己支出里的真钱，由你开启、每一分都看得见：建议百分比永远不会产生储蓄。随时可以关闭。', c116_fx_label: 'USD/DOP 汇率（1 美元兑多少比索）', c116_fx_help: '应用在总计中把多米尼加比索（DOP）金额换算成美元所用的汇率。这是你在这里保存的汇率，不是实时汇率。初始值：60.00。', c116_roundups_label: '凑整', c116_roundup_title: '凑整', c116_roundup_line: '凑整：+{amount} 存入储蓄', c116_roundup_sub: '来自 {date} 的支出', c116_fx_equiv: '≈ {amount} 美元', c116_cur_label: '货币', c116_cur_usd: 'USD · 美元 ($)', c116_cur_dop: 'DOP · 多米尼加比索', c116_acc_currency_label: '账户货币', c116_pair_title: '👫 情侣模式', c116_pair_note: '家庭里的情侣空间：你们两人都能查看和记录本月共享的支出与收入，并共用一个月度预算。每个账户的个人数据（自己的支出、账户和目标）不会被共享。', c116_pair_locked: '情侣模式是 PETO Pro 功能：开启后即可记录和查看共享的钱。', c116_pair_pro_btn: '查看 PETO Pro', c116_pair_loading: '正在加载共享账本…', c116_pair_month_inc: '本月共享收入', c116_pair_month_exp: '本月共享支出', c116_pair_balance: '本月共享结余', c116_pair_budget_label: '共享月度预算', c116_pair_budget_none: '尚未设定预算。', c116_pair_budget_of: '已花 {spent} / {limit}', c116_pair_budget_over: '你们已超出预算 {amount}。', c116_pair_budget_set: '设定', c116_pair_budget_clear: '清除', c116_pair_add_title: '一起记录', c116_pair_kind_exp: '支出', c116_pair_kind_inc: '收入', c116_pair_add_btn: '记录', c116_pair_list_title: '本月共享流水', c116_pair_empty: '本月还没有共享流水。', c116_pair_by: '由 {name} 记录', c116_pair_del_confirm: '删除这笔 {amount} 的共享流水？你们两人都会看到。',
   pro_tag: 'PRO',
   adv_title: '高级报告',
   adv_note: '这是 PETO Pro 功能：本月与上月对比、每个类别，以及本月的 CSV 导出。',
@@ -8770,6 +8831,7 @@ ja: {
   c115_debt_title: '🏁 AI借金完済プラン', c115_debt_note: '毎月すでに支払っている金額で、アプリが2つのルートをシミュレーションし、AIがあなたの数字を使って、どちらが合っているか、その理由を説明します。', c115_debt_empty: 'まず未払いの借金を1つ記録してください：プランはあなたの実際の借金と毎月の支払額から作られます。', c115_paying_line: '毎月合計 {pay} を支払う場合：', c115_route_avalanche: 'アバランチ · 金利の高い順', c115_route_snowball: 'スノーボール · 残高の小さい順', c115_free_when: '完済時期：{when} · {months}', c115_interest_total: '利息の合計：{amount}', c115_recommended: '★ おすすめ', c115_saves_line: 'もう一方のルートより利息が {amount} 節約できます。', c115_tie_line: '2つのルートの利息はほぼ同じ：ここではモチベーションが大事です。', c115_route_blocked: 'その合計支払額では、このルートでは残高が減りません。', c115_ai_btn: '✨ AIに説明してもらう', c115_ai_working: 'AIがあなたのルートを比較しています…', c115_ai_none: '今回はAIの説明が届きませんでした。上の比較があなたのプランです。',
   c115_bill_title: '🤝 AI請求交渉アシスタント', c115_bill_note: '固定費やサブスクの中から1つ選ぶと、AIが値下げをお願いするメッセージを、コピーしてそのまま送れる形で書きます。送信するのはあなたです：アプリが代わりに連絡することはありません。', c115_bill_empty: '固定支払いや検出されたサブスクがあれば、ここで値下げメッセージを作成できます。', c115_bill_btn: 'メッセージを作成', c115_bill_working: 'メッセージを作成しています…', c115_bill_none: '今回はAIのメッセージが届きませんでした。少ししてからもう一度お試しください。', c115_bill_text_title: 'あなたのメッセージ、送信準備完了：', c115_copy: 'テキストをコピー', c115_cat_internet: 'インターネット', c115_cat_phone: '電話', c115_cat_insurance: '保険', c115_cat_other: 'その他のサービス', c115_monthly: '{amount}/月',
   c115_goals_title: '🧭 AI目標コパイロット', c115_goals_note: 'AIがあなたの実際の収支と目標を見て、各目標に毎週いくら貯めるべきか、どの順番で進めるかを提案します。あくまで提案です：あなたの承認なしに、お金が動いたり貯まったりすることはありません。', c115_goals_btn: '✨ 目標を見直す', c115_goals_working: '収支と目標を確認しています…', c115_goals_empty: 'まず目標を作成してください：コパイロットはあなたの実際の目標で働きます。', c115_goals_none: '今回はAIの提案が届きませんでした。目標はそのままです。', c115_prop_title: 'コパイロットの提案', c115_prop_weekly: '毎週 {amount}', c115_prop_priority: 'おすすめの順番：{list}', c115_apply_btn: 'このプランを適用', c115_ignore_btn: '無視する', c115_applied: 'プランを適用しました：目標に記録されました。お金は動いていません。', c115_plan_line: 'コパイロットプラン：{amount}/週', c115_plan_clear: 'コパイロットプランを外す', c115_plan_active: 'コパイロットの週間プランが有効です',
+    c116_group_title: 'チームでお金管理', c116_round_label: 'おつり貯金（切り上げ）', c116_round_help: 'Pro限定。オンにすると、各支出が次のドルへ切り上げられ、差額があなたの貯蓄として「貯蓄 → 切り上げ」に明示して記録されます。あなた自身の支出からの本物のお金で、あなたが有効化し、1セント単位で見えます。提案された割合が貯蓄を生むことは決してありません。いつでもオフにできます。', c116_fx_label: 'USD/DOP レート（1ドルあたりのペソ）', c116_fx_help: 'アプリがドミニカペソ（DOP）の金額を合計でドルに換算する際のレートです。ここに保存したレートであり、ライブレートではありません。初期値：60.00。', c116_roundups_label: '切り上げ', c116_roundup_title: '切り上げ', c116_roundup_line: '切り上げ：+{amount} を貯蓄へ', c116_roundup_sub: '{date} の支出から', c116_fx_equiv: '≈ {amount}（ドル）', c116_cur_label: '通貨', c116_cur_usd: 'USD · ドル ($)', c116_cur_dop: 'DOP · ドミニカペソ', c116_acc_currency_label: '口座の通貨', c116_pair_title: '👫 カップルモード', c116_pair_note: '世帯の中のカップルスペース：二人とも今月の共有の支出と収入を見て記録でき、月予算を共有します。各アカウントの個人データ（自分の支出、口座、目標）は共有されません。', c116_pair_locked: 'カップルモードは PETO Pro の機能です：有効化すると共有のお金を記録・確認できます。', c116_pair_pro_btn: 'PETO Pro を見る', c116_pair_loading: '共有ブックを読み込み中…', c116_pair_month_inc: '今月の共有収入', c116_pair_month_exp: '今月の共有支出', c116_pair_balance: '今月の共有残高', c116_pair_budget_label: '共有の月予算', c116_pair_budget_none: 'まだ予算が設定されていません。', c116_pair_budget_of: '{limit} のうち {spent} を使用', c116_pair_budget_over: '予算を {amount} 超過しました。', c116_pair_budget_set: '設定', c116_pair_budget_clear: '解除', c116_pair_add_title: '二人で記録', c116_pair_kind_exp: '支出', c116_pair_kind_inc: '収入', c116_pair_add_btn: '記録', c116_pair_list_title: '今月の共有の動き', c116_pair_empty: '今月はまだ共有の動きがありません。', c116_pair_by: '{name} さん', c116_pair_del_confirm: '{amount} の共有の動きを削除しますか？二人とも表示されます。',
   pro_tag: 'PRO',
   adv_title: '高度なレポート',
   adv_note: 'PETO Proの機能です。今月と先月の比較、すべてのカテゴリ、月のCSVエクスポート。',
@@ -9778,6 +9840,7 @@ ko: {
   c115_debt_title: '🏁 AI 빚 탈출 플랜', c115_debt_note: '매달 이미 갚고 있는 금액으로 앱이 두 가지 경로를 시뮬레이션하고, AI가 당신의 숫자로 어떤 경로가 맞는지, 왜 그런지 설명합니다.', c115_debt_empty: '먼저 미결제 빚을 하나 기록하세요: 플랜은 당신의 실제 빚과 매월 갚는 금액으로 만들어집니다.', c115_paying_line: '매달 총 {pay}를 갚을 때:', c115_route_avalanche: '눈사태 · 이자 높은 순', c115_route_snowball: '눈덩이 · 잔액 작은 순', c115_free_when: '빚 청산: {when} · {months}', c115_interest_total: '총 이자: {amount}', c115_recommended: '★ 추천 경로', c115_saves_line: '다른 경로보다 이자를 {amount} 절약합니다.', c115_tie_line: '두 경로의 이자가 거의 같습니다: 여기서는 동기가 중요합니다.', c115_route_blocked: '그 총 상환액으로는 이 경로에서 잔액이 줄지 않습니다.', c115_ai_btn: '✨ AI에게 설명 듣기', c115_ai_working: 'AI가 당신의 경로를 비교하고 있습니다…', c115_ai_none: '이번에는 AI 설명이 오지 않았습니다. 위의 비교가 여전히 당신의 플랜입니다.',
   c115_bill_title: '🤝 AI 요금 협상 도우미', c115_bill_note: '고정 지출이나 구독 중 하나를 고르면 AI가 할인을 요청하는 메시지를 복사해서 바로 보낼 수 있게 작성합니다. 보내는 것은 당신입니다: 앱이 대신 연락하지 않습니다.', c115_bill_empty: '고정 결제나 감지된 구독이 생기면 여기에서 할인 메시지를 작성할 수 있습니다.', c115_bill_btn: '메시지 작성', c115_bill_working: '메시지를 작성하고 있습니다…', c115_bill_none: '이번에는 AI 메시지가 오지 않았습니다. 잠시 후 다시 시도하세요.', c115_bill_text_title: '보낼 준비가 된 메시지:', c115_copy: '텍스트 복사', c115_cat_internet: '인터넷', c115_cat_phone: '전화', c115_cat_insurance: '보험', c115_cat_other: '기타 서비스', c115_monthly: '{amount}/월',
   c115_goals_title: '🧭 AI 목표 코파일럿', c115_goals_note: 'AI가 당신의 실제 현금 흐름과 목표를 보고, 각 목표에 매주 얼마를 저축할지, 어떤 순서로 할지를 제안합니다. 제안일 뿐입니다: 당신이 승인하지 않으면 돈이 움직이거나 저축되지 않습니다.', c115_goals_btn: '✨ 내 목표 검토', c115_goals_working: '흐름과 목표를 검토하고 있습니다…', c115_goals_empty: '먼저 목표를 만드세요: 코파일럿은 당신의 실제 목표로 일합니다.', c115_goals_none: '이번에는 AI 제안이 오지 않았습니다. 목표는 그대로 유지됩니다.', c115_prop_title: '코파일럿의 제안', c115_prop_weekly: '주당 {amount}', c115_prop_priority: '추천 순서: {list}', c115_apply_btn: '이 플랜 적용', c115_ignore_btn: '무시', c115_applied: '플랜이 적용되었습니다: 목표에 기록되었습니다. 돈은 움직이지 않았습니다.', c115_plan_line: '코파일럿 플랜: {amount}/주', c115_plan_clear: '코파일럿 플랜 제거', c115_plan_active: '코파일럿 주간 플랜 활성',
+    c116_group_title: '함께 하는 돈 관리', c116_round_label: '올림 저축', c116_round_help: 'Pro 전용. 켜면 모든 지출이 다음 달러로 올림되고 차액이 「저축 → 올림」에 투명하게 당신의 저축으로 기록됩니다. 당신이 켜고 한 푼까지 보이는, 당신 자신의 지출에서 나온 실제 돈입니다. 제안 비율은 절대 저축을 만들지 않습니다. 언제든 끌 수 있습니다.', c116_fx_label: 'USD/DOP 환율 (1달러당 페소)', c116_fx_help: '앱이 합계에서 도미니카 페소(DOP) 금액을 달러로 환산할 때 쓰는 환율입니다. 여기에 저장한 환율이며 실시간 환율이 아닙니다. 초기값: 60.00.', c116_roundups_label: '올림', c116_roundup_title: '올림', c116_roundup_line: '올림: +{amount} 저축으로', c116_roundup_sub: '{date} 지출에서', c116_fx_equiv: '≈ {amount} 달러', c116_cur_label: '통화', c116_cur_usd: 'USD · 달러 ($)', c116_cur_dop: 'DOP · 도미니카 페소', c116_acc_currency_label: '계좌 통화', c116_pair_title: '👫 커플 모드', c116_pair_note: '가구 안의 커플 공간: 두 사람 모두 이번 달 공유 지출과 수입을 보고 기록하고 월 예산을 공유합니다. 각 계정의 개인 데이터(본인 지출, 계좌, 목표)는 공유되지 않습니다.', c116_pair_locked: '커플 모드는 PETO Pro 기능입니다. 켜면 공유 돈을 기록하고 볼 수 있습니다.', c116_pair_pro_btn: 'PETO Pro 보기', c116_pair_loading: '공유 장부를 불러오는 중…', c116_pair_month_inc: '이번 달 공유 수입', c116_pair_month_exp: '이번 달 공유 지출', c116_pair_balance: '이번 달 공유 잔액', c116_pair_budget_label: '공유 월 예산', c116_pair_budget_none: '아직 설정된 예산이 없습니다.', c116_pair_budget_of: '{limit} 중 {spent} 사용', c116_pair_budget_over: '예산을 {amount} 초과했습니다.', c116_pair_budget_set: '설정', c116_pair_budget_clear: '지우기', c116_pair_add_title: '함께 기록', c116_pair_kind_exp: '지출', c116_pair_kind_inc: '수입', c116_pair_add_btn: '기록', c116_pair_list_title: '이번 달 공유 내역', c116_pair_empty: '이번 달 공유 내역이 아직 없습니다.', c116_pair_by: '{name} 님', c116_pair_del_confirm: '{amount} 공유 내역을 삭제할까요? 두 사람 모두에게 보입니다.',
   pro_tag: 'PRO',
   adv_title: '고급 보고서',
   adv_note: 'PETO Pro 기능입니다. 이번 달과 지난달 비교, 모든 카테고리, 그리고 월의 CSV 내보내기.',
@@ -10786,6 +10849,7 @@ ru: {
   c115_debt_title: '🏁 Твой план выхода из долгов с ИИ', c115_debt_note: 'На основе того, что ты уже платишь каждый месяц, приложение моделирует оба пути, а ИИ объясняет простыми словами, какой тебе подходит и почему, — с твоими цифрами.', c115_debt_empty: 'Сначала запиши один непогашенный долг: план строится на твоих реальных долгах и на том, сколько ты платишь в месяц.', c115_paying_line: 'При платеже {pay} в месяц в общей сложности:', c115_route_avalanche: 'Лавина · сначала самый высокий процент', c115_route_snowball: 'Снежный ком · сначала самый маленький остаток', c115_free_when: 'Без долгов: {when} · {months}', c115_interest_total: 'Всего процентов: {amount}', c115_recommended: '★ Рекомендуемый', c115_saves_line: 'Ты экономишь {amount} на процентах по сравнению с другим путём.', c115_tie_line: 'Оба пути стоят почти одинаково по процентам: здесь решает мотивация.', c115_route_blocked: 'При таком общем платеже этот путь не уменьшает остаток.', c115_ai_btn: '✨ Пусть ИИ объяснит', c115_ai_working: 'ИИ сравнивает твои пути…', c115_ai_none: 'В этот раз ИИ не принёс объяснение. Сравнение выше остаётся твоим планом.',
   c115_bill_title: '🤝 Переговорщик по счетам с ИИ', c115_bill_note: 'Выбери один из своих фиксированных платежей или подписок, и ИИ составит сообщение, готовое к копированию и отправке, с просьбой о скидке. Отправляешь ты: приложение ни с кем за тебя не связывается.', c115_bill_empty: 'Когда у тебя будут фиксированные платежи или найденные подписки, здесь можно будет составить сообщение о скидке.', c115_bill_btn: 'Составить сообщение', c115_bill_working: 'Составляю твоё сообщение…', c115_bill_none: 'В этот раз ИИ не принёс сообщение. Попробуй ещё раз через минуту.', c115_bill_text_title: 'Твоё сообщение, готово к отправке:', c115_copy: 'Копировать текст', c115_cat_internet: 'Интернет', c115_cat_phone: 'Телефон', c115_cat_insurance: 'Страховка', c115_cat_other: 'Другая услуга', c115_monthly: '{amount}/мес.',
   c115_goals_title: '🧭 Копилот целей с ИИ', c115_goals_note: 'ИИ смотрит на твой реальный денежный поток и твои цели и предлагает, сколько откладывать каждую неделю на каждую и в каком порядке. Это только предложение: ничего не движется и не копится без твоего одобрения.', c115_goals_btn: '✨ Проверить мои цели', c115_goals_working: 'Проверяю твой поток и цели…', c115_goals_empty: 'Сначала создай цель: копилот работает с твоими настоящими целями.', c115_goals_none: 'В этот раз ИИ не принёс предложение. Твои цели остаются как есть.', c115_prop_title: 'Предложение копилота', c115_prop_weekly: '{amount} в неделю', c115_prop_priority: 'Предлагаемый порядок: {list}', c115_apply_btn: 'Применить этот план', c115_ignore_btn: 'Игнорировать', c115_applied: 'План применён: он отмечен у твоих целей. Деньги не двигались.', c115_plan_line: 'План копилота: {amount}/неделю', c115_plan_clear: 'Убрать план копилота', c115_plan_active: 'Недельный план копилота активен',
+    c116_group_title: 'Деньги в команде', c116_round_label: 'Округление, которое копит', c116_round_help: 'Только Pro. Когда это включено, каждый расход округляется до следующего доллара, а разница записывается как ваши сбережения — открыто, в разделе Сбережения → «Округления». Это реальные деньги из вашего же расхода, включённые вами и видимые до цента: предлагаемый процент никогда не создаёт сбережения. Отключите в любой момент.', c116_fx_label: 'Курс USD/DOP (песо за 1 доллар)', c116_fx_help: 'Курс, по которому приложение переводит суммы в доминиканских песо (DOP) в доллары в ваших итогах. Это курс, который вы сохраняете здесь; это не живой курс. Начальное значение: 60.00.', c116_roundups_label: 'Округления', c116_roundup_title: 'Округление', c116_roundup_line: 'Округление: +{amount} в сбережения', c116_roundup_sub: 'От расхода за {date}', c116_fx_equiv: '≈ {amount} в долларах', c116_cur_label: 'Валюта', c116_cur_usd: 'USD · Доллары ($)', c116_cur_dop: 'DOP · Доминиканские песо', c116_acc_currency_label: 'Валюта счёта', c116_pair_title: '👫 Режим пары', c116_pair_note: 'Пространство пары внутри вашего домохозяйства: вы оба видите и записываете общие расходы и доходы месяца и делите месячный бюджет. Личные данные каждого счёта (свои расходы, счета и цели) не передаются.', c116_pair_locked: 'Режим пары — функция PETO Pro: включите её, чтобы записывать и видеть общие деньги.', c116_pair_pro_btn: 'Смотреть PETO Pro', c116_pair_loading: 'Загрузка общей книги…', c116_pair_month_inc: 'Общие доходы месяца', c116_pair_month_exp: 'Общие расходы месяца', c116_pair_balance: 'Общий баланс месяца', c116_pair_budget_label: 'Общий месячный бюджет', c116_pair_budget_none: 'Бюджет пока не задан.', c116_pair_budget_of: 'Потрачено {spent} из {limit}', c116_pair_budget_over: 'Вы превысили бюджет на {amount}.', c116_pair_budget_set: 'Задать', c116_pair_budget_clear: 'Убрать', c116_pair_add_title: 'Записать вдвоём', c116_pair_kind_exp: 'Расход', c116_pair_kind_inc: 'Доход', c116_pair_add_btn: 'Записать', c116_pair_list_title: 'Общие движения этого месяца', c116_pair_empty: 'В этом месяце общих движений пока нет.', c116_pair_by: 'от {name}', c116_pair_del_confirm: 'Удалить это общее движение на {amount}? Это увидят оба.',
   pro_tag: 'PRO',
   adv_title: 'Расширенный отчёт',
   adv_note: 'Функция PETO Pro: этот месяц против предыдущего, каждая категория и экспорт месяца в CSV.',
@@ -11794,6 +11858,7 @@ hi: {
   c115_debt_title: '🏁 AI के साथ कर्ज़ से बाहर निकलने का प्लान', c115_debt_note: 'आप हर महीने जो पहले से चुका रहे हैं, उससे ऐप दोनों रास्ते चलाकर देखता है और AI आसान शब्दों में बताता है कि कौन-सा रास्ता आपके लिए सही है और क्यों — आपके ही आंकड़ों के साथ।', c115_debt_empty: 'पहले एक बकाया कर्ज़ दर्ज करें: प्लान आपके असली कर्ज़ों और हर महीने की चुकौती से बनता है।', c115_paying_line: 'कुल {pay} हर महीने चुकाने पर:', c115_route_avalanche: 'एवलांच · सबसे ज़्यादा ब्याज पहले', c115_route_snowball: 'स्नोबॉल · सबसे छोटा बकाया पहले', c115_free_when: 'कर्ज़-मुक्त: {when} · {months}', c115_interest_total: 'कुल ब्याज: {amount}', c115_recommended: '★ सुझाया गया रास्ता', c115_saves_line: 'दूसरे रास्ते के मुकाबले आप {amount} ब्याज बचाते हैं।', c115_tie_line: 'दोनों रास्तों का ब्याज लगभग बराबर है: यहाँ हौसला मायने रखता है।', c115_route_blocked: 'इस कुल भुगतान से इस रास्ते में बकाया कम नहीं होगा।', c115_ai_btn: '✨ AI से समझाओ', c115_ai_working: 'AI आपके रास्तों की तुलना कर रहा है…', c115_ai_none: 'इस बार AI की व्याख्या नहीं आई। ऊपर की तुलना ही आपका प्लान है।',
   c115_bill_title: '🤝 AI बिल मोलभाव सहायक', c115_bill_note: 'अपने तय खर्चों या सब्सक्रिप्शन में से एक चुनें और AI छूट माँगने का संदेश तैयार लिख देगा — कॉपी करके भेजने के लिए। भेजना आपको है: ऐप आपकी ओर से किसी से संपर्क नहीं करता।', c115_bill_empty: 'जब आपके तय भुगतान या पहचाने गए सब्सक्रिप्शन होंगे, तो आप यहाँ अपना छूट संदेश बनवा सकेंगे।', c115_bill_btn: 'संदेश लिखो', c115_bill_working: 'आपका संदेश लिखा जा रहा है…', c115_bill_none: 'इस बार AI का संदेश नहीं आया। थोड़ी देर में फिर कोशिश करें।', c115_bill_text_title: 'आपका संदेश, भेजने के लिए तैयार:', c115_copy: 'टेक्स्ट कॉपी करें', c115_cat_internet: 'इंटरनेट', c115_cat_phone: 'फ़ोन', c115_cat_insurance: 'बीमा', c115_cat_other: 'अन्य सेवा', c115_monthly: '{amount}/माह',
   c115_goals_title: '🧭 AI लक्ष्य कोपायलट', c115_goals_note: 'AI आपके असली नकदी प्रवाह और लक्ष्यों को देखकर सुझाव देता है कि हर लक्ष्य के लिए हर हफ़्ते कितना बचाएँ और किस क्रम में। यह सिर्फ़ एक सुझाव है: आपकी मंज़ूरी के बिना कुछ भी नहीं हिलता और न ही बचता है।', c115_goals_btn: '✨ मेरे लक्ष्य देखें', c115_goals_working: 'आपके प्रवाह और लक्ष्यों की जाँच हो रही है…', c115_goals_empty: 'पहले एक लक्ष्य बनाएँ: कोपायलट आपके असली लक्ष्यों पर काम करता है।', c115_goals_none: 'इस बार AI का सुझाव नहीं आया। आपके लक्ष्य जैसे हैं वैसे ही रहते हैं।', c115_prop_title: 'कोपायलट का सुझाव', c115_prop_weekly: '{amount} प्रति हफ़्ता', c115_prop_priority: 'सुझाया क्रम: {list}', c115_apply_btn: 'यह प्लान लागू करें', c115_ignore_btn: 'अनदेखा करें', c115_applied: 'प्लान लागू हुआ: यह आपके लक्ष्यों पर दर्ज हो गया। कोई पैसा नहीं हिला।', c115_plan_line: 'कोपायलट प्लान: {amount}/हफ़्ता', c115_plan_clear: 'कोपायलट प्लान हटाएँ', c115_plan_active: 'कोपायलट साप्ताहिक प्लान सक्रिय',
+    c116_group_title: 'टीम के साथ पैसा', c116_round_label: 'राउंड-अप बचत', c116_round_help: 'केवल Pro. यह चालू होने पर, हर खर्च अगले डॉलर तक राउंड हो जाता है और अंतर आपकी बचत के रूप में, खुलकर, बचत → «राउंड-अप» में दर्ज होता है। यह आपके अपने खर्च का असली पैसा है, जिसे आप चालू करते हैं और जो पैसे-पैसे दिखता है: सुझाया गया प्रतिशत कभी बचत नहीं बनाता। जब चाहें बंद करें।', c116_fx_label: 'USD/DOP दर (1 डॉलर के पेसो)', c116_fx_help: 'वह दर जिससे ऐप आपके कुल योग में डोमिनिकन पेसो (DOP) राशियों को डॉलर में बदलता है। यह वही दर है जो आप यहाँ सहेजते हैं; यह लाइव दर नहीं है। शुरुआती मान: 60.00।', c116_roundups_label: 'राउंड-अप', c116_roundup_title: 'राउंड-अप', c116_roundup_line: 'राउंड-अप: +{amount} बचत में', c116_roundup_sub: '{date} के खर्च से', c116_fx_equiv: '≈ {amount} डॉलर में', c116_cur_label: 'मुद्रा', c116_cur_usd: 'USD · डॉलर ($)', c116_cur_dop: 'DOP · डोमिनिकन पेसो', c116_acc_currency_label: 'खाते की मुद्रा', c116_pair_title: '👫 कपल मोड', c116_pair_note: 'आपके परिवार के अंदर कपल की जगह: आप दोनों इस महीने के साझा खर्च और आय देख और दर्ज कर सकते हैं और एक मासिक बजट साझा करते हैं। हर खाते का निजी डेटा (अपने खर्च, खाते और लक्ष्य) साझा नहीं होता।', c116_pair_locked: 'कपल मोड PETO Pro की सुविधा है: साझा पैसा दर्ज करने और देखने के लिए इसे चालू करें।', c116_pair_pro_btn: 'PETO Pro देखें', c116_pair_loading: 'साझा बही लोड हो रही है…', c116_pair_month_inc: 'महीने की साझा आय', c116_pair_month_exp: 'महीने के साझा खर्च', c116_pair_balance: 'महीने का साझा शेष', c116_pair_budget_label: 'साझा मासिक बजट', c116_pair_budget_none: 'अभी कोई बजट तय नहीं है।', c116_pair_budget_of: '{limit} में से {spent} खर्च', c116_pair_budget_over: 'आप बजट से {amount} आगे निकल गए।', c116_pair_budget_set: 'तय करें', c116_pair_budget_clear: 'हटाएँ', c116_pair_add_title: 'साथ में दर्ज करें', c116_pair_kind_exp: 'खर्च', c116_pair_kind_inc: 'आय', c116_pair_add_btn: 'दर्ज करें', c116_pair_list_title: 'इस महीने के साझा लेन-देन', c116_pair_empty: 'इस महीने अभी कोई साझा लेन-देन नहीं है।', c116_pair_by: '{name} द्वारा', c116_pair_del_confirm: '{amount} का यह साझा लेन-देन हटाएँ? आप दोनों को दिखेगा।',
   pro_tag: 'PRO',
   adv_title: 'उन्नत रिपोर्ट',
   adv_note: 'यह PETO Pro की सुविधा है: यह माह बनाम पिछला माह, हर श्रेणी और माह का CSV निर्यात।',
@@ -12802,6 +12867,7 @@ ar: {
   c115_debt_title: '🏁 خطتك للخروج من الديون مع الذكاء الاصطناعي', c115_debt_note: 'بالمبلغ الذي تدفعه كل شهر بالفعل، يحاكي التطبيق الطريقتين ويشرح لك الذكاء الاصطناعي أيّهما يناسبك ولماذا، بأرقامك الخاصة.', c115_debt_empty: 'سجّل أولًا دينًا مستحقًا: تُبنى الخطة على ديونك الحقيقية وما تدفعه شهريًا.', c115_paying_line: 'عند دفع {pay} شهريًا في المجموع:', c115_route_avalanche: 'الانهيار · الفائدة الأعلى أولًا', c115_route_snowball: 'كرة الثلج · الرصيد الأصغر أولًا', c115_free_when: 'خالٍ من الديون: {when} · {months}', c115_interest_total: 'إجمالي الفائدة: {amount}', c115_recommended: '★ المُوصى به', c115_saves_line: 'توفّر {amount} من الفائدة مقارنة بالطريق الآخر.', c115_tie_line: 'تكلفة الطريقين بالفائدة متقاربة جدًا: هنا يهمّ الحافز.', c115_route_blocked: 'بهذا المبلغ الإجمالي، هذا الطريق لا يخفّض الرصيد.', c115_ai_btn: '✨ دع الذكاء الاصطناعي يشرح', c115_ai_working: 'يقارن الذكاء الاصطناعي بين طريقيك…', c115_ai_none: 'لم يصل شرح الذكاء الاصطناعي هذه المرة. المقارنة أعلاه تبقى خطتك.',
   c115_bill_title: '🤝 مفاوض الفواتير مع الذكاء الاصطناعي', c115_bill_note: 'اختر إحدى مصاريفك الثابتة أو اشتراكاتك، وسيكتب لك الذكاء الاصطناعي رسالة جاهزة للنسخ والإرسال تطلب فيها تخفيضًا. أنت من يرسلها: التطبيق لا يتواصل مع أحد نيابة عنك.', c115_bill_empty: 'عندما تكون لديك مدفوعات ثابتة أو اشتراكات مكتشفة، ستتمكن من كتابة رسالة التخفيض هنا.', c115_bill_btn: 'اكتب الرسالة', c115_bill_working: 'جارٍ كتابة رسالتك…', c115_bill_none: 'لم تصل رسالة الذكاء الاصطناعي هذه المرة. حاول بعد قليل.', c115_bill_text_title: 'رسالتك، جاهزة للإرسال:', c115_copy: 'نسخ النص', c115_cat_internet: 'الإنترنت', c115_cat_phone: 'الهاتف', c115_cat_insurance: 'التأمين', c115_cat_other: 'خدمة أخرى', c115_monthly: '{amount}/شهر',
   c115_goals_title: '🧭 مساعد الأهداف مع الذكاء الاصطناعي', c115_goals_note: 'ينظر الذكاء الاصطناعي إلى تدفقك الحقيقي وأهدافك، ويقترح كم تدّخر أسبوعيًا لكل هدف وبأي ترتيب. إنه مجرد اقتراح: لا يتحرك شيء ولا يُدّخر شيء دون موافقتك.', c115_goals_btn: '✨ راجع أهدافي', c115_goals_working: 'جارٍ مراجعة تدفقك وأهدافك…', c115_goals_empty: 'أنشئ هدفًا أولًا: يعمل المساعد على أهدافك الحقيقية.', c115_goals_none: 'لم يصل اقتراح الذكاء الاصطناعي هذه المرة. تبقى أهدافك كما هي.', c115_prop_title: 'اقتراح المساعد', c115_prop_weekly: '{amount} أسبوعيًا', c115_prop_priority: 'الترتيب المقترح: {list}', c115_apply_btn: 'طبّق هذه الخطة', c115_ignore_btn: 'تجاهل', c115_applied: 'تم تطبيق الخطة: سُجّلت على أهدافك. لم يتحرك أي مال.', c115_plan_line: 'خطة المساعد: {amount}/أسبوع', c115_plan_clear: 'إزالة خطة المساعد', c115_plan_active: 'خطة المساعد الأسبوعية مفعّلة',
+    c116_group_title: 'المال كفريق', c116_round_label: 'التقريب الذي يوفّر', c116_round_help: 'للمحترفين فقط. عند تشغيله، يُقرَّب كل مصروف إلى الدولار التالي ويُسجَّل الفرق كمدخراتك، بوضوح، في المدخرات ← «التقريبات». إنه مال حقيقي من مصروفك نفسه، تُشغّله أنت ويظهر سنتًا بسنت: النسبة المقترحة لا تخلق مدخرات أبدًا. أوقفه متى شئت.', c116_fx_label: 'سعر USD/DOP (بيزو مقابل 1 دولار)', c116_fx_help: 'السعر الذي يحوّل به التطبيق مبالغ البيزو الدومينيكاني (DOP) إلى دولارات في مجاميعك. إنه السعر الذي تحفظه هنا؛ وليس سعرًا مباشرًا. القيمة الابتدائية: 60.00.', c116_roundups_label: 'التقريبات', c116_roundup_title: 'تقريب', c116_roundup_line: 'تقريب: +{amount} إلى المدخرات', c116_roundup_sub: 'من مصروف {date}', c116_fx_equiv: '≈ {amount} بالدولار', c116_cur_label: 'العملة', c116_cur_usd: 'USD · دولارات ($)', c116_cur_dop: 'DOP · بيزو دومينيكاني', c116_acc_currency_label: 'عملة الحساب', c116_pair_title: '👫 وضع الشريكين', c116_pair_note: 'مساحة الشريكين داخل أسرتك: كلاكما يرى ويسجّل مصروفات ودخل هذا الشهر المشتركة وتتشاركان ميزانية شهرية. البيانات الشخصية لكل حساب (مصروفاته وحساباته وأهدافه) لا تُشارَك.', c116_pair_locked: 'وضع الشريكين من مزايا PETO Pro: فعّله لتسجيل المال المشترك ورؤيته.', c116_pair_pro_btn: 'عرض PETO Pro', c116_pair_loading: 'جارٍ تحميل الدفتر المشترك…', c116_pair_month_inc: 'دخل الشهر المشترك', c116_pair_month_exp: 'مصروفات الشهر المشتركة', c116_pair_balance: 'رصيد الشهر المشترك', c116_pair_budget_label: 'الميزانية الشهرية المشتركة', c116_pair_budget_none: 'لا توجد ميزانية محددة بعد.', c116_pair_budget_of: 'أُنفق {spent} من {limit}', c116_pair_budget_over: 'تجاوزتما الميزانية بمقدار {amount}.', c116_pair_budget_set: 'تحديد', c116_pair_budget_clear: 'إزالة', c116_pair_add_title: 'التسجيل معًا', c116_pair_kind_exp: 'مصروف', c116_pair_kind_inc: 'دخل', c116_pair_add_btn: 'تسجيل', c116_pair_list_title: 'حركات هذا الشهر المشتركة', c116_pair_empty: 'لا توجد حركات مشتركة هذا الشهر بعد.', c116_pair_by: 'بواسطة {name}', c116_pair_del_confirm: 'حذف هذه الحركة المشتركة بقيمة {amount}؟ سيراها كلاكما.',
   pro_tag: 'PRO',
   adv_title: 'التقرير المتقدّم',
   adv_note: 'ميزة من PETO Pro: هذا الشهر مقابل السابق، كل فئة وتصدير CSV للشهر.',
@@ -13831,9 +13897,20 @@ function pendingDebtsTotal() {
    tecleado. Como todo es derivado de los movimientos, crear,
    editar, borrar y DESHACER dejan los saldos siempre exactos. */
 function accountLinkedSum(accountId) {
+  /* Compilación 116: la suma enlazada se calcula en la moneda
+     de la cuenta. Un movimiento en la misma moneda aporta su
+     monto original; uno en dólares aporta su equivalente en
+     pesos con la tasa guardada. Para cuentas USD con
+     movimientos USD (todo lo anterior a la 116) el resultado
+     es idéntico al de siempre. */
+  const acc116 = (db.accounts || []).find((a) => a.id === accountId);
+  const inAccCur116 = (m) => {
+    if (!acc116 || acc116.currency !== 'DOP') return m.amountCents;
+    return entryCurrency116(m) === 'DOP' ? entryOrigCents116(m) : usdToDop116(m.amountCents);
+  };
   let s = 0;
-  for (const i of db.incomes) if (i.accountId === accountId) s += i.amountCents;
-  for (const e of db.expenses) if (e.accountId === accountId) s -= e.amountCents;
+  for (const i of db.incomes) if (i.accountId === accountId) s += inAccCur116(i);
+  for (const e of db.expenses) if (e.accountId === accountId) s -= inAccCur116(e);
   return s;
 }
 function accountShownBalance(a) {
@@ -13889,7 +13966,9 @@ function availableMoney(key) {
      por el flujo del mes — contarlos también sería doble
      conteo, porque el saldo que da el banco ya los incluye. */
   const bankByBalance = bankBalancesKnown();
-  let total = (db.accounts || []).reduce((t, a) => t + accountShownBalance(a), 0);
+  /* Compilación 116: el saldo mostrado de una cuenta en pesos
+     entra en el total convertido a USD (accountBalanceUsd116). */
+  let total = (db.accounts || []).reduce((t, a) => t + accountBalanceUsd116(a), 0);
   for (const i of monthIncomes(key)) {
     if (bankByBalance && isBankMov(i)) continue;
     if (hasAccounts) {
@@ -15712,7 +15791,9 @@ function resetExpenseForm() {
 function openExpenseEdit(item) {
   expCatTouched = true;
   document.getElementById('exp-id').value = item.id;
-  document.getElementById('exp-amount').value = (item.amountCents / 100).toFixed(2);
+  document.getElementById('exp-amount').value = (entryOrigCents116(item) / 100).toFixed(2);
+  const expCur116 = document.getElementById('exp-currency');
+  if (expCur116) expCur116.value = entryCurrency116(item);
   fillCategorySelect();
   document.getElementById('exp-category').value = item.category;
   setSourceSelect('exp-source', item, false);
@@ -15784,11 +15865,19 @@ function renderExpenses() {
     const line1 = el('div', 'exp-line1');
     const name = (item.note && item.note.trim()) ? item.note.trim() : catName(item.category);
     line1.appendChild(el('div', 'item-title exp-title', name + (item.biz ? ' 💼' : '') + ((!item.category || item.category === 'Otros') ? ' ✨' : '')));
-    line1.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
+    line1.appendChild(el('span', 'item-amount', fmtEntry116(item)));
     li.appendChild(line1);
     const srcTag89 = movementSourceTag(item, false);
     const sub = catName(item.category) + ' · ' + prettyDate(item.date) + (srcTag89 ? ' · ' + srcTag89 : '');
     li.appendChild(el('div', 'item-sub exp-line2', sub));
+    /* Compilación 116: el equivalente en dólares de un gasto
+       en pesos y, si lo tuvo, la línea de su redondeo. */
+    if (entryCurrency116(item) === 'DOP') {
+      li.appendChild(el('div', 'item-sub exp-line2', t('c116_fx_equiv', { amount: fmt(item.amountCents) })));
+    }
+    if (item.roundUpCents > 0) {
+      li.appendChild(el('div', 'item-sub exp-line2', '🔺 ' + t('c116_roundup_line', { amount: fmt(item.roundUpCents) })));
+    }
     if (item.photo) {
       const thumb = document.createElement('img');
       thumb.className = 'receipt-thumb';
@@ -15835,6 +15924,10 @@ function onExpenseSubmit(ev) {
      total de ahorros son derivados: con guardar el enlace basta. */
   const expSrc = readSource('exp-source');
   db.settings.lastExpSource = expSrc.mem;
+  /* Compilación 116: la moneda del formulario. Lo tecleado en
+     pesos se convierte a USD con la tasa guardada y el trío
+     currency/origCents/rate116 viaja con el gasto. */
+  const fx116 = readEntryCurrency116('exp-currency', cents);
   beginUndo();
   let savedItem = null;
   if (id) {
@@ -15846,13 +15939,16 @@ function onExpenseSubmit(ev) {
        movimiento era una transferencia del banco, la marca se
        quita y pasa a contar como gasto normal — manda la
        decisión de la persona. */
-    if (found) { found.amountCents = cents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; found.transfer = false; savedItem = found; if (prevCat96 && prevCat96 !== category) learnCategory96(note, category); }
+    if (found) { found.amountCents = fx116.amountCents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; found.transfer = false; found.currency = fx116.currency; found.origCents = fx116.origCents; found.rate116 = fx116.rate116; savedItem = found; if (prevCat96 && prevCat96 !== category) learnCategory96(note, category); }
   } else {
-    savedItem = { id: uid(), amountCents: cents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings, src: expSrc.src };
+    savedItem = { id: uid(), amountCents: fx116.amountCents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings, src: expSrc.src, currency: fx116.currency, origCents: fx116.origCents, rate116: fx116.rate116, roundUpCents: 0 };
     db.expenses.push(savedItem);
     const ruleCat96 = userRuleCategory(note);
     if (ruleCat96 && ruleCat96 !== category) learnCategory96(note, category);
   }
+  /* Compilación 116: el redondeo que ahorra, si está activo
+     (dentro del mismo ciclo de guardado: deshacer lo cubre). */
+  applyRoundUp116(savedItem);
   expMonth = monthKeyOf(date);
   let photoFailed = false;
   if (!save() && savedItem && savedItem.photo) {
@@ -15913,7 +16009,9 @@ function resetIncomeForm() {
    (Bloque I), los resultados de Buscar. */
 function openIncomeEdit(item) {
   document.getElementById('inc-id').value = item.id;
-  document.getElementById('inc-amount').value = (item.amountCents / 100).toFixed(2);
+  document.getElementById('inc-amount').value = (entryOrigCents116(item) / 100).toFixed(2);
+  const incCur116 = document.getElementById('inc-currency');
+  if (incCur116) incCur116.value = entryCurrency116(item);
   setSourceSelect('inc-source', item, true);
   document.getElementById('inc-date').value = item.date;
   document.getElementById('inc-note').value = item.note;
@@ -15922,7 +16020,7 @@ function openIncomeEdit(item) {
   document.getElementById('inc-more').checked = incHasDetails;
   document.getElementById('inc-more-box').hidden = !incHasDetails;
   incSavingsTouched = true;
-  document.getElementById('inc-savings').value = ((item.savingsCents || 0) / 100).toFixed(2);
+  document.getElementById('inc-savings').value = ((entryCurrency116(item) === 'DOP' ? usdToDop116(item.savingsCents || 0) : (item.savingsCents || 0)) / 100).toFixed(2);
   document.getElementById('income-form-title').textContent = t('inc_edit');
   document.getElementById('inc-cancel-edit').hidden = false;
   updateSplitPreview();
@@ -15940,7 +16038,7 @@ function renderIncomes() {
   for (const item of list) {
     const li = el('li', 'item inc-item99');
     const main = el('div', 'item-main');
-    main.appendChild(el('div', 'item-title', fmt(item.amountCents) + (item.biz ? ' 💼' : '')));
+    main.appendChild(el('div', 'item-title', fmtEntry116(item) + (item.biz ? ' 💼' : '')));
     main.appendChild(el('div', 'item-sub', prettyDate(item.date) + (item.note ? ' · ' + item.note : '')));
     /* Compilación 99 · P15: el reparto va en CHIPS a lo ancho
        de la tarjeta (la línea de texto salía palabra por palabra
@@ -16030,12 +16128,16 @@ function onIncomeSubmit(ev) {
      cuenta), con su memoria de última usada, como en el gasto. */
   const incSrc = readSource('inc-source');
   db.settings.lastIncSource = incSrc.mem;
+  /* Compilación 116: la moneda del formulario; el ahorro
+     tecleado en pesos se convierte con la misma tasa. */
+  const fx116 = readEntryCurrency116('inc-currency', cents);
+  const savingsUsd116 = fx116.currency === 'DOP' ? dopToUsd116(savingsCents) : savingsCents;
   beginUndo();
   if (id) {
     const found = db.incomes.find((x) => x.id === id);
-    if (found) { found.amountCents = cents; found.savingsCents = savingsCents; found.date = date; found.note = note; found.biz = document.getElementById('inc-biz').checked === true; found.accountId = incSrc.accountId; found.toSavings = incSrc.savings; found.src = incSrc.src; }
+    if (found) { found.amountCents = fx116.amountCents; found.savingsCents = savingsUsd116; found.date = date; found.note = note; found.biz = document.getElementById('inc-biz').checked === true; found.accountId = incSrc.accountId; found.toSavings = incSrc.savings; found.src = incSrc.src; found.currency = fx116.currency; found.origCents = fx116.origCents; found.rate116 = fx116.rate116; }
   } else {
-    db.incomes.push({ id: uid(), amountCents: cents, savingsCents, date, note, biz: document.getElementById('inc-biz').checked === true, accountId: incSrc.accountId, toSavings: incSrc.savings, src: incSrc.src });
+    db.incomes.push({ id: uid(), amountCents: fx116.amountCents, savingsCents: savingsUsd116, date, note, biz: document.getElementById('inc-biz').checked === true, accountId: incSrc.accountId, toSavings: incSrc.savings, src: incSrc.src, currency: fx116.currency, origCents: fx116.origCents, rate116: fx116.rate116 });
   }
   save(); resetIncomeForm(); renderIncomes(); showUndoToast();
 }
@@ -16269,6 +16371,8 @@ function renderSavingsBreakdown108() {
   const manEl = document.getElementById('sav-manual108');
   const noteEl = document.getElementById('sav-bank-note108');
   const invEl = document.getElementById('sav-invest112');
+  const roundEl = document.getElementById('sav-roundups116');
+  const round116 = roundUpsTotal116();
   if (!autoEl || !manEl || !noteEl) return;
   const auto = bankSavingsCents();
   /* Compilación 112: las INVERSIONES del banco tienen su línea
@@ -16288,6 +16392,10 @@ function renderSavingsBreakdown108() {
       if (inv > 0) invEl.querySelector('strong').textContent = fmt(inv);
     }
     manEl.querySelector('strong').textContent = fmt(allSavingsTotal());
+    if (roundEl) {
+      roundEl.hidden = round116 <= 0;
+      if (round116 > 0) roundEl.querySelector('strong').textContent = fmt(round116);
+    }
     return;
   }
   if (invEl) invEl.hidden = true;
@@ -16298,12 +16406,16 @@ function renderSavingsBreakdown108() {
   } else if (!conns.length && bankImportedCount() > 0) {
     note = t('c108_note_disconnected', { amount: fmt(0) });
   }
-  if (!note) { wrap.hidden = true; return; }
+  if (!note && round116 <= 0) { wrap.hidden = true; return; }
   wrap.hidden = false;
   autoEl.hidden = true;
   manEl.hidden = true;
   if (invEl) invEl.hidden = true;
-  noteEl.hidden = false;
+  if (roundEl) {
+    roundEl.hidden = round116 <= 0;
+    if (round116 > 0) roundEl.querySelector('strong').textContent = fmt(round116);
+  }
+  noteEl.hidden = !note;
   noteEl.textContent = note;
 }
 function renderSavings() {
@@ -16397,17 +16509,22 @@ function renderSavings() {
         if (!window.confirm(t('exp_delete_confirm', { amount: fmt(item.amountCents), cat: catName(item.category), date: prettyDate(item.date) }))) return;
         beginUndo();
         db.expenses = db.expenses.filter((x) => x.id !== item.id);
+        removeRoundUp116(item.id);
         save(); renderSavings(); showUndoToast();
       }));
     } else {
-      main.appendChild(el('div', 'item-title', item.note ? item.note : t('sav_manual_title')));
+      main.appendChild(el('div', 'item-title', item.roundUpOf ? '🔺 ' + t('c116_roundup_title') : (item.note ? item.note : t('sav_manual_title'))));
       main.appendChild(el('div', 'item-sub', t('sav_manual_sub', { date: prettyDate(item.date) })));
+      if (item.roundUpOf) {
+        const srcExp116 = db.expenses.find((x) => x.id === item.roundUpOf);
+        if (srcExp116) main.appendChild(el('div', 'item-sub', t('c116_roundup_sub', { date: prettyDate(srcExp116.date) })));
+      }
       const assignedGoal = item.goalId ? db.goals.find((g) => g.id === item.goalId) : null;
       if (assignedGoal) main.appendChild(el('div', 'item-sub', '🎯 ' + assignedGoal.name));
       else if (item.goalId === 'efund') main.appendChild(el('div', 'item-sub', '🛟 ' + t('efund_title')));
       li.appendChild(main);
       li.appendChild(el('span', 'item-amount', fmt(item.amountCents)));
-      acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
+      if (!item.roundUpOf) acts.appendChild(actionButton(t('btn_repeat'), 'btn-ghost', () => {
         beginUndo();
         db.savings.push({ id: uid(), amountCents: item.amountCents, date: todayStr(), note: item.note, goalId: item.goalId || null });
         save(); renderSavings(); showUndoToast();
@@ -16416,6 +16533,9 @@ function renderSavings() {
         if (!window.confirm(t('sav_delete_manual_confirm', { amount: fmt(item.amountCents), date: prettyDate(item.date) }))) return;
         beginUndo();
         db.savings = db.savings.filter((x) => x.id !== item.id);
+        /* Compilación 116: si era un redondeo, el gasto
+           pierde su marca (el apartado ya no existe). */
+        if (item.roundUpOf) { const ex116 = db.expenses.find((x) => x.id === item.roundUpOf); if (ex116) ex116.roundUpCents = 0; }
         save(); renderSavings(); showUndoToast();
       }));
     }
@@ -16781,7 +16901,7 @@ function renderScoreCard() {
 let flowDaysSel = 30;
 function flowStartCents() {
   if (typeof bankBalancesKnown === 'function' && bankBalancesKnown()) return bankDepositTotalCents();
-  return (db.accounts || []).reduce((s, a) => s + accountShownBalance(a), 0);
+  return (db.accounts || []).reduce((s, a) => s + accountBalanceUsd116(a), 0);
 }
 function computeFlowProjection(days) {
   if (!db) return null;
@@ -18834,12 +18954,14 @@ function renderAccounts() {
     /* Compilación 41: se muestra el saldo vivo (base + movimientos
        enlazados); el formulario de edición también abre con ese
        saldo mostrado, y al guardar redefine la base. */
-    li.appendChild(el('span', 'item-amount', fmt(accountShownBalance(item))));
+    li.appendChild(el('span', 'item-amount', fmtAccount116(item)));
     const acts = el('div', 'item-actions');
     acts.appendChild(actionButton(t('btn_edit'), 'btn-ghost', () => {
       document.getElementById('acc-id').value = item.id;
       document.getElementById('acc-name').value = item.name;
       document.getElementById('acc-balance').value = (accountShownBalance(item) / 100).toFixed(2);
+      const accCur116 = document.getElementById('acc-currency');
+      if (accCur116) accCur116.value = item.currency === 'DOP' ? 'DOP' : 'USD';
       fillAccountCardFields(item);
       document.getElementById('account-form-title').textContent = t('acc_edit');
       document.getElementById('acc-cancel-edit').hidden = false;
@@ -18877,6 +18999,8 @@ function onAccountSubmit(ev) {
       if (Number.isFinite(dv) && dv >= 1 && dv <= 31) cardData[prop] = dv;
     }
   }
+  /* Compilación 116: la moneda elegida en el formulario. */
+  const accCurrency116 = (() => { const s116 = document.getElementById('acc-currency'); return s116 && s116.value === 'DOP' ? 'DOP' : 'USD'; })();
   const applyCard = (acc) => {
     delete acc.cardLimitCents; delete acc.cardCutDay; delete acc.cardDueDay;
     Object.assign(acc, cardData);
@@ -18887,9 +19011,9 @@ function onAccountSubmit(ev) {
     /* Compilación 41: teclear un saldo REDEFINE la base (lo tecleado
        menos la suma de movimientos enlazados) para que el saldo
        mostrado sea exactamente el tecleado. */
-    if (found) { found.name = name; found.balanceCents = cents - accountLinkedSum(found.id); applyCard(found); }
+    if (found) { found.name = name; found.balanceCents = cents - accountLinkedSum(found.id); found.currency = accCurrency116; applyCard(found); }
   } else {
-    const nueva = { id: uid(), name, balanceCents: cents };
+    const nueva = { id: uid(), name, balanceCents: cents, currency: accCurrency116 };
     applyCard(nueva);
     db.accounts.push(nueva);
   }
@@ -18943,6 +19067,8 @@ function renderCards() {
         document.getElementById('acc-id').value = item.id;
         document.getElementById('acc-name').value = item.name;
         document.getElementById('acc-balance').value = (accountShownBalance(item) / 100).toFixed(2);
+      const accCur116 = document.getElementById('acc-currency');
+      if (accCur116) accCur116.value = item.currency === 'DOP' ? 'DOP' : 'USD';
         fillAccountCardFields(item);
         document.getElementById('account-form-title').textContent = t('acc_edit');
         document.getElementById('acc-cancel-edit').hidden = false;
@@ -21298,6 +21424,11 @@ function renderSettings() {
   document.getElementById('set-biometric').checked = db.settings.biometric === true;
   const setBizEl = document.getElementById('set-biz');
   if (setBizEl) setBizEl.checked = bizModeOn();
+  /* Compilación 116: el interruptor del redondeo y la tasa. */
+  const round116El = document.getElementById('set-roundup116');
+  if (round116El) round116El.checked = db.settings.roundUp116 === true;
+  const fx116El = document.getElementById('set-fxrate116');
+  if (fx116El) fx116El.value = fxRate116().toFixed(2);
   document.getElementById('split-ahorro').value = db.settings.split.ahorro;
   document.getElementById('split-negocio').value = db.settings.split.negocio;
   document.getElementById('split-gastos').value = db.settings.split.gastos;
@@ -21408,6 +21539,12 @@ function saveSettingsFromForm() {
   db.settings.name = cleanText(document.getElementById('set-name').value, 40);
   const setCurrencyEl = document.getElementById('set-currency');
   if (setCurrencyEl && CURRENCIES.includes(setCurrencyEl.value)) db.settings.currency = setCurrencyEl.value;
+  /* Compilación 116: la tasa USD/RD$ del formulario, si es válida. */
+  const fx116Form = document.getElementById('set-fxrate116');
+  if (fx116Form) {
+    const fv116 = Number(String(fx116Form.value).replace(',', '.'));
+    if (Number.isFinite(fv116) && fv116 > 0 && fv116 <= 10000) db.settings.fxRate116 = Math.round(fv116 * 100) / 100;
+  }
   db.settings.textSize = document.getElementById('set-textsize').value === 'grande' ? 'grande' : 'normal';
   const paydayRaw = document.getElementById('set-payday').value;
   const paydayNum = Math.trunc(Number(paydayRaw));
@@ -25857,6 +25994,9 @@ async function onAiFlowExplain() {
   const proj = computeFlowProjection(45);
   const facts = ai94QuinFacts(p, proj);
   try {
+    /* La marca dailyPhrase la ignora el servidor desplegado (usa
+       su prompt de siempre); el código preparado de la Comp. 99 la
+       aprovecha con promptDailyPhrase para la frase única. */
     const r = await aiFn('cashflow', { facts: facts, dailyPhrase: true });
     if (!r || !r.alert) throw new Error('ai_generic');
     aiFlowState = { sig: ai2FlowSig(p), alert: r.alert, date: todayStr() };
@@ -28280,7 +28420,11 @@ function sharedBookClean(raw) {
     budgetPeriods: clean.budgetPeriods,
     fixed: clean.fixed, customCategories: clean.customCategories,
     goals: sharedGoalsClean(raw ? raw.goals : null),
-    iou: sharedIouClean(raw ? raw.iou : null)
+    iou: sharedIouClean(raw ? raw.iou : null),
+    /* Compilación 116: el presupuesto mensual compartido del
+       Modo pareja (centavos USD; 0 = sin presupuesto). Viaja
+       dentro del JSON del libro: no necesita columna nueva. */
+    pairBudgetCents: cleanCents(raw ? raw.pairBudgetCents : 0, false)
   };
 }
 async function householdPull() {
@@ -28501,6 +28645,7 @@ function renderSharedCard() {
     ul.appendChild(li);
   }
   renderFamSections(st);
+  renderPair116(st);
 }
 /* Compilación 76 · Pareja/familia 2.0: sobre el hogar existente
    (los permisos ya viven en el rol de cada miembro: dueño,
@@ -30537,6 +30682,268 @@ function renderGoalPilot115() {
   box.appendChild(acts);
 }
 
+
+/* ---------------- Compilación 116 · «Dinero en equipo» ----------------
+   Tres funciones SOLO Pro (la puerta es requirePro() en el
+   cliente; sin Pro no hay funcionalidad alguna):
+
+   (1) REDONDEO QUE AHORRA: interruptor en Ajustes. Al guardar
+   un gasto, la diferencia hasta el dólar siguiente se anota
+   como entrada de db.savings enlazada al gasto (roundUpOf),
+   con línea propia «Redondeos» en el desglose de Ahorros y
+   línea visible en el historial del gasto. REGLA DE ORO: el
+   porcentaje sugerido NUNCA crea ahorro; este redondeo no es
+   el porcentaje: es dinero real del propio gasto que la
+   persona activó y ve centavo a centavo. Con el interruptor
+   apagado (o sin Pro) no se anota nada y nada cambia.
+
+   (2) MODO PAREJA: la sección vive dentro de la tarjeta del
+   hogar que la sync en la nube ya trae en vivo (hogar con
+   código de 6, libro household_data con RLS). La 116 le da por
+   fin pantalla a householdAddMovement: totales del mes del
+   libro, presupuesto mensual compartido (pairBudgetCents
+   dentro del propio libro, sin migración nueva) y alta/baja
+   de movimientos con su autor. Lo personal de cada cuenta no
+   entra nunca en el libro: sigue privado.
+
+   (3) MULTIMONEDA USD/RD$: selector de moneda en gasto e
+   ingreso. El movimiento guarda currency, origCents (el monto
+   tal como se escribió) y rate116 (la tasa aplicada), y
+   amountCents queda SIEMPRE en USD convertido al guardar con
+   la tasa de Ajustes: ningún total existente se mueve. Las
+   cuentas manuales pueden marcarse en RD$: su saldo se enseña
+   en pesos y entra convertido en los totales combinados. La
+   tasa es la guardada por la persona (inicial 60.00), NO una
+   tasa en vivo. */
+
+/* ---- 116 (3) · Multimoneda: tasa y conversiones ---- */
+function fxRate116() {
+  const r = db && db.settings ? Number(db.settings.fxRate116) : NaN;
+  return (Number.isFinite(r) && r > 0) ? r : 60;
+}
+function dopToUsd116(dopCents) { return Math.round(dopCents / fxRate116()); }
+function usdToDop116(usdCents) { return Math.round(usdCents * fxRate116()); }
+function entryCurrency116(item) { return item && item.currency === 'DOP' ? 'DOP' : 'USD'; }
+function entryOrigCents116(item) {
+  return (item && typeof item.origCents === 'number' && Number.isFinite(item.origCents))
+    ? item.origCents : (item ? item.amountCents : 0);
+}
+/* El importe de un movimiento TAL como se escribió: en pesos
+   se enseña con RD$; en dólares, como siempre. */
+function fmtEntry116(item) {
+  return entryCurrency116(item) === 'DOP' ? fmtDop(entryOrigCents116(item)) : fmt(item.amountCents);
+}
+/* Lee el selector de moneda de un formulario y convierte el
+   monto tecleado: devuelve el trío que se guarda. */
+function readEntryCurrency116(selId, typedCents) {
+  const sel = document.getElementById(selId);
+  const cur = sel && sel.value === 'DOP' ? 'DOP' : 'USD';
+  if (cur === 'USD') return { currency: 'USD', amountCents: typedCents, origCents: typedCents, rate116: null };
+  return { currency: 'DOP', amountCents: dopToUsd116(typedCents), origCents: typedCents, rate116: fxRate116() };
+}
+/* El saldo mostrado de una cuenta, pasado a USD si es en pesos. */
+function accountBalanceUsd116(a) {
+  const shown = accountShownBalance(a);
+  return a && a.currency === 'DOP' ? dopToUsd116(shown) : shown;
+}
+function fmtAccount116(a) {
+  return a && a.currency === 'DOP' ? fmtDop(accountShownBalance(a)) : fmt(accountShownBalance(a));
+}
+
+/* ---- 116 (1) · El redondeo que ahorra ---- */
+function roundUpDiff116(amountCents) {
+  const r = amountCents % 100;
+  return r > 0 ? 100 - r : 0;
+}
+function roundUpActive116() {
+  return !!(db && db.settings && db.settings.roundUp116 === true) && isPro();
+}
+/* Anota (o recalcula, o retira si quedó en $0) el redondeo de
+   un gasto. SOLO corre con el interruptor encendido y Pro:
+   apagado o sin Pro no toca nada, ni siquiera al editar un
+   gasto viejo que sí tuvo redondeo (ese apartado se queda). */
+function applyRoundUp116(expense) {
+  if (!expense || !roundUpActive116()) return;
+  const diff = roundUpDiff116(expense.amountCents);
+  const existing = db.savings.filter((s) => s.roundUpOf === expense.id);
+  if (diff > 0) {
+    if (existing.length) {
+      existing[0].amountCents = diff;
+      existing[0].date = expense.date;
+      if (existing.length > 1) db.savings = db.savings.filter((s) => s.roundUpOf !== expense.id || s === existing[0]);
+    } else {
+      db.savings.push({ id: uid(), amountCents: diff, date: expense.date, note: '', goalId: null, roundUpOf: expense.id });
+    }
+    expense.roundUpCents = diff;
+  } else {
+    if (existing.length) db.savings = db.savings.filter((s) => s.roundUpOf !== expense.id);
+    expense.roundUpCents = 0;
+  }
+}
+/* Al borrar un gasto, su redondeo se va con él: el apartado
+   existía por ese gasto y solo por ese gasto. */
+function removeRoundUp116(expenseId) {
+  db.savings = db.savings.filter((s) => s.roundUpOf !== expenseId);
+}
+function roundUpsTotal116() {
+  return db.savings.reduce((tt, s) => tt + (s.roundUpOf ? s.amountCents : 0), 0);
+}
+function onRoundUpToggle116() {
+  const cb = document.getElementById('set-roundup116');
+  if (!cb) return;
+  if (cb.checked && !isPro()) { cb.checked = false; requirePro(); return; }
+  db.settings.roundUp116 = cb.checked === true;
+  save();
+}
+function onFxRateChange116() {
+  const inp = document.getElementById('set-fxrate116');
+  if (!inp) return;
+  const v = Number(String(inp.value).replace(',', '.'));
+  if (Number.isFinite(v) && v > 0 && v <= 10000) {
+    db.settings.fxRate116 = Math.round(v * 100) / 100;
+    save();
+  }
+  inp.value = fxRate116().toFixed(2);
+}
+
+/* ---- 116 (2) · Modo pareja sobre el libro del hogar ---- */
+function pairMovements116(monthKey) {
+  if (!householdBook) return [];
+  const out = [];
+  for (const e of (householdBook.expenses || [])) if (monthKeyOf(e.date) === monthKey) out.push({ kind: 'exp', item: e });
+  for (const i of (householdBook.incomes || [])) if (monthKeyOf(i.date) === monthKey) out.push({ kind: 'inc', item: i });
+  out.sort((a, b) => (a.item.date < b.item.date ? 1 : (a.item.date > b.item.date ? -1 : 0)));
+  return out;
+}
+function pairTotals116(monthKey) {
+  let exp = 0, inc = 0;
+  for (const m of pairMovements116(monthKey)) {
+    if (m.kind === 'exp') exp += m.item.amountCents; else inc += m.item.amountCents;
+  }
+  return { exp, inc, balance: inc - exp };
+}
+/* La sección de la pareja se pinta dentro de la tarjeta del
+   hogar (renderSharedCard la llama al final). Sin hogar no hay
+   sección; sin Pro, solo el candado: cero funcionalidad. */
+function renderPair116(st) {
+  const wrap = document.getElementById('pair116-wrap');
+  if (!wrap) return;
+  clearNode(wrap);
+  if (!st || !st.household) return;
+  wrap.appendChild(el('h4', null, t('c116_pair_title')));
+  wrap.appendChild(el('p', 'item-sub', t('c116_pair_note')));
+  if (!isPro()) {
+    wrap.appendChild(el('p', 'item-sub', t('c116_pair_locked')));
+    wrap.appendChild(actionButton(t('c116_pair_pro_btn'), 'btn-secondary', () => { requirePro(); }));
+    return;
+  }
+  if (!householdBook) {
+    wrap.appendChild(el('p', 'item-sub', t('c116_pair_loading')));
+    return;
+  }
+  const mk = currentMonthKey();
+  const tot = pairTotals116(mk);
+  const totals = el('div', 'pair116-totals');
+  totals.appendChild(el('p', 'total-line', t('c116_pair_month_inc') + ': ' + fmt(tot.inc)));
+  totals.appendChild(el('p', 'total-line', t('c116_pair_month_exp') + ': ' + fmt(tot.exp)));
+  totals.appendChild(el('p', 'total-line', t('c116_pair_balance') + ': ' + fmt(tot.balance)));
+  wrap.appendChild(totals);
+  /* El presupuesto mensual compartido. */
+  const limit = householdBook.pairBudgetCents || 0;
+  wrap.appendChild(el('h4', null, t('c116_pair_budget_label')));
+  if (limit > 0) {
+    wrap.appendChild(el('p', 'item-sub', t('c116_pair_budget_of', { spent: fmt(tot.exp), limit: fmt(limit) })));
+    if (tot.exp > limit) wrap.appendChild(el('p', 'pair116-over', t('c116_pair_budget_over', { amount: fmt(tot.exp - limit) })));
+  } else {
+    wrap.appendChild(el('p', 'item-sub', t('c116_pair_budget_none')));
+  }
+  const canEdit = st.household.role !== 'lector';
+  if (canEdit) {
+    const brow = el('div', 'pair116-row');
+    const bInp = document.createElement('input');
+    bInp.type = 'number'; bInp.inputMode = 'decimal'; bInp.min = '0'; bInp.step = '0.01';
+    bInp.id = 'pair116-budget-input';
+    if (limit > 0) bInp.value = (limit / 100).toFixed(2);
+    brow.appendChild(bInp);
+    brow.appendChild(actionButton(t('c116_pair_budget_set'), 'btn-secondary', () => {
+      const cents = parseAmount(bInp.value, true);
+      if (cents === null || cents < 0) return;
+      householdBook.pairBudgetCents = cents;
+      householdMarkDirty();
+      renderSharedCard();
+    }));
+    if (limit > 0) brow.appendChild(actionButton(t('c116_pair_budget_clear'), 'btn-ghost', () => {
+      householdBook.pairBudgetCents = 0;
+      householdMarkDirty();
+      renderSharedCard();
+    }));
+    wrap.appendChild(brow);
+    /* Anotar en pareja: householdAddMovement estampa el autor. */
+    wrap.appendChild(el('h4', null, t('c116_pair_add_title')));
+    const frow = el('div', 'pair116-row');
+    const kindSel = document.createElement('select');
+    kindSel.id = 'pair116-kind';
+    const oExp = el('option', null, t('c116_pair_kind_exp')); oExp.value = 'exp';
+    const oInc = el('option', null, t('c116_pair_kind_inc')); oInc.value = 'inc';
+    kindSel.appendChild(oExp); kindSel.appendChild(oInc);
+    const amtInp = document.createElement('input');
+    amtInp.type = 'number'; amtInp.inputMode = 'decimal'; amtInp.min = '0'; amtInp.step = '0.01';
+    amtInp.id = 'pair116-amount';
+    amtInp.placeholder = t('amount_label');
+    const catSel = document.createElement('select');
+    catSel.id = 'pair116-category';
+    for (const c of allCategories(db)) {
+      const o = el('option', null, catName(c)); o.value = c;
+      catSel.appendChild(o);
+    }
+    const noteInp = document.createElement('input');
+    noteInp.type = 'text'; noteInp.id = 'pair116-note';
+    noteInp.placeholder = t('note_label');
+    frow.appendChild(kindSel); frow.appendChild(amtInp); frow.appendChild(catSel); frow.appendChild(noteInp);
+    frow.appendChild(actionButton(t('c116_pair_add_btn'), 'btn-primary', () => {
+      const cents = parseAmount(amtInp.value, false);
+      if (cents === null || cents <= 0) return;
+      const kind = kindSel.value === 'inc' ? 'incomes' : 'expenses';
+      const item = { id: uid(), amountCents: cents, date: todayStr(), note: noteInp.value.trim().slice(0, 120) };
+      if (kind === 'expenses') item.category = catSel.value;
+      householdAddMovement(kind, item);
+      renderSharedCard();
+    }));
+    wrap.appendChild(frow);
+  }
+  /* Los movimientos del mes, con su autor. */
+  wrap.appendChild(el('h4', null, t('c116_pair_list_title')));
+  const movs = pairMovements116(mk);
+  if (!movs.length) {
+    wrap.appendChild(el('p', 'item-sub', t('c116_pair_empty')));
+    return;
+  }
+  const list = el('ul', 'list');
+  for (const m of movs) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    const title = m.item.note ? m.item.note
+      : (m.kind === 'exp' ? catName(m.item.category || 'Otros') : t('c116_pair_kind_inc'));
+    main.appendChild(el('div', 'item-title', title));
+    let sub = prettyDate(m.item.date);
+    if (m.item.author_name) sub += ' · ' + t('c116_pair_by', { name: m.item.author_name });
+    main.appendChild(el('div', 'item-sub', sub));
+    li.appendChild(main);
+    li.appendChild(el('span', 'item-amount', (m.kind === 'exp' ? '−' : '+') + fmt(m.item.amountCents)));
+    if (canEdit) {
+      li.appendChild(actionButton(t('btn_delete'), 'btn-ghost', () => {
+        if (!window.confirm(t('c116_pair_del_confirm', { amount: fmt(m.item.amountCents) }))) return;
+        const arrName = m.kind === 'exp' ? 'expenses' : 'incomes';
+        householdBook[arrName] = (householdBook[arrName] || []).filter((x) => x.id !== m.item.id);
+        householdMarkDirty();
+        renderSharedCard();
+      }));
+    }
+    list.appendChild(li);
+  }
+  wrap.appendChild(list);
+}
+
 /* ---------------- Compilación 98 · Fase F (7) · Entrevista inicial con IA ----
    La configuración inicial por formularios gana su reemplazo
    conversacional: la acción 'onboarding-interview' conversa en
@@ -32315,7 +32722,7 @@ function wireEvents() {
   const repBtn89 = document.getElementById('exp-act-repeat89');
   if (repBtn89) repBtn89.addEventListener('click', () => { const item = detItem89(); if (!item) return; beginUndo(); db.expenses.push({ id: uid(), amountCents: item.amountCents, category: item.category, date: todayStr(), note: item.note, photo: item.photo || null, accountId: item.accountId || null, fromSavings: item.fromSavings === true, src: movementSrc(item, false), transfer: item.transfer === true }); save(); resetExpenseForm(); renderExpenses(); showUndoToast(); });
   const delBtn89 = document.getElementById('exp-act-delete89');
-  if (delBtn89) delBtn89.addEventListener('click', () => { const item = detItem89(); if (!item) return; if (!window.confirm(t('exp_delete_confirm', { amount: fmt(item.amountCents), cat: catName(item.category), date: prettyDate(item.date) }))) return; beginUndo(); db.expenses = db.expenses.filter((x) => x.id !== item.id); save(); resetExpenseForm(); renderExpenses(); showUndoToast(); });
+  if (delBtn89) delBtn89.addEventListener('click', () => { const item = detItem89(); if (!item) return; if (!window.confirm(t('exp_delete_confirm', { amount: fmt(item.amountCents), cat: catName(item.category), date: prettyDate(item.date) }))) return; beginUndo(); db.expenses = db.expenses.filter((x) => x.id !== item.id); removeRoundUp116(item.id); save(); resetExpenseForm(); renderExpenses(); showUndoToast(); });
   const sugBtn89 = document.getElementById('exp-act-suggest89');
   if (sugBtn89) sugBtn89.addEventListener('click', () => { const item = detItem89(); const box = document.getElementById('exp-ai-box89'); if (item && box) onAiSuggest(item, box); });
   /* Compilación 99 · P18: «Explícame este cargo» en el detalle. */
@@ -32430,6 +32837,12 @@ function wireEvents() {
      cuenta y el selector de idioma arriba de la bienvenida. */
   const setBizCb = document.getElementById('set-biz');
   if (setBizCb) setBizCb.addEventListener('change', onBizModeToggle);
+  /* Compilación 116: el interruptor del redondeo que ahorra y
+     la tasa USD/RD$ también se aplican al momento. */
+  const round116Cb = document.getElementById('set-roundup116');
+  if (round116Cb) round116Cb.addEventListener('change', onRoundUpToggle116);
+  const fx116Inp = document.getElementById('set-fxrate116');
+  if (fx116Inp) fx116Inp.addEventListener('change', onFxRateChange116);
   const remArrivedEl = document.getElementById('rem-arrived');
   if (remArrivedEl) remArrivedEl.addEventListener('input', updateRemRateFromArrived);
   const remAmountEl = document.getElementById('rem-amount');

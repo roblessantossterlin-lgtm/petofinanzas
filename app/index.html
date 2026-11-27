@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Compilación 115 · «Deudas y metas con IA» -->
+<!-- Compilación 116 · «Dinero en equipo» -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -408,6 +408,11 @@
       <p class="muted small" data-i18n="ai_help">Recibo con IA: la foto va segura al servidor y vuelve completa; revisas antes de guardar.</p>
       <input id="exp-ai-photo" type="file" accept="image/*" hidden>
       <p id="exp-voice-status" class="muted small" aria-live="polite"></p>
+      <label for="exp-currency" data-i18n="c116_cur_label">Moneda</label>
+      <select id="exp-currency">
+        <option value="USD" data-i18n="c116_cur_usd">USD · Dólares ($)</option>
+        <option value="DOP" data-i18n="c116_cur_dop">RD$ · Pesos dominicanos</option>
+      </select>
       <label for="exp-category" data-i18n="category_label">Categoría</label>
       <select id="exp-category" required></select>
       <label for="exp-source" data-i18n="src_exp_label">¿De dónde salió?</label>
@@ -467,6 +472,11 @@
         <button id="inc-voice" type="button" class="btn btn-secondary" data-i18n="voice_btn">Dictar</button>
       </div>
       <p id="inc-voice-status" class="muted small" aria-live="polite"></p>
+      <label for="inc-currency" data-i18n="c116_cur_label">Moneda</label>
+      <select id="inc-currency">
+        <option value="USD" data-i18n="c116_cur_usd">USD · Dólares ($)</option>
+        <option value="DOP" data-i18n="c116_cur_dop">RD$ · Pesos dominicanos</option>
+      </select>
       <label id="inc-savings-label" for="inc-savings">Ahorro ($)</label>
       <input id="inc-savings" type="number" inputmode="decimal" min="0" max="9999999" step="0.01" placeholder="0.00">
       <p class="muted small" data-i18n="inc_savings_help">Sugerencia según tu porcentaje de ahorro — cámbialo por lo que realmente ahorraste. Puedes poner $0.</p>
@@ -516,6 +526,7 @@
       <p class="total-line" id="sav-bank-auto108"><span data-i18n="c108_bank_auto_label">Ahorro en tu banco (automático)</span>: <strong>$0.00</strong></p>
       <p class="total-line" id="sav-invest112" hidden><span data-i18n="c112_invest_label">Inversiones</span>: <strong>$0.00</strong></p>
       <p class="total-line" id="sav-manual108"><span data-i18n="c108_manual_label">Ahorro manual</span>: <strong>$0.00</strong></p>
+      <p class="total-line" id="sav-roundups116" hidden><span data-i18n="c116_roundups_label">Redondeos</span>: <strong>$0.00</strong></p>
       <p class="muted small" id="sav-bank-note108" hidden></p>
     </div>
 
@@ -906,6 +917,11 @@
       <input id="acc-name" type="text" maxlength="60" data-i18n-ph="acc_name_ph" placeholder="Ej.: Efectivo, Banco, Ahorros" required>
       <label for="acc-balance" data-i18n="acc_balance_label">Saldo ($)</label>
       <input id="acc-balance" type="number" inputmode="decimal" min="-9999999" max="9999999" step="0.01" required placeholder="0.00">
+      <label for="acc-currency" data-i18n="c116_acc_currency_label">Moneda de la cuenta</label>
+      <select id="acc-currency">
+        <option value="USD" data-i18n="c116_cur_usd">USD · Dólares ($)</option>
+        <option value="DOP" data-i18n="c116_cur_dop">RD$ · Pesos dominicanos</option>
+      </select>
       <label class="toggle-row">
         <span data-i18n="card_is">Es tarjeta de crédito</span>
         <input type="checkbox" id="acc-is-card">
@@ -1466,7 +1482,16 @@
       <p class="muted small set92-oneline" data-i18n="set_biz_help">Con esto encendido, los formularios preguntan si un movimiento es de tu negocio, el reparto sugerido incluye la parte de Negocio y el Resumen muestra el informe de tu negocio. Apagado, todo eso se esconde; tus datos no se tocan.</p>
 
       
-      </section><section class="card form-card setacc-nested" id="settings-cloud">
+      </section><section class="set109-group"><h3 data-i18n="c116_group_title">Dinero en equipo</h3>
+      <label class="toggle-row">
+        <span data-i18n="c116_round_label">Redondeo que ahorra</span>
+        <input type="checkbox" id="set-roundup116">
+      </label>
+      <p class="muted small set92-oneline" data-i18n="c116_round_help">Solo Pro. Con esto encendido, cada gasto se redondea al dólar siguiente y la diferencia se anota como ahorro tuyo, a la vista, en Ahorros.</p>
+      <label for="set-fxrate116" data-i18n="c116_fx_label">Tasa USD/RD$ (pesos por 1 dólar)</label>
+      <input id="set-fxrate116" type="number" inputmode="decimal" min="1" max="10000" step="0.01">
+      <p class="muted small set92-oneline" data-i18n="c116_fx_help">La tasa guardada con la que la app convierte los montos en pesos (RD$) a dólares en tus totales. No es una tasa en vivo.</p>
+</section><section class="card form-card setacc-nested" id="settings-cloud">
             <div class="sections-head" id="setacc-cloud-head" role="button" tabindex="0" aria-expanded="false" aria-controls="setacc-cloud-body">
               <h3 data-i18n="cloud_title">Cuenta en la nube</h3>
               <span class="sections-summary muted small" id="setacc-cloud-summary"></span>
@@ -1593,6 +1618,7 @@
         <p class="total-line" data-i18n="shared_members_title">Miembros</p>
         <ul id="shared-members" class="item-list"></ul>
         <div id="fam-wrap"></div>
+    <div id="pair116-wrap"></div>
         <div class="form-actions">
           <button id="btn-shared-leave" type="button" class="btn btn-ghost" data-i18n="shared_leave_btn">Salir del hogar</button>
         </div>

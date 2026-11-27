@@ -2034,3 +2034,10 @@ html[data-accent="verde"] .chat-action93{color:#1A1A3E}
 .c115-cat{margin:0 .4rem;max-width:9.5rem}
 .c115-props{margin:.4rem 0;padding-left:1.2rem}
 .c115-props li{margin:.45rem 0}
+
+/* Compilación 116 · «Dinero en equipo»: las filas del Modo
+   pareja (presupuesto y alta de movimientos) y el aviso de
+   presupuesto pasado. */
+.pair116-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.pair116-row input,.pair116-row select{flex:1 1 110px;min-width:0}
+.pair116-over{color:#FF7A6B;font-weight:600}
