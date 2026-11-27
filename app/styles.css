@@ -2024,3 +2024,13 @@ html[data-accent="verde"] .chat-action93{color:#1A1A3E}
 .pro-sub114{font-weight:600;margin:.2rem 0 0}
 .pro-legal114{margin-top:.9rem;line-height:2}
 .pro-legal114 a{color:var(--accent);text-decoration:underline;padding:.3rem .05rem}
+
+/* Compilación 115 · «Deudas y metas con IA»: la insignia de
+   la ruta recomendada (ámbar de marca), el selector de
+   categoría del negociador y la lista de la propuesta del
+   copiloto. Sin tocar la tarjeta compacta de Inicio ni el
+   botón flotante. */
+.c115-rec{display:inline-block;background:var(--accent);color:#13132B;border-radius:999px;padding:.08rem .55rem;font-size:.78rem;font-weight:700;vertical-align:middle}
+.c115-cat{margin:0 .4rem;max-width:9.5rem}
+.c115-props{margin:.4rem 0;padding-left:1.2rem}
+.c115-props li{margin:.45rem 0}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Compilación 114 · «Enlaces en el muro de pago» -->
+<!-- Compilación 115 · «Deudas y metas con IA» -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -580,6 +580,23 @@
     <div id="goals-list"></div>
     <div id="goals-empty" class="empty-state" hidden></div>
 
+    <!-- Compilación 115 · «Deudas y metas con IA» (3): el
+         copiloto de metas propone con IA el ajuste semanal
+         por meta y el orden de prioridad, desde el flujo
+         real. La propuesta se aprueba o se ignora: aprobar
+         solo anota el plan en cada meta; nunca mueve
+         dinero ni guarda ahorro solo. -->
+    <section id="goalpilot115-card" class="card form-card">
+      <h3 data-i18n="c115_goals_title">🧭 Copiloto de metas con IA</h3>
+      <p class="muted small" data-i18n="c115_goals_note">La IA mira tu flujo real y tus metas, y te propone cuánto guardar por semana en cada una y en qué orden. Es solo una propuesta: nada se mueve ni se guarda sin que la apruebes.</p>
+      <p id="goalpilot115-empty" class="empty-state" hidden data-i18n="c115_goals_empty">Crea primero una meta: el copiloto trabaja con tus metas reales.</p>
+      <div class="form-actions">
+        <button id="goalpilot115-btn" type="button" class="btn btn-secondary" data-i18n="c115_goals_btn">✨ Revisar mis metas</button>
+      </div>
+      <p id="goalpilot115-status" class="muted small" aria-live="polite"></p>
+      <div id="goalpilot115-results"></div>
+    </section>
+
     <section class="card form-card">
       <label class="toggle-row">
         <span data-i18n="chal_ask">¿Quieres un reto semanal?</span>
@@ -852,6 +869,20 @@
       <p class="muted small" data-i18n="rec_intro">Detectados en tus movimientos: mismo comercio, monto parecido y periodos regulares. Es solo lectura; nada se crea solo.</p>
       <ul id="recurring-list" class="item-list"></ul>
     </section>
+
+    <!-- Compilación 115 · «Deudas y metas con IA» (2): el
+         negociador lista los cargos que la app ya conoce
+         (pagos fijos y suscripciones detectadas) y redacta
+         con IA un mensaje listo para copiar y enviar
+         pidiendo una rebaja, en el idioma de la app. La
+         persona lo envía: la app no contacta a nadie. -->
+    <section id="billneg115-card" class="card form-card">
+      <h3 data-i18n="c115_bill_title">🤝 Negociador de facturas con IA</h3>
+      <p class="muted small" data-i18n="c115_bill_note">Elige uno de tus cargos fijos o suscripciones y la IA te redacta un mensaje listo para copiar y enviar pidiendo una rebaja. Tú lo envías: la app no contacta a nadie por ti.</p>
+      <ul id="billneg115-list" class="item-list"></ul>
+      <p id="billneg115-empty" class="empty-state" hidden data-i18n="c115_bill_empty">Cuando tengas pagos fijos o suscripciones detectadas, podrás redactar tu mensaje de rebaja desde aquí.</p>
+      <div id="billneg115-result"></div>
+    </section>
   </main>
 
   <!-- ======= CUENTAS ======= -->
@@ -1040,6 +1071,26 @@
       </div>
       <p id="debt-ai97-status" class="muted small" aria-live="polite"></p>
       <div id="debt-ai97-results"></div>
+    </section>
+
+    <!-- Compilación 115 · «Deudas y metas con IA» (1): el plan
+         de salida compara las DOS rutas con el pago total real
+         (meses, fecha de salida e interés de cada una, con la
+         recomendada marcada) y la IA lo explica en palabras
+         simples. Las cifras las calcula la app; nada se
+         aplica solo. -->
+    <section id="debt-exit115-card" class="card form-card">
+      <h3 data-i18n="c115_debt_title">🏁 Tu plan de salida de deudas con IA</h3>
+      <p class="muted small" data-i18n="c115_debt_note">Con lo que ya pagas al mes, la app simula las dos rutas y la IA te explica cuál te conviene y por qué, con tus números.</p>
+      <p id="debt-exit115-empty" class="empty-state" hidden data-i18n="c115_debt_empty">Anota primero una deuda pendiente: el plan se arma con tus deudas reales y lo que pagas al mes.</p>
+      <div id="debt-exit115-body">
+        <div id="debt-exit115-results"></div>
+        <div class="form-actions">
+          <button id="debt-exit115-btn" type="button" class="btn btn-secondary" data-i18n="c115_ai_btn">✨ Que la IA me lo explique</button>
+        </div>
+        <p id="debt-exit115-status" class="muted small" aria-live="polite"></p>
+        <div id="debt-exit115-ai"></div>
+      </div>
     </section>
   </main>
 

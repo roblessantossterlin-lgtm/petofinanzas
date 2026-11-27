@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 114';
-const BUILD_NUM = 114;
+const BUILD_LABEL = 'Compilación 115';
+const BUILD_NUM = 115;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -770,6 +770,27 @@ function cleanBankConns(v) {
    guardadas (veredicto de «¿Te lo puedes permitir?» y frase del
    día): solo textos acotados y la firma de la frase; cualquier
    otra forma se descarta a null. */
+/* Compilación 115: el plan semanal del copiloto de metas
+   (goalId → centavos por semana) solo acepta su forma exacta:
+   claves cortas y montos positivos con tope; cualquier otra
+   cosa vuelve a null. Es una ANOTACIÓN de plan: no es ahorro
+   ni mueve dinero. */
+function cleanGoalPlan115(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const out = {};
+  let n = 0;
+  for (const k of Object.keys(v)) {
+    const cents = v[k];
+    if (typeof k === 'string' && k.length <= 40 &&
+        typeof cents === 'number' && Number.isFinite(cents) &&
+        cents > 0 && cents <= 10000000) {
+      out[k] = Math.round(cents);
+      n++;
+    }
+    if (n >= 20) break;
+  }
+  return n ? out : null;
+}
 function cleanHomeAi101(v) {
   if (!v || typeof v !== 'object') return null;
   const out = { afford: null, flow: null };
@@ -913,6 +934,8 @@ function validateData(raw) {
     : null;
   if (d.settings.aiWeekly && !d.settings.aiWeekly.lines.length) d.settings.aiWeekly = null;
   d.settings.homeAi101 = cleanHomeAi101(s.homeAi101);
+  /* Compilación 115: el plan semanal del copiloto de metas. */
+  d.settings.goalPlan115 = cleanGoalPlan115(s.goalPlan115);
   /* Compilación 85 (Fase A): el contador local de IA gratis solo
      acepta su forma exacta: mes YYYY-MM y conteos numéricos por
      acción (máx. 9999); cualquier otra cosa vuelve a null. */
@@ -1932,6 +1955,9 @@ es: {
   pro_restore_none: 'No encontramos una suscripción activa para restaurar.',
   pro_per_month: 'al mes',
   c114_sub_title: 'PETO Pro mensual', c114_sub_period: 'Suscripción mensual', c114_eula_link: 'Términos de uso (EULA)', c114_privacy_link: 'Política de privacidad',
+  c115_debt_title: '🏁 Tu plan de salida de deudas con IA', c115_debt_note: 'Con lo que ya pagas al mes, la app simula las dos rutas y la IA te explica cuál te conviene y por qué, con tus números.', c115_debt_empty: 'Anota primero una deuda pendiente: el plan se arma con tus deudas reales y lo que pagas al mes.', c115_paying_line: 'Pagando {pay} al mes en total:', c115_route_avalanche: 'Avalancha · mayor interés primero', c115_route_snowball: 'Bola de nieve · menor saldo primero', c115_free_when: 'Libre de deudas: {when} · {months}', c115_interest_total: 'Interés total: {amount}', c115_recommended: '★ La recomendada', c115_saves_line: 'Ahorras {amount} de interés frente a la otra ruta.', c115_tie_line: 'Las dos rutas cuestan casi lo mismo en interés: aquí manda la motivación.', c115_route_blocked: 'Con ese pago total, esta ruta no hace bajar el saldo.', c115_ai_btn: '✨ Que la IA me lo explique', c115_ai_working: 'La IA está comparando tus rutas…', c115_ai_none: 'La IA no trajo la explicación esta vez. La comparación de arriba sigue siendo tu plan.',
+  c115_bill_title: '🤝 Negociador de facturas con IA', c115_bill_note: 'Elige uno de tus cargos fijos o suscripciones y la IA te redacta un mensaje listo para copiar y enviar pidiendo una rebaja. Tú lo envías: la app no contacta a nadie por ti.', c115_bill_empty: 'Cuando tengas pagos fijos o suscripciones detectadas, podrás redactar tu mensaje de rebaja desde aquí.', c115_bill_btn: 'Redactar texto', c115_bill_working: 'Redactando tu mensaje…', c115_bill_none: 'La IA no trajo el mensaje esta vez. Prueba de nuevo en un momento.', c115_bill_text_title: 'Tu mensaje, listo para enviar:', c115_copy: 'Copiar texto', c115_cat_internet: 'Internet', c115_cat_phone: 'Teléfono', c115_cat_insurance: 'Seguro', c115_cat_other: 'Otro servicio', c115_monthly: '{amount}/mes',
+  c115_goals_title: '🧭 Copiloto de metas con IA', c115_goals_note: 'La IA mira tu flujo real y tus metas, y te propone cuánto guardar por semana en cada una y en qué orden. Es solo una propuesta: nada se mueve ni se guarda sin que la apruebes.', c115_goals_btn: '✨ Revisar mis metas', c115_goals_working: 'Revisando tu flujo y tus metas…', c115_goals_empty: 'Crea primero una meta: el copiloto trabaja con tus metas reales.', c115_goals_none: 'La IA no trajo propuesta esta vez. Tus metas quedan como están.', c115_prop_title: 'La propuesta del copiloto', c115_prop_weekly: '{amount} por semana', c115_prop_priority: 'Orden sugerido: {list}', c115_apply_btn: 'Aplicar este plan', c115_ignore_btn: 'Ignorar', c115_applied: 'Plan aplicado: quedó anotado en tus metas. No se movió dinero.', c115_plan_line: 'Plan del copiloto: {amount}/semana', c115_plan_clear: 'Quitar el plan del copiloto', c115_plan_active: 'Plan semanal del copiloto activo',
   pro_tag: 'PRO',
   adv_title: 'Informe avanzado',
   adv_note: 'Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.',
@@ -2694,6 +2720,9 @@ en: {
   pro_restore_none: 'We could not find an active subscription to restore.',
   pro_per_month: 'a month',
   c114_sub_title: 'PETO Pro Monthly', c114_sub_period: 'Monthly subscription', c114_eula_link: 'Terms of Use (EULA)', c114_privacy_link: 'Privacy Policy',
+  c115_debt_title: '🏁 Your debt exit plan with AI', c115_debt_note: 'With what you already pay each month, the app simulates both routes and the AI explains which one fits you and why, with your numbers.', c115_debt_empty: 'Add a pending debt first: the plan is built from your real debts and what you pay each month.', c115_paying_line: 'Paying {pay} a month in total:', c115_route_avalanche: 'Avalanche · highest interest first', c115_route_snowball: 'Snowball · smallest balance first', c115_free_when: 'Debt-free: {when} · {months}', c115_interest_total: 'Total interest: {amount}', c115_recommended: '★ The recommended one', c115_saves_line: 'You save {amount} in interest versus the other route.', c115_tie_line: 'Both routes cost about the same in interest: here motivation rules.', c115_route_blocked: 'With that total payment, this route does not bring the balance down.', c115_ai_btn: '✨ Have the AI explain it', c115_ai_working: 'The AI is comparing your routes…', c115_ai_none: 'The AI brought no explanation this time. The comparison above is still your plan.',
+  c115_bill_title: '🤝 Bill negotiator with AI', c115_bill_note: 'Pick one of your fixed charges or subscriptions and the AI drafts a message, ready to copy and send, asking for a lower price. You send it: the app contacts no one for you.', c115_bill_empty: 'Once you have fixed payments or detected subscriptions, you can draft your discount message here.', c115_bill_btn: 'Draft message', c115_bill_working: 'Drafting your message…', c115_bill_none: 'The AI brought no message this time. Try again in a moment.', c115_bill_text_title: 'Your message, ready to send:', c115_copy: 'Copy text', c115_cat_internet: 'Internet', c115_cat_phone: 'Phone', c115_cat_insurance: 'Insurance', c115_cat_other: 'Other service', c115_monthly: '{amount}/mo',
+  c115_goals_title: '🧭 Goals copilot with AI', c115_goals_note: 'The AI looks at your real cash flow and your goals, and proposes how much to save each week toward each one and in what order. It is only a proposal: nothing moves or gets saved unless you approve it.', c115_goals_btn: '✨ Review my goals', c115_goals_working: 'Reviewing your flow and your goals…', c115_goals_empty: 'Create a goal first: the copilot works with your real goals.', c115_goals_none: 'The AI brought no proposal this time. Your goals stay as they are.', c115_prop_title: 'The copilot proposal', c115_prop_weekly: '{amount} per week', c115_prop_priority: 'Suggested order: {list}', c115_apply_btn: 'Apply this plan', c115_ignore_btn: 'Ignore', c115_applied: 'Plan applied: it is noted on your goals. No money was moved.', c115_plan_line: 'Copilot plan: {amount}/week', c115_plan_clear: 'Remove the copilot plan', c115_plan_active: 'Copilot weekly plan active',
   pro_tag: 'PRO',
   adv_title: 'Advanced report',
   adv_note: 'A PETO Pro feature: this month vs the previous one, every category and a CSV export of the month.',
@@ -3699,6 +3728,9 @@ it: {
   pro_restore_none: 'Non abbiamo trovato un abbonamento attivo da ripristinare.',
   pro_per_month: 'al mese',
   c114_sub_title: 'PETO Pro mensile', c114_sub_period: 'Abbonamento mensile', c114_eula_link: 'Termini di utilizzo (EULA)', c114_privacy_link: 'Informativa sulla privacy',
+  c115_debt_title: '🏁 Il tuo piano per uscire dai debiti con l’IA', c115_debt_note: 'Con quello che già paghi ogni mese, l’app simula i due percorsi e l’IA ti spiega quale ti conviene e perché, con i tuoi numeri.', c115_debt_empty: 'Prima annota un debito in sospeso: il piano si costruisce con i tuoi debiti reali e con quanto paghi al mese.', c115_paying_line: 'Pagando {pay} al mese in totale:', c115_route_avalanche: 'Valanga · prima l’interesse più alto', c115_route_snowball: 'Palla di neve · prima il saldo più piccolo', c115_free_when: 'Senza debiti: {when} · {months}', c115_interest_total: 'Interessi totali: {amount}', c115_recommended: '★ La consigliata', c115_saves_line: 'Risparmi {amount} di interessi rispetto all’altro percorso.', c115_tie_line: 'I due percorsi costano quasi uguale in interessi: qui conta la motivazione.', c115_route_blocked: 'Con quel pagamento totale, questo percorso non fa scendere il saldo.', c115_ai_btn: '✨ Fatti spiegare dall’IA', c115_ai_working: 'L’IA sta confrontando i tuoi percorsi…', c115_ai_none: 'L’IA non ha portato la spiegazione questa volta. Il confronto qui sopra resta il tuo piano.',
+  c115_bill_title: '🤝 Negozia bollette con l’IA', c115_bill_note: 'Scegli una delle tue spese fisse o abbonamenti e l’IA ti scrive un messaggio pronto da copiare e inviare per chiedere uno sconto. Lo invii tu: l’app non contatta nessuno per te.', c115_bill_empty: 'Quando avrai pagamenti fissi o abbonamenti rilevati, potrai scrivere qui il tuo messaggio di sconto.', c115_bill_btn: 'Scrivi il messaggio', c115_bill_working: 'Sto scrivendo il tuo messaggio…', c115_bill_none: 'L’IA non ha portato il messaggio questa volta. Riprova tra un momento.', c115_bill_text_title: 'Il tuo messaggio, pronto da inviare:', c115_copy: 'Copia il testo', c115_cat_internet: 'Internet', c115_cat_phone: 'Telefono', c115_cat_insurance: 'Assicurazione', c115_cat_other: 'Altro servizio', c115_monthly: '{amount}/mese',
+  c115_goals_title: '🧭 Copilota degli obiettivi con l’IA', c115_goals_note: 'L’IA guarda il tuo flusso reale e i tuoi obiettivi, e ti propone quanto mettere da parte ogni settimana per ciascuno e in che ordine. È solo una proposta: nulla si muove né si risparmia senza la tua approvazione.', c115_goals_btn: '✨ Rivedi i miei obiettivi', c115_goals_working: 'Sto rivedendo flusso e obiettivi…', c115_goals_empty: 'Prima crea un obiettivo: il copilota lavora con i tuoi obiettivi reali.', c115_goals_none: 'L’IA non ha portato una proposta questa volta. I tuoi obiettivi restano come sono.', c115_prop_title: 'La proposta del copilota', c115_prop_weekly: '{amount} a settimana', c115_prop_priority: 'Ordine suggerito: {list}', c115_apply_btn: 'Applica questo piano', c115_ignore_btn: 'Ignora', c115_applied: 'Piano applicato: è annotato sui tuoi obiettivi. Non è stato mosso denaro.', c115_plan_line: 'Piano del copilota: {amount}/settimana', c115_plan_clear: 'Togli il piano del copilota', c115_plan_active: 'Piano settimanale del copilota attivo',
   pro_tag: 'PRO',
   adv_title: 'Resoconto avanzato',
   adv_note: 'Funzione di PETO Pro: questo mese a confronto con il precedente, tutte le categorie ed esportazione del mese in CSV.',
@@ -4703,6 +4735,9 @@ pt: {
   pro_restore_none: 'Não encontramos uma assinatura ativa para restaurar.',
   pro_per_month: 'por mês',
   c114_sub_title: 'PETO Pro mensal', c114_sub_period: 'Assinatura mensal', c114_eula_link: 'Termos de Uso (EULA)', c114_privacy_link: 'Política de Privacidade',
+  c115_debt_title: '🏁 Seu plano para sair das dívidas com IA', c115_debt_note: 'Com o que você já paga por mês, o app simula as duas rotas e a IA explica qual combina com você e por quê, com os seus números.', c115_debt_empty: 'Anote primeiro uma dívida pendente: o plano é montado com suas dívidas reais e o que você paga por mês.', c115_paying_line: 'Pagando {pay} por mês no total:', c115_route_avalanche: 'Avalanche · maior juro primeiro', c115_route_snowball: 'Bola de neve · menor saldo primeiro', c115_free_when: 'Livre de dívidas: {when} · {months}', c115_interest_total: 'Juros totais: {amount}', c115_recommended: '★ A recomendada', c115_saves_line: 'Você economiza {amount} de juros em relação à outra rota.', c115_tie_line: 'As duas rotas custam quase o mesmo em juros: aqui manda a motivação.', c115_route_blocked: 'Com esse pagamento total, esta rota não faz o saldo baixar.', c115_ai_btn: '✨ Que a IA me explique', c115_ai_working: 'A IA está comparando suas rotas…', c115_ai_none: 'A IA não trouxe a explicação desta vez. A comparação acima continua sendo o seu plano.',
+  c115_bill_title: '🤝 Negociador de contas com IA', c115_bill_note: 'Escolha uma das suas cobranças fixas ou assinaturas e a IA escreve uma mensagem pronta para copiar e enviar pedindo um desconto. Você envia: o app não contata ninguém por você.', c115_bill_empty: 'Quando você tiver pagamentos fixos ou assinaturas detectadas, poderá escrever sua mensagem de desconto aqui.', c115_bill_btn: 'Escrever mensagem', c115_bill_working: 'Escrevendo sua mensagem…', c115_bill_none: 'A IA não trouxe a mensagem desta vez. Tente de novo em um momento.', c115_bill_text_title: 'Sua mensagem, pronta para enviar:', c115_copy: 'Copiar texto', c115_cat_internet: 'Internet', c115_cat_phone: 'Telefone', c115_cat_insurance: 'Seguro', c115_cat_other: 'Outro serviço', c115_monthly: '{amount}/mês',
+  c115_goals_title: '🧭 Copiloto de metas com IA', c115_goals_note: 'A IA olha seu fluxo real e suas metas, e propõe quanto guardar por semana em cada uma e em que ordem. É só uma proposta: nada se move nem se guarda sem a sua aprovação.', c115_goals_btn: '✨ Revisar minhas metas', c115_goals_working: 'Revisando seu fluxo e suas metas…', c115_goals_empty: 'Crie primeiro uma meta: o copiloto trabalha com suas metas reais.', c115_goals_none: 'A IA não trouxe proposta desta vez. Suas metas ficam como estão.', c115_prop_title: 'A proposta do copiloto', c115_prop_weekly: '{amount} por semana', c115_prop_priority: 'Ordem sugerida: {list}', c115_apply_btn: 'Aplicar este plano', c115_ignore_btn: 'Ignorar', c115_applied: 'Plano aplicado: ficou anotado nas suas metas. Nenhum dinheiro foi movido.', c115_plan_line: 'Plano do copiloto: {amount}/semana', c115_plan_clear: 'Remover o plano do copiloto', c115_plan_active: 'Plano semanal do copiloto ativo',
   pro_tag: 'PRO',
   adv_title: 'Relatório avançado',
   adv_note: 'Uma função do PETO Pro: este mês vs o anterior, cada categoria e uma exportação CSV do mês.',
@@ -5708,6 +5743,9 @@ fr: {
   pro_restore_none: 'Nous n’avons trouvé aucun abonnement actif à restaurer.',
   pro_per_month: 'par mois',
   c114_sub_title: 'PETO Pro mensuel', c114_sub_period: 'Abonnement mensuel', c114_eula_link: 'Conditions d’utilisation (EULA)', c114_privacy_link: 'Politique de confidentialité',
+  c115_debt_title: '🏁 Ton plan de sortie de dettes avec l’IA', c115_debt_note: 'Avec ce que tu paies déjà chaque mois, l’appli simule les deux routes et l’IA t’explique laquelle te convient et pourquoi, avec tes chiffres.', c115_debt_empty: 'Note d’abord une dette en attente : le plan se construit avec tes dettes réelles et ce que tu paies par mois.', c115_paying_line: 'En payant {pay} par mois au total :', c115_route_avalanche: 'Avalanche · l’intérêt le plus élevé d’abord', c115_route_snowball: 'Boule de neige · le plus petit solde d’abord', c115_free_when: 'Sans dettes : {when} · {months}', c115_interest_total: 'Intérêts totaux : {amount}', c115_recommended: '★ La recommandée', c115_saves_line: 'Tu économises {amount} d’intérêts par rapport à l’autre route.', c115_tie_line: 'Les deux routes coûtent presque pareil en intérêts : ici, c’est la motivation qui compte.', c115_route_blocked: 'Avec ce paiement total, cette route ne fait pas baisser le solde.', c115_ai_btn: '✨ Que l’IA m’explique', c115_ai_working: 'L’IA compare tes routes…', c115_ai_none: 'L’IA n’a pas apporté l’explication cette fois. La comparaison ci-dessus reste ton plan.',
+  c115_bill_title: '🤝 Négociateur de factures avec l’IA', c115_bill_note: 'Choisis un de tes frais fixes ou abonnements et l’IA te rédige un message prêt à copier et à envoyer pour demander une réduction. C’est toi qui l’envoies : l’appli ne contacte personne pour toi.', c115_bill_empty: 'Quand tu auras des paiements fixes ou des abonnements détectés, tu pourras rédiger ton message de réduction ici.', c115_bill_btn: 'Rédiger le message', c115_bill_working: 'Rédaction de ton message…', c115_bill_none: 'L’IA n’a pas apporté le message cette fois. Réessaie dans un moment.', c115_bill_text_title: 'Ton message, prêt à envoyer :', c115_copy: 'Copier le texte', c115_cat_internet: 'Internet', c115_cat_phone: 'Téléphone', c115_cat_insurance: 'Assurance', c115_cat_other: 'Autre service', c115_monthly: '{amount}/mois',
+  c115_goals_title: '🧭 Copilote d’objectifs avec l’IA', c115_goals_note: 'L’IA regarde ton flux réel et tes objectifs, et te propose combien mettre de côté chaque semaine pour chacun et dans quel ordre. Ce n’est qu’une proposition : rien ne bouge ni ne s’épargne sans ton accord.', c115_goals_btn: '✨ Revoir mes objectifs', c115_goals_working: 'Analyse de ton flux et de tes objectifs…', c115_goals_empty: 'Crée d’abord un objectif : le copilote travaille avec tes objectifs réels.', c115_goals_none: 'L’IA n’a pas apporté de proposition cette fois. Tes objectifs restent comme ils sont.', c115_prop_title: 'La proposition du copilote', c115_prop_weekly: '{amount} par semaine', c115_prop_priority: 'Ordre suggéré : {list}', c115_apply_btn: 'Appliquer ce plan', c115_ignore_btn: 'Ignorer', c115_applied: 'Plan appliqué : il est noté sur tes objectifs. Aucun argent n’a bougé.', c115_plan_line: 'Plan du copilote : {amount}/semaine', c115_plan_clear: 'Retirer le plan du copilote', c115_plan_active: 'Plan hebdomadaire du copilote actif',
   pro_tag: 'PRO',
   adv_title: 'Rapport avancé',
   adv_note: 'Une fonction PETO Pro : ce mois-ci contre le mois précédent, chaque catégorie et un export CSV du mois.',
@@ -6713,6 +6751,9 @@ de: {
   pro_restore_none: 'Wir konnten kein aktives Abo zum Wiederherstellen finden.',
   pro_per_month: 'pro Monat',
   c114_sub_title: 'PETO Pro monatlich', c114_sub_period: 'Monatsabo', c114_eula_link: 'Nutzungsbedingungen (EULA)', c114_privacy_link: 'Datenschutzrichtlinie',
+  c115_debt_title: '🏁 Dein Schulden-Ausstiegsplan mit KI', c115_debt_note: 'Mit dem, was du schon jeden Monat zahlst, simuliert die App beide Wege und die KI erklärt dir, welcher zu dir passt und warum – mit deinen Zahlen.', c115_debt_empty: 'Trage zuerst eine offene Schuld ein: Der Plan entsteht aus deinen echten Schulden und dem, was du monatlich zahlst.', c115_paying_line: 'Bei insgesamt {pay} pro Monat:', c115_route_avalanche: 'Lawine · höchste Zinsen zuerst', c115_route_snowball: 'Schneeball · kleinster Saldo zuerst', c115_free_when: 'Schuldenfrei: {when} · {months}', c115_interest_total: 'Zinsen gesamt: {amount}', c115_recommended: '★ Die empfohlene', c115_saves_line: 'Du sparst {amount} Zinsen gegenüber dem anderen Weg.', c115_tie_line: 'Beide Wege kosten fast gleich viel Zinsen: Hier zählt die Motivation.', c115_route_blocked: 'Mit dieser Gesamtzahlung lässt dieser Weg den Saldo nicht sinken.', c115_ai_btn: '✨ Von der KI erklären lassen', c115_ai_working: 'Die KI vergleicht deine Wege…', c115_ai_none: 'Die KI hat diesmal keine Erklärung gebracht. Der Vergleich oben bleibt dein Plan.',
+  c115_bill_title: '🤝 Rechnungs-Verhandler mit KI', c115_bill_note: 'Wähle eine deiner festen Kosten oder Abos und die KI schreibt dir eine Nachricht, fertig zum Kopieren und Senden, um einen Rabatt zu bitten. Du sendest sie: Die App kontaktiert niemanden für dich.', c115_bill_empty: 'Sobald du feste Zahlungen oder erkannte Abos hast, kannst du hier deine Rabatt-Nachricht schreiben lassen.', c115_bill_btn: 'Nachricht schreiben', c115_bill_working: 'Deine Nachricht wird geschrieben…', c115_bill_none: 'Die KI hat diesmal keine Nachricht gebracht. Versuche es gleich noch einmal.', c115_bill_text_title: 'Deine Nachricht, bereit zum Senden:', c115_copy: 'Text kopieren', c115_cat_internet: 'Internet', c115_cat_phone: 'Telefon', c115_cat_insurance: 'Versicherung', c115_cat_other: 'Anderer Dienst', c115_monthly: '{amount}/Monat',
+  c115_goals_title: '🧭 Ziel-Copilot mit KI', c115_goals_note: 'Die KI schaut auf deinen echten Geldfluss und deine Ziele und schlägt vor, wie viel du pro Woche für jedes Ziel zurücklegen solltest und in welcher Reihenfolge. Es ist nur ein Vorschlag: Nichts bewegt oder spart sich ohne deine Zustimmung.', c115_goals_btn: '✨ Meine Ziele prüfen', c115_goals_working: 'Dein Fluss und deine Ziele werden geprüft…', c115_goals_empty: 'Erstelle zuerst ein Ziel: Der Copilot arbeitet mit deinen echten Zielen.', c115_goals_none: 'Die KI hat diesmal keinen Vorschlag gebracht. Deine Ziele bleiben, wie sie sind.', c115_prop_title: 'Der Vorschlag des Copiloten', c115_prop_weekly: '{amount} pro Woche', c115_prop_priority: 'Vorgeschlagene Reihenfolge: {list}', c115_apply_btn: 'Diesen Plan übernehmen', c115_ignore_btn: 'Ignorieren', c115_applied: 'Plan übernommen: Er steht jetzt bei deinen Zielen. Es wurde kein Geld bewegt.', c115_plan_line: 'Copilot-Plan: {amount}/Woche', c115_plan_clear: 'Copilot-Plan entfernen', c115_plan_active: 'Copilot-Wochenplan aktiv',
   pro_tag: 'PRO',
   adv_title: 'Erweiterter Bericht',
   adv_note: 'Eine PETO-Pro-Funktion: dieser Monat gegen den vorigen, jede Kategorie und ein CSV-Export des Monats.',
@@ -7718,6 +7759,9 @@ zh: {
   pro_restore_none: '未找到可恢复的有效订阅。',
   pro_per_month: '每月',
   c114_sub_title: 'PETO Pro 月度版', c114_sub_period: '每月订阅', c114_eula_link: '使用条款 (EULA)', c114_privacy_link: '隐私政策',
+  c115_debt_title: '🏁 AI 债务脱困计划', c115_debt_note: '根据你每月已经在还的金额，应用会模拟两条路线，AI 会用你的数字向你解释哪条更适合你、为什么。', c115_debt_empty: '先记下一笔待还债务：计划会根据你的真实债务和每月还款额来制定。', c115_paying_line: '每月总共还款 {pay}：', c115_route_avalanche: '雪崩法 · 先还利息最高的', c115_route_snowball: '滚雪球法 · 先还余额最小的', c115_free_when: '还清债务：{when} · {months}', c115_interest_total: '总利息：{amount}', c115_recommended: '★ 推荐路线', c115_saves_line: '与另一条路线相比，你能省下 {amount} 利息。', c115_tie_line: '两条路线的利息差不多：这时动力更重要。', c115_route_blocked: '以这个总还款额，这条路线无法让余额下降。', c115_ai_btn: '✨ 让 AI 解释一下', c115_ai_working: 'AI 正在比较你的两条路线…', c115_ai_none: 'AI 这次没有给出解释。上面的比较仍然是你的计划。',
+  c115_bill_title: '🤝 AI 账单谈判助手', c115_bill_note: '从你的固定支出或订阅中选一项，AI 会为你写好一条可直接复制发送的消息，向对方申请降价。由你来发送：应用不会替你联系任何人。', c115_bill_empty: '当你有了固定付款或检测到的订阅，就可以在这里起草你的降价消息。', c115_bill_btn: '起草消息', c115_bill_working: '正在起草你的消息…', c115_bill_none: 'AI 这次没有写出消息。请稍后再试。', c115_bill_text_title: '你的消息，已可发送：', c115_copy: '复制文本', c115_cat_internet: '互联网', c115_cat_phone: '电话', c115_cat_insurance: '保险', c115_cat_other: '其他服务', c115_monthly: '{amount}/月',
+  c115_goals_title: '🧭 AI 目标副驾驶', c115_goals_note: 'AI 会查看你的真实收支和目标，建议你每周为每个目标存多少、按什么顺序。这只是一个建议：未经你批准，不会有任何资金被移动或存入。', c115_goals_btn: '✨ 查看我的目标', c115_goals_working: '正在查看你的收支和目标…', c115_goals_empty: '先创建一个目标：副驾驶会根据你的真实目标工作。', c115_goals_none: 'AI 这次没有给出建议。你的目标保持不变。', c115_prop_title: '副驾驶的建议', c115_prop_weekly: '每周 {amount}', c115_prop_priority: '建议顺序：{list}', c115_apply_btn: '应用此计划', c115_ignore_btn: '忽略', c115_applied: '计划已应用：已记录在你的目标上。没有移动任何资金。', c115_plan_line: '副驾驶计划：{amount}/周', c115_plan_clear: '移除副驾驶计划', c115_plan_active: '副驾驶每周计划已启用',
   pro_tag: 'PRO',
   adv_title: '高级报告',
   adv_note: '这是 PETO Pro 功能：本月与上月对比、每个类别，以及本月的 CSV 导出。',
@@ -8723,6 +8767,9 @@ ja: {
   pro_restore_none: '復元できる有効な購読が見つかりませんでした。',
   pro_per_month: '月額',
   c114_sub_title: 'PETO Pro 月額プラン', c114_sub_period: '月額サブスクリプション', c114_eula_link: '利用規約 (EULA)', c114_privacy_link: 'プライバシーポリシー',
+  c115_debt_title: '🏁 AI借金完済プラン', c115_debt_note: '毎月すでに支払っている金額で、アプリが2つのルートをシミュレーションし、AIがあなたの数字を使って、どちらが合っているか、その理由を説明します。', c115_debt_empty: 'まず未払いの借金を1つ記録してください：プランはあなたの実際の借金と毎月の支払額から作られます。', c115_paying_line: '毎月合計 {pay} を支払う場合：', c115_route_avalanche: 'アバランチ · 金利の高い順', c115_route_snowball: 'スノーボール · 残高の小さい順', c115_free_when: '完済時期：{when} · {months}', c115_interest_total: '利息の合計：{amount}', c115_recommended: '★ おすすめ', c115_saves_line: 'もう一方のルートより利息が {amount} 節約できます。', c115_tie_line: '2つのルートの利息はほぼ同じ：ここではモチベーションが大事です。', c115_route_blocked: 'その合計支払額では、このルートでは残高が減りません。', c115_ai_btn: '✨ AIに説明してもらう', c115_ai_working: 'AIがあなたのルートを比較しています…', c115_ai_none: '今回はAIの説明が届きませんでした。上の比較があなたのプランです。',
+  c115_bill_title: '🤝 AI請求交渉アシスタント', c115_bill_note: '固定費やサブスクの中から1つ選ぶと、AIが値下げをお願いするメッセージを、コピーしてそのまま送れる形で書きます。送信するのはあなたです：アプリが代わりに連絡することはありません。', c115_bill_empty: '固定支払いや検出されたサブスクがあれば、ここで値下げメッセージを作成できます。', c115_bill_btn: 'メッセージを作成', c115_bill_working: 'メッセージを作成しています…', c115_bill_none: '今回はAIのメッセージが届きませんでした。少ししてからもう一度お試しください。', c115_bill_text_title: 'あなたのメッセージ、送信準備完了：', c115_copy: 'テキストをコピー', c115_cat_internet: 'インターネット', c115_cat_phone: '電話', c115_cat_insurance: '保険', c115_cat_other: 'その他のサービス', c115_monthly: '{amount}/月',
+  c115_goals_title: '🧭 AI目標コパイロット', c115_goals_note: 'AIがあなたの実際の収支と目標を見て、各目標に毎週いくら貯めるべきか、どの順番で進めるかを提案します。あくまで提案です：あなたの承認なしに、お金が動いたり貯まったりすることはありません。', c115_goals_btn: '✨ 目標を見直す', c115_goals_working: '収支と目標を確認しています…', c115_goals_empty: 'まず目標を作成してください：コパイロットはあなたの実際の目標で働きます。', c115_goals_none: '今回はAIの提案が届きませんでした。目標はそのままです。', c115_prop_title: 'コパイロットの提案', c115_prop_weekly: '毎週 {amount}', c115_prop_priority: 'おすすめの順番：{list}', c115_apply_btn: 'このプランを適用', c115_ignore_btn: '無視する', c115_applied: 'プランを適用しました：目標に記録されました。お金は動いていません。', c115_plan_line: 'コパイロットプラン：{amount}/週', c115_plan_clear: 'コパイロットプランを外す', c115_plan_active: 'コパイロットの週間プランが有効です',
   pro_tag: 'PRO',
   adv_title: '高度なレポート',
   adv_note: 'PETO Proの機能です。今月と先月の比較、すべてのカテゴリ、月のCSVエクスポート。',
@@ -9728,6 +9775,9 @@ ko: {
   pro_restore_none: '복원할 활성 구독을 찾을 수 없습니다.',
   pro_per_month: '월',
   c114_sub_title: 'PETO Pro 월간', c114_sub_period: '월간 구독', c114_eula_link: '이용 약관 (EULA)', c114_privacy_link: '개인정보 처리방침',
+  c115_debt_title: '🏁 AI 빚 탈출 플랜', c115_debt_note: '매달 이미 갚고 있는 금액으로 앱이 두 가지 경로를 시뮬레이션하고, AI가 당신의 숫자로 어떤 경로가 맞는지, 왜 그런지 설명합니다.', c115_debt_empty: '먼저 미결제 빚을 하나 기록하세요: 플랜은 당신의 실제 빚과 매월 갚는 금액으로 만들어집니다.', c115_paying_line: '매달 총 {pay}를 갚을 때:', c115_route_avalanche: '눈사태 · 이자 높은 순', c115_route_snowball: '눈덩이 · 잔액 작은 순', c115_free_when: '빚 청산: {when} · {months}', c115_interest_total: '총 이자: {amount}', c115_recommended: '★ 추천 경로', c115_saves_line: '다른 경로보다 이자를 {amount} 절약합니다.', c115_tie_line: '두 경로의 이자가 거의 같습니다: 여기서는 동기가 중요합니다.', c115_route_blocked: '그 총 상환액으로는 이 경로에서 잔액이 줄지 않습니다.', c115_ai_btn: '✨ AI에게 설명 듣기', c115_ai_working: 'AI가 당신의 경로를 비교하고 있습니다…', c115_ai_none: '이번에는 AI 설명이 오지 않았습니다. 위의 비교가 여전히 당신의 플랜입니다.',
+  c115_bill_title: '🤝 AI 요금 협상 도우미', c115_bill_note: '고정 지출이나 구독 중 하나를 고르면 AI가 할인을 요청하는 메시지를 복사해서 바로 보낼 수 있게 작성합니다. 보내는 것은 당신입니다: 앱이 대신 연락하지 않습니다.', c115_bill_empty: '고정 결제나 감지된 구독이 생기면 여기에서 할인 메시지를 작성할 수 있습니다.', c115_bill_btn: '메시지 작성', c115_bill_working: '메시지를 작성하고 있습니다…', c115_bill_none: '이번에는 AI 메시지가 오지 않았습니다. 잠시 후 다시 시도하세요.', c115_bill_text_title: '보낼 준비가 된 메시지:', c115_copy: '텍스트 복사', c115_cat_internet: '인터넷', c115_cat_phone: '전화', c115_cat_insurance: '보험', c115_cat_other: '기타 서비스', c115_monthly: '{amount}/월',
+  c115_goals_title: '🧭 AI 목표 코파일럿', c115_goals_note: 'AI가 당신의 실제 현금 흐름과 목표를 보고, 각 목표에 매주 얼마를 저축할지, 어떤 순서로 할지를 제안합니다. 제안일 뿐입니다: 당신이 승인하지 않으면 돈이 움직이거나 저축되지 않습니다.', c115_goals_btn: '✨ 내 목표 검토', c115_goals_working: '흐름과 목표를 검토하고 있습니다…', c115_goals_empty: '먼저 목표를 만드세요: 코파일럿은 당신의 실제 목표로 일합니다.', c115_goals_none: '이번에는 AI 제안이 오지 않았습니다. 목표는 그대로 유지됩니다.', c115_prop_title: '코파일럿의 제안', c115_prop_weekly: '주당 {amount}', c115_prop_priority: '추천 순서: {list}', c115_apply_btn: '이 플랜 적용', c115_ignore_btn: '무시', c115_applied: '플랜이 적용되었습니다: 목표에 기록되었습니다. 돈은 움직이지 않았습니다.', c115_plan_line: '코파일럿 플랜: {amount}/주', c115_plan_clear: '코파일럿 플랜 제거', c115_plan_active: '코파일럿 주간 플랜 활성',
   pro_tag: 'PRO',
   adv_title: '고급 보고서',
   adv_note: 'PETO Pro 기능입니다. 이번 달과 지난달 비교, 모든 카테고리, 그리고 월의 CSV 내보내기.',
@@ -10733,6 +10783,9 @@ ru: {
   pro_restore_none: 'Мы не нашли активную подписку для восстановления.',
   pro_per_month: 'в месяц',
   c114_sub_title: 'PETO Pro на месяц', c114_sub_period: 'Ежемесячная подписка', c114_eula_link: 'Условия использования (EULA)', c114_privacy_link: 'Политика конфиденциальности',
+  c115_debt_title: '🏁 Твой план выхода из долгов с ИИ', c115_debt_note: 'На основе того, что ты уже платишь каждый месяц, приложение моделирует оба пути, а ИИ объясняет простыми словами, какой тебе подходит и почему, — с твоими цифрами.', c115_debt_empty: 'Сначала запиши один непогашенный долг: план строится на твоих реальных долгах и на том, сколько ты платишь в месяц.', c115_paying_line: 'При платеже {pay} в месяц в общей сложности:', c115_route_avalanche: 'Лавина · сначала самый высокий процент', c115_route_snowball: 'Снежный ком · сначала самый маленький остаток', c115_free_when: 'Без долгов: {when} · {months}', c115_interest_total: 'Всего процентов: {amount}', c115_recommended: '★ Рекомендуемый', c115_saves_line: 'Ты экономишь {amount} на процентах по сравнению с другим путём.', c115_tie_line: 'Оба пути стоят почти одинаково по процентам: здесь решает мотивация.', c115_route_blocked: 'При таком общем платеже этот путь не уменьшает остаток.', c115_ai_btn: '✨ Пусть ИИ объяснит', c115_ai_working: 'ИИ сравнивает твои пути…', c115_ai_none: 'В этот раз ИИ не принёс объяснение. Сравнение выше остаётся твоим планом.',
+  c115_bill_title: '🤝 Переговорщик по счетам с ИИ', c115_bill_note: 'Выбери один из своих фиксированных платежей или подписок, и ИИ составит сообщение, готовое к копированию и отправке, с просьбой о скидке. Отправляешь ты: приложение ни с кем за тебя не связывается.', c115_bill_empty: 'Когда у тебя будут фиксированные платежи или найденные подписки, здесь можно будет составить сообщение о скидке.', c115_bill_btn: 'Составить сообщение', c115_bill_working: 'Составляю твоё сообщение…', c115_bill_none: 'В этот раз ИИ не принёс сообщение. Попробуй ещё раз через минуту.', c115_bill_text_title: 'Твоё сообщение, готово к отправке:', c115_copy: 'Копировать текст', c115_cat_internet: 'Интернет', c115_cat_phone: 'Телефон', c115_cat_insurance: 'Страховка', c115_cat_other: 'Другая услуга', c115_monthly: '{amount}/мес.',
+  c115_goals_title: '🧭 Копилот целей с ИИ', c115_goals_note: 'ИИ смотрит на твой реальный денежный поток и твои цели и предлагает, сколько откладывать каждую неделю на каждую и в каком порядке. Это только предложение: ничего не движется и не копится без твоего одобрения.', c115_goals_btn: '✨ Проверить мои цели', c115_goals_working: 'Проверяю твой поток и цели…', c115_goals_empty: 'Сначала создай цель: копилот работает с твоими настоящими целями.', c115_goals_none: 'В этот раз ИИ не принёс предложение. Твои цели остаются как есть.', c115_prop_title: 'Предложение копилота', c115_prop_weekly: '{amount} в неделю', c115_prop_priority: 'Предлагаемый порядок: {list}', c115_apply_btn: 'Применить этот план', c115_ignore_btn: 'Игнорировать', c115_applied: 'План применён: он отмечен у твоих целей. Деньги не двигались.', c115_plan_line: 'План копилота: {amount}/неделю', c115_plan_clear: 'Убрать план копилота', c115_plan_active: 'Недельный план копилота активен',
   pro_tag: 'PRO',
   adv_title: 'Расширенный отчёт',
   adv_note: 'Функция PETO Pro: этот месяц против предыдущего, каждая категория и экспорт месяца в CSV.',
@@ -11738,6 +11791,9 @@ hi: {
   pro_restore_none: 'बहाल करने के लिए कोई सक्रिय सदस्यता नहीं मिली।',
   pro_per_month: 'प्रति माह',
   c114_sub_title: 'PETO Pro मासिक', c114_sub_period: 'मासिक सदस्यता', c114_eula_link: 'उपयोग की शर्तें (EULA)', c114_privacy_link: 'गोपनीयता नीति',
+  c115_debt_title: '🏁 AI के साथ कर्ज़ से बाहर निकलने का प्लान', c115_debt_note: 'आप हर महीने जो पहले से चुका रहे हैं, उससे ऐप दोनों रास्ते चलाकर देखता है और AI आसान शब्दों में बताता है कि कौन-सा रास्ता आपके लिए सही है और क्यों — आपके ही आंकड़ों के साथ।', c115_debt_empty: 'पहले एक बकाया कर्ज़ दर्ज करें: प्लान आपके असली कर्ज़ों और हर महीने की चुकौती से बनता है।', c115_paying_line: 'कुल {pay} हर महीने चुकाने पर:', c115_route_avalanche: 'एवलांच · सबसे ज़्यादा ब्याज पहले', c115_route_snowball: 'स्नोबॉल · सबसे छोटा बकाया पहले', c115_free_when: 'कर्ज़-मुक्त: {when} · {months}', c115_interest_total: 'कुल ब्याज: {amount}', c115_recommended: '★ सुझाया गया रास्ता', c115_saves_line: 'दूसरे रास्ते के मुकाबले आप {amount} ब्याज बचाते हैं।', c115_tie_line: 'दोनों रास्तों का ब्याज लगभग बराबर है: यहाँ हौसला मायने रखता है।', c115_route_blocked: 'इस कुल भुगतान से इस रास्ते में बकाया कम नहीं होगा।', c115_ai_btn: '✨ AI से समझाओ', c115_ai_working: 'AI आपके रास्तों की तुलना कर रहा है…', c115_ai_none: 'इस बार AI की व्याख्या नहीं आई। ऊपर की तुलना ही आपका प्लान है।',
+  c115_bill_title: '🤝 AI बिल मोलभाव सहायक', c115_bill_note: 'अपने तय खर्चों या सब्सक्रिप्शन में से एक चुनें और AI छूट माँगने का संदेश तैयार लिख देगा — कॉपी करके भेजने के लिए। भेजना आपको है: ऐप आपकी ओर से किसी से संपर्क नहीं करता।', c115_bill_empty: 'जब आपके तय भुगतान या पहचाने गए सब्सक्रिप्शन होंगे, तो आप यहाँ अपना छूट संदेश बनवा सकेंगे।', c115_bill_btn: 'संदेश लिखो', c115_bill_working: 'आपका संदेश लिखा जा रहा है…', c115_bill_none: 'इस बार AI का संदेश नहीं आया। थोड़ी देर में फिर कोशिश करें।', c115_bill_text_title: 'आपका संदेश, भेजने के लिए तैयार:', c115_copy: 'टेक्स्ट कॉपी करें', c115_cat_internet: 'इंटरनेट', c115_cat_phone: 'फ़ोन', c115_cat_insurance: 'बीमा', c115_cat_other: 'अन्य सेवा', c115_monthly: '{amount}/माह',
+  c115_goals_title: '🧭 AI लक्ष्य कोपायलट', c115_goals_note: 'AI आपके असली नकदी प्रवाह और लक्ष्यों को देखकर सुझाव देता है कि हर लक्ष्य के लिए हर हफ़्ते कितना बचाएँ और किस क्रम में। यह सिर्फ़ एक सुझाव है: आपकी मंज़ूरी के बिना कुछ भी नहीं हिलता और न ही बचता है।', c115_goals_btn: '✨ मेरे लक्ष्य देखें', c115_goals_working: 'आपके प्रवाह और लक्ष्यों की जाँच हो रही है…', c115_goals_empty: 'पहले एक लक्ष्य बनाएँ: कोपायलट आपके असली लक्ष्यों पर काम करता है।', c115_goals_none: 'इस बार AI का सुझाव नहीं आया। आपके लक्ष्य जैसे हैं वैसे ही रहते हैं।', c115_prop_title: 'कोपायलट का सुझाव', c115_prop_weekly: '{amount} प्रति हफ़्ता', c115_prop_priority: 'सुझाया क्रम: {list}', c115_apply_btn: 'यह प्लान लागू करें', c115_ignore_btn: 'अनदेखा करें', c115_applied: 'प्लान लागू हुआ: यह आपके लक्ष्यों पर दर्ज हो गया। कोई पैसा नहीं हिला।', c115_plan_line: 'कोपायलट प्लान: {amount}/हफ़्ता', c115_plan_clear: 'कोपायलट प्लान हटाएँ', c115_plan_active: 'कोपायलट साप्ताहिक प्लान सक्रिय',
   pro_tag: 'PRO',
   adv_title: 'उन्नत रिपोर्ट',
   adv_note: 'यह PETO Pro की सुविधा है: यह माह बनाम पिछला माह, हर श्रेणी और माह का CSV निर्यात।',
@@ -12743,6 +12799,9 @@ ar: {
   pro_restore_none: 'لم نجد اشتراكًا نشطًا لاستعادته.',
   pro_per_month: 'شهريًا',
   c114_sub_title: 'PETO Pro الشهري', c114_sub_period: 'اشتراك شهري', c114_eula_link: 'شروط الاستخدام (EULA)', c114_privacy_link: 'سياسة الخصوصية',
+  c115_debt_title: '🏁 خطتك للخروج من الديون مع الذكاء الاصطناعي', c115_debt_note: 'بالمبلغ الذي تدفعه كل شهر بالفعل، يحاكي التطبيق الطريقتين ويشرح لك الذكاء الاصطناعي أيّهما يناسبك ولماذا، بأرقامك الخاصة.', c115_debt_empty: 'سجّل أولًا دينًا مستحقًا: تُبنى الخطة على ديونك الحقيقية وما تدفعه شهريًا.', c115_paying_line: 'عند دفع {pay} شهريًا في المجموع:', c115_route_avalanche: 'الانهيار · الفائدة الأعلى أولًا', c115_route_snowball: 'كرة الثلج · الرصيد الأصغر أولًا', c115_free_when: 'خالٍ من الديون: {when} · {months}', c115_interest_total: 'إجمالي الفائدة: {amount}', c115_recommended: '★ المُوصى به', c115_saves_line: 'توفّر {amount} من الفائدة مقارنة بالطريق الآخر.', c115_tie_line: 'تكلفة الطريقين بالفائدة متقاربة جدًا: هنا يهمّ الحافز.', c115_route_blocked: 'بهذا المبلغ الإجمالي، هذا الطريق لا يخفّض الرصيد.', c115_ai_btn: '✨ دع الذكاء الاصطناعي يشرح', c115_ai_working: 'يقارن الذكاء الاصطناعي بين طريقيك…', c115_ai_none: 'لم يصل شرح الذكاء الاصطناعي هذه المرة. المقارنة أعلاه تبقى خطتك.',
+  c115_bill_title: '🤝 مفاوض الفواتير مع الذكاء الاصطناعي', c115_bill_note: 'اختر إحدى مصاريفك الثابتة أو اشتراكاتك، وسيكتب لك الذكاء الاصطناعي رسالة جاهزة للنسخ والإرسال تطلب فيها تخفيضًا. أنت من يرسلها: التطبيق لا يتواصل مع أحد نيابة عنك.', c115_bill_empty: 'عندما تكون لديك مدفوعات ثابتة أو اشتراكات مكتشفة، ستتمكن من كتابة رسالة التخفيض هنا.', c115_bill_btn: 'اكتب الرسالة', c115_bill_working: 'جارٍ كتابة رسالتك…', c115_bill_none: 'لم تصل رسالة الذكاء الاصطناعي هذه المرة. حاول بعد قليل.', c115_bill_text_title: 'رسالتك، جاهزة للإرسال:', c115_copy: 'نسخ النص', c115_cat_internet: 'الإنترنت', c115_cat_phone: 'الهاتف', c115_cat_insurance: 'التأمين', c115_cat_other: 'خدمة أخرى', c115_monthly: '{amount}/شهر',
+  c115_goals_title: '🧭 مساعد الأهداف مع الذكاء الاصطناعي', c115_goals_note: 'ينظر الذكاء الاصطناعي إلى تدفقك الحقيقي وأهدافك، ويقترح كم تدّخر أسبوعيًا لكل هدف وبأي ترتيب. إنه مجرد اقتراح: لا يتحرك شيء ولا يُدّخر شيء دون موافقتك.', c115_goals_btn: '✨ راجع أهدافي', c115_goals_working: 'جارٍ مراجعة تدفقك وأهدافك…', c115_goals_empty: 'أنشئ هدفًا أولًا: يعمل المساعد على أهدافك الحقيقية.', c115_goals_none: 'لم يصل اقتراح الذكاء الاصطناعي هذه المرة. تبقى أهدافك كما هي.', c115_prop_title: 'اقتراح المساعد', c115_prop_weekly: '{amount} أسبوعيًا', c115_prop_priority: 'الترتيب المقترح: {list}', c115_apply_btn: 'طبّق هذه الخطة', c115_ignore_btn: 'تجاهل', c115_applied: 'تم تطبيق الخطة: سُجّلت على أهدافك. لم يتحرك أي مال.', c115_plan_line: 'خطة المساعد: {amount}/أسبوع', c115_plan_clear: 'إزالة خطة المساعد', c115_plan_active: 'خطة المساعد الأسبوعية مفعّلة',
   pro_tag: 'PRO',
   adv_title: 'التقرير المتقدّم',
   adv_note: 'ميزة من PETO Pro: هذا الشهر مقابل السابق، كل فئة وتصدير CSV للشهر.',
@@ -18301,6 +18360,7 @@ function renderFixed() {
     ul.appendChild(li);
   }
   renderRecurring();
+  renderBillNeg115();
 }
 /* ---------------- Compilación 54 · Cobros que se repiten -----
    Detector de SOLO LECTURA sobre los gastos contados (manuales
@@ -19142,6 +19202,7 @@ function renderDebts() {
     ul.appendChild(li);
   }
   renderDebtPlan();
+  renderDebtExit115();
 }
 function onDebtSubmit(ev) {
   ev.preventDefault();
@@ -23107,6 +23168,13 @@ function renderGoals() {
     fill.style.width = pct + '%';
     bar.appendChild(fill);
     card.appendChild(bar);
+    /* Compilación 115: la línea del plan semanal del copiloto,
+       si la persona lo aprobó para esta meta. Es la anotación
+       del plan: no suma ni mueve ahorro. */
+    const plan115 = (db.settings && db.settings.goalPlan115) || null;
+    if (plan115 && plan115[g.id] > 0 && acc < g.targetCents) {
+      card.appendChild(el('p', 'item-sub', '🧭 ' + t('c115_plan_line', { amount: fmt(plan115[g.id]) })));
+    }
     if (acc >= g.targetCents) card.appendChild(el('p', 'goal-done', t('goal_done')));
     const row = el('div', 'form-actions');
     const amt = document.createElement('input');
@@ -23137,6 +23205,7 @@ function renderGoals() {
     card.appendChild(row);
     list.appendChild(card);
   }
+  renderGoalPilot115();
 }
 function moveGoalMoney(id, input, dir) {
   const cents = parseAmount(input.value, false);
@@ -30031,6 +30100,443 @@ function renderDebtAi97() {
   }
 }
 
+/* ---------------- Compilación 115 · «Deudas y metas con IA» ----------------
+   Tres funciones SOLO Pro (aprobadas por Sterlin el 27-nov-2026),
+   cada una con su acción nueva del servidor `ai`:
+   (1) El plan de salida de deudas: la app corre simulatePayoff
+   con el pago total real en las dos rutas y enseña de cada una
+   meses, FECHA de salida e interés total, con la recomendada
+   marcada; 'debt-exit-plan' solo lo explica en palabras
+   simples. (2) El negociador de facturas: lista los cargos que
+   la app YA conoce (pagos fijos + detectados, sin duplicar) y
+   'bill-negotiate' redacta el mensaje listo para pegar, en el
+   idioma de la app; la persona lo envía, la app no contacta a
+   nadie. (3) El copiloto de metas: 'goals-copilot' propone el
+   ajuste semanal por meta y el orden; la propuesta se aprueba
+   o se ignora, y aprobar SOLO anota el plan en
+   settings.goalPlan115 — jamás mueve dinero ni guarda ahorro:
+   la regla de oro queda intacta. */
+
+/* ---- 115 (1) · Plan de salida de deudas ---- */
+function debtExitRoutes115() {
+  const pending = (db.debts || []).filter((d) => d.status === 'pendiente' && d.amountCents > 0);
+  if (!pending.length) return null;
+  let totalPay = 0;
+  for (const d of pending) {
+    const info = debtPayoffInfo(d);
+    totalPay += info ? info.pay : (d.pagoMinCents || 0);
+  }
+  if (!(totalPay > 0)) return { pending: pending, totalPay: 0, av: null, sn: null };
+  return {
+    pending: pending, totalPay: totalPay,
+    av: simulatePayoff(db.debts, totalPay, 'avalancha'),
+    sn: simulatePayoff(db.debts, totalPay, 'nieve'),
+  };
+}
+/* La recomendada se decide AQUÍ, con matemática local: gana
+   la de menos interés; en empate (o casi), la bola de nieve,
+   porque saldar una deuda pronto sostiene la motivación. */
+function debtExitPick115(av, sn) {
+  if (av && av.ok && sn && sn.ok) {
+    return av.totalInterestCents < sn.totalInterestCents ? 'av' : 'sn';
+  }
+  if (av && av.ok) return 'av';
+  if (sn && sn.ok) return 'sn';
+  return '';
+}
+let debtExitAi115Text = '';
+function renderDebtExit115() {
+  const box = document.getElementById('debt-exit115-results');
+  const empty = document.getElementById('debt-exit115-empty');
+  const body = document.getElementById('debt-exit115-body');
+  if (!box) return;
+  clearNode(box);
+  const r = debtExitRoutes115();
+  if (empty) empty.hidden = !!r;
+  if (body) body.hidden = !r;
+  if (!r) { renderDebtExitAi115(); return; }
+  box.appendChild(el('p', 'muted small', t('c115_paying_line', { pay: fmt(r.totalPay) })));
+  const pick = debtExitPick115(r.av, r.sn);
+  const routes = [
+    { key: 'av', name: t('c115_route_avalanche'), res: r.av },
+    { key: 'sn', name: t('c115_route_snowball'), res: r.sn },
+  ];
+  for (const rt of routes) {
+    const card = el('div', 'calc-block');
+    const h = el('h4', null, rt.name);
+    if (pick === rt.key) {
+      h.appendChild(document.createTextNode(' '));
+      h.appendChild(el('span', 'c115-rec', t('c115_recommended')));
+    }
+    card.appendChild(h);
+    if (!rt.res || !rt.res.ok) {
+      card.appendChild(el('p', 'error', t('c115_route_blocked')));
+    } else {
+      card.appendChild(el('p', null, t('c115_free_when', {
+        when: debtPayoffWhen(rt.res.months), months: debtMonthsText(rt.res.months),
+      })));
+      card.appendChild(el('p', null, t('c115_interest_total', { amount: fmt(rt.res.totalInterestCents) })));
+      if (rt.res.order && rt.res.order.length) {
+        card.appendChild(el('p', 'muted small', t('calc_order')));
+        const ol = el('ol', 'calc-order');
+        for (const n of rt.res.order) ol.appendChild(el('li', null, n));
+        card.appendChild(ol);
+      }
+    }
+    box.appendChild(card);
+  }
+  if (r.av && r.av.ok && r.sn && r.sn.ok) {
+    const diff = Math.abs(r.av.totalInterestCents - r.sn.totalInterestCents);
+    box.appendChild(el('p', 'muted small', diff >= 100
+      ? t('c115_saves_line', { amount: fmt(diff) })
+      : t('c115_tie_line')));
+  }
+  renderDebtExitAi115();
+}
+function renderDebtExitAi115() {
+  const box = document.getElementById('debt-exit115-ai');
+  if (!box) return;
+  clearNode(box);
+  if (!debtExitAi115Text) return;
+  for (const para of debtExitAi115Text.split('\n')) {
+    const line = para.trim();
+    if (line) box.appendChild(el('p', null, line));
+  }
+}
+function debtExitFacts115() {
+  const r = debtExitRoutes115();
+  if (!r) return '';
+  const lines = [];
+  const totalDebt = r.pending.reduce((s, d) => s + d.amountCents, 0);
+  lines.push('Deudas pendientes: ' + r.pending.length + ' · Saldo total: ' + fmt(totalDebt) + '.');
+  lines.push('Por deuda (saldo · interés anual · pago mínimo · pago planeado):');
+  for (const d of r.pending) {
+    lines.push('- ' + d.name + ': saldo ' + fmt(d.amountCents) +
+      ' · APR ' + (d.interesPct || 0) + '%' +
+      ' · mínimo ' + fmt(d.pagoMinCents || 0) +
+      ' · planeado ' + fmt(d.pagoPlanCents || 0) + '.');
+  }
+  lines.push('Pagando en total ' + fmt(r.totalPay) + ' al mes entre todas, las dos rutas simuladas por la app:');
+  const routeLine = (label, res) => !res
+    ? '- ' + label + ': sin pago total suficiente para simular.'
+    : (!res.ok
+      ? '- ' + label + ': con ese pago total el saldo NO baja.'
+      : '- ' + label + ': libre de deudas en ' + res.months + ' meses (' +
+        debtPayoffWhen(res.months) + '), interés total ' +
+        fmt(res.totalInterestCents) + ', orden de salida: ' +
+        res.order.join(' → ') + '.');
+  lines.push(routeLine('Avalancha (mayor interés primero)', r.av));
+  lines.push(routeLine('Bola de nieve (menor saldo primero)', r.sn));
+  const inc = sumCents(monthCountedIncomes(currentMonthKey()));
+  if (inc > 0) lines.push('Ingresos contados este mes: ' + fmt(inc) + '.');
+  return lines.join('\n').slice(0, 4900);
+}
+async function onDebtExitAi115() {
+  if (!requirePro()) return;
+  const status = document.getElementById('debt-exit115-status');
+  const facts = debtExitFacts115();
+  if (!facts) { if (status) status.textContent = t('c115_debt_empty'); return; }
+  if (status) status.textContent = t('c115_ai_working');
+  try {
+    const r = await aiFn('debt-exit-plan', { facts: facts, lang: lang() });
+    debtExitAi115Text = (r && r.text) ? r.text : '';
+    if (status) status.textContent = debtExitAi115Text ? '' : t('c115_ai_none');
+    renderDebtExitAi115();
+  } catch (e) {
+    aiGatePaywall(e);
+    if (status) status.textContent = aiErrorText(e);
+  }
+}
+
+/* ---- 115 (2) · Negociador de facturas ---- */
+/* Los cargos que la app ya conoce: pagos fijos (con su costo
+   mensual real según frecuencia) y suscripciones detectadas
+   en los movimientos, sin contar dos veces el mismo nombre. */
+function billNegCharges115() {
+  const out = [];
+  const seen = new Set();
+  for (const f of (db.fixed || [])) {
+    if (!(f.amountCents > 0)) continue;
+    const k = (f.name || '').trim().toLowerCase();
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push({ name: f.name, monthlyCents: fixedSubsMonthlyCents(f) });
+  }
+  for (const r of detectRecurring()) {
+    const k = (r.name || '').trim().toLowerCase();
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push({
+      name: r.name,
+      monthlyCents: r.freq === 'week' ? Math.round(r.amount * 52 / 12) : r.amount,
+    });
+  }
+  out.sort((a, b) => b.monthlyCents - a.monthlyCents);
+  return out.slice(0, 12);
+}
+/* Categoría propuesta por el nombre del cargo; la persona la
+   puede corregir en el selector antes de redactar. */
+function billNegGuessCat115(name) {
+  const n = (name || '').toLowerCase();
+  if (/internet|wifi|broadband|fios|fibra|optimum|altice|spectrum|comcast|xfinity/.test(n)) return 'internet';
+  if (/t-mobile|tmobile|at&t|verizon|telefon|celular|mobile|wireless|mint|visible|telcel|movistar|claro/.test(n)) return 'phone';
+  if (/seguro|insurance|geico|progressive|state farm|allstate|liberty|aetna|cigna|health plan/.test(n)) return 'insurance';
+  return 'other';
+}
+let billNeg115Current = null;
+function renderBillNeg115() {
+  const list = document.getElementById('billneg115-list');
+  const empty = document.getElementById('billneg115-empty');
+  if (!list) return;
+  clearNode(list);
+  const charges = billNegCharges115();
+  if (empty) empty.hidden = charges.length > 0;
+  for (const c of charges) {
+    const li = el('li', 'item');
+    const main = el('div', 'item-main');
+    main.appendChild(el('div', 'item-title', c.name));
+    main.appendChild(el('div', 'item-sub', t('c115_monthly', { amount: fmt(c.monthlyCents) })));
+    li.appendChild(main);
+    const sel = document.createElement('select');
+    sel.className = 'c115-cat';
+    sel.setAttribute('aria-label', c.name);
+    for (const cat of ['internet', 'phone', 'insurance', 'other']) {
+      const op = document.createElement('option');
+      op.value = cat;
+      op.textContent = t('c115_cat_' + cat);
+      if (billNegGuessCat115(c.name) === cat) op.selected = true;
+      sel.appendChild(op);
+    }
+    li.appendChild(sel);
+    li.appendChild(actionButton(t('c115_bill_btn'), 'btn-secondary', () => { onBillNeg115(c, sel); }));
+    list.appendChild(li);
+  }
+  renderBillNeg115Result();
+}
+function renderBillNeg115Result() {
+  const box = document.getElementById('billneg115-result');
+  if (!box) return;
+  clearNode(box);
+  const c = billNeg115Current;
+  if (!c) return;
+  box.appendChild(el('div', 'chat88-title', c.name));
+  if (c.working) {
+    box.appendChild(el('p', 'muted small', t('c115_bill_working')));
+    return;
+  }
+  if (c.error) {
+    box.appendChild(el('p', 'muted small', c.error));
+    return;
+  }
+  if (!c.text) {
+    box.appendChild(el('p', 'muted small', t('c115_bill_none')));
+    return;
+  }
+  box.appendChild(el('div', 'chat88-title', t('c115_bill_text_title')));
+  box.appendChild(el('div', 'c94-script', c.text));
+  ai94ListInto(box, 'c94_tips_title', c.tips);
+  const acts = el('div', 'form-actions');
+  const btn = el('button', 'btn btn-small btn-secondary', t('c115_copy'));
+  btn.type = 'button';
+  btn.addEventListener('click', () => { ai94CopyText(c.text, btn); });
+  acts.appendChild(btn);
+  box.appendChild(acts);
+}
+async function onBillNeg115(charge, sel) {
+  if (!requirePro()) return;
+  billNeg115Current = { name: charge.name, working: true };
+  renderBillNeg115Result();
+  try {
+    const r = await aiFn('bill-negotiate', {
+      name: charge.name,
+      category: sel ? sel.value : billNegGuessCat115(charge.name),
+      currentCents: charge.monthlyCents,
+      lang: lang(),
+    });
+    if (!r || !r.text) throw new Error('ai_generic');
+    billNeg115Current = { name: charge.name, text: r.text, tips: r.tips || [] };
+  } catch (e) {
+    billNeg115Current = { name: charge.name, error: aiErrorText(e) };
+    aiGatePaywall(e);
+  }
+  renderBillNeg115Result();
+}
+
+/* ---- 115 (3) · Copiloto de metas ---- */
+/* Ritmo reciente de una meta: sus aportes de los últimos 90
+   días, como promedio mensual. */
+function goalPace115(g) {
+  const since = addDaysStr(todayStr(), -90);
+  let sum = 0;
+  for (const s of (db.savings || [])) {
+    if (s.goalId === g.id && s.date >= since) sum += s.amountCents || 0;
+  }
+  return Math.round(sum / 3);
+}
+function goalCopilotRows115() {
+  const rows = [];
+  for (const g of (db.goals || [])) {
+    if (!(g.targetCents > 0)) continue;
+    const acc = goalAccumulated(g);
+    const remaining = Math.max(0, g.targetCents - acc);
+    const pace = goalPace115(g);
+    const monthsAtPace = remaining <= 0 ? 0
+      : (pace > 0 ? Math.ceil(remaining / pace) : Infinity);
+    rows.push({
+      g: g, acc: acc, remaining: remaining, pace: pace,
+      monthsAtPace: monthsAtPace,
+      done: remaining <= 0,
+      behind: remaining > 0 && (pace <= 0 || monthsAtPace > 24),
+    });
+  }
+  return rows;
+}
+function goalCopilotFacts115(rows) {
+  const lines = [];
+  let inc3 = 0, exp3 = 0;
+  for (let k = 0; k < 3; k++) {
+    const mk = monthKeyShift(currentMonthKey(), -k);
+    inc3 += sumCents(monthCountedIncomes(mk));
+    exp3 += sumCents(monthCountedExpenses(mk));
+  }
+  const avgInc = Math.round(inc3 / 3);
+  const avgExp = Math.round(exp3 / 3);
+  let fixedM = 0;
+  for (const f of (db.fixed || [])) fixedM += fixedSubsMonthlyCents(f);
+  let debtPay = 0;
+  for (const d of (db.debts || [])) {
+    const info = debtPayoffInfo(d);
+    if (info) debtPay += info.pay;
+  }
+  const free = Math.max(0, avgInc - avgExp - fixedM - debtPay);
+  lines.push('Promedio mensual (últimos 3 meses): ingresos ' + fmt(avgInc) +
+    ', gastos ' + fmt(avgExp) + '.');
+  lines.push('Pagos fijos al mes: ' + fmt(fixedM) +
+    '. Pagos a deudas al mes: ' + fmt(debtPay) + '.');
+  lines.push('Flujo libre aproximado: ' + fmt(free) + ' al mes (~' +
+    fmt(Math.round(free * 12 / 52)) + ' por semana).');
+  lines.push('Metas:');
+  for (const r of rows) {
+    let line = '- ' + r.g.name + ': ahorrado ' + fmt(r.acc) + ' de ' +
+      fmt(r.g.targetCents) + '; faltan ' + fmt(r.remaining) +
+      '; ritmo reciente ' + fmt(r.pace) + '/mes';
+    if (r.done) line += '; META COMPLETA';
+    else if (r.pace <= 0) line += '; sin aportes en los últimos 90 días: VA ATRASADA';
+    else {
+      line += '; a ese ritmo termina en ' + r.monthsAtPace + ' meses';
+      if (r.behind) line += ': VA ATRASADA';
+    }
+    lines.push(line + '.');
+  }
+  return lines.join('\n').slice(0, 4900);
+}
+let goalPilot115Proposal = null;
+async function onGoalPilot115() {
+  if (!requirePro()) return;
+  const st = document.getElementById('goalpilot115-status');
+  const rows = goalCopilotRows115().filter((r) => !r.done);
+  if (!rows.length) { if (st) st.textContent = t('c115_goals_empty'); return; }
+  if (st) st.textContent = t('c115_goals_working');
+  try {
+    const r = await aiFn('goals-copilot', {
+      facts: goalCopilotFacts115(rows),
+      goals: rows.map((x) => x.g.name),
+      lang: lang(),
+    });
+    if (!r || !Array.isArray(r.proposals) || !r.proposals.length) {
+      throw new Error('ai_generic');
+    }
+    const used = new Set();
+    const props = [];
+    for (const p of r.proposals) {
+      const row = rows.find((x) => x.g.name === p.name && !used.has(x.g.id));
+      if (!row || !(p.weeklyCents > 0)) continue;
+      used.add(row.g.id);
+      props.push({ id: row.g.id, name: p.name, weeklyCents: p.weeklyCents, note: p.note || '' });
+    }
+    if (!props.length) throw new Error('ai_generic');
+    const prio = [];
+    for (const n of (r.priority || [])) {
+      const row = rows.find((x) => x.g.name === n);
+      if (row && !prio.includes(row.g.id)) prio.push(row.g.id);
+    }
+    goalPilot115Proposal = { text: r.text || '', proposals: props, priorityIds: prio };
+    if (st) st.textContent = '';
+    renderGoalPilot115();
+  } catch (e) {
+    if (st) st.textContent = aiErrorText(e);
+    aiGatePaywall(e);
+  }
+}
+function renderGoalPilot115() {
+  const box = document.getElementById('goalpilot115-results');
+  const empty = document.getElementById('goalpilot115-empty');
+  const btn = document.getElementById('goalpilot115-btn');
+  if (!box) return;
+  clearNode(box);
+  const rows = goalCopilotRows115().filter((r) => !r.done);
+  if (empty) empty.hidden = rows.length > 0;
+  if (btn) btn.hidden = rows.length === 0;
+  const plan = (db.settings && db.settings.goalPlan115) || null;
+  if (plan && Object.keys(plan).length) {
+    const row = el('div', 'form-actions');
+    row.appendChild(el('span', 'muted small', t('c115_plan_active')));
+    row.appendChild(actionButton(t('c115_plan_clear'), 'btn-ghost', () => {
+      db.settings.goalPlan115 = null;
+      save();
+      renderGoals();
+    }));
+    box.appendChild(row);
+  }
+  const p = goalPilot115Proposal;
+  if (!p) return;
+  box.appendChild(el('h4', null, t('c115_prop_title')));
+  if (p.text) {
+    for (const para of p.text.split('\n')) {
+      const line = para.trim();
+      if (line) box.appendChild(el('p', null, line));
+    }
+  }
+  const ul = el('ul', 'c115-props');
+  for (const pr of p.proposals) {
+    const li = document.createElement('li');
+    li.appendChild(el('strong', null, pr.name + ': '));
+    li.appendChild(document.createTextNode(t('c115_prop_weekly', { amount: fmt(pr.weeklyCents) })));
+    if (pr.note) li.appendChild(el('div', 'item-sub', pr.note));
+    ul.appendChild(li);
+  }
+  box.appendChild(ul);
+  if (p.priorityIds && p.priorityIds.length) {
+    const names = p.priorityIds.map((id) => {
+      const g = (db.goals || []).find((x) => x.id === id);
+      return g ? g.name : '';
+    }).filter(Boolean);
+    if (names.length) {
+      box.appendChild(el('p', 'muted small',
+        t('c115_prop_priority', { list: names.join(' → ') })));
+    }
+  }
+  const acts = el('div', 'form-actions');
+  acts.appendChild(actionButton(t('c115_apply_btn'), 'btn-primary', () => {
+    /* Aprobar SOLO anota el plan semanal por meta. Ni un
+       centavo se mueve: savedCents, savings y goals quedan
+       exactamente como estaban. */
+    const newPlan = {};
+    for (const pr of p.proposals) newPlan[pr.id] = pr.weeklyCents;
+    db.settings.goalPlan115 = newPlan;
+    goalPilot115Proposal = null;
+    save();
+    renderGoals();
+    const st = document.getElementById('goalpilot115-status');
+    if (st) st.textContent = t('c115_applied');
+  }));
+  acts.appendChild(actionButton(t('c115_ignore_btn'), 'btn-ghost', () => {
+    goalPilot115Proposal = null;
+    renderGoalPilot115();
+  }));
+  box.appendChild(acts);
+}
+
 /* ---------------- Compilación 98 · Fase F (7) · Entrevista inicial con IA ----
    La configuración inicial por formularios gana su reemplazo
    conversacional: la acción 'onboarding-interview' conversa en
@@ -31716,6 +32222,12 @@ function wireEvents() {
   if (debtAiBtn97) debtAiBtn97.addEventListener('click', onDebtAi97);
   const sanAiBtn97 = document.getElementById('san-ai97-btn');
   if (sanAiBtn97) sanAiBtn97.addEventListener('click', onSanAi97);
+  /* Compilación 115: plan de salida de deudas y copiloto de
+     metas con IA (el negociador se cablea por fila al pintar). */
+  const debtExitBtn115 = document.getElementById('debt-exit115-btn');
+  if (debtExitBtn115) debtExitBtn115.addEventListener('click', onDebtExitAi115);
+  const goalPilotBtn115 = document.getElementById('goalpilot115-btn');
+  if (goalPilotBtn115) goalPilotBtn115.addEventListener('click', onGoalPilot115);
   /* Compilación 98: predicción de flujo con IA y botón de la
      entrevista en la bienvenida. */
   const flowAiBtn98 = document.getElementById('flow-ai98-btn');
