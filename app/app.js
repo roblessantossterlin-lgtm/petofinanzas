@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 112';
-const BUILD_NUM = 112;
+const BUILD_LABEL = 'Compilación 113';
+const BUILD_NUM = 113;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -15225,21 +15225,31 @@ function renderHome() {
   if (availInfoBtn) availInfoBtn.hidden = !availHelp;
   if (!availHelp && availInfoPop) availInfoPop.hidden = true;
   renderNextStep();
-  /* Compilación 108: la tarjeta «Ahorros del mes» enseña SOLO el
-     flujo del mes (monthSavings, lo anotado a mano). La Comp. 51
-     le sumaba en pantalla el SALDO de las cuentas de ahorro del
-     banco: un saldo no es un flujo del mes y la tarjeta contaba
-     como «ahorrado este mes» dinero que podía llevar años en la
-     cuenta. El saldo del banco cuenta donde toca: en el TOTAL de
-     Ahorros, en la meta principal y en el fondo de emergencia
-     (totalSavings108), con su desglose en la vista de Ahorros.
-     La línea «incluye…» de la Comp. 51 queda siempre oculta.
+  /* Compilación 108: la tarjeta «Ahorros del mes» enseñaba SOLO
+     el flujo del mes (monthSavings, lo anotado a mano). La Comp.
+     51 le sumaba en pantalla el SALDO de las cuentas de ahorro
+     del banco: un saldo no es un flujo del mes y la tarjeta
+     contaba como «ahorrado este mes» dinero que podía llevar
+     años en la cuenta. El saldo del banco contaba donde tocaba:
+     en el TOTAL de Ahorros, en la meta principal y en el fondo
+     de emergencia (totalSavings108), con su desglose en la
+     vista de Ahorros. La línea «incluye…» de la Comp. 51 queda
+     siempre oculta.
      Compilación 112: la tarjeta se renombra a «Ahorros e
-     inversiones» (tile_savings, 12 idiomas). El saldo de las
-     cuentas de INVERSIÓN del banco se suma al total combinado
-     (totalSavings108), no a este flujo del mes, igual que el
-     saldo de ahorros desde la 108. */
-  document.getElementById('sum-savings').textContent = fmt(monthSavings(key));
+     inversiones» (tile_savings, 12 idiomas) y el saldo de las
+     cuentas de INVERSIÓN del banco se suma al total combinado.
+     Compilación 113 · «La tarjeta muestra el total» (DECISIÓN
+     EXPRESA de Sterlin, 27-nov-2026): vio su Inicio con la
+     tarjeta renombrada enseñando el flujo del mes ($0.00 en su
+     captura, con dinero real en sus cuentas) y ELIGIÓ que el
+     número grande de la tarjeta enseñe el TOTAL combinado
+     (totalSavings108: manual + ahorros del banco +
+     inversiones), el mismo total que manda en la vista de
+     Ahorros, la meta y el fondo. El flujo del mes NO se toca:
+     monthSavings sigue existiendo y mandando en el «del mes»
+     de la vista de Ahorros; lo que cambia es solo qué número
+     enseña esta tarjeta. */
+  document.getElementById('sum-savings').textContent = fmt(totalSavings108());
   const savBankLine = document.getElementById('sum-savings-bank');
   if (savBankLine) { savBankLine.hidden = true; savBankLine.textContent = ''; }
   document.getElementById('sum-debts').textContent = fmt(pendingDebtsTotal());
@@ -16040,7 +16050,12 @@ function resetSavingsForm() {
    (bankInvestmentsCents), con su línea propia «Inversiones»
    en el desglose; la tarjeta de Inicio se renombra a «Ahorros
    e inversiones». Misma excepción aprobada: solo saldos
-   reales; el manual y el flujo del mes no se tocan. */
+   reales; el manual y el flujo del mes no se tocan.
+   Compilación 113: el número grande de la tarjeta de Inicio
+   enseña ESTE total combinado (decisión expresa de Sterlin,
+   27-nov-2026, tras ver la captura de su Inicio);
+   monthSavings sigue siendo el flujo del mes en la vista de
+   Ahorros. */
 function totalSavings108() {
   return allSavingsTotal() + bankSavingsCents() + bankInvestmentsCents();
 }
