@@ -2041,3 +2041,13 @@ html[data-accent="verde"] .chat-action93{color:#1A1A3E}
 .pair116-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
 .pair116-row input,.pair116-row select{flex:1 1 110px;min-width:0}
 .pair116-over{color:#FF7A6B;font-weight:600}
+/* Compilación 117 · «IA que anticipa»: la fila editable de la
+   propuesta del presupuesto automático, la fila del formulario
+   de fechas especiales y la alarma de mes peligroso. */
+.budauto117-row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.budauto117-row .budauto117-cat{flex:1 1 auto;min-width:0}
+.budauto117-row input{flex:0 1 110px;min-width:0}
+.danger117-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.danger117-row select,.danger117-row input{flex:1 1 90px;min-width:0}
+.danger117-alarm{font-weight:600}
+

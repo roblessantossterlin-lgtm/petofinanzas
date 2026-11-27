@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Compilación 116 · «Dinero en equipo» -->
+<!-- Compilación 117 · «IA que anticipa» -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -745,7 +745,73 @@
         <p id="mr-status" class="muted small" aria-live="polite"></p>
       </div>
     </section>
-  </div></div></main>
+  </div></div>
+
+    <!-- Compilación 117 · «IA que anticipa» (1): el simulador
+         «qué pasa si». La proyección de 12 meses es matemática
+         local (promedios reales + motor de deudas); la IA solo
+         la narra (acción what-if-sim, solo Pro). -->
+    <section id="whatif117-card" class="card form-card">
+      <h3 data-i18n="c117_wi_title">🔮 Simulador «qué pasa si»</h3>
+      <p class="muted small" data-i18n="c117_wi_note">Función de PETO Pro. Elige un escenario con tus números reales y la app proyecta tu saldo mes a mes durante 12 meses, con su matemática local. La IA solo te lo cuenta: no inventa cifras.</p>
+      <label for="whatif117-type" data-i18n="c117_wi_type_label">Escenario</label>
+      <select id="whatif117-type">
+        <option value="cat" data-i18n="c117_wi_type_cat">Gastar más o menos en una categoría</option>
+        <option value="income" data-i18n="c117_wi_type_income">Un ingreso extra al mes</option>
+        <option value="debt" data-i18n="c117_wi_type_debt">Un pago extra a una deuda</option>
+      </select>
+      <div id="whatif117-cat-row">
+        <label for="whatif117-cat" data-i18n="category_label">Categoría</label>
+        <select id="whatif117-cat"></select>
+      </div>
+      <div id="whatif117-dir-row">
+        <label for="whatif117-dir" data-i18n="c117_wi_dir_less">Gastar MENOS</label>
+        <select id="whatif117-dir">
+          <option value="less" data-i18n="c117_wi_dir_less">Gastar MENOS</option>
+          <option value="more" data-i18n="c117_wi_dir_more">Gastar MÁS</option>
+        </select>
+      </div>
+      <label for="whatif117-amount" data-i18n="amount_label">Cantidad</label>
+      <input id="whatif117-amount" type="number" min="0" step="1" inputmode="decimal">
+      <div class="form-actions">
+        <button id="whatif117-run" type="button" class="btn btn-secondary" data-i18n="c117_wi_run_btn">Proyectar 12 meses</button>
+        <button id="whatif117-ai-btn" type="button" class="btn btn-secondary" data-i18n="c117_wi_ai_btn">✨ Que la IA me lo explique</button>
+      </div>
+      <p id="whatif117-status" class="muted small" aria-live="polite"></p>
+      <p id="whatif117-empty" class="muted small" data-i18n="c117_wi_empty" hidden>Todavía no hay movimientos suficientes para proyectar: anota tus ingresos y gastos de los últimos meses y vuelve. Sin tus números reales, la app no inventa una proyección.</p>
+      <div id="whatif117-results"></div>
+      <div id="whatif117-ai"></div>
+    </section>
+
+    <!-- Compilación 117 · «IA que anticipa» (3): la alarma de
+         mes peligroso. Detección 100 % local (picos históricos
+         del mismo mes y fechas especiales registradas); la IA
+         solo redacta el aviso (acción danger-month, solo Pro).
+         Sin patrón detectado, no se muestra alarma falsa. -->
+    <section id="danger117-card" class="card form-card">
+      <h3 data-i18n="c117_dg_title">⚠️ Mes peligroso a la vista</h3>
+      <p class="muted small" data-i18n="c117_dg_note">La app vigila tus meses caros con tus datos locales: los picos históricos del mismo mes en años anteriores y las fechas especiales que registres aquí. Si uno llega en 30 días o menos, te avisa con el extra estimado.</p>
+      <ul id="danger117-alarms" class="item-list"></ul>
+      <p id="danger117-state" class="muted small"></p>
+      <div class="form-actions">
+        <button id="danger117-ai-btn" type="button" class="btn btn-secondary" data-i18n="c117_dg_ai_btn" hidden>✨ Que la IA me prepare</button>
+      </div>
+      <p id="danger117-status" class="muted small" aria-live="polite"></p>
+      <div id="danger117-ai"></div>
+      <h4 data-i18n="c117_dg_dates_title">Tus fechas especiales</h4>
+      <p id="danger117-dates-empty" class="muted small" data-i18n="c117_dg_dates_empty">Sin fechas registradas. Agrega cumpleaños, aniversarios o impuestos para vigilarlos cada año.</p>
+      <ul id="danger117-dates" class="item-list"></ul>
+      <form id="danger117-form" autocomplete="off">
+        <input id="danger117-name" type="text" maxlength="60" data-i18n-ph="c117_dg_name_ph" placeholder="Ej.: Cumpleaños de mi hija">
+        <div class="danger117-row">
+          <select id="danger117-month" aria-label="Mes"></select>
+          <input id="danger117-day" type="number" min="1" max="31" step="1" data-i18n-ph="c117_dg_day_ph" placeholder="Día">
+          <input id="danger117-extra" type="number" min="0" step="1" data-i18n-ph="c117_dg_extra_ph" placeholder="Extra $ (opcional)">
+        </div>
+        <button type="submit" class="btn btn-secondary" data-i18n="c117_dg_add_btn">Agregar fecha</button>
+      </form>
+    </section>
+  </main>
 
   <!-- ======= BUSCAR ======= -->
   <main id="view-buscar" class="view" hidden>
@@ -823,6 +889,22 @@
       <p id="bud-ai96-status" class="muted small" aria-live="polite"></p>
       <ul id="bud-ai96-results" class="item-list"></ul>
     </section>
+    <!-- Compilación 117 · «IA que anticipa» (2): el presupuesto
+         automático con IA, extensión de income-detect (Comp. 102).
+         La app agrega ~90 días reales por categoría; la IA
+         propone el presupuesto mensual completo (acción
+         budget-auto, solo Pro); la propuesta se enseña EDITABLE
+         y nada se aplica sin el botón Aplicar. -->
+    <section id="budauto117-card" class="card form-card">
+      <h3 data-i18n="c117_ba_title">🧾 Presupuesto automático con IA</h3>
+      <p class="muted small" data-i18n="c117_ba_note">Función de PETO Pro. La app suma tus últimos ~90 días de gastos reales por categoría y la IA propone tu presupuesto mensual completo. La propuesta es editable y NADA se aplica hasta que toques «Aplicar». Solo propone topes de gasto: nunca anota ahorro por ti.</p>
+      <div class="form-actions">
+        <button id="budauto117-btn" type="button" class="btn btn-secondary" data-i18n="c117_ba_btn">✨ Crear mi presupuesto con IA</button>
+      </div>
+      <p id="budauto117-status" class="muted small" aria-live="polite"></p>
+      <div id="budauto117-results"></div>
+    </section>
+
 
     <!-- Compilación 90 (punto 7): «Categoría personalizada» pasa a
          ser el botón «+ Categoría»; el formulario nace plegado. -->
