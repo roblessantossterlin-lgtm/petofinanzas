@@ -2015,3 +2015,12 @@ html[data-accent="verde"] .chat-action93{color:#1A1A3E}
 /* Podcast: la invitación a Spotify al final de la lista */
 .pod109-more{margin-top:12px;text-align:center}
 .pod109-more p{margin:0 0 8px}
+
+/* Compilación 114: línea de la suscripción y enlaces legales del
+   muro de pago (Guideline 3.1.2(c): título, duración y precio de
+   la suscripción y los enlaces a Términos de uso (EULA) y
+   Política de privacidad, visibles y tocables en el flujo de
+   compra). */
+.pro-sub114{font-weight:600;margin:.2rem 0 0}
+.pro-legal114{margin-top:.9rem;line-height:2}
+.pro-legal114 a{color:var(--accent);text-decoration:underline;padding:.3rem .05rem}

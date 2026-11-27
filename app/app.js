@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 113';
-const BUILD_NUM = 113;
+const BUILD_LABEL = 'Compilación 114';
+const BUILD_NUM = 114;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -1931,6 +1931,7 @@ es: {
   pro_buy_pending: 'Tu pago quedó pendiente de aprobación. PETO Pro se activará en cuanto la tienda lo confirme.',
   pro_restore_none: 'No encontramos una suscripción activa para restaurar.',
   pro_per_month: 'al mes',
+  c114_sub_title: 'PETO Pro mensual', c114_sub_period: 'Suscripción mensual', c114_eula_link: 'Términos de uso (EULA)', c114_privacy_link: 'Política de privacidad',
   pro_tag: 'PRO',
   adv_title: 'Informe avanzado',
   adv_note: 'Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.',
@@ -2692,6 +2693,7 @@ en: {
   pro_buy_pending: 'Your payment is pending approval. PETO Pro will turn on as soon as the store confirms it.',
   pro_restore_none: 'We could not find an active subscription to restore.',
   pro_per_month: 'a month',
+  c114_sub_title: 'PETO Pro Monthly', c114_sub_period: 'Monthly subscription', c114_eula_link: 'Terms of Use (EULA)', c114_privacy_link: 'Privacy Policy',
   pro_tag: 'PRO',
   adv_title: 'Advanced report',
   adv_note: 'A PETO Pro feature: this month vs the previous one, every category and a CSV export of the month.',
@@ -3696,6 +3698,7 @@ it: {
   pro_buy_pending: 'Il tuo pagamento è in attesa di approvazione. PETO Pro si attiverà appena lo store lo confermerà.',
   pro_restore_none: 'Non abbiamo trovato un abbonamento attivo da ripristinare.',
   pro_per_month: 'al mese',
+  c114_sub_title: 'PETO Pro mensile', c114_sub_period: 'Abbonamento mensile', c114_eula_link: 'Termini di utilizzo (EULA)', c114_privacy_link: 'Informativa sulla privacy',
   pro_tag: 'PRO',
   adv_title: 'Resoconto avanzato',
   adv_note: 'Funzione di PETO Pro: questo mese a confronto con il precedente, tutte le categorie ed esportazione del mese in CSV.',
@@ -4699,6 +4702,7 @@ pt: {
   pro_buy_pending: 'Seu pagamento ficou pendente de aprovação. O PETO Pro será ativado assim que a loja confirmar.',
   pro_restore_none: 'Não encontramos uma assinatura ativa para restaurar.',
   pro_per_month: 'por mês',
+  c114_sub_title: 'PETO Pro mensal', c114_sub_period: 'Assinatura mensal', c114_eula_link: 'Termos de Uso (EULA)', c114_privacy_link: 'Política de Privacidade',
   pro_tag: 'PRO',
   adv_title: 'Relatório avançado',
   adv_note: 'Uma função do PETO Pro: este mês vs o anterior, cada categoria e uma exportação CSV do mês.',
@@ -5703,6 +5707,7 @@ fr: {
   pro_buy_pending: 'Ton paiement est en attente d’approbation. PETO Pro s’activera dès que la boutique le confirmera.',
   pro_restore_none: 'Nous n’avons trouvé aucun abonnement actif à restaurer.',
   pro_per_month: 'par mois',
+  c114_sub_title: 'PETO Pro mensuel', c114_sub_period: 'Abonnement mensuel', c114_eula_link: 'Conditions d’utilisation (EULA)', c114_privacy_link: 'Politique de confidentialité',
   pro_tag: 'PRO',
   adv_title: 'Rapport avancé',
   adv_note: 'Une fonction PETO Pro : ce mois-ci contre le mois précédent, chaque catégorie et un export CSV du mois.',
@@ -6707,6 +6712,7 @@ de: {
   pro_buy_pending: 'Deine Zahlung wartet auf Genehmigung. PETO Pro wird aktiviert, sobald der Store sie bestätigt.',
   pro_restore_none: 'Wir konnten kein aktives Abo zum Wiederherstellen finden.',
   pro_per_month: 'pro Monat',
+  c114_sub_title: 'PETO Pro monatlich', c114_sub_period: 'Monatsabo', c114_eula_link: 'Nutzungsbedingungen (EULA)', c114_privacy_link: 'Datenschutzrichtlinie',
   pro_tag: 'PRO',
   adv_title: 'Erweiterter Bericht',
   adv_note: 'Eine PETO-Pro-Funktion: dieser Monat gegen den vorigen, jede Kategorie und ein CSV-Export des Monats.',
@@ -7711,6 +7717,7 @@ zh: {
   pro_buy_pending: '你的付款正在等待批准。商店确认后，PETO Pro 将自动启用。',
   pro_restore_none: '未找到可恢复的有效订阅。',
   pro_per_month: '每月',
+  c114_sub_title: 'PETO Pro 月度版', c114_sub_period: '每月订阅', c114_eula_link: '使用条款 (EULA)', c114_privacy_link: '隐私政策',
   pro_tag: 'PRO',
   adv_title: '高级报告',
   adv_note: '这是 PETO Pro 功能：本月与上月对比、每个类别，以及本月的 CSV 导出。',
@@ -8715,6 +8722,7 @@ ja: {
   pro_buy_pending: '支払いは承認待ちです。ストアが確認するとPETO Proが有効になります。',
   pro_restore_none: '復元できる有効な購読が見つかりませんでした。',
   pro_per_month: '月額',
+  c114_sub_title: 'PETO Pro 月額プラン', c114_sub_period: '月額サブスクリプション', c114_eula_link: '利用規約 (EULA)', c114_privacy_link: 'プライバシーポリシー',
   pro_tag: 'PRO',
   adv_title: '高度なレポート',
   adv_note: 'PETO Proの機能です。今月と先月の比較、すべてのカテゴリ、月のCSVエクスポート。',
@@ -9719,6 +9727,7 @@ ko: {
   pro_buy_pending: '결제가 승인 대기 중입니다. 스토어가 확인하면 PETO Pro가 켜집니다.',
   pro_restore_none: '복원할 활성 구독을 찾을 수 없습니다.',
   pro_per_month: '월',
+  c114_sub_title: 'PETO Pro 월간', c114_sub_period: '월간 구독', c114_eula_link: '이용 약관 (EULA)', c114_privacy_link: '개인정보 처리방침',
   pro_tag: 'PRO',
   adv_title: '고급 보고서',
   adv_note: 'PETO Pro 기능입니다. 이번 달과 지난달 비교, 모든 카테고리, 그리고 월의 CSV 내보내기.',
@@ -10723,6 +10732,7 @@ ru: {
   pro_buy_pending: 'Ваш платёж ожидает одобрения. PETO Pro включится, как только магазин его подтвердит.',
   pro_restore_none: 'Мы не нашли активную подписку для восстановления.',
   pro_per_month: 'в месяц',
+  c114_sub_title: 'PETO Pro на месяц', c114_sub_period: 'Ежемесячная подписка', c114_eula_link: 'Условия использования (EULA)', c114_privacy_link: 'Политика конфиденциальности',
   pro_tag: 'PRO',
   adv_title: 'Расширенный отчёт',
   adv_note: 'Функция PETO Pro: этот месяц против предыдущего, каждая категория и экспорт месяца в CSV.',
@@ -11727,6 +11737,7 @@ hi: {
   pro_buy_pending: 'आपका भुगतान मंज़ूरी के इंतज़ार में है। स्टोर की पुष्टि होते ही PETO Pro चालू हो जाएगा।',
   pro_restore_none: 'बहाल करने के लिए कोई सक्रिय सदस्यता नहीं मिली।',
   pro_per_month: 'प्रति माह',
+  c114_sub_title: 'PETO Pro मासिक', c114_sub_period: 'मासिक सदस्यता', c114_eula_link: 'उपयोग की शर्तें (EULA)', c114_privacy_link: 'गोपनीयता नीति',
   pro_tag: 'PRO',
   adv_title: 'उन्नत रिपोर्ट',
   adv_note: 'यह PETO Pro की सुविधा है: यह माह बनाम पिछला माह, हर श्रेणी और माह का CSV निर्यात।',
@@ -12731,6 +12742,7 @@ ar: {
   pro_buy_pending: 'دفعتك بانتظار الموافقة. سيُفعَّل PETO Pro بمجرد تأكيد المتجر.',
   pro_restore_none: 'لم نجد اشتراكًا نشطًا لاستعادته.',
   pro_per_month: 'شهريًا',
+  c114_sub_title: 'PETO Pro الشهري', c114_sub_period: 'اشتراك شهري', c114_eula_link: 'شروط الاستخدام (EULA)', c114_privacy_link: 'سياسة الخصوصية',
   pro_tag: 'PRO',
   adv_title: 'التقرير المتقدّم',
   adv_note: 'ميزة من PETO Pro: هذا الشهر مقابل السابق، كل فئة وتصدير CSV للشهر.',
@@ -20550,6 +20562,10 @@ const PUB_SITE_URL = 'https://petofinanzas.com/';
    En la web es el mismo dominio, así que la URL absoluta vale para
    teléfono y web por igual. */
 const PRIVACY_URL = 'https://petofinanzas.com/privacidad/';
+/* Compilación 114 (Guideline 3.1.2(c) de Apple): los Términos de
+   Uso (EULA) estándar de Apple, enlazados desde el propio muro de
+   pago junto a la política de privacidad (PRIVACY_URL). */
+const EULA_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 function sanPublicLinkEl(label, href, className) {
   const a = el('a', className, label);
   a.href = href;
@@ -29601,6 +29617,12 @@ function renderProPaywall() {
      todos los puntos de entrada (muro, tarjeta de Ajustes,
      tarjeta y barra de Inicio): precio, prueba y sincronización
      en una sola frase. Sin cambiar precio ni condiciones. */
+  /* Compilación 114 (Guideline 3.1.2(c) de Apple): la línea de
+     la suscripción con su TÍTULO y su DURACIÓN, siempre visible
+     en el muro junto al precio (la línea de arriba) y la prueba
+     (los términos de la caja de compra), en el idioma de la app. */
+  const sub114 = document.getElementById('pro-sub114');
+  if (sub114) sub114.textContent = t('c114_sub_title') + ' · ' + t('c114_sub_period');
   const uni105 = document.getElementById('pro-unified105');
   if (uni105) uni105.textContent = t('c105_pro_line');
   const ul = document.getElementById('pro-benefits');
@@ -31832,6 +31854,14 @@ function wireEvents() {
   document.getElementById('pro-waitlist-btn').addEventListener('click', onProWaitlist);
   document.getElementById('pro-buy-btn').addEventListener('click', onProBuy);
   document.getElementById('pro-restore-btn').addEventListener('click', onProRestore);
+  /* Compilación 114: los enlaces legales del muro de pago abren
+     su destino con window.open (en el teléfono, el navegador del
+     sistema), igual que el botón de la política en Ajustes. El
+     href real queda en el HTML: el enlace es funcional tal cual. */
+  const eula114 = document.getElementById('pro-eula114');
+  if (eula114) eula114.addEventListener('click', (ev) => { ev.preventDefault(); window.open(EULA_URL, '_blank'); });
+  const privacy114 = document.getElementById('pro-privacy114');
+  if (privacy114) privacy114.addEventListener('click', (ev) => { ev.preventDefault(); window.open(PRIVACY_URL, '_blank'); });
   document.getElementById('pro-paywall').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) hideProPaywall(); });
   document.getElementById('btn-org-pro').addEventListener('click', showProPaywall);
   document.getElementById('btn-adv-open').addEventListener('click', onAdvOpen);
