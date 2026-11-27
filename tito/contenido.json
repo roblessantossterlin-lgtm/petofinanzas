@@ -1,7 +1,7 @@
 {
   "app": "tito-el-zorrito",
   "version": 1,
-  "actualizado": "2026-11-26",
+  "actualizado": "2026-11-27",
   "items": [
     {
       "id": "dibujo-2026-11-19-pez",
@@ -128,6 +128,20 @@
       "titulo": "La canción de dormir temprano",
       "archivo": "assets/cancion-2026-11-26-dormir.mp3",
       "fecha": "2026-11-26"
+    },
+    {
+      "id": "dibujo-2026-11-27-granja",
+      "tipo": "dibujo",
+      "titulo": "Tito y la granja",
+      "archivo": "assets/dibujo-2026-11-27-granja.png",
+      "fecha": "2026-11-27"
+    },
+    {
+      "id": "cancion-2026-11-27-perdon",
+      "tipo": "cancion",
+      "titulo": "La canción de pedir perdón",
+      "archivo": "assets/cancion-2026-11-27-perdon.mp3",
+      "fecha": "2026-11-27"
     }
   ]
 }
