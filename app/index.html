@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Compilación 117 · «IA que anticipa» -->
+<!-- Compilación 118 · «Motivación y viajes» -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -383,6 +383,33 @@
     <div class="form-actions">
       <button id="gastos-new105" class="btn btn-primary" type="button" data-i18n="c105_new_btn">+ Nuevo</button>
     </div>
+    <!-- Compilación 118 · Modo viaje (#17) -->
+    <section id="trips118-card" class="card form-card">
+      <h3 data-i18n="c118_tr_title">✈️ Modo viaje</h3>
+      <p class="muted small" data-i18n="c118_tr_note">Función de PETO Pro. Cada viaje lleva su presupuesto aparte: al registrar un gasto, márcalo con su viaje y se acumula contra ese presupuesto. Los gastos del viaje cuentan en tu mes como cualquier gasto (el dinero salió igual): el viaje es una lupa sobre ellos, no una copia.</p>
+      <div id="trips118-locked" class="pro-lock118">
+        <p class="muted small">🔒 PETO Pro</p>
+        <div class="form-actions">
+          <button id="trip118-pro" type="button" class="btn btn-secondary" data-i18n="c118_pro_btn">Ver PETO Pro</button>
+        </div>
+      </div>
+      <form id="trips118-form" autocomplete="off" hidden>
+        <label for="trip118-name" data-i18n="c118_tr_name_label">Nombre del viaje</label>
+        <input id="trip118-name" type="text" maxlength="60" data-i18n-ph="c118_tr_name_ph" placeholder="Ej.: Santo Domingo">
+        <label for="trip118-start" data-i18n="c118_tr_start_label">Desde</label>
+        <input id="trip118-start" type="date">
+        <label for="trip118-end" data-i18n="c118_tr_end_label">Hasta</label>
+        <input id="trip118-end" type="date">
+        <label for="trip118-budget" data-i18n="c118_tr_budget_label">Presupuesto del viaje ($)</label>
+        <input id="trip118-budget" type="text" inputmode="decimal" placeholder="0.00">
+        <p id="trip118-error" class="form-error" role="alert"></p>
+        <div class="form-actions">
+          <button id="trip118-create" type="button" class="btn btn-primary" data-i18n="c118_tr_create_btn">Crear viaje</button>
+        </div>
+      </form>
+      <div id="trips118-list"></div>
+    </section>
+
     <div id="exp-uncat89" class="exp-uncat89" hidden></div>
     <!-- Compilación 99 · P18: aviso de posible cargo duplicado. -->
     <div id="exp-dup99" class="exp-dup99" hidden></div>
@@ -417,6 +444,8 @@
       <select id="exp-category" required></select>
       <label for="exp-source" data-i18n="src_exp_label">¿De dónde salió?</label>
       <select id="exp-source"></select>
+      <label for="exp-trip118" data-i18n="c118_tr_form_label">Viaje (opcional)</label>
+      <select id="exp-trip118"></select>
       <label for="exp-date" data-i18n="date_label">Fecha</label>
       <input id="exp-date" type="date" required>
       <label class="toggle-row">
@@ -606,6 +635,34 @@
       </div>
       <p id="goalpilot115-status" class="muted small" aria-live="polite"></p>
       <div id="goalpilot115-results"></div>
+    </section>
+
+    <!-- Compilación 118 · Desafíos de ahorro (#16) -->
+    <section id="challenges118-card" class="card form-card">
+      <h3 data-i18n="c118_ch_title">🏆 Desafíos de ahorro</h3>
+      <p class="muted small" data-i18n="c118_ch_note">Función de PETO Pro. Retos con fecha: guarda una cantidad en 7 o 30 días, o pasa 7 días sin gasto hormiga. El progreso sale SOLO de los ahorros que tú anotas: el reto nunca crea ahorro por sí solo. Si no se cumple, se cierra sin castigo.</p>
+      <div id="challenges118-locked" class="pro-lock118">
+        <p class="muted small">🔒 PETO Pro</p>
+        <div class="form-actions">
+          <button id="chal118-pro" type="button" class="btn btn-secondary" data-i18n="c118_pro_btn">Ver PETO Pro</button>
+        </div>
+      </div>
+      <form id="challenges118-form" autocomplete="off" hidden>
+        <label for="chal118-type" data-i18n="c118_ch_type_label">Tipo de reto</label>
+        <select id="chal118-type">
+          <option value="save7" data-i18n="c118_ch_type_save7">Guardar una cantidad en 7 días</option>
+          <option value="save30" data-i18n="c118_ch_type_save30">Guardar una cantidad en 30 días</option>
+          <option value="noants" data-i18n="c118_ch_type_noants">7 días sin gasto hormiga</option>
+        </select>
+        <label for="chal118-target" data-i18n="c118_ch_target_label">Cantidad a guardar ($)</label>
+        <input id="chal118-target" type="text" inputmode="decimal" placeholder="0.00">
+        <p id="chal118-error" class="form-error" role="alert"></p>
+        <div class="form-actions">
+          <button id="chal118-start" type="button" class="btn btn-primary" data-i18n="c118_ch_start_btn">Empezar reto</button>
+        </div>
+      </form>
+      <div id="challenges118-list"></div>
+      <div id="challenges118-history"></div>
     </section>
 
     <section class="card form-card">

@@ -2050,4 +2050,15 @@ html[data-accent="verde"] .chat-action93{color:#1A1A3E}
 .danger117-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
 .danger117-row select,.danger117-row input{flex:1 1 90px;min-width:0}
 .danger117-alarm{font-weight:600}
+/* Compilación 118 · «Motivación y viajes» */
+.pro-lock118{margin-top:10px}
+.chal118-active,.trip118-card{border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:12px;background:var(--surface)}
+.chal118-head,.trip118-head{font-weight:700}
+.chal118-streak{font-weight:600;color:var(--accent)}
+.chal118-days,.chal118-note,.trip118-dates,.trip118-perday{color:var(--muted)}
+.chal118-row{border-top:1px solid var(--border);padding:8px 0}
+.chal118-hist-title{margin-top:16px}
+.trip118-over{color:var(--danger);font-weight:600}
+.exp-trip89{color:var(--accent);font-weight:600}
+
 

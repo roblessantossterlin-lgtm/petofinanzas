@@ -36,8 +36,8 @@ applyPlatformClass();
 
 /* ---------------- Constantes ---------------- */
 const DB_KEY = 'cgastos.db.v1';
-const BUILD_LABEL = 'Compilación 117';
-const BUILD_NUM = 117;
+const BUILD_LABEL = 'Compilación 118';
+const BUILD_NUM = 118;
 /* Compilación 58 (informe de testers, día 6): la etiqueta visible se
    lee en el idioma activo — en inglés el pie ya no termina en la
    palabra española «Compilación». BUILD_LABEL queda como forma
@@ -383,6 +383,8 @@ function defaultData() {
     savings: [],
     savingsGoal: null,
     goals: [],
+ challenges118: [],
+ trips118: [],
     remittances: [],
     alertsSent: {},
     san: null,
@@ -1095,6 +1097,7 @@ function validateData(raw) {
     origCents: (typeof x.origCents === 'number' && Number.isFinite(x.origCents)) ? cleanCents(x.origCents, false) : cleanCents(x.amountCents, false),
     rate116: (typeof x.rate116 === 'number' && Number.isFinite(x.rate116) && x.rate116 > 0) ? Math.round(x.rate116 * 100) / 100 : null,
     roundUpCents: cleanCents(x.roundUpCents, false),
+    tripId118: cleanText(x.tripId118, 64) || null,
     /* El autor SOLO existe en los movimientos del libro
        compartido del hogar (householdAddMovement lo estampa);
        el saneado lo conserva para que la pareja vea quién
@@ -1294,6 +1297,46 @@ function validateData(raw) {
     savedCents: cleanCents(x.savedCents, false),
     icon: cleanGoalIcon(x.icon), photo: cleanGoalPhoto(x.photo)
   }));
+  /* Compilación 118: los desafíos y los viajes se sanean como
+     todo lo demás — fechas válidas, centavos enteros, textos
+     con tope; un viaje con fechas imposibles se descarta. */
+  d.challenges118 = [];
+  if (Array.isArray(raw.challenges118)) {
+    for (const c of raw.challenges118) {
+      if (!c || typeof c !== 'object') continue;
+      const type118 = c.type === 'noants' ? 'noants' : 'save';
+      const days118 = type118 === 'noants' ? 7 : (c.days === 30 ? 30 : 7);
+      const start118 = cleanDate(c.startDate);
+      if (!start118) continue;
+      d.challenges118.push({
+        id: cleanId(c.id),
+        type: type118,
+        days: days118,
+        targetCents: cleanCents(c.targetCents, false),
+        startDate: start118,
+        endDate: cleanDate(c.endDate) || addDaysStr(start118, days118 - 1),
+        status: c.status === 'dropped' ? 'dropped' : 'active',
+      });
+    }
+  }
+  d.trips118 = [];
+  if (Array.isArray(raw.trips118)) {
+    for (const tr of raw.trips118) {
+      if (!tr || typeof tr !== 'object') continue;
+      const tStart118 = cleanDate(tr.startDate);
+      const tEnd118 = cleanDate(tr.endDate);
+      if (!tStart118 || !tEnd118 || tEnd118 < tStart118) continue;
+      d.trips118.push({
+        id: cleanId(tr.id),
+        name: cleanText(tr.name, 60),
+        startDate: tStart118,
+        endDate: tEnd118,
+        budgetCents: cleanCents(tr.budgetCents, false),
+        closed: tr.closed === true,
+        closedDate: cleanDate(tr.closedDate),
+      });
+    }
+  }
   d.remittances = arr(raw.remittances).filter((x) => x && typeof x === 'object').map((x) => ({
     id: cleanId(x.id), date: cleanDate(x.date),
     usdCents: cleanCents(x.usdCents, false),
@@ -1317,6 +1360,10 @@ function validateData(raw) {
      no se pierde, solo la etiqueta de redondeo). */
   const expenseIds116 = new Set(d.expenses.map((e) => e.id));
   for (const s of d.savings) if (s.roundUpOf && !expenseIds116.has(s.roundUpOf)) s.roundUpOf = null;
+  /* Compilación 118: un gasto cuyo viaje ya no existe pierde
+     la marca (el gasto se queda, como siempre). */
+  const tripIds118 = new Set(d.trips118.map((tr) => tr.id));
+  for (const e of d.expenses) if (e.tripId118 && !tripIds118.has(e.tripId118)) e.tripId118 = null;
   for (const i of d.incomes) if (i.goalId && !goalIds.has(i.goalId)) i.goalId = null;
   /* Compilación 41: un movimiento enlazado a una cuenta que ya no
      existe queda sin enlazar (deja de mover saldos), nunca se pierde
@@ -2043,6 +2090,58 @@ es: {
   c115_goals_title: '🧭 Copiloto de metas con IA', c115_goals_note: 'La IA mira tu flujo real y tus metas, y te propone cuánto guardar por semana en cada una y en qué orden. Es solo una propuesta: nada se mueve ni se guarda sin que la apruebes.', c115_goals_btn: '✨ Revisar mis metas', c115_goals_working: 'Revisando tu flujo y tus metas…', c115_goals_empty: 'Crea primero una meta: el copiloto trabaja con tus metas reales.', c115_goals_none: 'La IA no trajo propuesta esta vez. Tus metas quedan como están.', c115_prop_title: 'La propuesta del copiloto', c115_prop_weekly: '{amount} por semana', c115_prop_priority: 'Orden sugerido: {list}', c115_apply_btn: 'Aplicar este plan', c115_ignore_btn: 'Ignorar', c115_applied: 'Plan aplicado: quedó anotado en tus metas. No se movió dinero.', c115_plan_line: 'Plan del copiloto: {amount}/semana', c115_plan_clear: 'Quitar el plan del copiloto', c115_plan_active: 'Plan semanal del copiloto activo',
     c116_group_title: 'Dinero en equipo', c116_round_label: 'Redondeo que ahorra', c116_round_help: 'Solo Pro. Con esto encendido, cada gasto se redondea al dólar siguiente y la diferencia se anota como ahorro tuyo, a la vista, en Ahorros → «Redondeos». Es dinero real de tu propio gasto, que tú activas y ves centavo a centavo: el porcentaje sugerido nunca crea ahorro. Apágalo cuando quieras.', c116_fx_label: 'Tasa USD/RD$ (pesos por 1 dólar)', c116_fx_help: 'La tasa con la que la app pasa los montos en pesos dominicanos (RD$) a dólares en tus totales. Es la tasa que tú dejas guardada aquí; no es una tasa en vivo. Valor inicial: 60.00.', c116_roundups_label: 'Redondeos', c116_roundup_title: 'Redondeo', c116_roundup_line: 'Redondeo: +{amount} a Ahorros', c116_roundup_sub: 'Del gasto del {date}', c116_fx_equiv: '≈ {amount} en dólares', c116_cur_label: 'Moneda', c116_cur_usd: 'USD · Dólares ($)', c116_cur_dop: 'RD$ · Pesos dominicanos', c116_acc_currency_label: 'Moneda de la cuenta', c116_pair_title: '👫 Modo pareja', c116_pair_note: 'El espacio de la pareja dentro de tu hogar: los dos ven y anotan los gastos e ingresos compartidos del mes y comparten un presupuesto mensual. Lo personal de cada cuenta (sus gastos propios, cuentas y metas) no se comparte.', c116_pair_locked: 'El Modo pareja es de PETO Pro: actívalo para anotar y ver el dinero compartido.', c116_pair_pro_btn: 'Ver PETO Pro', c116_pair_loading: 'Cargando el libro compartido…', c116_pair_month_inc: 'Ingresos compartidos del mes', c116_pair_month_exp: 'Gastos compartidos del mes', c116_pair_balance: 'Balance compartido del mes', c116_pair_budget_label: 'Presupuesto mensual compartido', c116_pair_budget_none: 'Sin presupuesto fijado todavía.', c116_pair_budget_of: '{spent} gastados de {limit}', c116_pair_budget_over: 'Se pasaron del presupuesto por {amount}.', c116_pair_budget_set: 'Fijar', c116_pair_budget_clear: 'Quitar', c116_pair_add_title: 'Anotar en pareja', c116_pair_kind_exp: 'Gasto', c116_pair_kind_inc: 'Ingreso', c116_pair_add_btn: 'Anotar', c116_pair_list_title: 'Movimientos compartidos de este mes', c116_pair_empty: 'Todavía no hay movimientos compartidos este mes.', c116_pair_by: 'por {name}', c116_pair_del_confirm: '¿Borrar este movimiento compartido de {amount}? Lo verán los dos.',
     c117_wi_title: '🔮 Simulador «qué pasa si»', c117_wi_note: 'Función de PETO Pro. Elige un escenario con tus números reales y la app proyecta tu saldo mes a mes durante 12 meses, con su matemática local. La IA solo te lo cuenta: no inventa cifras.', c117_wi_type_label: 'Escenario', c117_wi_type_cat: 'Gastar más o menos en una categoría', c117_wi_type_income: 'Un ingreso extra al mes', c117_wi_type_debt: 'Un pago extra a una deuda', c117_wi_dir_more: 'Gastar MÁS', c117_wi_dir_less: 'Gastar MENOS', c117_wi_more_word: 'más', c117_wi_less_word: 'menos', c117_wi_run_btn: 'Proyectar 12 meses', c117_wi_empty: 'Todavía no hay movimientos suficientes para proyectar: anota tus ingresos y gastos de los últimos meses y vuelve. Sin tus números reales, la app no inventa una proyección.', c117_wi_nodebt: 'No tienes deudas pendientes anotadas: este escenario necesita al menos una deuda en la sección Deudas.', c117_wi_base_line: 'Tu promedio real de 3 meses: entra {inc} y sale {exp} al mes. Saldo inicial: {start}.', c117_wi_row: '{month}: {with} con el cambio · {without} sin el cambio', c117_wi_end_line: 'A los 12 meses: {with} con el cambio contra {without} sin el cambio (diferencia: {diff}).', c117_wi_debt_line: 'Deudas: con el pago extra sales en {whenNew} ({monthsNew}); con el pago actual, en {whenBase} ({monthsBase}). Interés ahorrado: {saved}.', c117_wi_debt_blocked: 'Con el pago actual el saldo de la deuda no baja; con el pago extra sí: sales en {when} ({months}).', c117_wi_scen_cat: 'Escenario: gastar {amount} {word} al mes en {cat}.', c117_wi_scen_income: 'Escenario: un ingreso extra de {amount} al mes.', c117_wi_scen_debt: 'Escenario: un pago extra de {amount} al mes a tus deudas.', c117_wi_ai_btn: '✨ Que la IA me lo explique', c117_wi_working: 'La IA está leyendo tu proyección…', c117_wi_none: 'La IA no devolvió explicación esta vez. Tu proyección sigue arriba, intacta.', c117_wi_bad_amount: 'Escribe una cantidad válida, mayor que cero.', c117_ba_title: '🧾 Presupuesto automático con IA', c117_ba_note: 'Función de PETO Pro. La app suma tus últimos ~90 días de gastos reales por categoría y la IA propone tu presupuesto mensual completo. La propuesta es editable y NADA se aplica hasta que toques «Aplicar». Solo propone topes de gasto: nunca anota ahorro por ti.', c117_ba_btn: '✨ Crear mi presupuesto con IA', c117_ba_working: 'La IA está armando tu presupuesto con tus gastos reales…', c117_ba_empty: 'Todavía no hay historial suficiente: hacen falta gastos anotados en al menos 2 meses distintos (unas 8 salidas en ~90 días). Sigue registrando y vuelve.', c117_ba_none: 'La IA no devolvió propuesta esta vez. Tus topes actuales no se tocaron.', c117_ba_prop_title: 'Tu propuesta — edítala antes de aplicar', c117_ba_avg_line: 'Promedio real: {amount}/mes', c117_ba_current_line: 'Tope actual: {amount}/mes', c117_ba_total_line: 'Suma de los topes propuestos: {amount} al mes.', c117_ba_apply_btn: 'Aplicar presupuesto', c117_ba_ignore_btn: 'Ignorar', c117_ba_applied: 'Presupuesto aplicado: tus topes quedaron como la propuesta.', c117_dg_title: '⚠️ Mes peligroso a la vista', c117_dg_note: 'La app vigila tus meses caros con tus datos locales: los picos históricos del mismo mes en años anteriores y las fechas especiales que registres aquí. Si uno llega en 30 días o menos, te avisa con el extra estimado.', c117_dg_none: 'Sin patrones detectados todavía: cuando un mismo mes se repita caro en tu historial, la app lo vigilará sola.', c117_dg_ok: 'Nada peligroso en los próximos 30 días.', c117_dg_alarm_hist: '🔔 {month} llega en {days} días: ese mes sueles gastar {extra} EXTRA.', c117_dg_alarm_date: '🔔 {name} llega en {days} días ({date}).', c117_dg_extra_line: 'Extra estimado: {amount}.', c117_dg_detected: 'Meses caros detectados: {months}.', c117_dg_ai_btn: '✨ Que la IA me prepare', c117_dg_working: 'La IA está redactando tu aviso…', c117_dg_ai_none: 'La IA no devolvió aviso esta vez. La alarma sigue arriba.', c117_dg_dates_title: 'Tus fechas especiales', c117_dg_dates_empty: 'Sin fechas registradas. Agrega cumpleaños, aniversarios o impuestos para vigilarlos cada año.', c117_dg_name_ph: 'Ej.: Cumpleaños de mi hija', c117_dg_day_ph: 'Día', c117_dg_extra_ph: 'Extra $ (opcional)', c117_dg_add_btn: 'Agregar fecha',
+    c118_ch_title: '🏆 Desafíos de ahorro',
+    c118_ch_note: 'Función de PETO Pro. Retos con fecha: guarda una cantidad en 7 o 30 días, o pasa 7 días sin gasto hormiga. El progreso sale SOLO de los ahorros que tú anotas: el reto nunca crea ahorro por sí solo. Si no se cumple, se cierra sin castigo.',
+    c118_ch_type_label: 'Tipo de reto',
+    c118_ch_type_save7: 'Guardar una cantidad en 7 días',
+    c118_ch_type_save30: 'Guardar una cantidad en 30 días',
+    c118_ch_type_noants: '7 días sin gasto hormiga',
+    c118_ch_target_label: 'Cantidad a guardar ($)',
+    c118_ch_start_btn: 'Empezar reto',
+    c118_ch_active_save: 'Reto activo: guarda {target} en {days} días',
+    c118_ch_active_noants: 'Reto activo: {days} días sin gasto hormiga',
+    c118_ch_progress: 'Llevas {have} de {target}',
+    c118_ch_days_line: 'Día {n} de {total} · quedan {left} días',
+    c118_ch_streak: '🔥 Racha: {n} días en el reto',
+    c118_ch_noants_ok: 'Vas limpio: {n} días sin gasto hormiga',
+    c118_ch_noants_def: 'Gasto hormiga = un gasto de {amount} o menos.',
+    c118_ch_done: '🏅 ¡Reto cumplido!',
+    c118_ch_failed: 'No se cumplió esta vez. Sin castigo: cuando quieras, otro reto.',
+    c118_ch_dropped: 'Reto abandonado.',
+    c118_ch_abandon_btn: 'Abandonar reto',
+    c118_ch_abandon_confirm: '¿Abandonar este reto? Se cierra sin castigo y queda en tu historial.',
+    c118_ch_history_title: 'Tus retos anteriores',
+    c118_ch_history_empty: 'Todavía no terminaste ningún reto.',
+    c118_ch_bad_target: 'Escribe la cantidad del reto, mayor que cero.',
+    c118_ch_name_save: 'Guardar {target} en {days} días',
+    c118_ch_name_noants: '7 días sin gasto hormiga',
+    c118_tr_title: '✈️ Modo viaje',
+    c118_tr_note: 'Función de PETO Pro. Cada viaje lleva su presupuesto aparte: al registrar un gasto, márcalo con su viaje y se acumula contra ese presupuesto. Los gastos del viaje cuentan en tu mes como cualquier gasto (el dinero salió igual): el viaje es una lupa sobre ellos, no una copia.',
+    c118_tr_name_label: 'Nombre del viaje',
+    c118_tr_name_ph: 'Ej.: Santo Domingo',
+    c118_tr_start_label: 'Desde',
+    c118_tr_end_label: 'Hasta',
+    c118_tr_budget_label: 'Presupuesto del viaje ($)',
+    c118_tr_create_btn: 'Crear viaje',
+    c118_tr_empty: 'Sin viajes todavía. Crea el primero y marca sus gastos al registrarlos.',
+    c118_tr_spent_line: '{spent} de {budget}',
+    c118_tr_over: '⚠️ Te pasaste por {amount}.',
+    c118_tr_perday: 'Promedio: {amount} por día',
+    c118_tr_close_btn: 'Cerrar viaje',
+    c118_tr_close_confirm: '¿Cerrar «{name}»? Queda guardado su resumen final; sus gastos no se tocan.',
+    c118_tr_closed: 'Cerrado',
+    c118_tr_open: 'En curso',
+    c118_tr_final: 'Resumen final: {spent} de {budget} en {days} días · {perday} por día.',
+    c118_tr_delete_btn: 'Borrar',
+    c118_tr_delete_confirm: '¿Borrar el viaje «{name}»? Sus gastos NO se borran: solo pierden la marca del viaje.',
+    c118_tr_form_label: 'Viaje (opcional)',
+    c118_tr_none: 'Sin viaje',
+    c118_tr_bad: 'Revisa el viaje: nombre, fechas (el fin no puede ser antes del inicio) y un presupuesto mayor que cero.',
+    c118_pro_btn: 'Ver PETO Pro',
+    c118_share_btn: '📤 Compartir logro',
+    c118_card_goal_head: '¡Meta cumplida!',
+    c118_card_chal_head: '¡Reto cumplido!',
+    c118_card_saved: 'Ahorrado',
   pro_tag: 'PRO',
   adv_title: 'Informe avanzado',
   adv_note: 'Función de PETO Pro: este mes contra el anterior, todas las categorías y exportar el mes en CSV.',
@@ -2810,6 +2909,58 @@ en: {
   c115_goals_title: '🧭 Goals copilot with AI', c115_goals_note: 'The AI looks at your real cash flow and your goals, and proposes how much to save each week toward each one and in what order. It is only a proposal: nothing moves or gets saved unless you approve it.', c115_goals_btn: '✨ Review my goals', c115_goals_working: 'Reviewing your flow and your goals…', c115_goals_empty: 'Create a goal first: the copilot works with your real goals.', c115_goals_none: 'The AI brought no proposal this time. Your goals stay as they are.', c115_prop_title: 'The copilot proposal', c115_prop_weekly: '{amount} per week', c115_prop_priority: 'Suggested order: {list}', c115_apply_btn: 'Apply this plan', c115_ignore_btn: 'Ignore', c115_applied: 'Plan applied: it is noted on your goals. No money was moved.', c115_plan_line: 'Copilot plan: {amount}/week', c115_plan_clear: 'Remove the copilot plan', c115_plan_active: 'Copilot weekly plan active',
     c116_group_title: 'Money as a team', c116_round_label: 'Round-up savings', c116_round_help: 'Pro only. With this on, every expense rounds up to the next dollar and the difference is recorded as your savings, in plain sight, under Savings → “Round-ups”. It is real money from your own expense, switched on by you and visible cent by cent: the suggested percentage never creates savings. Turn it off anytime.', c116_fx_label: 'USD/DOP rate (pesos per 1 dollar)', c116_fx_help: 'The rate the app uses to convert Dominican peso (DOP) amounts into dollars in your totals. It is the rate you save here; it is not a live rate. Starting value: 60.00.', c116_roundups_label: 'Round-ups', c116_roundup_title: 'Round-up', c116_roundup_line: 'Round-up: +{amount} to Savings', c116_roundup_sub: 'From the {date} expense', c116_fx_equiv: '≈ {amount} in dollars', c116_cur_label: 'Currency', c116_cur_usd: 'USD · Dollars ($)', c116_cur_dop: 'DOP · Dominican pesos', c116_acc_currency_label: 'Account currency', c116_pair_title: '👫 Couple mode', c116_pair_note: 'The couple space inside your household: both of you see and record this month’s shared expenses and income and share a monthly budget. Each account’s personal data (own expenses, accounts and goals) is not shared.', c116_pair_locked: 'Couple mode is a PETO Pro feature: turn it on to record and see the shared money.', c116_pair_pro_btn: 'See PETO Pro', c116_pair_loading: 'Loading the shared book…', c116_pair_month_inc: 'Shared income this month', c116_pair_month_exp: 'Shared expenses this month', c116_pair_balance: 'Shared balance this month', c116_pair_budget_label: 'Shared monthly budget', c116_pair_budget_none: 'No budget set yet.', c116_pair_budget_of: '{spent} spent of {limit}', c116_pair_budget_over: 'You went over the budget by {amount}.', c116_pair_budget_set: 'Set', c116_pair_budget_clear: 'Clear', c116_pair_add_title: 'Add together', c116_pair_kind_exp: 'Expense', c116_pair_kind_inc: 'Income', c116_pair_add_btn: 'Add', c116_pair_list_title: 'Shared movements this month', c116_pair_empty: 'No shared movements yet this month.', c116_pair_by: 'by {name}', c116_pair_del_confirm: 'Delete this shared movement of {amount}? Both of you will see it.',
     c117_wi_title: '🔮 What-if simulator', c117_wi_note: 'A PETO Pro feature. Pick a scenario with your real numbers and the app projects your balance month by month for 12 months, with its local math. The AI only narrates it: it never makes up figures.', c117_wi_type_label: 'Scenario', c117_wi_type_cat: 'Spend more or less in a category', c117_wi_type_income: 'Extra income each month', c117_wi_type_debt: 'An extra payment toward a debt', c117_wi_dir_more: 'Spend MORE', c117_wi_dir_less: 'Spend LESS', c117_wi_more_word: 'more', c117_wi_less_word: 'less', c117_wi_run_btn: 'Project 12 months', c117_wi_empty: 'There are not enough movements yet to project: record your income and expenses from the last few months and come back. Without your real numbers, the app will not invent a projection.', c117_wi_nodebt: 'You have no pending debts recorded: this scenario needs at least one debt in the Debts section.', c117_wi_base_line: 'Your real 3-month average: {inc} comes in and {exp} goes out each month. Starting balance: {start}.', c117_wi_row: '{month}: {with} with the change · {without} without it', c117_wi_end_line: 'At 12 months: {with} with the change vs. {without} without it (difference: {diff}).', c117_wi_debt_line: 'Debts: with the extra payment you are debt-free in {whenNew} ({monthsNew}); with your current payment, in {whenBase} ({monthsBase}). Interest saved: {saved}.', c117_wi_debt_blocked: 'With your current payment the debt balance never goes down; with the extra payment it does: you are out in {when} ({months}).', c117_wi_scen_cat: 'Scenario: spend {amount} {word} per month on {cat}.', c117_wi_scen_income: 'Scenario: extra income of {amount} per month.', c117_wi_scen_debt: 'Scenario: an extra payment of {amount} per month toward your debts.', c117_wi_ai_btn: '✨ Have the AI explain it', c117_wi_working: 'The AI is reading your projection…', c117_wi_none: 'The AI returned no explanation this time. Your projection above is untouched.', c117_wi_bad_amount: 'Enter a valid amount, greater than zero.', c117_ba_title: '🧾 Automatic budget with AI', c117_ba_note: 'A PETO Pro feature. The app adds up your last ~90 days of real spending by category and the AI proposes your complete monthly budget. The proposal is editable and NOTHING is applied until you tap “Apply”. It only proposes spending caps: it never records savings for you.', c117_ba_btn: '✨ Build my budget with AI', c117_ba_working: 'The AI is building your budget from your real spending…', c117_ba_empty: 'There is not enough history yet: spending needs to be recorded in at least 2 different months (about 8 outflows in ~90 days). Keep recording and come back.', c117_ba_none: 'The AI returned no proposal this time. Your current caps were not touched.', c117_ba_prop_title: 'Your proposal — edit it before applying', c117_ba_avg_line: 'Real average: {amount}/month', c117_ba_current_line: 'Current cap: {amount}/month', c117_ba_total_line: 'Total of the proposed caps: {amount} per month.', c117_ba_apply_btn: 'Apply budget', c117_ba_ignore_btn: 'Ignore', c117_ba_applied: 'Budget applied: your caps are now the proposal.', c117_dg_title: '⚠️ Expensive month ahead', c117_dg_note: 'The app watches your expensive months with your local data: historical spending peaks of the same month in past years and the special dates you register here. If one is 30 days away or less, it warns you with the estimated extra.', c117_dg_none: 'No patterns detected yet: when the same month turns out expensive in your history, the app will watch it on its own.', c117_dg_ok: 'Nothing dangerous in the next 30 days.', c117_dg_alarm_hist: '🔔 {month} arrives in {days} days: that month you usually spend {extra} EXTRA.', c117_dg_alarm_date: '🔔 {name} arrives in {days} days ({date}).', c117_dg_extra_line: 'Estimated extra: {amount}.', c117_dg_detected: 'Expensive months detected: {months}.', c117_dg_ai_btn: '✨ Have the AI prepare me', c117_dg_working: 'The AI is writing your heads-up…', c117_dg_ai_none: 'The AI returned no message this time. The alarm above still stands.', c117_dg_dates_title: 'Your special dates', c117_dg_dates_empty: 'No dates registered. Add birthdays, anniversaries or taxes to watch them every year.', c117_dg_name_ph: 'E.g.: My daughter’s birthday', c117_dg_day_ph: 'Day', c117_dg_extra_ph: 'Extra $ (optional)', c117_dg_add_btn: 'Add date',
+    c118_ch_title: '🏆 Savings challenges',
+    c118_ch_note: 'A PETO Pro feature. Dated challenges: save an amount in 7 or 30 days, or go 7 days with no small-change spending. Progress comes ONLY from the savings you record yourself: the challenge never creates savings on its own. If it is not met, it closes with no penalty.',
+    c118_ch_type_label: 'Challenge type',
+    c118_ch_type_save7: 'Save an amount in 7 days',
+    c118_ch_type_save30: 'Save an amount in 30 days',
+    c118_ch_type_noants: '7 days with no small-change spending',
+    c118_ch_target_label: 'Amount to save ($)',
+    c118_ch_start_btn: 'Start challenge',
+    c118_ch_active_save: 'Active challenge: save {target} in {days} days',
+    c118_ch_active_noants: 'Active challenge: {days} days with no small-change spending',
+    c118_ch_progress: 'You have {have} of {target}',
+    c118_ch_days_line: 'Day {n} of {total} · {left} days left',
+    c118_ch_streak: '🔥 Streak: {n} days in the challenge',
+    c118_ch_noants_ok: 'Still clean: {n} days with no small-change spending',
+    c118_ch_noants_def: 'Small-change spending = an expense of {amount} or less.',
+    c118_ch_done: '🏅 Challenge completed!',
+    c118_ch_failed: 'Not this time. No penalty: start another whenever you want.',
+    c118_ch_dropped: 'Challenge dropped.',
+    c118_ch_abandon_btn: 'Drop challenge',
+    c118_ch_abandon_confirm: 'Drop this challenge? It closes with no penalty and stays in your history.',
+    c118_ch_history_title: 'Your past challenges',
+    c118_ch_history_empty: 'You have not finished any challenge yet.',
+    c118_ch_bad_target: 'Enter the challenge amount, greater than zero.',
+    c118_ch_name_save: 'Save {target} in {days} days',
+    c118_ch_name_noants: '7 days with no small-change spending',
+    c118_tr_title: '✈️ Travel mode',
+    c118_tr_note: 'A PETO Pro feature. Each trip keeps its own separate budget: when you record an expense, tag it with its trip and it adds up against that budget. Trip expenses count in your month like any other expense (the money left just the same): the trip is a lens over them, not a copy.',
+    c118_tr_name_label: 'Trip name',
+    c118_tr_name_ph: 'E.g.: Santo Domingo',
+    c118_tr_start_label: 'From',
+    c118_tr_end_label: 'To',
+    c118_tr_budget_label: 'Trip budget ($)',
+    c118_tr_create_btn: 'Create trip',
+    c118_tr_empty: 'No trips yet. Create the first one and tag its expenses as you record them.',
+    c118_tr_spent_line: '{spent} of {budget}',
+    c118_tr_over: '⚠️ You went over by {amount}.',
+    c118_tr_perday: 'Average: {amount} per day',
+    c118_tr_close_btn: 'Close trip',
+    c118_tr_close_confirm: 'Close “{name}”? Its final summary is kept; its expenses are not touched.',
+    c118_tr_closed: 'Closed',
+    c118_tr_open: 'Underway',
+    c118_tr_final: 'Final summary: {spent} of {budget} in {days} days · {perday} per day.',
+    c118_tr_delete_btn: 'Delete',
+    c118_tr_delete_confirm: 'Delete the trip “{name}”? Its expenses are NOT deleted: they only lose the trip tag.',
+    c118_tr_form_label: 'Trip (optional)',
+    c118_tr_none: 'No trip',
+    c118_tr_bad: 'Check the trip: a name, dates (the end cannot be before the start) and a budget greater than zero.',
+    c118_pro_btn: 'See PETO Pro',
+    c118_share_btn: '📤 Share achievement',
+    c118_card_goal_head: 'Goal reached!',
+    c118_card_chal_head: 'Challenge completed!',
+    c118_card_saved: 'Saved',
   pro_tag: 'PRO',
   adv_title: 'Advanced report',
   adv_note: 'A PETO Pro feature: this month vs the previous one, every category and a CSV export of the month.',
@@ -3820,6 +3971,58 @@ it: {
   c115_goals_title: '🧭 Copilota degli obiettivi con l’IA', c115_goals_note: 'L’IA guarda il tuo flusso reale e i tuoi obiettivi, e ti propone quanto mettere da parte ogni settimana per ciascuno e in che ordine. È solo una proposta: nulla si muove né si risparmia senza la tua approvazione.', c115_goals_btn: '✨ Rivedi i miei obiettivi', c115_goals_working: 'Sto rivedendo flusso e obiettivi…', c115_goals_empty: 'Prima crea un obiettivo: il copilota lavora con i tuoi obiettivi reali.', c115_goals_none: 'L’IA non ha portato una proposta questa volta. I tuoi obiettivi restano come sono.', c115_prop_title: 'La proposta del copilota', c115_prop_weekly: '{amount} a settimana', c115_prop_priority: 'Ordine suggerito: {list}', c115_apply_btn: 'Applica questo piano', c115_ignore_btn: 'Ignora', c115_applied: 'Piano applicato: è annotato sui tuoi obiettivi. Non è stato mosso denaro.', c115_plan_line: 'Piano del copilota: {amount}/settimana', c115_plan_clear: 'Togli il piano del copilota', c115_plan_active: 'Piano settimanale del copilota attivo',
     c116_group_title: 'Denaro in squadra', c116_round_label: 'Arrotondamento che fa risparmiare', c116_round_help: 'Solo Pro. Con questa opzione attiva, ogni spesa viene arrotondata al dollaro successivo e la differenza viene registrata come tuo risparmio, in bella vista, in Risparmi → «Arrotondamenti». È denaro reale della tua spesa, attivato da te e visibile centesimo per centesimo: la percentuale suggerita non crea mai risparmio. Disattivala quando vuoi.', c116_fx_label: 'Tasso USD/DOP (pesos per 1 dollaro)', c116_fx_help: 'Il tasso con cui l’app converte gli importi in pesos dominicani (DOP) in dollari nei tuoi totali. È il tasso che salvi qui; non è un tasso in tempo reale. Valore iniziale: 60.00.', c116_roundups_label: 'Arrotondamenti', c116_roundup_title: 'Arrotondamento', c116_roundup_line: 'Arrotondamento: +{amount} ai Risparmi', c116_roundup_sub: 'Dalla spesa del {date}', c116_fx_equiv: '≈ {amount} in dollari', c116_cur_label: 'Valuta', c116_cur_usd: 'USD · Dollari ($)', c116_cur_dop: 'DOP · Pesos dominicani', c116_acc_currency_label: 'Valuta del conto', c116_pair_title: '👫 Modalità coppia', c116_pair_note: 'Lo spazio della coppia dentro la tua casa: entrambi vedete e registrate le spese e le entrate condivise del mese e condividete un budget mensile. I dati personali di ciascun account (spese proprie, conti e obiettivi) non vengono condivisi.', c116_pair_locked: 'La modalità coppia è di PETO Pro: attivala per registrare e vedere il denaro condiviso.', c116_pair_pro_btn: 'Vedi PETO Pro', c116_pair_loading: 'Caricamento del libro condiviso…', c116_pair_month_inc: 'Entrate condivise del mese', c116_pair_month_exp: 'Spese condivise del mese', c116_pair_balance: 'Saldo condiviso del mese', c116_pair_budget_label: 'Budget mensile condiviso', c116_pair_budget_none: 'Nessun budget impostato.', c116_pair_budget_of: '{spent} spesi di {limit}', c116_pair_budget_over: 'Avete superato il budget di {amount}.', c116_pair_budget_set: 'Imposta', c116_pair_budget_clear: 'Rimuovi', c116_pair_add_title: 'Registra in coppia', c116_pair_kind_exp: 'Spesa', c116_pair_kind_inc: 'Entrata', c116_pair_add_btn: 'Registra', c116_pair_list_title: 'Movimenti condivisi di questo mese', c116_pair_empty: 'Nessun movimento condiviso questo mese.', c116_pair_by: 'di {name}', c116_pair_del_confirm: 'Eliminare questo movimento condiviso di {amount}? Lo vedrete entrambi.',
     c117_wi_title: '🔮 Simulatore «e se…»', c117_wi_note: 'Funzione di PETO Pro. Scegli uno scenario con i tuoi numeri reali e l’app proietta il tuo saldo mese per mese per 12 mesi, con la sua matematica locale. L’IA te lo racconta soltanto: non inventa cifre.', c117_wi_type_label: 'Scenario', c117_wi_type_cat: 'Spendere di più o di meno in una categoria', c117_wi_type_income: 'Un’entrata extra al mese', c117_wi_type_debt: 'Un pagamento extra su un debito', c117_wi_dir_more: 'Spendere DI PIÙ', c117_wi_dir_less: 'Spendere DI MENO', c117_wi_more_word: 'in più', c117_wi_less_word: 'in meno', c117_wi_run_btn: 'Proietta 12 mesi', c117_wi_empty: 'Non ci sono ancora movimenti sufficienti per proiettare: registra entrate e spese degli ultimi mesi e torna. Senza i tuoi numeri reali, l’app non inventa una proiezione.', c117_wi_nodebt: 'Non hai debiti in sospeso registrati: questo scenario richiede almeno un debito nella sezione Debiti.', c117_wi_base_line: 'La tua media reale di 3 mesi: entrano {inc} ed escono {exp} al mese. Saldo iniziale: {start}.', c117_wi_row: '{month}: {with} con la modifica · {without} senza', c117_wi_end_line: 'A 12 mesi: {with} con la modifica contro {without} senza (differenza: {diff}).', c117_wi_debt_line: 'Debiti: con il pagamento extra sei libero in {whenNew} ({monthsNew}); con il pagamento attuale, in {whenBase} ({monthsBase}). Interessi risparmiati: {saved}.', c117_wi_debt_blocked: 'Con il pagamento attuale il saldo del debito non scende; con quello extra sì: sei fuori in {when} ({months}).', c117_wi_scen_cat: 'Scenario: spendere {amount} {word} al mese in {cat}.', c117_wi_scen_income: 'Scenario: un’entrata extra di {amount} al mese.', c117_wi_scen_debt: 'Scenario: un pagamento extra di {amount} al mese sui tuoi debiti.', c117_wi_ai_btn: '✨ Fattelo spiegare dall’IA', c117_wi_working: 'L’IA sta leggendo la tua proiezione…', c117_wi_none: 'L’IA non ha restituito spiegazioni questa volta. La tua proiezione sopra è intatta.', c117_wi_bad_amount: 'Scrivi un importo valido, maggiore di zero.', c117_ba_title: '🧾 Bilancio automatico con IA', c117_ba_note: 'Funzione di PETO Pro. L’app somma le tue spese reali degli ultimi ~90 giorni per categoria e l’IA propone il tuo bilancio mensile completo. La proposta è modificabile e NULLA viene applicato finché non tocchi «Applica». Propone solo tetti di spesa: non registra mai risparmi per te.', c117_ba_btn: '✨ Crea il mio bilancio con l’IA', c117_ba_working: 'L’IA sta creando il tuo bilancio dalle tue spese reali…', c117_ba_empty: 'Non c’è ancora storico sufficiente: servono spese registrate in almeno 2 mesi diversi (circa 8 uscite in ~90 giorni). Continua a registrare e torna.', c117_ba_none: 'L’IA non ha restituito proposte questa volta. I tuoi tetti attuali non sono stati toccati.', c117_ba_prop_title: 'La tua proposta — modificala prima di applicare', c117_ba_avg_line: 'Media reale: {amount}/mese', c117_ba_current_line: 'Tetto attuale: {amount}/mese', c117_ba_total_line: 'Somma dei tetti proposti: {amount} al mese.', c117_ba_apply_btn: 'Applica bilancio', c117_ba_ignore_btn: 'Ignora', c117_ba_applied: 'Bilancio applicato: i tuoi tetti ora sono la proposta.', c117_dg_title: '⚠️ Mese costoso in arrivo', c117_dg_note: 'L’app controlla i tuoi mesi costosi con i tuoi dati locali: i picchi storici dello stesso mese negli anni passati e le date speciali che registri qui. Se uno arriva entro 30 giorni, ti avvisa con l’extra stimato.', c117_dg_none: 'Nessun schema rilevato ancora: quando lo stesso mese risulterà costoso nel tuo storico, l’app lo controllerà da sola.', c117_dg_ok: 'Niente di pericoloso nei prossimi 30 giorni.', c117_dg_alarm_hist: '🔔 {month} arriva tra {days} giorni: quel mese di solito spendi {extra} EXTRA.', c117_dg_alarm_date: '🔔 {name} arriva tra {days} giorni ({date}).', c117_dg_extra_line: 'Extra stimato: {amount}.', c117_dg_detected: 'Mesi costosi rilevati: {months}.', c117_dg_ai_btn: '✨ Fatti preparare dall’IA', c117_dg_working: 'L’IA sta scrivendo il tuo avviso…', c117_dg_ai_none: 'L’IA non ha restituito avvisi questa volta. L’allarme sopra resta.', c117_dg_dates_title: 'Le tue date speciali', c117_dg_dates_empty: 'Nessuna data registrata. Aggiungi compleanni, anniversari o tasse per controllarli ogni anno.', c117_dg_name_ph: 'Es.: Compleanno di mia figlia', c117_dg_day_ph: 'Giorno', c117_dg_extra_ph: 'Extra $ (facoltativo)', c117_dg_add_btn: 'Aggiungi data',
+    c118_ch_title: '🏆 Sfide di risparmio',
+    c118_ch_note: 'Funzione di PETO Pro. Sfide con data: risparmia una somma in 7 o 30 giorni, o passa 7 giorni senza spese formica. L’avanzamento viene SOLO dai risparmi che registri tu: la sfida non crea mai risparmi da sola. Se non si completa, si chiude senza penalità.',
+    c118_ch_type_label: 'Tipo di sfida',
+    c118_ch_type_save7: 'Risparmiare una somma in 7 giorni',
+    c118_ch_type_save30: 'Risparmiare una somma in 30 giorni',
+    c118_ch_type_noants: '7 giorni senza spese formica',
+    c118_ch_target_label: 'Somma da risparmiare ($)',
+    c118_ch_start_btn: 'Inizia la sfida',
+    c118_ch_active_save: 'Sfida attiva: risparmia {target} in {days} giorni',
+    c118_ch_active_noants: 'Sfida attiva: {days} giorni senza spese formica',
+    c118_ch_progress: 'Hai {have} di {target}',
+    c118_ch_days_line: 'Giorno {n} di {total} · mancano {left} giorni',
+    c118_ch_streak: '🔥 Serie: {n} giorni nella sfida',
+    c118_ch_noants_ok: 'Ancora pulito: {n} giorni senza spese formica',
+    c118_ch_noants_def: 'Spesa formica = una spesa di {amount} o meno.',
+    c118_ch_done: '🏅 Sfida completata!',
+    c118_ch_failed: 'Non questa volta. Nessuna penalità: iniziane un’altra quando vuoi.',
+    c118_ch_dropped: 'Sfida abbandonata.',
+    c118_ch_abandon_btn: 'Abbandona la sfida',
+    c118_ch_abandon_confirm: 'Abbandonare questa sfida? Si chiude senza penalità e resta nel tuo storico.',
+    c118_ch_history_title: 'Le tue sfide passate',
+    c118_ch_history_empty: 'Non hai ancora finito nessuna sfida.',
+    c118_ch_bad_target: 'Scrivi la somma della sfida, maggiore di zero.',
+    c118_ch_name_save: 'Risparmiare {target} in {days} giorni',
+    c118_ch_name_noants: '7 giorni senza spese formica',
+    c118_tr_title: '✈️ Modalità viaggio',
+    c118_tr_note: 'Funzione di PETO Pro. Ogni viaggio ha il suo bilancio a parte: quando registri una spesa, marcala con il suo viaggio e si accumula contro quel bilancio. Le spese del viaggio contano nel tuo mese come qualsiasi spesa (i soldi sono usciti uguale): il viaggio è una lente su di esse, non una copia.',
+    c118_tr_name_label: 'Nome del viaggio',
+    c118_tr_name_ph: 'Es.: Santo Domingo',
+    c118_tr_start_label: 'Dal',
+    c118_tr_end_label: 'Al',
+    c118_tr_budget_label: 'Bilancio del viaggio ($)',
+    c118_tr_create_btn: 'Crea viaggio',
+    c118_tr_empty: 'Nessun viaggio ancora. Crea il primo e marca le sue spese quando le registri.',
+    c118_tr_spent_line: '{spent} di {budget}',
+    c118_tr_over: '⚠️ Hai superato di {amount}.',
+    c118_tr_perday: 'Media: {amount} al giorno',
+    c118_tr_close_btn: 'Chiudi viaggio',
+    c118_tr_close_confirm: 'Chiudere «{name}»? Il suo riepilogo finale resta salvato; le sue spese non si toccano.',
+    c118_tr_closed: 'Chiuso',
+    c118_tr_open: 'In corso',
+    c118_tr_final: 'Riepilogo finale: {spent} di {budget} in {days} giorni · {perday} al giorno.',
+    c118_tr_delete_btn: 'Elimina',
+    c118_tr_delete_confirm: 'Eliminare il viaggio «{name}»? Le sue spese NON si eliminano: perdono solo la marca del viaggio.',
+    c118_tr_form_label: 'Viaggio (facoltativo)',
+    c118_tr_none: 'Nessun viaggio',
+    c118_tr_bad: 'Controlla il viaggio: un nome, le date (la fine non può essere prima dell’inizio) e un bilancio maggiore di zero.',
+    c118_pro_btn: 'Vedi PETO Pro',
+    c118_share_btn: '📤 Condividi il traguardo',
+    c118_card_goal_head: 'Obiettivo raggiunto!',
+    c118_card_chal_head: 'Sfida completata!',
+    c118_card_saved: 'Risparmiato',
   pro_tag: 'PRO',
   adv_title: 'Resoconto avanzato',
   adv_note: 'Funzione di PETO Pro: questo mese a confronto con il precedente, tutte le categorie ed esportazione del mese in CSV.',
@@ -4829,6 +5032,58 @@ pt: {
   c115_goals_title: '🧭 Copiloto de metas com IA', c115_goals_note: 'A IA olha seu fluxo real e suas metas, e propõe quanto guardar por semana em cada uma e em que ordem. É só uma proposta: nada se move nem se guarda sem a sua aprovação.', c115_goals_btn: '✨ Revisar minhas metas', c115_goals_working: 'Revisando seu fluxo e suas metas…', c115_goals_empty: 'Crie primeiro uma meta: o copiloto trabalha com suas metas reais.', c115_goals_none: 'A IA não trouxe proposta desta vez. Suas metas ficam como estão.', c115_prop_title: 'A proposta do copiloto', c115_prop_weekly: '{amount} por semana', c115_prop_priority: 'Ordem sugerida: {list}', c115_apply_btn: 'Aplicar este plano', c115_ignore_btn: 'Ignorar', c115_applied: 'Plano aplicado: ficou anotado nas suas metas. Nenhum dinheiro foi movido.', c115_plan_line: 'Plano do copiloto: {amount}/semana', c115_plan_clear: 'Remover o plano do copiloto', c115_plan_active: 'Plano semanal do copiloto ativo',
     c116_group_title: 'Dinheiro em equipe', c116_round_label: 'Arredondamento que poupa', c116_round_help: 'Somente Pro. Com isso ligado, cada gasto é arredondado para o dólar seguinte e a diferença é registrada como sua poupança, à vista, em Poupança → «Arredondamentos». É dinheiro real do seu próprio gasto, ativado por você e visível centavo a centavo: a porcentagem sugerida nunca cria poupança. Desligue quando quiser.', c116_fx_label: 'Taxa USD/DOP (pesos por 1 dólar)', c116_fx_help: 'A taxa com que o app converte os valores em pesos dominicanos (DOP) para dólares nos seus totais. É a taxa que você salva aqui; não é uma taxa ao vivo. Valor inicial: 60.00.', c116_roundups_label: 'Arredondamentos', c116_roundup_title: 'Arredondamento', c116_roundup_line: 'Arredondamento: +{amount} para a Poupança', c116_roundup_sub: 'Do gasto de {date}', c116_fx_equiv: '≈ {amount} em dólares', c116_cur_label: 'Moeda', c116_cur_usd: 'USD · Dólares ($)', c116_cur_dop: 'DOP · Pesos dominicanos', c116_acc_currency_label: 'Moeda da conta', c116_pair_title: '👫 Modo casal', c116_pair_note: 'O espaço do casal dentro da sua casa: os dois veem e registram os gastos e receitas compartilhados do mês e dividem um orçamento mensal. Os dados pessoais de cada conta (gastos próprios, contas e metas) não são compartilhados.', c116_pair_locked: 'O Modo casal é do PETO Pro: ative para registrar e ver o dinheiro compartilhado.', c116_pair_pro_btn: 'Ver o PETO Pro', c116_pair_loading: 'Carregando o livro compartilhado…', c116_pair_month_inc: 'Receitas compartilhadas do mês', c116_pair_month_exp: 'Gastos compartilhados do mês', c116_pair_balance: 'Saldo compartilhado do mês', c116_pair_budget_label: 'Orçamento mensal compartilhado', c116_pair_budget_none: 'Nenhum orçamento definido ainda.', c116_pair_budget_of: '{spent} gastos de {limit}', c116_pair_budget_over: 'Vocês passaram do orçamento em {amount}.', c116_pair_budget_set: 'Definir', c116_pair_budget_clear: 'Remover', c116_pair_add_title: 'Registrar em casal', c116_pair_kind_exp: 'Gasto', c116_pair_kind_inc: 'Receita', c116_pair_add_btn: 'Registrar', c116_pair_list_title: 'Movimentos compartilhados deste mês', c116_pair_empty: 'Ainda não há movimentos compartilhados neste mês.', c116_pair_by: 'por {name}', c116_pair_del_confirm: 'Excluir este movimento compartilhado de {amount}? Os dois verão.',
     c117_wi_title: '🔮 Simulador «e se…»', c117_wi_note: 'Função do PETO Pro. Escolha um cenário com os seus números reais e o app projeta o seu saldo mês a mês durante 12 meses, com a matemática local dele. A IA só conta para você: não inventa valores.', c117_wi_type_label: 'Cenário', c117_wi_type_cat: 'Gastar mais ou menos numa categoria', c117_wi_type_income: 'Uma renda extra por mês', c117_wi_type_debt: 'Um pagamento extra numa dívida', c117_wi_dir_more: 'Gastar MAIS', c117_wi_dir_less: 'Gastar MENOS', c117_wi_more_word: 'a mais', c117_wi_less_word: 'a menos', c117_wi_run_btn: 'Projetar 12 meses', c117_wi_empty: 'Ainda não há movimentos suficientes para projetar: registre suas rendas e gastos dos últimos meses e volte. Sem os seus números reais, o app não inventa uma projeção.', c117_wi_nodebt: 'Você não tem dívidas pendentes registradas: este cenário precisa de pelo menos uma dívida na seção Dívidas.', c117_wi_base_line: 'Sua média real de 3 meses: entram {inc} e saem {exp} por mês. Saldo inicial: {start}.', c117_wi_row: '{month}: {with} com a mudança · {without} sem ela', c117_wi_end_line: 'Aos 12 meses: {with} com a mudança contra {without} sem ela (diferença: {diff}).', c117_wi_debt_line: 'Dívidas: com o pagamento extra você sai em {whenNew} ({monthsNew}); com o pagamento atual, em {whenBase} ({monthsBase}). Juros economizados: {saved}.', c117_wi_debt_blocked: 'Com o pagamento atual o saldo da dívida não cai; com o extra, sim: você sai em {when} ({months}).', c117_wi_scen_cat: 'Cenário: gastar {amount} {word} por mês em {cat}.', c117_wi_scen_income: 'Cenário: uma renda extra de {amount} por mês.', c117_wi_scen_debt: 'Cenário: um pagamento extra de {amount} por mês nas suas dívidas.', c117_wi_ai_btn: '✨ Que a IA me explique', c117_wi_working: 'A IA está lendo a sua projeção…', c117_wi_none: 'A IA não devolveu explicação desta vez. A sua projeção continua acima, intacta.', c117_wi_bad_amount: 'Escreva um valor válido, maior que zero.', c117_ba_title: '🧾 Orçamento automático com IA', c117_ba_note: 'Função do PETO Pro. O app soma os seus gastos reais dos últimos ~90 dias por categoria e a IA propõe o seu orçamento mensal completo. A proposta é editável e NADA é aplicado até você tocar em «Aplicar». Só propõe tetos de gasto: nunca registra poupança por você.', c117_ba_btn: '✨ Criar meu orçamento com IA', c117_ba_working: 'A IA está montando o seu orçamento com os seus gastos reais…', c117_ba_empty: 'Ainda não há histórico suficiente: são precisos gastos registrados em pelo menos 2 meses diferentes (umas 8 saídas em ~90 dias). Continue registrando e volte.', c117_ba_none: 'A IA não devolveu proposta desta vez. Os seus tetos atuais não foram tocados.', c117_ba_prop_title: 'Sua proposta — edite antes de aplicar', c117_ba_avg_line: 'Média real: {amount}/mês', c117_ba_current_line: 'Teto atual: {amount}/mês', c117_ba_total_line: 'Soma dos tetos propostos: {amount} por mês.', c117_ba_apply_btn: 'Aplicar orçamento', c117_ba_ignore_btn: 'Ignorar', c117_ba_applied: 'Orçamento aplicado: os seus tetos ficaram como a proposta.', c117_dg_title: '⚠️ Mês perigoso à vista', c117_dg_note: 'O app vigia os seus meses caros com os seus dados locais: os picos históricos do mesmo mês em anos anteriores e as datas especiais que você registrar aqui. Se um chegar em 30 dias ou menos, avisa com o extra estimado.', c117_dg_none: 'Nenhum padrão detectado ainda: quando o mesmo mês se repetir caro no seu histórico, o app o vigiará sozinho.', c117_dg_ok: 'Nada perigoso nos próximos 30 dias.', c117_dg_alarm_hist: '🔔 {month} chega em {days} dias: nesse mês você costuma gastar {extra} EXTRA.', c117_dg_alarm_date: '🔔 {name} chega em {days} dias ({date}).', c117_dg_extra_line: 'Extra estimado: {amount}.', c117_dg_detected: 'Meses caros detectados: {months}.', c117_dg_ai_btn: '✨ Que a IA me prepare', c117_dg_working: 'A IA está escrevendo o seu aviso…', c117_dg_ai_none: 'A IA não devolveu aviso desta vez. O alarme continua acima.', c117_dg_dates_title: 'Suas datas especiais', c117_dg_dates_empty: 'Sem datas registradas. Adicione aniversários, datas comemorativas ou impostos para vigiá-los todo ano.', c117_dg_name_ph: 'Ex.: Aniversário da minha filha', c117_dg_day_ph: 'Dia', c117_dg_extra_ph: 'Extra $ (opcional)', c117_dg_add_btn: 'Adicionar data',
+    c118_ch_title: '🏆 Desafios de poupança',
+    c118_ch_note: 'Função do PETO Pro. Desafios com data: guarde um valor em 7 ou 30 dias, ou passe 7 dias sem gasto formiga. O progresso vem SÓ da poupança que você mesmo registra: o desafio nunca cria poupança sozinho. Se não cumprir, fecha sem punição.',
+    c118_ch_type_label: 'Tipo de desafio',
+    c118_ch_type_save7: 'Guardar um valor em 7 dias',
+    c118_ch_type_save30: 'Guardar um valor em 30 dias',
+    c118_ch_type_noants: '7 dias sem gasto formiga',
+    c118_ch_target_label: 'Valor a guardar ($)',
+    c118_ch_start_btn: 'Começar desafio',
+    c118_ch_active_save: 'Desafio ativo: guarde {target} em {days} dias',
+    c118_ch_active_noants: 'Desafio ativo: {days} dias sem gasto formiga',
+    c118_ch_progress: 'Você tem {have} de {target}',
+    c118_ch_days_line: 'Dia {n} de {total} · faltam {left} dias',
+    c118_ch_streak: '🔥 Sequência: {n} dias no desafio',
+    c118_ch_noants_ok: 'Segue limpo: {n} dias sem gasto formiga',
+    c118_ch_noants_def: 'Gasto formiga = um gasto de {amount} ou menos.',
+    c118_ch_done: '🏅 Desafio cumprido!',
+    c118_ch_failed: 'Não foi desta vez. Sem punição: comece outro quando quiser.',
+    c118_ch_dropped: 'Desafio abandonado.',
+    c118_ch_abandon_btn: 'Abandonar desafio',
+    c118_ch_abandon_confirm: 'Abandonar este desafio? Ele fecha sem punição e fica no seu histórico.',
+    c118_ch_history_title: 'Seus desafios anteriores',
+    c118_ch_history_empty: 'Você ainda não terminou nenhum desafio.',
+    c118_ch_bad_target: 'Escreva o valor do desafio, maior que zero.',
+    c118_ch_name_save: 'Guardar {target} em {days} dias',
+    c118_ch_name_noants: '7 dias sem gasto formiga',
+    c118_tr_title: '✈️ Modo viagem',
+    c118_tr_note: 'Função do PETO Pro. Cada viagem tem seu orçamento separado: ao registrar um gasto, marque-o com a sua viagem e ele se acumula contra esse orçamento. Os gastos da viagem contam no seu mês como qualquer gasto (o dinheiro saiu igual): a viagem é uma lupa sobre eles, não uma cópia.',
+    c118_tr_name_label: 'Nome da viagem',
+    c118_tr_name_ph: 'Ex.: Santo Domingo',
+    c118_tr_start_label: 'De',
+    c118_tr_end_label: 'Até',
+    c118_tr_budget_label: 'Orçamento da viagem ($)',
+    c118_tr_create_btn: 'Criar viagem',
+    c118_tr_empty: 'Nenhuma viagem ainda. Crie a primeira e marque os gastos dela ao registrá-los.',
+    c118_tr_spent_line: '{spent} de {budget}',
+    c118_tr_over: '⚠️ Você passou {amount} do orçamento.',
+    c118_tr_perday: 'Média: {amount} por dia',
+    c118_tr_close_btn: 'Fechar viagem',
+    c118_tr_close_confirm: 'Fechar «{name}»? O resumo final fica guardado; os gastos não são tocados.',
+    c118_tr_closed: 'Fechada',
+    c118_tr_open: 'Em andamento',
+    c118_tr_final: 'Resumo final: {spent} de {budget} em {days} dias · {perday} por dia.',
+    c118_tr_delete_btn: 'Excluir',
+    c118_tr_delete_confirm: 'Excluir a viagem «{name}»? Os gastos dela NÃO são excluídos: só perdem a marca da viagem.',
+    c118_tr_form_label: 'Viagem (opcional)',
+    c118_tr_none: 'Sem viagem',
+    c118_tr_bad: 'Confira a viagem: um nome, as datas (o fim não pode ser antes do início) e um orçamento maior que zero.',
+    c118_pro_btn: 'Ver o PETO Pro',
+    c118_share_btn: '📤 Compartilhar conquista',
+    c118_card_goal_head: 'Meta alcançada!',
+    c118_card_chal_head: 'Desafio cumprido!',
+    c118_card_saved: 'Poupado',
   pro_tag: 'PRO',
   adv_title: 'Relatório avançado',
   adv_note: 'Uma função do PETO Pro: este mês vs o anterior, cada categoria e uma exportação CSV do mês.',
@@ -5839,6 +6094,58 @@ fr: {
   c115_goals_title: '🧭 Copilote d’objectifs avec l’IA', c115_goals_note: 'L’IA regarde ton flux réel et tes objectifs, et te propose combien mettre de côté chaque semaine pour chacun et dans quel ordre. Ce n’est qu’une proposition : rien ne bouge ni ne s’épargne sans ton accord.', c115_goals_btn: '✨ Revoir mes objectifs', c115_goals_working: 'Analyse de ton flux et de tes objectifs…', c115_goals_empty: 'Crée d’abord un objectif : le copilote travaille avec tes objectifs réels.', c115_goals_none: 'L’IA n’a pas apporté de proposition cette fois. Tes objectifs restent comme ils sont.', c115_prop_title: 'La proposition du copilote', c115_prop_weekly: '{amount} par semaine', c115_prop_priority: 'Ordre suggéré : {list}', c115_apply_btn: 'Appliquer ce plan', c115_ignore_btn: 'Ignorer', c115_applied: 'Plan appliqué : il est noté sur tes objectifs. Aucun argent n’a bougé.', c115_plan_line: 'Plan du copilote : {amount}/semaine', c115_plan_clear: 'Retirer le plan du copilote', c115_plan_active: 'Plan hebdomadaire du copilote actif',
     c116_group_title: 'L’argent en équipe', c116_round_label: 'Arrondi qui épargne', c116_round_help: 'Pro uniquement. Une fois activé, chaque dépense est arrondie au dollar supérieur et la différence est notée comme votre épargne, en toute visibilité, dans Épargne → « Arrondis ». C’est l’argent réel de votre propre dépense, activé par vous et visible centime par centime : le pourcentage suggéré ne crée jamais d’épargne. Désactivez-le quand vous voulez.', c116_fx_label: 'Taux USD/DOP (pesos pour 1 dollar)', c116_fx_help: 'Le taux avec lequel l’app convertit les montants en pesos dominicains (DOP) en dollars dans vos totaux. C’est le taux que vous enregistrez ici ; ce n’est pas un taux en direct. Valeur initiale : 60.00.', c116_roundups_label: 'Arrondis', c116_roundup_title: 'Arrondi', c116_roundup_line: 'Arrondi : +{amount} vers l’Épargne', c116_roundup_sub: 'De la dépense du {date}', c116_fx_equiv: '≈ {amount} en dollars', c116_cur_label: 'Devise', c116_cur_usd: 'USD · Dollars ($)', c116_cur_dop: 'DOP · Pesos dominicains', c116_acc_currency_label: 'Devise du compte', c116_pair_title: '👫 Mode couple', c116_pair_note: 'L’espace du couple dans votre foyer : vous voyez et notez tous les deux les dépenses et revenus partagés du mois et vous partagez un budget mensuel. Les données personnelles de chaque compte (dépenses propres, comptes et objectifs) ne sont pas partagées.', c116_pair_locked: 'Le Mode couple est réservé à PETO Pro : activez-le pour noter et voir l’argent partagé.', c116_pair_pro_btn: 'Voir PETO Pro', c116_pair_loading: 'Chargement du livre partagé…', c116_pair_month_inc: 'Revenus partagés du mois', c116_pair_month_exp: 'Dépenses partagées du mois', c116_pair_balance: 'Solde partagé du mois', c116_pair_budget_label: 'Budget mensuel partagé', c116_pair_budget_none: 'Aucun budget défini pour le moment.', c116_pair_budget_of: '{spent} dépensés sur {limit}', c116_pair_budget_over: 'Vous avez dépassé le budget de {amount}.', c116_pair_budget_set: 'Définir', c116_pair_budget_clear: 'Retirer', c116_pair_add_title: 'Noter en couple', c116_pair_kind_exp: 'Dépense', c116_pair_kind_inc: 'Revenu', c116_pair_add_btn: 'Noter', c116_pair_list_title: 'Mouvements partagés de ce mois', c116_pair_empty: 'Aucun mouvement partagé ce mois-ci pour le moment.', c116_pair_by: 'par {name}', c116_pair_del_confirm: 'Supprimer ce mouvement partagé de {amount} ? Vous le verrez tous les deux.',
     c117_wi_title: '🔮 Simulateur « et si… »', c117_wi_note: 'Fonction PETO Pro. Choisissez un scénario avec vos chiffres réels et l’appli projette votre solde mois par mois pendant 12 mois, avec ses calculs locaux. L’IA ne fait que le raconter : elle n’invente aucun chiffre.', c117_wi_type_label: 'Scénario', c117_wi_type_cat: 'Dépenser plus ou moins dans une catégorie', c117_wi_type_income: 'Un revenu en plus chaque mois', c117_wi_type_debt: 'Un paiement en plus sur une dette', c117_wi_dir_more: 'Dépenser PLUS', c117_wi_dir_less: 'Dépenser MOINS', c117_wi_more_word: 'de plus', c117_wi_less_word: 'de moins', c117_wi_run_btn: 'Projeter 12 mois', c117_wi_empty: 'Il n’y a pas encore assez de mouvements pour projeter : enregistrez vos revenus et dépenses des derniers mois et revenez. Sans vos chiffres réels, l’appli n’invente pas de projection.', c117_wi_nodebt: 'Vous n’avez aucune dette en attente enregistrée : ce scénario exige au moins une dette dans la section Dettes.', c117_wi_base_line: 'Votre moyenne réelle sur 3 mois : {inc} entrent et {exp} sortent chaque mois. Solde de départ : {start}.', c117_wi_row: '{month} : {with} avec le changement · {without} sans', c117_wi_end_line: 'À 12 mois : {with} avec le changement contre {without} sans (différence : {diff}).', c117_wi_debt_line: 'Dettes : avec le paiement en plus, vous en sortez en {whenNew} ({monthsNew}) ; avec le paiement actuel, en {whenBase} ({monthsBase}). Intérêts économisés : {saved}.', c117_wi_debt_blocked: 'Avec le paiement actuel, le solde de la dette ne baisse pas ; avec le paiement en plus, si : vous en sortez en {when} ({months}).', c117_wi_scen_cat: 'Scénario : dépenser {amount} {word} par mois en {cat}.', c117_wi_scen_income: 'Scénario : un revenu en plus de {amount} par mois.', c117_wi_scen_debt: 'Scénario : un paiement en plus de {amount} par mois sur vos dettes.', c117_wi_ai_btn: '✨ Que l’IA me l’explique', c117_wi_working: 'L’IA lit votre projection…', c117_wi_none: 'L’IA n’a pas renvoyé d’explication cette fois. Votre projection ci-dessus est intacte.', c117_wi_bad_amount: 'Écrivez un montant valide, supérieur à zéro.', c117_ba_title: '🧾 Budget automatique avec IA', c117_ba_note: 'Fonction PETO Pro. L’appli additionne vos dépenses réelles des ~90 derniers jours par catégorie et l’IA propose votre budget mensuel complet. La proposition est modifiable et RIEN n’est appliqué tant que vous ne touchez pas « Appliquer ». Elle ne propose que des plafonds de dépenses : elle n’enregistre jamais d’épargne pour vous.', c117_ba_btn: '✨ Créer mon budget avec l’IA', c117_ba_working: 'L’IA construit votre budget à partir de vos dépenses réelles…', c117_ba_empty: 'Il n’y a pas encore assez d’historique : il faut des dépenses enregistrées sur au moins 2 mois différents (environ 8 sorties en ~90 jours). Continuez à enregistrer et revenez.', c117_ba_none: 'L’IA n’a pas renvoyé de proposition cette fois. Vos plafonds actuels n’ont pas été touchés.', c117_ba_prop_title: 'Votre proposition — modifiez-la avant d’appliquer', c117_ba_avg_line: 'Moyenne réelle : {amount}/mois', c117_ba_current_line: 'Plafond actuel : {amount}/mois', c117_ba_total_line: 'Somme des plafonds proposés : {amount} par mois.', c117_ba_apply_btn: 'Appliquer le budget', c117_ba_ignore_btn: 'Ignorer', c117_ba_applied: 'Budget appliqué : vos plafonds sont désormais la proposition.', c117_dg_title: '⚠️ Mois coûteux en vue', c117_dg_note: 'L’appli surveille vos mois coûteux avec vos données locales : les pics historiques du même mois les années passées et les dates spéciales que vous enregistrez ici. Si l’un arrive dans 30 jours ou moins, elle vous prévient avec le surplus estimé.', c117_dg_none: 'Aucun motif détecté pour l’instant : quand le même mois se répétera coûteux dans votre historique, l’appli le surveillera toute seule.', c117_dg_ok: 'Rien de dangereux dans les 30 prochains jours.', c117_dg_alarm_hist: '🔔 {month} arrive dans {days} jours : ce mois-là, vous dépensez d’habitude {extra} EN PLUS.', c117_dg_alarm_date: '🔔 {name} arrive dans {days} jours ({date}).', c117_dg_extra_line: 'Surplus estimé : {amount}.', c117_dg_detected: 'Mois coûteux détectés : {months}.', c117_dg_ai_btn: '✨ Que l’IA me prépare', c117_dg_working: 'L’IA rédige votre alerte…', c117_dg_ai_none: 'L’IA n’a pas renvoyé d’alerte cette fois. L’alarme ci-dessus reste.', c117_dg_dates_title: 'Vos dates spéciales', c117_dg_dates_empty: 'Aucune date enregistrée. Ajoutez anniversaires, dates anniversaires ou impôts pour les surveiller chaque année.', c117_dg_name_ph: 'Ex. : Anniversaire de ma fille', c117_dg_day_ph: 'Jour', c117_dg_extra_ph: 'Surplus $ (optionnel)', c117_dg_add_btn: 'Ajouter la date',
+    c118_ch_title: '🏆 Défis d’épargne',
+    c118_ch_note: 'Fonction PETO Pro. Des défis datés : épargnez un montant en 7 ou 30 jours, ou passez 7 jours sans petite dépense. La progression vient UNIQUEMENT de l’épargne que vous enregistrez vous-même : le défi ne crée jamais d’épargne tout seul. S’il n’est pas tenu, il se ferme sans pénalité.',
+    c118_ch_type_label: 'Type de défi',
+    c118_ch_type_save7: 'Épargner un montant en 7 jours',
+    c118_ch_type_save30: 'Épargner un montant en 30 jours',
+    c118_ch_type_noants: '7 jours sans petite dépense',
+    c118_ch_target_label: 'Montant à épargner ($)',
+    c118_ch_start_btn: 'Commencer le défi',
+    c118_ch_active_save: 'Défi actif : épargnez {target} en {days} jours',
+    c118_ch_active_noants: 'Défi actif : {days} jours sans petite dépense',
+    c118_ch_progress: 'Vous avez {have} sur {target}',
+    c118_ch_days_line: 'Jour {n} sur {total} · il reste {left} jours',
+    c118_ch_streak: '🔥 Série : {n} jours dans le défi',
+    c118_ch_noants_ok: 'Toujours propre : {n} jours sans petite dépense',
+    c118_ch_noants_def: 'Petite dépense = une dépense de {amount} ou moins.',
+    c118_ch_done: '🏅 Défi relevé !',
+    c118_ch_failed: 'Pas cette fois. Sans pénalité : recommencez quand vous voulez.',
+    c118_ch_dropped: 'Défi abandonné.',
+    c118_ch_abandon_btn: 'Abandonner le défi',
+    c118_ch_abandon_confirm: 'Abandonner ce défi ? Il se ferme sans pénalité et reste dans votre historique.',
+    c118_ch_history_title: 'Vos défis passés',
+    c118_ch_history_empty: 'Vous n’avez encore terminé aucun défi.',
+    c118_ch_bad_target: 'Écrivez le montant du défi, supérieur à zéro.',
+    c118_ch_name_save: 'Épargner {target} en {days} jours',
+    c118_ch_name_noants: '7 jours sans petite dépense',
+    c118_tr_title: '✈️ Mode voyage',
+    c118_tr_note: 'Fonction PETO Pro. Chaque voyage a son budget séparé : quand vous enregistrez une dépense, marquez-la avec son voyage et elle s’ajoute à ce budget. Les dépenses du voyage comptent dans votre mois comme toute dépense (l’argent est sorti pareil) : le voyage est une loupe dessus, pas une copie.',
+    c118_tr_name_label: 'Nom du voyage',
+    c118_tr_name_ph: 'Ex. : Saint-Domingue',
+    c118_tr_start_label: 'Du',
+    c118_tr_end_label: 'Au',
+    c118_tr_budget_label: 'Budget du voyage ($)',
+    c118_tr_create_btn: 'Créer le voyage',
+    c118_tr_empty: 'Aucun voyage pour l’instant. Créez le premier et marquez ses dépenses en les enregistrant.',
+    c118_tr_spent_line: '{spent} sur {budget}',
+    c118_tr_over: '⚠️ Vous avez dépassé de {amount}.',
+    c118_tr_perday: 'Moyenne : {amount} par jour',
+    c118_tr_close_btn: 'Fermer le voyage',
+    c118_tr_close_confirm: 'Fermer « {name} » ? Son résumé final est conservé ; ses dépenses ne sont pas touchées.',
+    c118_tr_closed: 'Fermé',
+    c118_tr_open: 'En cours',
+    c118_tr_final: 'Résumé final : {spent} sur {budget} en {days} jours · {perday} par jour.',
+    c118_tr_delete_btn: 'Supprimer',
+    c118_tr_delete_confirm: 'Supprimer le voyage « {name} » ? Ses dépenses ne sont PAS supprimées : elles perdent seulement la marque du voyage.',
+    c118_tr_form_label: 'Voyage (optionnel)',
+    c118_tr_none: 'Sans voyage',
+    c118_tr_bad: 'Vérifiez le voyage : un nom, des dates (la fin ne peut pas précéder le début) et un budget supérieur à zéro.',
+    c118_pro_btn: 'Voir PETO Pro',
+    c118_share_btn: '📤 Partager la réussite',
+    c118_card_goal_head: 'Objectif atteint !',
+    c118_card_chal_head: 'Défi relevé !',
+    c118_card_saved: 'Épargné',
   pro_tag: 'PRO',
   adv_title: 'Rapport avancé',
   adv_note: 'Une fonction PETO Pro : ce mois-ci contre le mois précédent, chaque catégorie et un export CSV du mois.',
@@ -6849,6 +7156,58 @@ de: {
   c115_goals_title: '🧭 Ziel-Copilot mit KI', c115_goals_note: 'Die KI schaut auf deinen echten Geldfluss und deine Ziele und schlägt vor, wie viel du pro Woche für jedes Ziel zurücklegen solltest und in welcher Reihenfolge. Es ist nur ein Vorschlag: Nichts bewegt oder spart sich ohne deine Zustimmung.', c115_goals_btn: '✨ Meine Ziele prüfen', c115_goals_working: 'Dein Fluss und deine Ziele werden geprüft…', c115_goals_empty: 'Erstelle zuerst ein Ziel: Der Copilot arbeitet mit deinen echten Zielen.', c115_goals_none: 'Die KI hat diesmal keinen Vorschlag gebracht. Deine Ziele bleiben, wie sie sind.', c115_prop_title: 'Der Vorschlag des Copiloten', c115_prop_weekly: '{amount} pro Woche', c115_prop_priority: 'Vorgeschlagene Reihenfolge: {list}', c115_apply_btn: 'Diesen Plan übernehmen', c115_ignore_btn: 'Ignorieren', c115_applied: 'Plan übernommen: Er steht jetzt bei deinen Zielen. Es wurde kein Geld bewegt.', c115_plan_line: 'Copilot-Plan: {amount}/Woche', c115_plan_clear: 'Copilot-Plan entfernen', c115_plan_active: 'Copilot-Wochenplan aktiv',
     c116_group_title: 'Geld im Team', c116_round_label: 'Aufrunden, das spart', c116_round_help: 'Nur Pro. Ist das an, wird jede Ausgabe auf den nächsten Dollar aufgerundet und die Differenz als dein Erspartes vermerkt, offen sichtbar unter Sparen → „Aufrundungen“. Das ist echtes Geld aus deiner eigenen Ausgabe, von dir eingeschaltet und Cent für Cent sichtbar: Der vorgeschlagene Prozentsatz erzeugt nie Ersparnisse. Schalte es jederzeit wieder aus.', c116_fx_label: 'USD/DOP-Kurs (Pesos pro 1 Dollar)', c116_fx_help: 'Der Kurs, mit dem die App Beträge in dominikanischen Pesos (DOP) in deinen Summen in Dollar umrechnet. Es ist der Kurs, den du hier speicherst; kein Live-Kurs. Startwert: 60.00.', c116_roundups_label: 'Aufrundungen', c116_roundup_title: 'Aufrundung', c116_roundup_line: 'Aufrundung: +{amount} zum Sparen', c116_roundup_sub: 'Von der Ausgabe vom {date}', c116_fx_equiv: '≈ {amount} in Dollar', c116_cur_label: 'Währung', c116_cur_usd: 'USD · Dollar ($)', c116_cur_dop: 'DOP · Dominikanische Pesos', c116_acc_currency_label: 'Währung des Kontos', c116_pair_title: '👫 Paar-Modus', c116_pair_note: 'Der Paar-Bereich in eurem Haushalt: Ihr seht und tragt beide die gemeinsamen Ausgaben und Einnahmen des Monats ein und teilt ein Monatsbudget. Die persönlichen Daten jedes Kontos (eigene Ausgaben, Konten und Ziele) werden nicht geteilt.', c116_pair_locked: 'Der Paar-Modus ist Teil von PETO Pro: Aktiviere ihn, um das gemeinsame Geld einzutragen und zu sehen.', c116_pair_pro_btn: 'PETO Pro ansehen', c116_pair_loading: 'Gemeinsames Buch wird geladen…', c116_pair_month_inc: 'Gemeinsame Einnahmen des Monats', c116_pair_month_exp: 'Gemeinsame Ausgaben des Monats', c116_pair_balance: 'Gemeinsamer Saldo des Monats', c116_pair_budget_label: 'Gemeinsames Monatsbudget', c116_pair_budget_none: 'Noch kein Budget festgelegt.', c116_pair_budget_of: '{spent} von {limit} ausgegeben', c116_pair_budget_over: 'Ihr seid {amount} über dem Budget.', c116_pair_budget_set: 'Festlegen', c116_pair_budget_clear: 'Entfernen', c116_pair_add_title: 'Gemeinsam eintragen', c116_pair_kind_exp: 'Ausgabe', c116_pair_kind_inc: 'Einnahme', c116_pair_add_btn: 'Eintragen', c116_pair_list_title: 'Gemeinsame Bewegungen dieses Monats', c116_pair_empty: 'Diesen Monat noch keine gemeinsamen Bewegungen.', c116_pair_by: 'von {name}', c116_pair_del_confirm: 'Diese gemeinsame Bewegung über {amount} löschen? Ihr seht es beide.',
     c117_wi_title: '🔮 Was-wäre-wenn-Simulator', c117_wi_note: 'Eine PETO-Pro-Funktion. Wähle ein Szenario mit deinen echten Zahlen, und die App projiziert deinen Kontostand Monat für Monat über 12 Monate – mit ihrer lokalen Mathematik. Die KI erzählt es nur: Sie erfindet keine Zahlen.', c117_wi_type_label: 'Szenario', c117_wi_type_cat: 'Mehr oder weniger in einer Kategorie ausgeben', c117_wi_type_income: 'Ein zusätzliches Einkommen pro Monat', c117_wi_type_debt: 'Eine zusätzliche Zahlung auf eine Schuld', c117_wi_dir_more: 'MEHR ausgeben', c117_wi_dir_less: 'WENIGER ausgeben', c117_wi_more_word: 'mehr', c117_wi_less_word: 'weniger', c117_wi_run_btn: '12 Monate projizieren', c117_wi_empty: 'Noch nicht genug Bewegungen zum Projizieren: Trage deine Einnahmen und Ausgaben der letzten Monate ein und komm zurück. Ohne deine echten Zahlen erfindet die App keine Projektion.', c117_wi_nodebt: 'Du hast keine offenen Schulden eingetragen: Dieses Szenario braucht mindestens eine Schuld im Bereich Schulden.', c117_wi_base_line: 'Dein echter 3-Monats-Schnitt: {inc} kommen rein und {exp} gehen raus pro Monat. Startsaldo: {start}.', c117_wi_row: '{month}: {with} mit der Änderung · {without} ohne', c117_wi_end_line: 'Nach 12 Monaten: {with} mit der Änderung gegen {without} ohne (Differenz: {diff}).', c117_wi_debt_line: 'Schulden: Mit der Extrazahlung bist du in {whenNew} schuldenfrei ({monthsNew}); mit der aktuellen Zahlung in {whenBase} ({monthsBase}). Gesparte Zinsen: {saved}.', c117_wi_debt_blocked: 'Mit der aktuellen Zahlung sinkt der Schuldsaldo nie; mit der Extrazahlung schon: Du bist in {when} raus ({months}).', c117_wi_scen_cat: 'Szenario: {amount} {word} pro Monat für {cat} ausgeben.', c117_wi_scen_income: 'Szenario: ein zusätzliches Einkommen von {amount} pro Monat.', c117_wi_scen_debt: 'Szenario: eine Extrazahlung von {amount} pro Monat auf deine Schulden.', c117_wi_ai_btn: '✨ Von der KI erklären lassen', c117_wi_working: 'Die KI liest deine Projektion…', c117_wi_none: 'Die KI hat diesmal keine Erklärung geliefert. Deine Projektion oben ist unverändert.', c117_wi_bad_amount: 'Gib einen gültigen Betrag über null ein.', c117_ba_title: '🧾 Automatisches Budget mit KI', c117_ba_note: 'Eine PETO-Pro-Funktion. Die App addiert deine echten Ausgaben der letzten ~90 Tage pro Kategorie, und die KI schlägt dein komplettes Monatsbudget vor. Der Vorschlag ist bearbeitbar, und NICHTS wird angewendet, bis du auf „Übernehmen“ tippst. Sie schlägt nur Ausgabenlimits vor: Sie trägt nie Ersparnisse für dich ein.', c117_ba_btn: '✨ Mein Budget mit KI erstellen', c117_ba_working: 'Die KI baut dein Budget aus deinen echten Ausgaben…', c117_ba_empty: 'Noch nicht genug Verlauf: Ausgaben müssen in mindestens 2 verschiedenen Monaten eingetragen sein (etwa 8 Abgänge in ~90 Tagen). Trage weiter ein und komm zurück.', c117_ba_none: 'Die KI hat diesmal keinen Vorschlag geliefert. Deine aktuellen Limits wurden nicht angerührt.', c117_ba_prop_title: 'Dein Vorschlag – bearbeite ihn vor dem Übernehmen', c117_ba_avg_line: 'Echter Schnitt: {amount}/Monat', c117_ba_current_line: 'Aktuelles Limit: {amount}/Monat', c117_ba_total_line: 'Summe der vorgeschlagenen Limits: {amount} pro Monat.', c117_ba_apply_btn: 'Budget übernehmen', c117_ba_ignore_btn: 'Ignorieren', c117_ba_applied: 'Budget übernommen: Deine Limits sind jetzt der Vorschlag.', c117_dg_title: '⚠️ Teurer Monat in Sicht', c117_dg_note: 'Die App beobachtet deine teuren Monate mit deinen lokalen Daten: historische Ausgaben-Spitzen desselben Monats in früheren Jahren und die besonderen Termine, die du hier einträgst. Kommt einer in 30 Tagen oder weniger, warnt sie dich mit dem geschätzten Extra.', c117_dg_none: 'Noch keine Muster erkannt: Wenn sich derselbe Monat in deinem Verlauf als teuer wiederholt, beobachtet die App ihn von selbst.', c117_dg_ok: 'Nichts Gefährliches in den nächsten 30 Tagen.', c117_dg_alarm_hist: '🔔 {month} kommt in {days} Tagen: In dem Monat gibst du meist {extra} EXTRA aus.', c117_dg_alarm_date: '🔔 {name} kommt in {days} Tagen ({date}).', c117_dg_extra_line: 'Geschätztes Extra: {amount}.', c117_dg_detected: 'Erkannte teure Monate: {months}.', c117_dg_ai_btn: '✨ Von der KI vorbereiten lassen', c117_dg_working: 'Die KI schreibt deine Warnung…', c117_dg_ai_none: 'Die KI hat diesmal keine Warnung geliefert. Der Alarm oben bleibt.', c117_dg_dates_title: 'Deine besonderen Termine', c117_dg_dates_empty: 'Keine Termine eingetragen. Füge Geburtstage, Jahrestage oder Steuern hinzu, um sie jedes Jahr zu beobachten.', c117_dg_name_ph: 'Z. B.: Geburtstag meiner Tochter', c117_dg_day_ph: 'Tag', c117_dg_extra_ph: 'Extra $ (optional)', c117_dg_add_btn: 'Termin hinzufügen',
+    c118_ch_title: '🏆 Spar-Challenges',
+    c118_ch_note: 'Eine PETO-Pro-Funktion. Challenges mit Datum: Spare einen Betrag in 7 oder 30 Tagen oder schaffe 7 Tage ohne Kleinausgaben. Der Fortschritt kommt NUR aus dem, was du selbst als Ersparnis einträgst: Die Challenge erzeugt nie von selbst Ersparnisse. Wird sie nicht geschafft, endet sie ohne Strafe.',
+    c118_ch_type_label: 'Challenge-Art',
+    c118_ch_type_save7: 'Einen Betrag in 7 Tagen sparen',
+    c118_ch_type_save30: 'Einen Betrag in 30 Tagen sparen',
+    c118_ch_type_noants: '7 Tage ohne Kleinausgaben',
+    c118_ch_target_label: 'Zu sparender Betrag ($)',
+    c118_ch_start_btn: 'Challenge starten',
+    c118_ch_active_save: 'Aktive Challenge: Spare {target} in {days} Tagen',
+    c118_ch_active_noants: 'Aktive Challenge: {days} Tage ohne Kleinausgaben',
+    c118_ch_progress: 'Du hast {have} von {target}',
+    c118_ch_days_line: 'Tag {n} von {total} · noch {left} Tage',
+    c118_ch_streak: '🔥 Serie: {n} Tage in der Challenge',
+    c118_ch_noants_ok: 'Weiter sauber: {n} Tage ohne Kleinausgaben',
+    c118_ch_noants_def: 'Kleinausgabe = eine Ausgabe von {amount} oder weniger.',
+    c118_ch_done: '🏅 Challenge geschafft!',
+    c118_ch_failed: 'Diesmal nicht. Ohne Strafe: Starte jederzeit eine neue.',
+    c118_ch_dropped: 'Challenge abgebrochen.',
+    c118_ch_abandon_btn: 'Challenge abbrechen',
+    c118_ch_abandon_confirm: 'Diese Challenge abbrechen? Sie endet ohne Strafe und bleibt in deinem Verlauf.',
+    c118_ch_history_title: 'Deine früheren Challenges',
+    c118_ch_history_empty: 'Du hast noch keine Challenge beendet.',
+    c118_ch_bad_target: 'Gib den Challenge-Betrag ein, größer als null.',
+    c118_ch_name_save: '{target} in {days} Tagen sparen',
+    c118_ch_name_noants: '7 Tage ohne Kleinausgaben',
+    c118_tr_title: '✈️ Reisemodus',
+    c118_tr_note: 'Eine PETO-Pro-Funktion. Jede Reise hat ihr eigenes Budget: Wenn du eine Ausgabe einträgst, markiere sie mit ihrer Reise, und sie zählt gegen dieses Budget. Reiseausgaben zählen in deinem Monat wie jede Ausgabe (das Geld ist genauso weg): Die Reise ist eine Lupe darüber, keine Kopie.',
+    c118_tr_name_label: 'Name der Reise',
+    c118_tr_name_ph: 'Z. B.: Santo Domingo',
+    c118_tr_start_label: 'Von',
+    c118_tr_end_label: 'Bis',
+    c118_tr_budget_label: 'Reisebudget ($)',
+    c118_tr_create_btn: 'Reise erstellen',
+    c118_tr_empty: 'Noch keine Reisen. Erstelle die erste und markiere ihre Ausgaben beim Eintragen.',
+    c118_tr_spent_line: '{spent} von {budget}',
+    c118_tr_over: '⚠️ Du bist {amount} darüber.',
+    c118_tr_perday: 'Schnitt: {amount} pro Tag',
+    c118_tr_close_btn: 'Reise abschließen',
+    c118_tr_close_confirm: '„{name}“ abschließen? Die Abschlussübersicht bleibt gespeichert; die Ausgaben werden nicht angerührt.',
+    c118_tr_closed: 'Abgeschlossen',
+    c118_tr_open: 'Laufend',
+    c118_tr_final: 'Abschluss: {spent} von {budget} in {days} Tagen · {perday} pro Tag.',
+    c118_tr_delete_btn: 'Löschen',
+    c118_tr_delete_confirm: 'Die Reise „{name}“ löschen? Ihre Ausgaben werden NICHT gelöscht: Sie verlieren nur die Reise-Markierung.',
+    c118_tr_form_label: 'Reise (optional)',
+    c118_tr_none: 'Keine Reise',
+    c118_tr_bad: 'Prüfe die Reise: ein Name, Daten (das Ende darf nicht vor dem Anfang liegen) und ein Budget über null.',
+    c118_pro_btn: 'PETO Pro ansehen',
+    c118_share_btn: '📤 Erfolg teilen',
+    c118_card_goal_head: 'Ziel erreicht!',
+    c118_card_chal_head: 'Challenge geschafft!',
+    c118_card_saved: 'Gespart',
   pro_tag: 'PRO',
   adv_title: 'Erweiterter Bericht',
   adv_note: 'Eine PETO-Pro-Funktion: dieser Monat gegen den vorigen, jede Kategorie und ein CSV-Export des Monats.',
@@ -7859,6 +8218,58 @@ zh: {
   c115_goals_title: '🧭 AI 目标副驾驶', c115_goals_note: 'AI 会查看你的真实收支和目标，建议你每周为每个目标存多少、按什么顺序。这只是一个建议：未经你批准，不会有任何资金被移动或存入。', c115_goals_btn: '✨ 查看我的目标', c115_goals_working: '正在查看你的收支和目标…', c115_goals_empty: '先创建一个目标：副驾驶会根据你的真实目标工作。', c115_goals_none: 'AI 这次没有给出建议。你的目标保持不变。', c115_prop_title: '副驾驶的建议', c115_prop_weekly: '每周 {amount}', c115_prop_priority: '建议顺序：{list}', c115_apply_btn: '应用此计划', c115_ignore_btn: '忽略', c115_applied: '计划已应用：已记录在你的目标上。没有移动任何资金。', c115_plan_line: '副驾驶计划：{amount}/周', c115_plan_clear: '移除副驾驶计划', c115_plan_active: '副驾驶每周计划已启用',
     c116_group_title: '团队理财', c116_round_label: '凑整储蓄', c116_round_help: '仅限 Pro。开启后，每笔支出都会向上凑整到下一个整美元，差额会作为你的储蓄记录下来，在「储蓄 → 凑整」中一目了然。这是你自己支出里的真钱，由你开启、每一分都看得见：建议百分比永远不会产生储蓄。随时可以关闭。', c116_fx_label: 'USD/DOP 汇率（1 美元兑多少比索）', c116_fx_help: '应用在总计中把多米尼加比索（DOP）金额换算成美元所用的汇率。这是你在这里保存的汇率，不是实时汇率。初始值：60.00。', c116_roundups_label: '凑整', c116_roundup_title: '凑整', c116_roundup_line: '凑整：+{amount} 存入储蓄', c116_roundup_sub: '来自 {date} 的支出', c116_fx_equiv: '≈ {amount} 美元', c116_cur_label: '货币', c116_cur_usd: 'USD · 美元 ($)', c116_cur_dop: 'DOP · 多米尼加比索', c116_acc_currency_label: '账户货币', c116_pair_title: '👫 情侣模式', c116_pair_note: '家庭里的情侣空间：你们两人都能查看和记录本月共享的支出与收入，并共用一个月度预算。每个账户的个人数据（自己的支出、账户和目标）不会被共享。', c116_pair_locked: '情侣模式是 PETO Pro 功能：开启后即可记录和查看共享的钱。', c116_pair_pro_btn: '查看 PETO Pro', c116_pair_loading: '正在加载共享账本…', c116_pair_month_inc: '本月共享收入', c116_pair_month_exp: '本月共享支出', c116_pair_balance: '本月共享结余', c116_pair_budget_label: '共享月度预算', c116_pair_budget_none: '尚未设定预算。', c116_pair_budget_of: '已花 {spent} / {limit}', c116_pair_budget_over: '你们已超出预算 {amount}。', c116_pair_budget_set: '设定', c116_pair_budget_clear: '清除', c116_pair_add_title: '一起记录', c116_pair_kind_exp: '支出', c116_pair_kind_inc: '收入', c116_pair_add_btn: '记录', c116_pair_list_title: '本月共享流水', c116_pair_empty: '本月还没有共享流水。', c116_pair_by: '由 {name} 记录', c116_pair_del_confirm: '删除这笔 {amount} 的共享流水？你们两人都会看到。',
     c117_wi_title: '🔮 「如果……会怎样」模拟器', c117_wi_note: 'PETO Pro 功能。选择一个带你真实数字的情景，应用会用本地计算逐月推演未来 12 个月的余额。AI 只负责讲述：绝不编造数字。', c117_wi_type_label: '情景', c117_wi_type_cat: '在某个类别多花或少花', c117_wi_type_income: '每月一笔额外收入', c117_wi_type_debt: '每月多还一笔债务', c117_wi_dir_more: '多花', c117_wi_dir_less: '少花', c117_wi_more_word: '多', c117_wi_less_word: '少', c117_wi_run_btn: '推演 12 个月', c117_wi_empty: '目前记录还不够，无法推演：先记下最近几个月的收入和支出再回来。没有你的真实数字，应用不会编造推演。', c117_wi_nodebt: '你还没有登记待还债务：这个情景需要在「债务」里至少有一笔债务。', c117_wi_base_line: '你近 3 个月的真实平均：每月进 {inc}，出 {exp}。起始余额：{start}。', c117_wi_row: '{month}：改动后 {with} · 不改动 {without}', c117_wi_end_line: '12 个月后：改动后 {with}，不改动 {without}（差额：{diff}）。', c117_wi_debt_line: '债务：多还款后你在 {whenNew} 还清（{monthsNew}）；按现在的还款，在 {whenBase}（{monthsBase}）。省下的利息：{saved}。', c117_wi_debt_blocked: '按现在的还款，债务余额永远降不下来；多还款后可以：你在 {when} 还清（{months}）。', c117_wi_scen_cat: '情景：每月在 {cat} 上{word}花 {amount}。', c117_wi_scen_income: '情景：每月多一笔 {amount} 的收入。', c117_wi_scen_debt: '情景：每月多还 {amount} 的债务。', c117_wi_ai_btn: '✨ 让 AI 讲给我听', c117_wi_working: 'AI 正在读你的推演…', c117_wi_none: 'AI 这次没有返回讲解。上面的推演原样保留。', c117_wi_bad_amount: '请输入大于零的有效金额。', c117_ba_title: '🧾 AI 自动预算', c117_ba_note: 'PETO Pro 功能。应用按类别汇总你最近约 90 天的真实支出，AI 据此提出完整的月度预算。提案可以编辑，在你点「应用」之前什么都不会生效。它只提支出上限：绝不替你记储蓄。', c117_ba_btn: '✨ 用 AI 生成我的预算', c117_ba_working: 'AI 正在用你的真实支出生成预算…', c117_ba_empty: '历史还不够：需要在至少 2 个不同月份里有支出记录（约 90 天内 8 笔以上）。继续记录再回来。', c117_ba_none: 'AI 这次没有返回提案。你现在的上限没有被动过。', c117_ba_prop_title: '你的提案——应用前先编辑', c117_ba_avg_line: '真实平均：{amount}/月', c117_ba_current_line: '当前上限：{amount}/月', c117_ba_total_line: '提案上限合计：每月 {amount}。', c117_ba_apply_btn: '应用预算', c117_ba_ignore_btn: '忽略', c117_ba_applied: '预算已应用：你的上限已按提案更新。', c117_dg_title: '⚠️ 前方有高支出月份', c117_dg_note: '应用用你的本地数据盯住高支出月份：往年同期月份的历史支出高峰，以及你在这里登记的特殊日期。如果某个在 30 天内到来，就会带着预估的额外支出提醒你。', c117_dg_none: '还没有检测到规律：当同一个月份在你的历史里反复变贵时，应用会自动盯住它。', c117_dg_ok: '未来 30 天没有危险。', c117_dg_alarm_hist: '🔔 {month} 将在 {days} 天后到来：那个月你通常会多花 {extra}。', c117_dg_alarm_date: '🔔 {name} 将在 {days} 天后到来（{date}）。', c117_dg_extra_line: '预估额外支出：{amount}。', c117_dg_detected: '检测到的高支出月份：{months}。', c117_dg_ai_btn: '✨ 让 AI 帮我准备', c117_dg_working: 'AI 正在写你的提醒…', c117_dg_ai_none: 'AI 这次没有返回提醒。上面的警报仍在。', c117_dg_dates_title: '你的特殊日期', c117_dg_dates_empty: '还没有登记日期。添加生日、纪念日或税款日期，每年自动盯住。', c117_dg_name_ph: '例如：女儿的生日', c117_dg_day_ph: '日', c117_dg_extra_ph: '额外 $（可选）', c117_dg_add_btn: '添加日期',
+    c118_ch_title: '🏆 储蓄挑战',
+    c118_ch_note: 'PETO Pro 功能。带日期的挑战：在 7 天或 30 天内存下一定金额，或坚持 7 天没有小额消费。进度只来自你自己记录的储蓄：挑战绝不会自己创造储蓄。没完成也不会有惩罚，直接结束。',
+    c118_ch_type_label: '挑战类型',
+    c118_ch_type_save7: '7 天内存下一笔金额',
+    c118_ch_type_save30: '30 天内存下一笔金额',
+    c118_ch_type_noants: '7 天没有小额消费',
+    c118_ch_target_label: '要存的金额 ($)',
+    c118_ch_start_btn: '开始挑战',
+    c118_ch_active_save: '进行中的挑战：在 {days} 天内存下 {target}',
+    c118_ch_active_noants: '进行中的挑战：{days} 天没有小额消费',
+    c118_ch_progress: '已存 {have} / {target}',
+    c118_ch_days_line: '第 {n} 天，共 {total} 天 · 还剩 {left} 天',
+    c118_ch_streak: '🔥 连续记录：已坚持 {n} 天',
+    c118_ch_noants_ok: '保持干净：已 {n} 天没有小额消费',
+    c118_ch_noants_def: '小额消费 = 一笔 {amount} 或更少的支出。',
+    c118_ch_done: '🏅 挑战完成！',
+    c118_ch_failed: '这次没完成。没有惩罚：想开始随时可以再来。',
+    c118_ch_dropped: '挑战已放弃。',
+    c118_ch_abandon_btn: '放弃挑战',
+    c118_ch_abandon_confirm: '放弃这个挑战？它会无惩罚结束并留在你的历史里。',
+    c118_ch_history_title: '你过去的挑战',
+    c118_ch_history_empty: '你还没有完成过任何挑战。',
+    c118_ch_bad_target: '请输入大于零的挑战金额。',
+    c118_ch_name_save: '在 {days} 天内存下 {target}',
+    c118_ch_name_noants: '7 天没有小额消费',
+    c118_tr_title: '✈️ 旅行模式',
+    c118_tr_note: 'PETO Pro 功能。每次旅行有独立预算：记录支出时给它打上旅行标记，就会累计到该预算里。旅行支出和任何支出一样计入当月（钱确实花出去了）：旅行只是它们上面的一层视图，不是副本。',
+    c118_tr_name_label: '旅行名称',
+    c118_tr_name_ph: '例如：圣多明各',
+    c118_tr_start_label: '从',
+    c118_tr_end_label: '到',
+    c118_tr_budget_label: '旅行预算 ($)',
+    c118_tr_create_btn: '创建旅行',
+    c118_tr_empty: '还没有旅行。创建第一个，并在记录支出时给它们打标记。',
+    c118_tr_spent_line: '{spent} / {budget}',
+    c118_tr_over: '⚠️ 你超支了 {amount}。',
+    c118_tr_perday: '平均：每天 {amount}',
+    c118_tr_close_btn: '结束旅行',
+    c118_tr_close_confirm: '结束「{name}」？最终总结会保留；它的支出不会被动。',
+    c118_tr_closed: '已结束',
+    c118_tr_open: '进行中',
+    c118_tr_final: '最终总结：{days} 天花了 {spent} / {budget} · 每天 {perday}。',
+    c118_tr_delete_btn: '删除',
+    c118_tr_delete_confirm: '删除旅行「{name}」？它的支出不会被删除：只是去掉旅行标记。',
+    c118_tr_form_label: '旅行（可选）',
+    c118_tr_none: '无旅行',
+    c118_tr_bad: '请检查旅行：名称、日期（结束不能早于开始）和大于零的预算。',
+    c118_pro_btn: '查看 PETO Pro',
+    c118_share_btn: '📤 分享成就',
+    c118_card_goal_head: '目标达成！',
+    c118_card_chal_head: '挑战完成！',
+    c118_card_saved: '已存下',
   pro_tag: 'PRO',
   adv_title: '高级报告',
   adv_note: '这是 PETO Pro 功能：本月与上月对比、每个类别，以及本月的 CSV 导出。',
@@ -8869,6 +9280,58 @@ ja: {
   c115_goals_title: '🧭 AI目標コパイロット', c115_goals_note: 'AIがあなたの実際の収支と目標を見て、各目標に毎週いくら貯めるべきか、どの順番で進めるかを提案します。あくまで提案です：あなたの承認なしに、お金が動いたり貯まったりすることはありません。', c115_goals_btn: '✨ 目標を見直す', c115_goals_working: '収支と目標を確認しています…', c115_goals_empty: 'まず目標を作成してください：コパイロットはあなたの実際の目標で働きます。', c115_goals_none: '今回はAIの提案が届きませんでした。目標はそのままです。', c115_prop_title: 'コパイロットの提案', c115_prop_weekly: '毎週 {amount}', c115_prop_priority: 'おすすめの順番：{list}', c115_apply_btn: 'このプランを適用', c115_ignore_btn: '無視する', c115_applied: 'プランを適用しました：目標に記録されました。お金は動いていません。', c115_plan_line: 'コパイロットプラン：{amount}/週', c115_plan_clear: 'コパイロットプランを外す', c115_plan_active: 'コパイロットの週間プランが有効です',
     c116_group_title: 'チームでお金管理', c116_round_label: 'おつり貯金（切り上げ）', c116_round_help: 'Pro限定。オンにすると、各支出が次のドルへ切り上げられ、差額があなたの貯蓄として「貯蓄 → 切り上げ」に明示して記録されます。あなた自身の支出からの本物のお金で、あなたが有効化し、1セント単位で見えます。提案された割合が貯蓄を生むことは決してありません。いつでもオフにできます。', c116_fx_label: 'USD/DOP レート（1ドルあたりのペソ）', c116_fx_help: 'アプリがドミニカペソ（DOP）の金額を合計でドルに換算する際のレートです。ここに保存したレートであり、ライブレートではありません。初期値：60.00。', c116_roundups_label: '切り上げ', c116_roundup_title: '切り上げ', c116_roundup_line: '切り上げ：+{amount} を貯蓄へ', c116_roundup_sub: '{date} の支出から', c116_fx_equiv: '≈ {amount}（ドル）', c116_cur_label: '通貨', c116_cur_usd: 'USD · ドル ($)', c116_cur_dop: 'DOP · ドミニカペソ', c116_acc_currency_label: '口座の通貨', c116_pair_title: '👫 カップルモード', c116_pair_note: '世帯の中のカップルスペース：二人とも今月の共有の支出と収入を見て記録でき、月予算を共有します。各アカウントの個人データ（自分の支出、口座、目標）は共有されません。', c116_pair_locked: 'カップルモードは PETO Pro の機能です：有効化すると共有のお金を記録・確認できます。', c116_pair_pro_btn: 'PETO Pro を見る', c116_pair_loading: '共有ブックを読み込み中…', c116_pair_month_inc: '今月の共有収入', c116_pair_month_exp: '今月の共有支出', c116_pair_balance: '今月の共有残高', c116_pair_budget_label: '共有の月予算', c116_pair_budget_none: 'まだ予算が設定されていません。', c116_pair_budget_of: '{limit} のうち {spent} を使用', c116_pair_budget_over: '予算を {amount} 超過しました。', c116_pair_budget_set: '設定', c116_pair_budget_clear: '解除', c116_pair_add_title: '二人で記録', c116_pair_kind_exp: '支出', c116_pair_kind_inc: '収入', c116_pair_add_btn: '記録', c116_pair_list_title: '今月の共有の動き', c116_pair_empty: '今月はまだ共有の動きがありません。', c116_pair_by: '{name} さん', c116_pair_del_confirm: '{amount} の共有の動きを削除しますか？二人とも表示されます。',
     c117_wi_title: '🔮 「もしも」シミュレーター', c117_wi_note: 'PETO Pro の機能です。あなたの実際の数字でシナリオを選ぶと、アプリがローカル計算で 12 か月先まで残高を月ごとに予測します。AI はそれを説明するだけ：数字を作ることはありません。', c117_wi_type_label: 'シナリオ', c117_wi_type_cat: 'カテゴリの支出を増やす／減らす', c117_wi_type_income: '毎月の臨時収入', c117_wi_type_debt: '借金への毎月の追加返済', c117_wi_dir_more: '多く使う', c117_wi_dir_less: '少なく使う', c117_wi_more_word: '多く', c117_wi_less_word: '少なく', c117_wi_run_btn: '12 か月を予測', c117_wi_empty: '予測に必要な記録がまだ足りません：最近数か月の収入と支出を記録してから戻ってきてください。あなたの実際の数字なしに、アプリは予測を作りません。', c117_wi_nodebt: '未返済の借金が記録されていません：このシナリオには「借金」に少なくとも 1 件必要です。', c117_wi_base_line: 'あなたの直近 3 か月の実平均：毎月 {inc} 入り、{exp} 出ます。開始残高：{start}。', c117_wi_row: '{month}：変更あり {with} ・ 変更なし {without}', c117_wi_end_line: '12 か月後：変更あり {with} 対 変更なし {without}（差額：{diff}）。', c117_wi_debt_line: '借金：追加返済で {whenNew} に完済（{monthsNew}）；今の返済では {whenBase}（{monthsBase}）。節約できる利息：{saved}。', c117_wi_debt_blocked: '今の返済では借金の残高は減りません；追加返済なら減ります：{when} に完済（{months}）。', c117_wi_scen_cat: 'シナリオ：{cat} に毎月 {amount} {word}使う。', c117_wi_scen_income: 'シナリオ：毎月 {amount} の臨時収入。', c117_wi_scen_debt: 'シナリオ：借金に毎月 {amount} の追加返済。', c117_wi_ai_btn: '✨ AI に説明してもらう', c117_wi_working: 'AI があなたの予測を読んでいます…', c117_wi_none: '今回は AI の説明が返りませんでした。上の予測はそのままです。', c117_wi_bad_amount: '0 より大きい有効な金額を入力してください。', c117_ba_title: '🧾 AI 自動予算', c117_ba_note: 'PETO Pro の機能です。アプリが直近約 90 日の実際の支出をカテゴリ別に合計し、AI が月予算の全体像を提案します。提案は編集でき、「適用」を押すまで何も適用されません。提案するのは支出の上限だけ：貯蓄を勝手に記録することはありません。', c117_ba_btn: '✨ AI で予算を作る', c117_ba_working: 'AI があなたの実際の支出から予算を作っています…', c117_ba_empty: '履歴がまだ足りません：少なくとも 2 つの異なる月に支出の記録が必要です（約 90 日で 8 件ほど）。記録を続けて戻ってきてください。', c117_ba_none: '今回は AI の提案が返りませんでした。今の上限は変更されていません。', c117_ba_prop_title: 'あなたの提案 — 適用前に編集できます', c117_ba_avg_line: '実平均：{amount}/月', c117_ba_current_line: '現在の上限：{amount}/月', c117_ba_total_line: '提案上限の合計：月 {amount}。', c117_ba_apply_btn: '予算を適用', c117_ba_ignore_btn: '無視', c117_ba_applied: '予算を適用しました：上限が提案どおりになりました。', c117_dg_title: '⚠️ 出費の多い月が近づいています', c117_dg_note: 'アプリはあなたのローカルデータで出費の多い月を見張ります：過去の同じ月の支出ピークと、ここで登録した特別な日付。30 日以内に来るものがあれば、推定の追加支出とともに知らせます。', c117_dg_none: 'まだパターンは検出されていません：同じ月が履歴の中で繰り返し高くなれば、アプリが自動で見張ります。', c117_dg_ok: '今後 30 日は危険なし。', c117_dg_alarm_hist: '🔔 {month} が {days} 日後に来ます：その月は普段より {extra} 多く使う傾向があります。', c117_dg_alarm_date: '🔔 {name} が {days} 日後に来ます（{date}）。', c117_dg_extra_line: '推定の追加支出：{amount}。', c117_dg_detected: '検出された高支出の月：{months}。', c117_dg_ai_btn: '✨ AI に備えてもらう', c117_dg_working: 'AI がお知らせを書いています…', c117_dg_ai_none: '今回は AI のお知らせが返りませんでした。上のアラームは残っています。', c117_dg_dates_title: 'あなたの特別な日付', c117_dg_dates_empty: '登録された日付はありません。誕生日、記念日、税金の日付を追加すると毎年見張ります。', c117_dg_name_ph: '例：娘の誕生日', c117_dg_day_ph: '日', c117_dg_extra_ph: '追加 $（任意）', c117_dg_add_btn: '日付を追加',
+    c118_ch_title: '🏆 貯蓄チャレンジ',
+    c118_ch_note: 'PETO Pro の機能です。期限付きチャレンジ：7 日または 30 日で金額を貯める、または 7 日間小さな支出なしで過ごす。進捗はあなたが自分で記録した貯蓄だけから計算されます：チャレンジが勝手に貯蓄を作ることはありません。達成できなくてもペナルティなしで終了します。',
+    c118_ch_type_label: 'チャレンジの種類',
+    c118_ch_type_save7: '7 日で金額を貯める',
+    c118_ch_type_save30: '30 日で金額を貯める',
+    c118_ch_type_noants: '7 日間小さな支出なし',
+    c118_ch_target_label: '貯める金額 ($)',
+    c118_ch_start_btn: 'チャレンジ開始',
+    c118_ch_active_save: '進行中：{days} 日で {target} を貯める',
+    c118_ch_active_noants: '進行中：{days} 日間小さな支出なし',
+    c118_ch_progress: '{target} のうち {have} まで来ました',
+    c118_ch_days_line: '{total} 日中 {n} 日目 · 残り {left} 日',
+    c118_ch_streak: '🔥 継続：チャレンジ {n} 日目',
+    c118_ch_noants_ok: 'クリーン継続中：小さな支出なし {n} 日',
+    c118_ch_noants_def: '小さな支出 = {amount} 以下の支出。',
+    c118_ch_done: '🏅 チャレンジ達成！',
+    c118_ch_failed: '今回は未達成。ペナルティなし：いつでも再挑戦できます。',
+    c118_ch_dropped: 'チャレンジをやめました。',
+    c118_ch_abandon_btn: 'チャレンジをやめる',
+    c118_ch_abandon_confirm: 'このチャレンジをやめますか？ペナルティなしで終了し、履歴に残ります。',
+    c118_ch_history_title: '過去のチャレンジ',
+    c118_ch_history_empty: 'まだチャレンジを終えていません。',
+    c118_ch_bad_target: '0 より大きいチャレンジ金額を入力してください。',
+    c118_ch_name_save: '{days} 日で {target} を貯める',
+    c118_ch_name_noants: '7 日間小さな支出なし',
+    c118_tr_title: '✈️ 旅行モード',
+    c118_tr_note: 'PETO Pro の機能です。旅行ごとに別の予算を持てます：支出を記録するときに旅行の印を付けると、その予算に積み上がります。旅行の支出も他の支出と同じくその月に数えます（お金は同じように出ていくから）：旅行はその上のレンズであり、コピーではありません。',
+    c118_tr_name_label: '旅行の名前',
+    c118_tr_name_ph: '例：サントドミンゴ',
+    c118_tr_start_label: '開始',
+    c118_tr_end_label: '終了',
+    c118_tr_budget_label: '旅行の予算 ($)',
+    c118_tr_create_btn: '旅行を作成',
+    c118_tr_empty: 'まだ旅行がありません。最初の旅行を作り、支出に印を付けましょう。',
+    c118_tr_spent_line: '{budget} のうち {spent}',
+    c118_tr_over: '⚠️ {amount} 超過しています。',
+    c118_tr_perday: '平均：1 日 {amount}',
+    c118_tr_close_btn: '旅行を閉じる',
+    c118_tr_close_confirm: '「{name}」を閉じますか？最終まとめは残ります；支出には触れません。',
+    c118_tr_closed: '終了',
+    c118_tr_open: '進行中',
+    c118_tr_final: '最終まとめ：{days} 日で {budget} のうち {spent} · 1 日 {perday}。',
+    c118_tr_delete_btn: '削除',
+    c118_tr_delete_confirm: '旅行「{name}」を削除しますか？支出は削除されません：旅行の印が外れるだけです。',
+    c118_tr_form_label: '旅行（任意）',
+    c118_tr_none: '旅行なし',
+    c118_tr_bad: '旅行を確認してください：名前、日付（終了が開始より前は不可）、0 より大きい予算。',
+    c118_pro_btn: 'PETO Pro を見る',
+    c118_share_btn: '📤 成果を共有',
+    c118_card_goal_head: '目標達成！',
+    c118_card_chal_head: 'チャレンジ達成！',
+    c118_card_saved: '貯蓄額',
   pro_tag: 'PRO',
   adv_title: '高度なレポート',
   adv_note: 'PETO Proの機能です。今月と先月の比較、すべてのカテゴリ、月のCSVエクスポート。',
@@ -9879,6 +10342,58 @@ ko: {
   c115_goals_title: '🧭 AI 목표 코파일럿', c115_goals_note: 'AI가 당신의 실제 현금 흐름과 목표를 보고, 각 목표에 매주 얼마를 저축할지, 어떤 순서로 할지를 제안합니다. 제안일 뿐입니다: 당신이 승인하지 않으면 돈이 움직이거나 저축되지 않습니다.', c115_goals_btn: '✨ 내 목표 검토', c115_goals_working: '흐름과 목표를 검토하고 있습니다…', c115_goals_empty: '먼저 목표를 만드세요: 코파일럿은 당신의 실제 목표로 일합니다.', c115_goals_none: '이번에는 AI 제안이 오지 않았습니다. 목표는 그대로 유지됩니다.', c115_prop_title: '코파일럿의 제안', c115_prop_weekly: '주당 {amount}', c115_prop_priority: '추천 순서: {list}', c115_apply_btn: '이 플랜 적용', c115_ignore_btn: '무시', c115_applied: '플랜이 적용되었습니다: 목표에 기록되었습니다. 돈은 움직이지 않았습니다.', c115_plan_line: '코파일럿 플랜: {amount}/주', c115_plan_clear: '코파일럿 플랜 제거', c115_plan_active: '코파일럿 주간 플랜 활성',
     c116_group_title: '함께 하는 돈 관리', c116_round_label: '올림 저축', c116_round_help: 'Pro 전용. 켜면 모든 지출이 다음 달러로 올림되고 차액이 「저축 → 올림」에 투명하게 당신의 저축으로 기록됩니다. 당신이 켜고 한 푼까지 보이는, 당신 자신의 지출에서 나온 실제 돈입니다. 제안 비율은 절대 저축을 만들지 않습니다. 언제든 끌 수 있습니다.', c116_fx_label: 'USD/DOP 환율 (1달러당 페소)', c116_fx_help: '앱이 합계에서 도미니카 페소(DOP) 금액을 달러로 환산할 때 쓰는 환율입니다. 여기에 저장한 환율이며 실시간 환율이 아닙니다. 초기값: 60.00.', c116_roundups_label: '올림', c116_roundup_title: '올림', c116_roundup_line: '올림: +{amount} 저축으로', c116_roundup_sub: '{date} 지출에서', c116_fx_equiv: '≈ {amount} 달러', c116_cur_label: '통화', c116_cur_usd: 'USD · 달러 ($)', c116_cur_dop: 'DOP · 도미니카 페소', c116_acc_currency_label: '계좌 통화', c116_pair_title: '👫 커플 모드', c116_pair_note: '가구 안의 커플 공간: 두 사람 모두 이번 달 공유 지출과 수입을 보고 기록하고 월 예산을 공유합니다. 각 계정의 개인 데이터(본인 지출, 계좌, 목표)는 공유되지 않습니다.', c116_pair_locked: '커플 모드는 PETO Pro 기능입니다. 켜면 공유 돈을 기록하고 볼 수 있습니다.', c116_pair_pro_btn: 'PETO Pro 보기', c116_pair_loading: '공유 장부를 불러오는 중…', c116_pair_month_inc: '이번 달 공유 수입', c116_pair_month_exp: '이번 달 공유 지출', c116_pair_balance: '이번 달 공유 잔액', c116_pair_budget_label: '공유 월 예산', c116_pair_budget_none: '아직 설정된 예산이 없습니다.', c116_pair_budget_of: '{limit} 중 {spent} 사용', c116_pair_budget_over: '예산을 {amount} 초과했습니다.', c116_pair_budget_set: '설정', c116_pair_budget_clear: '지우기', c116_pair_add_title: '함께 기록', c116_pair_kind_exp: '지출', c116_pair_kind_inc: '수입', c116_pair_add_btn: '기록', c116_pair_list_title: '이번 달 공유 내역', c116_pair_empty: '이번 달 공유 내역이 아직 없습니다.', c116_pair_by: '{name} 님', c116_pair_del_confirm: '{amount} 공유 내역을 삭제할까요? 두 사람 모두에게 보입니다.',
     c117_wi_title: '🔮 «만약에» 시뮬레이터', c117_wi_note: 'PETO Pro 기능입니다. 실제 숫자로 시나리오를 고르면 앱이 로컬 계산으로 12개월 동안 매달 잔액을 예측합니다. AI는 그것을 설명만 합니다: 숫자를 지어내지 않습니다.', c117_wi_type_label: '시나리오', c117_wi_type_cat: '카테고리 지출 늘리기/줄이기', c117_wi_type_income: '매달 추가 수입', c117_wi_type_debt: '빚에 매달 추가 상환', c117_wi_dir_more: '더 쓰기', c117_wi_dir_less: '덜 쓰기', c117_wi_more_word: '더', c117_wi_less_word: '덜', c117_wi_run_btn: '12개월 예측', c117_wi_empty: '아직 예측할 기록이 부족합니다: 최근 몇 달의 수입과 지출을 기록하고 돌아오세요. 실제 숫자가 없으면 앱은 예측을 지어내지 않습니다.', c117_wi_nodebt: '등록된 미상환 빚이 없습니다: 이 시나리오는 «빚»에 최소 한 건이 필요합니다.', c117_wi_base_line: '최근 3개월 실제 평균: 매달 {inc} 들어오고 {exp} 나갑니다. 시작 잔액: {start}.', c117_wi_row: '{month}: 변경 시 {with} · 변경 없을 때 {without}', c117_wi_end_line: '12개월 후: 변경 시 {with} 대 변경 없을 때 {without} (차이: {diff}).', c117_wi_debt_line: '빚: 추가 상환하면 {whenNew}에 청산({monthsNew}); 지금 상환으로는 {whenBase}({monthsBase}). 절약되는 이자: {saved}.', c117_wi_debt_blocked: '지금 상환으로는 빚 잔액이 줄지 않습니다; 추가 상환하면 줄어듭니다: {when}에 청산({months}).', c117_wi_scen_cat: '시나리오: {cat}에 매달 {amount} {word} 쓰기.', c117_wi_scen_income: '시나리오: 매달 {amount}의 추가 수입.', c117_wi_scen_debt: '시나리오: 빚에 매달 {amount} 추가 상환.', c117_wi_ai_btn: '✨ AI 설명 듣기', c117_wi_working: 'AI가 예측을 읽고 있습니다…', c117_wi_none: '이번에는 AI 설명이 오지 않았습니다. 위의 예측은 그대로입니다.', c117_wi_bad_amount: '0보다 큰 유효한 금액을 입력하세요.', c117_ba_title: '🧾 AI 자동 예산', c117_ba_note: 'PETO Pro 기능입니다. 앱이 최근 약 90일의 실제 지출을 카테고리별로 합산하고 AI가 월 예산 전체를 제안합니다. 제안은 편집할 수 있고 «적용»을 누르기 전에는 아무것도 적용되지 않습니다. 지출 한도만 제안합니다: 저축을 대신 기록하지 않습니다.', c117_ba_btn: '✨ AI로 내 예산 만들기', c117_ba_working: 'AI가 실제 지출로 예산을 만들고 있습니다…', c117_ba_empty: '아직 기록이 부족합니다: 최소 2개의 서로 다른 달에 지출 기록이 필요합니다(약 90일 동안 8건 정도). 계속 기록하고 돌아오세요.', c117_ba_none: '이번에는 AI 제안이 오지 않았습니다. 현재 한도는 건드려지지 않았습니다.', c117_ba_prop_title: '제안 — 적용 전에 편집하세요', c117_ba_avg_line: '실제 평균: {amount}/월', c117_ba_current_line: '현재 한도: {amount}/월', c117_ba_total_line: '제안 한도 합계: 월 {amount}.', c117_ba_apply_btn: '예산 적용', c117_ba_ignore_btn: '무시', c117_ba_applied: '예산이 적용되었습니다: 한도가 제안대로 바뀌었습니다.', c117_dg_title: '⚠️ 지출 많은 달이 다가옵니다', c117_dg_note: '앱이 로컬 데이터로 지출 많은 달을 지켜봅니다: 지난 해 같은 달의 지출 피크와 여기에 등록한 특별한 날짜. 30일 이내에 오는 것이 있으면 예상 추가 지출과 함께 알려줍니다.', c117_dg_none: '아직 패턴이 감지되지 않았습니다: 같은 달이 기록에서 반복해서 비싸지면 앱이 스스로 지켜봅니다.', c117_dg_ok: '앞으로 30일은 위험 없음.', c117_dg_alarm_hist: '🔔 {month}이(가) {days}일 후에 옵니다: 그 달에는 보통 {extra}를 추가로 씁니다.', c117_dg_alarm_date: '🔔 {name}이(가) {days}일 후에 옵니다({date}).', c117_dg_extra_line: '예상 추가 지출: {amount}.', c117_dg_detected: '감지된 고지출 달: {months}.', c117_dg_ai_btn: '✨ AI에게 준비받기', c117_dg_working: 'AI가 알림을 쓰고 있습니다…', c117_dg_ai_none: '이번에는 AI 알림이 오지 않았습니다. 위의 알람은 그대로입니다.', c117_dg_dates_title: '나의 특별한 날짜', c117_dg_dates_empty: '등록된 날짜가 없습니다. 생일, 기념일, 세금 날짜를 추가하면 매년 지켜봅니다.', c117_dg_name_ph: '예: 딸 생일', c117_dg_day_ph: '일', c117_dg_extra_ph: '추가 $ (선택)', c117_dg_add_btn: '날짜 추가',
+    c118_ch_title: '🏆 저축 챌린지',
+    c118_ch_note: 'PETO Pro 기능입니다. 기한 있는 챌린지: 7일 또는 30일 안에 금액 모으기, 또는 7일 동안 잔지출 없이 지내기. 진행도는 당신이 직접 기록한 저축에서만 계산됩니다: 챌린지가 저축을 대신 만들어주지 않습니다. 못 채워도 벌칙 없이 끝납니다.',
+    c118_ch_type_label: '챌린지 종류',
+    c118_ch_type_save7: '7일 안에 금액 모으기',
+    c118_ch_type_save30: '30일 안에 금액 모으기',
+    c118_ch_type_noants: '7일 동안 잔지출 없음',
+    c118_ch_target_label: '모을 금액 ($)',
+    c118_ch_start_btn: '챌린지 시작',
+    c118_ch_active_save: '진행 중 챌린지: {days}일 안에 {target} 모으기',
+    c118_ch_active_noants: '진행 중 챌린지: {days}일 동안 잔지출 없음',
+    c118_ch_progress: '{target} 중 {have} 모았습니다',
+    c118_ch_days_line: '{total}일 중 {n}일째 · {left}일 남음',
+    c118_ch_streak: '🔥 연속: 챌린지 {n}일째',
+    c118_ch_noants_ok: '깨끗하게 유지 중: 잔지출 없이 {n}일',
+    c118_ch_noants_def: '잔지출 = {amount} 이하의 지출.',
+    c118_ch_done: '🏅 챌린지 완료!',
+    c118_ch_failed: '이번엔 못 채웠습니다. 벌칙 없음: 원할 때 다시 시작하세요.',
+    c118_ch_dropped: '챌린지를 그만뒀습니다.',
+    c118_ch_abandon_btn: '챌린지 그만두기',
+    c118_ch_abandon_confirm: '이 챌린지를 그만둘까요? 벌칙 없이 끝나고 기록에 남습니다.',
+    c118_ch_history_title: '지난 챌린지',
+    c118_ch_history_empty: '아직 끝낸 챌린지가 없습니다.',
+    c118_ch_bad_target: '0보다 큰 챌린지 금액을 입력하세요.',
+    c118_ch_name_save: '{days}일 안에 {target} 모으기',
+    c118_ch_name_noants: '7일 동안 잔지출 없음',
+    c118_tr_title: '✈️ 여행 모드',
+    c118_tr_note: 'PETO Pro 기능입니다. 여행마다 별도 예산을 둡니다: 지출을 기록할 때 여행 표시를 하면 그 예산에 쌓입니다. 여행 지출도 다른 지출처럼 그 달에 셉니다(돈이 똑같이 나가니까): 여행은 그 위의 렌즈이지 복사본이 아닙니다.',
+    c118_tr_name_label: '여행 이름',
+    c118_tr_name_ph: '예: 산토도밍고',
+    c118_tr_start_label: '시작',
+    c118_tr_end_label: '종료',
+    c118_tr_budget_label: '여행 예산 ($)',
+    c118_tr_create_btn: '여행 만들기',
+    c118_tr_empty: '아직 여행이 없습니다. 첫 여행을 만들고 지출에 표시하세요.',
+    c118_tr_spent_line: '{budget} 중 {spent}',
+    c118_tr_over: '⚠️ {amount} 초과했습니다.',
+    c118_tr_perday: '평균: 하루 {amount}',
+    c118_tr_close_btn: '여행 닫기',
+    c118_tr_close_confirm: '“{name}”을(를) 닫을까요? 최종 요약은 남고, 지출은 건드리지 않습니다.',
+    c118_tr_closed: '닫힘',
+    c118_tr_open: '진행 중',
+    c118_tr_final: '최종 요약: {days}일 동안 {budget} 중 {spent} · 하루 {perday}.',
+    c118_tr_delete_btn: '삭제',
+    c118_tr_delete_confirm: '여행 “{name}”을(를) 삭제할까요? 지출은 삭제되지 않습니다: 여행 표시만 사라집니다.',
+    c118_tr_form_label: '여행 (선택)',
+    c118_tr_none: '여행 없음',
+    c118_tr_bad: '여행을 확인하세요: 이름, 날짜(종료가 시작보다 앞설 수 없음), 0보다 큰 예산.',
+    c118_pro_btn: 'PETO Pro 보기',
+    c118_share_btn: '📤 성과 공유',
+    c118_card_goal_head: '목표 달성!',
+    c118_card_chal_head: '챌린지 완료!',
+    c118_card_saved: '모은 금액',
   pro_tag: 'PRO',
   adv_title: '고급 보고서',
   adv_note: 'PETO Pro 기능입니다. 이번 달과 지난달 비교, 모든 카테고리, 그리고 월의 CSV 내보내기.',
@@ -10889,6 +11404,58 @@ ru: {
   c115_goals_title: '🧭 Копилот целей с ИИ', c115_goals_note: 'ИИ смотрит на твой реальный денежный поток и твои цели и предлагает, сколько откладывать каждую неделю на каждую и в каком порядке. Это только предложение: ничего не движется и не копится без твоего одобрения.', c115_goals_btn: '✨ Проверить мои цели', c115_goals_working: 'Проверяю твой поток и цели…', c115_goals_empty: 'Сначала создай цель: копилот работает с твоими настоящими целями.', c115_goals_none: 'В этот раз ИИ не принёс предложение. Твои цели остаются как есть.', c115_prop_title: 'Предложение копилота', c115_prop_weekly: '{amount} в неделю', c115_prop_priority: 'Предлагаемый порядок: {list}', c115_apply_btn: 'Применить этот план', c115_ignore_btn: 'Игнорировать', c115_applied: 'План применён: он отмечен у твоих целей. Деньги не двигались.', c115_plan_line: 'План копилота: {amount}/неделю', c115_plan_clear: 'Убрать план копилота', c115_plan_active: 'Недельный план копилота активен',
     c116_group_title: 'Деньги в команде', c116_round_label: 'Округление, которое копит', c116_round_help: 'Только Pro. Когда это включено, каждый расход округляется до следующего доллара, а разница записывается как ваши сбережения — открыто, в разделе Сбережения → «Округления». Это реальные деньги из вашего же расхода, включённые вами и видимые до цента: предлагаемый процент никогда не создаёт сбережения. Отключите в любой момент.', c116_fx_label: 'Курс USD/DOP (песо за 1 доллар)', c116_fx_help: 'Курс, по которому приложение переводит суммы в доминиканских песо (DOP) в доллары в ваших итогах. Это курс, который вы сохраняете здесь; это не живой курс. Начальное значение: 60.00.', c116_roundups_label: 'Округления', c116_roundup_title: 'Округление', c116_roundup_line: 'Округление: +{amount} в сбережения', c116_roundup_sub: 'От расхода за {date}', c116_fx_equiv: '≈ {amount} в долларах', c116_cur_label: 'Валюта', c116_cur_usd: 'USD · Доллары ($)', c116_cur_dop: 'DOP · Доминиканские песо', c116_acc_currency_label: 'Валюта счёта', c116_pair_title: '👫 Режим пары', c116_pair_note: 'Пространство пары внутри вашего домохозяйства: вы оба видите и записываете общие расходы и доходы месяца и делите месячный бюджет. Личные данные каждого счёта (свои расходы, счета и цели) не передаются.', c116_pair_locked: 'Режим пары — функция PETO Pro: включите её, чтобы записывать и видеть общие деньги.', c116_pair_pro_btn: 'Смотреть PETO Pro', c116_pair_loading: 'Загрузка общей книги…', c116_pair_month_inc: 'Общие доходы месяца', c116_pair_month_exp: 'Общие расходы месяца', c116_pair_balance: 'Общий баланс месяца', c116_pair_budget_label: 'Общий месячный бюджет', c116_pair_budget_none: 'Бюджет пока не задан.', c116_pair_budget_of: 'Потрачено {spent} из {limit}', c116_pair_budget_over: 'Вы превысили бюджет на {amount}.', c116_pair_budget_set: 'Задать', c116_pair_budget_clear: 'Убрать', c116_pair_add_title: 'Записать вдвоём', c116_pair_kind_exp: 'Расход', c116_pair_kind_inc: 'Доход', c116_pair_add_btn: 'Записать', c116_pair_list_title: 'Общие движения этого месяца', c116_pair_empty: 'В этом месяце общих движений пока нет.', c116_pair_by: 'от {name}', c116_pair_del_confirm: 'Удалить это общее движение на {amount}? Это увидят оба.',
     c117_wi_title: '🔮 Симулятор «а что, если»', c117_wi_note: 'Функция PETO Pro. Выберите сценарий с вашими реальными цифрами, и приложение спроецирует ваш баланс по месяцам на 12 месяцев своей локальной математикой. ИИ только рассказывает об этом: цифры он не выдумывает.', c117_wi_type_label: 'Сценарий', c117_wi_type_cat: 'Тратить больше или меньше в категории', c117_wi_type_income: 'Дополнительный доход каждый месяц', c117_wi_type_debt: 'Дополнительный платёж по долгу', c117_wi_dir_more: 'Тратить БОЛЬШЕ', c117_wi_dir_less: 'Тратить МЕНЬШЕ', c117_wi_more_word: 'больше', c117_wi_less_word: 'меньше', c117_wi_run_btn: 'Спроецировать 12 месяцев', c117_wi_empty: 'Пока недостаточно движений для проекции: запишите доходы и расходы последних месяцев и возвращайтесь. Без ваших реальных цифр приложение проекцию не выдумывает.', c117_wi_nodebt: 'У вас нет записанных непогашенных долгов: для этого сценария нужен хотя бы один долг в разделе «Долги».', c117_wi_base_line: 'Ваше реальное среднее за 3 месяца: приходит {inc} и уходит {exp} в месяц. Начальный баланс: {start}.', c117_wi_row: '{month}: {with} с изменением · {without} без него', c117_wi_end_line: 'Через 12 месяцев: {with} с изменением против {without} без него (разница: {diff}).', c117_wi_debt_line: 'Долги: с дополнительным платежом вы свободны в {whenNew} ({monthsNew}); с текущим платежом — в {whenBase} ({monthsBase}). Сэкономленные проценты: {saved}.', c117_wi_debt_blocked: 'С текущим платежом баланс долга не уменьшается; с дополнительным — да: вы выходите в {when} ({months}).', c117_wi_scen_cat: 'Сценарий: тратить {amount} {word} в месяц на {cat}.', c117_wi_scen_income: 'Сценарий: дополнительный доход {amount} в месяц.', c117_wi_scen_debt: 'Сценарий: дополнительный платёж {amount} в месяц по вашим долгам.', c117_wi_ai_btn: '✨ Пусть ИИ объяснит', c117_wi_working: 'ИИ читает вашу проекцию…', c117_wi_none: 'В этот раз ИИ не вернул объяснение. Ваша проекция выше не тронута.', c117_wi_bad_amount: 'Введите корректную сумму больше нуля.', c117_ba_title: '🧾 Автоматический бюджет с ИИ', c117_ba_note: 'Функция PETO Pro. Приложение суммирует ваши реальные траты за последние ~90 дней по категориям, а ИИ предлагает ваш полный месячный бюджет. Предложение можно редактировать, и НИЧЕГО не применяется, пока вы не нажмёте «Применить». Предлагаются только лимиты трат: сбережения за вас не записываются.', c117_ba_btn: '✨ Создать мой бюджет с ИИ', c117_ba_working: 'ИИ собирает ваш бюджет из ваших реальных трат…', c117_ba_empty: 'Истории пока недостаточно: нужны траты, записанные минимум в 2 разных месяцах (около 8 списаний за ~90 дней). Продолжайте записывать и возвращайтесь.', c117_ba_none: 'В этот раз ИИ не вернул предложение. Ваши текущие лимиты не тронуты.', c117_ba_prop_title: 'Ваше предложение — отредактируйте перед применением', c117_ba_avg_line: 'Реальное среднее: {amount}/мес', c117_ba_current_line: 'Текущий лимит: {amount}/мес', c117_ba_total_line: 'Сумма предложенных лимитов: {amount} в месяц.', c117_ba_apply_btn: 'Применить бюджет', c117_ba_ignore_btn: 'Игнорировать', c117_ba_applied: 'Бюджет применён: ваши лимиты теперь как в предложении.', c117_dg_title: '⚠️ Впереди дорогой месяц', c117_dg_note: 'Приложение следит за вашими дорогими месяцами по локальным данным: исторические пики трат того же месяца в прошлые годы и особые даты, которые вы регистрируете здесь. Если такой месяц наступит через 30 дней или раньше, оно предупредит с оценкой перерасхода.', c117_dg_none: 'Паттерны пока не обнаружены: когда тот же месяц в вашей истории будет повторяться дорогим, приложение начнёт следить за ним само.', c117_dg_ok: 'Ничего опасного в ближайшие 30 дней.', c117_dg_alarm_hist: '🔔 {month} наступит через {days} дн.: в этот месяц вы обычно тратите на {extra} БОЛЬШЕ.', c117_dg_alarm_date: '🔔 {name} наступит через {days} дн. ({date}).', c117_dg_extra_line: 'Оценка перерасхода: {amount}.', c117_dg_detected: 'Обнаружены дорогие месяцы: {months}.', c117_dg_ai_btn: '✨ Пусть ИИ подготовит меня', c117_dg_working: 'ИИ пишет ваше предупреждение…', c117_dg_ai_none: 'В этот раз ИИ не вернул предупреждение. Тревога выше остаётся.', c117_dg_dates_title: 'Ваши особые даты', c117_dg_dates_empty: 'Нет зарегистрированных дат. Добавьте дни рождения, годовщины или налоги, чтобы следить за ними каждый год.', c117_dg_name_ph: 'Напр.: День рождения дочери', c117_dg_day_ph: 'День', c117_dg_extra_ph: 'Перерасход $ (необязательно)', c117_dg_add_btn: 'Добавить дату',
+    c118_ch_title: '🏆 Челленджи накоплений',
+    c118_ch_note: 'Функция PETO Pro. Челленджи со сроком: накопить сумму за 7 или 30 дней или прожить 7 дней без мелких трат. Прогресс считается ТОЛЬКО из тех накоплений, что вы записали сами: челлендж никогда не создаёт накопления сам. Если не вышло — закрывается без штрафа.',
+    c118_ch_type_label: 'Тип челленджа',
+    c118_ch_type_save7: 'Накопить сумму за 7 дней',
+    c118_ch_type_save30: 'Накопить сумму за 30 дней',
+    c118_ch_type_noants: '7 дней без мелких трат',
+    c118_ch_target_label: 'Сумма к накоплению ($)',
+    c118_ch_start_btn: 'Начать челлендж',
+    c118_ch_active_save: 'Активный челлендж: накопить {target} за {days} дней',
+    c118_ch_active_noants: 'Активный челлендж: {days} дней без мелких трат',
+    c118_ch_progress: 'У вас {have} из {target}',
+    c118_ch_days_line: 'День {n} из {total} · осталось {left} дней',
+    c118_ch_streak: '🔥 Серия: {n} дней в челлендже',
+    c118_ch_noants_ok: 'Пока чисто: {n} дней без мелких трат',
+    c118_ch_noants_def: 'Мелкая трата = расход на {amount} или меньше.',
+    c118_ch_done: '🏅 Челлендж выполнен!',
+    c118_ch_failed: 'В этот раз не вышло. Без штрафа: начните новый, когда захотите.',
+    c118_ch_dropped: 'Челлендж брошен.',
+    c118_ch_abandon_btn: 'Бросить челлендж',
+    c118_ch_abandon_confirm: 'Бросить этот челлендж? Он закроется без штрафа и останется в истории.',
+    c118_ch_history_title: 'Ваши прошлые челленджи',
+    c118_ch_history_empty: 'Вы ещё не завершили ни одного челленджа.',
+    c118_ch_bad_target: 'Укажите сумму челленджа больше нуля.',
+    c118_ch_name_save: 'Накопить {target} за {days} дней',
+    c118_ch_name_noants: '7 дней без мелких трат',
+    c118_tr_title: '✈️ Режим поездки',
+    c118_tr_note: 'Функция PETO Pro. У каждой поездки свой отдельный бюджет: когда записываете расход, отметьте его поездкой, и он встанет против этого бюджета. Расходы поездки считаются в вашем месяце как любые другие (деньги ушли так же): поездка — это линза над ними, а не копия.',
+    c118_tr_name_label: 'Название поездки',
+    c118_tr_name_ph: 'Напр.: Санто-Доминго',
+    c118_tr_start_label: 'С',
+    c118_tr_end_label: 'По',
+    c118_tr_budget_label: 'Бюджет поездки ($)',
+    c118_tr_create_btn: 'Создать поездку',
+    c118_tr_empty: 'Поездок пока нет. Создайте первую и отмечайте её расходы при записи.',
+    c118_tr_spent_line: '{spent} из {budget}',
+    c118_tr_over: '⚠️ Вы вышли за бюджет на {amount}.',
+    c118_tr_perday: 'В среднем: {amount} в день',
+    c118_tr_close_btn: 'Закрыть поездку',
+    c118_tr_close_confirm: 'Закрыть «{name}»? Итоговая сводка сохранится; расходы не трогаются.',
+    c118_tr_closed: 'Закрыта',
+    c118_tr_open: 'Идёт',
+    c118_tr_final: 'Итог: {spent} из {budget} за {days} дней · {perday} в день.',
+    c118_tr_delete_btn: 'Удалить',
+    c118_tr_delete_confirm: 'Удалить поездку «{name}»? Её расходы НЕ удаляются: они только теряют отметку поездки.',
+    c118_tr_form_label: 'Поездка (необязательно)',
+    c118_tr_none: 'Без поездки',
+    c118_tr_bad: 'Проверьте поездку: название, даты (конец не раньше начала) и бюджет больше нуля.',
+    c118_pro_btn: 'Смотреть PETO Pro',
+    c118_share_btn: '📤 Поделиться достижением',
+    c118_card_goal_head: 'Цель достигнута!',
+    c118_card_chal_head: 'Челлендж выполнен!',
+    c118_card_saved: 'Накоплено',
   pro_tag: 'PRO',
   adv_title: 'Расширенный отчёт',
   adv_note: 'Функция PETO Pro: этот месяц против предыдущего, каждая категория и экспорт месяца в CSV.',
@@ -11899,6 +12466,58 @@ hi: {
   c115_goals_title: '🧭 AI लक्ष्य कोपायलट', c115_goals_note: 'AI आपके असली नकदी प्रवाह और लक्ष्यों को देखकर सुझाव देता है कि हर लक्ष्य के लिए हर हफ़्ते कितना बचाएँ और किस क्रम में। यह सिर्फ़ एक सुझाव है: आपकी मंज़ूरी के बिना कुछ भी नहीं हिलता और न ही बचता है।', c115_goals_btn: '✨ मेरे लक्ष्य देखें', c115_goals_working: 'आपके प्रवाह और लक्ष्यों की जाँच हो रही है…', c115_goals_empty: 'पहले एक लक्ष्य बनाएँ: कोपायलट आपके असली लक्ष्यों पर काम करता है।', c115_goals_none: 'इस बार AI का सुझाव नहीं आया। आपके लक्ष्य जैसे हैं वैसे ही रहते हैं।', c115_prop_title: 'कोपायलट का सुझाव', c115_prop_weekly: '{amount} प्रति हफ़्ता', c115_prop_priority: 'सुझाया क्रम: {list}', c115_apply_btn: 'यह प्लान लागू करें', c115_ignore_btn: 'अनदेखा करें', c115_applied: 'प्लान लागू हुआ: यह आपके लक्ष्यों पर दर्ज हो गया। कोई पैसा नहीं हिला।', c115_plan_line: 'कोपायलट प्लान: {amount}/हफ़्ता', c115_plan_clear: 'कोपायलट प्लान हटाएँ', c115_plan_active: 'कोपायलट साप्ताहिक प्लान सक्रिय',
     c116_group_title: 'टीम के साथ पैसा', c116_round_label: 'राउंड-अप बचत', c116_round_help: 'केवल Pro. यह चालू होने पर, हर खर्च अगले डॉलर तक राउंड हो जाता है और अंतर आपकी बचत के रूप में, खुलकर, बचत → «राउंड-अप» में दर्ज होता है। यह आपके अपने खर्च का असली पैसा है, जिसे आप चालू करते हैं और जो पैसे-पैसे दिखता है: सुझाया गया प्रतिशत कभी बचत नहीं बनाता। जब चाहें बंद करें।', c116_fx_label: 'USD/DOP दर (1 डॉलर के पेसो)', c116_fx_help: 'वह दर जिससे ऐप आपके कुल योग में डोमिनिकन पेसो (DOP) राशियों को डॉलर में बदलता है। यह वही दर है जो आप यहाँ सहेजते हैं; यह लाइव दर नहीं है। शुरुआती मान: 60.00।', c116_roundups_label: 'राउंड-अप', c116_roundup_title: 'राउंड-अप', c116_roundup_line: 'राउंड-अप: +{amount} बचत में', c116_roundup_sub: '{date} के खर्च से', c116_fx_equiv: '≈ {amount} डॉलर में', c116_cur_label: 'मुद्रा', c116_cur_usd: 'USD · डॉलर ($)', c116_cur_dop: 'DOP · डोमिनिकन पेसो', c116_acc_currency_label: 'खाते की मुद्रा', c116_pair_title: '👫 कपल मोड', c116_pair_note: 'आपके परिवार के अंदर कपल की जगह: आप दोनों इस महीने के साझा खर्च और आय देख और दर्ज कर सकते हैं और एक मासिक बजट साझा करते हैं। हर खाते का निजी डेटा (अपने खर्च, खाते और लक्ष्य) साझा नहीं होता।', c116_pair_locked: 'कपल मोड PETO Pro की सुविधा है: साझा पैसा दर्ज करने और देखने के लिए इसे चालू करें।', c116_pair_pro_btn: 'PETO Pro देखें', c116_pair_loading: 'साझा बही लोड हो रही है…', c116_pair_month_inc: 'महीने की साझा आय', c116_pair_month_exp: 'महीने के साझा खर्च', c116_pair_balance: 'महीने का साझा शेष', c116_pair_budget_label: 'साझा मासिक बजट', c116_pair_budget_none: 'अभी कोई बजट तय नहीं है।', c116_pair_budget_of: '{limit} में से {spent} खर्च', c116_pair_budget_over: 'आप बजट से {amount} आगे निकल गए।', c116_pair_budget_set: 'तय करें', c116_pair_budget_clear: 'हटाएँ', c116_pair_add_title: 'साथ में दर्ज करें', c116_pair_kind_exp: 'खर्च', c116_pair_kind_inc: 'आय', c116_pair_add_btn: 'दर्ज करें', c116_pair_list_title: 'इस महीने के साझा लेन-देन', c116_pair_empty: 'इस महीने अभी कोई साझा लेन-देन नहीं है।', c116_pair_by: '{name} द्वारा', c116_pair_del_confirm: '{amount} का यह साझा लेन-देन हटाएँ? आप दोनों को दिखेगा।',
     c117_wi_title: '🔮 «अगर ऐसा हो तो» सिम्युलेटर', c117_wi_note: 'PETO Pro की सुविधा। अपने असली आंकड़ों के साथ एक परिदृश्य चुनें और ऐप अपने स्थानीय गणित से 12 महीनों तक हर महीने आपका बैलेंस प्रोजेक्ट करता है। AI सिर्फ़ उसे सुनाता है: वह आंकड़े नहीं गढ़ता।', c117_wi_type_label: 'परिदृश्य', c117_wi_type_cat: 'किसी श्रेणी में ज़्यादा या कम खर्च', c117_wi_type_income: 'हर महीने एक अतिरिक्त आय', c117_wi_type_debt: 'किसी कर्ज़ पर एक अतिरिक्त भुगतान', c117_wi_dir_more: 'ज़्यादा खर्च', c117_wi_dir_less: 'कम खर्च', c117_wi_more_word: 'ज़्यादा', c117_wi_less_word: 'कम', c117_wi_run_btn: '12 महीने प्रोजेक्ट करें', c117_wi_empty: 'प्रोजेक्ट करने के लिए अभी पर्याप्त लेन-देन नहीं हैं: पिछले कुछ महीनों की आय और खर्च दर्ज करें और वापस आएं। आपके असली आंकड़ों के बिना ऐप प्रोजेक्शन नहीं गढ़ेगा।', c117_wi_nodebt: 'आपके कोई बकाया कर्ज़ दर्ज नहीं हैं: इस परिदृश्य के लिए «कर्ज़» में कम से कम एक कर्ज़ चाहिए।', c117_wi_base_line: 'आपका असली 3-महीने का औसत: हर महीने {inc} आता है और {exp} जाता है। शुरुआती बैलेंस: {start}।', c117_wi_row: '{month}: बदलाव के साथ {with} · बिना बदलाव {without}', c117_wi_end_line: '12 महीनों पर: बदलाव के साथ {with} बनाम बिना बदलाव {without} (अंतर: {diff})।', c117_wi_debt_line: 'कर्ज़: अतिरिक्त भुगतान से आप {whenNew} में कर्ज़मुक्त ({monthsNew}); मौजूदा भुगतान से {whenBase} में ({monthsBase})। बचाया गया ब्याज: {saved}।', c117_wi_debt_blocked: 'मौजूदा भुगतान से कर्ज़ का बैलेंस कभी घटता नहीं; अतिरिक्त भुगतान से घटता है: आप {when} में बाहर ({months})।', c117_wi_scen_cat: 'परिदृश्य: {cat} पर हर महीने {amount} {word} खर्च।', c117_wi_scen_income: 'परिदृश्य: हर महीने {amount} की अतिरिक्त आय।', c117_wi_scen_debt: 'परिदृश्य: अपने कर्ज़ों पर हर महीने {amount} का अतिरिक्त भुगतान।', c117_wi_ai_btn: '✨ AI से समझवाएं', c117_wi_working: 'AI आपका प्रोजेक्शन पढ़ रहा है…', c117_wi_none: 'इस बार AI ने कोई व्याख्या नहीं लौटाई। ऊपर आपका प्रोजेक्शन वैसा ही है।', c117_wi_bad_amount: 'शून्य से बड़ी कोई मान्य रकम लिखें।', c117_ba_title: '🧾 AI के साथ स्वचालित बजट', c117_ba_note: 'PETO Pro की सुविधा। ऐप पिछले ~90 दिनों के आपके असली खर्च को श्रेणी के हिसाब से जोड़ता है और AI आपका पूरा मासिक बजट प्रस्तावित करता है। प्रस्ताव संपादित किया जा सकता है और «लागू करें» दबाने तक कुछ भी लागू नहीं होता। यह सिर्फ़ खर्च की सीमाएं प्रस्तावित करता है: यह आपकी ओर से बचत कभी दर्ज नहीं करता।', c117_ba_btn: '✨ AI से मेरा बजट बनाएं', c117_ba_working: 'AI आपके असली खर्च से आपका बजट बना रहा है…', c117_ba_empty: 'अभी पर्याप्त इतिहास नहीं है: कम से कम 2 अलग-अलग महीनों में खर्च दर्ज होना चाहिए (~90 दिनों में करीब 8 निकासियां)। दर्ज करते रहें और वापस आएं।', c117_ba_none: 'इस बार AI ने कोई प्रस्ताव नहीं लौटाया। आपकी मौजूदा सीमाएं नहीं छुई गईं।', c117_ba_prop_title: 'आपका प्रस्ताव — लागू करने से पहले संपादित करें', c117_ba_avg_line: 'असली औसत: {amount}/महीना', c117_ba_current_line: 'मौजूदा सीमा: {amount}/महीना', c117_ba_total_line: 'प्रस्तावित सीमाओं का योग: हर महीने {amount}।', c117_ba_apply_btn: 'बजट लागू करें', c117_ba_ignore_btn: 'अनदेखा करें', c117_ba_applied: 'बजट लागू हो गया: आपकी सीमाएं अब प्रस्ताव जैसी हैं।', c117_dg_title: '⚠️ आगे महंगा महीना है', c117_dg_note: 'ऐप आपके स्थानीय डेटा से आपके महंगे महीनों पर नज़र रखता है: पिछले वर्षों में उसी महीने के ऐतिहासिक खर्च-शिखर और यहां दर्ज की गई आपकी विशेष तारीखें। अगर कोई 30 दिनों या कम में आ रहा है, तो अनुमानित अतिरिक्त खर्च के साथ चेतावनी मिलती है।', c117_dg_none: 'अभी कोई पैटर्न नहीं मिला: जब वही महीना आपके इतिहास में बार-बार महंगा होगा, ऐप खुद उस पर नज़र रखेगा।', c117_dg_ok: 'अगले 30 दिनों में कुछ ख़तरनाक नहीं।', c117_dg_alarm_hist: '🔔 {month} {days} दिनों में आएगा: उस महीने आप आमतौर पर {extra} अतिरिक्त खर्च करते हैं।', c117_dg_alarm_date: '🔔 {name} {days} दिनों में आएगा ({date})।', c117_dg_extra_line: 'अनुमानित अतिरिक्त: {amount}।', c117_dg_detected: 'मिले महंगे महीने: {months}।', c117_dg_ai_btn: '✨ AI से तैयारी करवाएं', c117_dg_working: 'AI आपकी चेतावनी लिख रहा है…', c117_dg_ai_none: 'इस बार AI ने कोई चेतावनी नहीं लौटाई। ऊपर वाला अलार्म बना हुआ है।', c117_dg_dates_title: 'आपकी विशेष तारीखें', c117_dg_dates_empty: 'कोई तारीख दर्ज नहीं। जन्मदिन, वर्षगांठ या कर की तारीखें जोड़ें ताकि हर साल उन पर नज़र रहे।', c117_dg_name_ph: 'उदा.: मेरी बेटी का जन्मदिन', c117_dg_day_ph: 'दिन', c117_dg_extra_ph: 'अतिरिक्त $ (वैकल्पिक)', c117_dg_add_btn: 'तारीख जोड़ें',
+    c118_ch_title: '🏆 बचत चुनौतियाँ',
+    c118_ch_note: 'PETO Pro की सुविधा। तारीख वाली चुनौतियाँ: 7 या 30 दिनों में एक रकम बचाएँ, या 7 दिन बिना छोटी फिज़ूलखर्ची के बिताएँ। प्रगति सिर्फ़ उसी बचत से गिनी जाती है जो आप खुद दर्ज करते हैं: चुनौती कभी अपने आप बचत नहीं बनाती। पूरी न हो तो बिना सज़ा के बंद हो जाती है।',
+    c118_ch_type_label: 'चुनौती का प्रकार',
+    c118_ch_type_save7: '7 दिनों में एक रकम बचाना',
+    c118_ch_type_save30: '30 दिनों में एक रकम बचाना',
+    c118_ch_type_noants: '7 दिन बिना छोटी फिज़ूलखर्ची',
+    c118_ch_target_label: 'बचाने की रकम ($)',
+    c118_ch_start_btn: 'चुनौती शुरू करें',
+    c118_ch_active_save: 'सक्रिय चुनौती: {days} दिनों में {target} बचाएँ',
+    c118_ch_active_noants: 'सक्रिय चुनौती: {days} दिन बिना छोटी फिज़ूलखर्ची',
+    c118_ch_progress: 'आपके पास {target} में से {have} है',
+    c118_ch_days_line: 'दिन {n} / {total} · {left} दिन बचे',
+    c118_ch_streak: '🔥 सिलसिला: चुनौती में {n} दिन',
+    c118_ch_noants_ok: 'अभी तक साफ़: {n} दिन बिना छोटी फिज़ूलखर्ची',
+    c118_ch_noants_def: 'छोटी फिज़ूलखर्ची = {amount} या उससे कम का खर्च।',
+    c118_ch_done: '🏅 चुनौती पूरी!',
+    c118_ch_failed: 'इस बार नहीं हो पाया। कोई सज़ा नहीं: जब चाहें नई चुनौती शुरू करें।',
+    c118_ch_dropped: 'चुनौती छोड़ी गई।',
+    c118_ch_abandon_btn: 'चुनौती छोड़ें',
+    c118_ch_abandon_confirm: 'यह चुनौती छोड़ें? यह बिना सज़ा के बंद होगी और आपके इतिहास में रहेगी।',
+    c118_ch_history_title: 'आपकी पिछली चुनौतियाँ',
+    c118_ch_history_empty: 'आपने अभी तक कोई चुनौती पूरी नहीं की।',
+    c118_ch_bad_target: 'चुनौती की रकम लिखें, शून्य से ज़्यादा।',
+    c118_ch_name_save: '{days} दिनों में {target} बचाना',
+    c118_ch_name_noants: '7 दिन बिना छोटी फिज़ूलखर्ची',
+    c118_tr_title: '✈️ यात्रा मोड',
+    c118_tr_note: 'PETO Pro की सुविधा। हर यात्रा का अपना अलग बजट होता है: खर्च दर्ज करते समय उसे उसकी यात्रा से जोड़ें, और वह उस बजट के सामने जुड़ता है। यात्रा के खर्च आपके महीने में किसी भी खर्च की तरह गिने जाते हैं (पैसा वैसे ही गया): यात्रा उनके ऊपर का एक नज़रिया है, नकल नहीं।',
+    c118_tr_name_label: 'यात्रा का नाम',
+    c118_tr_name_ph: 'उदा.: सांतो डोमिंगो',
+    c118_tr_start_label: 'से',
+    c118_tr_end_label: 'तक',
+    c118_tr_budget_label: 'यात्रा का बजट ($)',
+    c118_tr_create_btn: 'यात्रा बनाएँ',
+    c118_tr_empty: 'अभी कोई यात्रा नहीं। पहली बनाएँ और खर्च दर्ज करते समय उन्हें जोड़ें।',
+    c118_tr_spent_line: '{budget} में से {spent}',
+    c118_tr_over: '⚠️ आप {amount} ज़्यादा खर्च कर गए।',
+    c118_tr_perday: 'औसत: रोज़ {amount}',
+    c118_tr_close_btn: 'यात्रा बंद करें',
+    c118_tr_close_confirm: '«{name}» बंद करें? इसका अंतिम सारांश रहेगा; इसके खर्च नहीं छुए जाएँगे।',
+    c118_tr_closed: 'बंद',
+    c118_tr_open: 'चल रही है',
+    c118_tr_final: 'अंतिम सारांश: {days} दिनों में {budget} में से {spent} · रोज़ {perday}।',
+    c118_tr_delete_btn: 'हटाएँ',
+    c118_tr_delete_confirm: 'यात्रा «{name}» हटाएँ? इसके खर्च नहीं हटेंगे: सिर्फ़ यात्रा का निशान हटेगा।',
+    c118_tr_form_label: 'यात्रा (वैकल्पिक)',
+    c118_tr_none: 'कोई यात्रा नहीं',
+    c118_tr_bad: 'यात्रा जाँचें: नाम, तारीखें (अंत शुरुआत से पहले नहीं हो सकता) और शून्य से बड़ा बजट।',
+    c118_pro_btn: 'PETO Pro देखें',
+    c118_share_btn: '📤 उपलब्धि साझा करें',
+    c118_card_goal_head: 'लक्ष्य पूरा!',
+    c118_card_chal_head: 'चुनौती पूरी!',
+    c118_card_saved: 'बचाया',
   pro_tag: 'PRO',
   adv_title: 'उन्नत रिपोर्ट',
   adv_note: 'यह PETO Pro की सुविधा है: यह माह बनाम पिछला माह, हर श्रेणी और माह का CSV निर्यात।',
@@ -12909,6 +13528,58 @@ ar: {
   c115_goals_title: '🧭 مساعد الأهداف مع الذكاء الاصطناعي', c115_goals_note: 'ينظر الذكاء الاصطناعي إلى تدفقك الحقيقي وأهدافك، ويقترح كم تدّخر أسبوعيًا لكل هدف وبأي ترتيب. إنه مجرد اقتراح: لا يتحرك شيء ولا يُدّخر شيء دون موافقتك.', c115_goals_btn: '✨ راجع أهدافي', c115_goals_working: 'جارٍ مراجعة تدفقك وأهدافك…', c115_goals_empty: 'أنشئ هدفًا أولًا: يعمل المساعد على أهدافك الحقيقية.', c115_goals_none: 'لم يصل اقتراح الذكاء الاصطناعي هذه المرة. تبقى أهدافك كما هي.', c115_prop_title: 'اقتراح المساعد', c115_prop_weekly: '{amount} أسبوعيًا', c115_prop_priority: 'الترتيب المقترح: {list}', c115_apply_btn: 'طبّق هذه الخطة', c115_ignore_btn: 'تجاهل', c115_applied: 'تم تطبيق الخطة: سُجّلت على أهدافك. لم يتحرك أي مال.', c115_plan_line: 'خطة المساعد: {amount}/أسبوع', c115_plan_clear: 'إزالة خطة المساعد', c115_plan_active: 'خطة المساعد الأسبوعية مفعّلة',
     c116_group_title: 'المال كفريق', c116_round_label: 'التقريب الذي يوفّر', c116_round_help: 'للمحترفين فقط. عند تشغيله، يُقرَّب كل مصروف إلى الدولار التالي ويُسجَّل الفرق كمدخراتك، بوضوح، في المدخرات ← «التقريبات». إنه مال حقيقي من مصروفك نفسه، تُشغّله أنت ويظهر سنتًا بسنت: النسبة المقترحة لا تخلق مدخرات أبدًا. أوقفه متى شئت.', c116_fx_label: 'سعر USD/DOP (بيزو مقابل 1 دولار)', c116_fx_help: 'السعر الذي يحوّل به التطبيق مبالغ البيزو الدومينيكاني (DOP) إلى دولارات في مجاميعك. إنه السعر الذي تحفظه هنا؛ وليس سعرًا مباشرًا. القيمة الابتدائية: 60.00.', c116_roundups_label: 'التقريبات', c116_roundup_title: 'تقريب', c116_roundup_line: 'تقريب: +{amount} إلى المدخرات', c116_roundup_sub: 'من مصروف {date}', c116_fx_equiv: '≈ {amount} بالدولار', c116_cur_label: 'العملة', c116_cur_usd: 'USD · دولارات ($)', c116_cur_dop: 'DOP · بيزو دومينيكاني', c116_acc_currency_label: 'عملة الحساب', c116_pair_title: '👫 وضع الشريكين', c116_pair_note: 'مساحة الشريكين داخل أسرتك: كلاكما يرى ويسجّل مصروفات ودخل هذا الشهر المشتركة وتتشاركان ميزانية شهرية. البيانات الشخصية لكل حساب (مصروفاته وحساباته وأهدافه) لا تُشارَك.', c116_pair_locked: 'وضع الشريكين من مزايا PETO Pro: فعّله لتسجيل المال المشترك ورؤيته.', c116_pair_pro_btn: 'عرض PETO Pro', c116_pair_loading: 'جارٍ تحميل الدفتر المشترك…', c116_pair_month_inc: 'دخل الشهر المشترك', c116_pair_month_exp: 'مصروفات الشهر المشتركة', c116_pair_balance: 'رصيد الشهر المشترك', c116_pair_budget_label: 'الميزانية الشهرية المشتركة', c116_pair_budget_none: 'لا توجد ميزانية محددة بعد.', c116_pair_budget_of: 'أُنفق {spent} من {limit}', c116_pair_budget_over: 'تجاوزتما الميزانية بمقدار {amount}.', c116_pair_budget_set: 'تحديد', c116_pair_budget_clear: 'إزالة', c116_pair_add_title: 'التسجيل معًا', c116_pair_kind_exp: 'مصروف', c116_pair_kind_inc: 'دخل', c116_pair_add_btn: 'تسجيل', c116_pair_list_title: 'حركات هذا الشهر المشتركة', c116_pair_empty: 'لا توجد حركات مشتركة هذا الشهر بعد.', c116_pair_by: 'بواسطة {name}', c116_pair_del_confirm: 'حذف هذه الحركة المشتركة بقيمة {amount}؟ سيراها كلاكما.',
     c117_wi_title: '🔮 محاكي «ماذا لو»', c117_wi_note: 'ميزة من PETO Pro. اختر سيناريو بأرقامك الحقيقية وسيُسقط التطبيق رصيدك شهرًا بشهر لمدة 12 شهرًا بحساباته المحلية. الذكاء الاصطناعي يرويه فقط: لا يخترع أرقامًا.', c117_wi_type_label: 'السيناريو', c117_wi_type_cat: 'إنفاق أكثر أو أقل في فئة', c117_wi_type_income: 'دخل إضافي كل شهر', c117_wi_type_debt: 'دفعة إضافية على دين', c117_wi_dir_more: 'إنفاق أكثر', c117_wi_dir_less: 'إنفاق أقل', c117_wi_more_word: 'أكثر', c117_wi_less_word: 'أقل', c117_wi_run_btn: 'إسقاط 12 شهرًا', c117_wi_empty: 'لا توجد حركات كافية بعد للإسقاط: سجّل دخلك ومصروفاتك في الأشهر الأخيرة وارجع. بدون أرقامك الحقيقية لن يخترع التطبيق إسقاطًا.', c117_wi_nodebt: 'ليس لديك ديون معلّقة مسجلة: هذا السيناريو يحتاج دينًا واحدًا على الأقل في قسم الديون.', c117_wi_base_line: 'متوسطك الحقيقي لثلاثة أشهر: يدخل {inc} ويخرج {exp} كل شهر. الرصيد الابتدائي: {start}.', c117_wi_row: '{month}: {with} مع التغيير · {without} بدونه', c117_wi_end_line: 'عند 12 شهرًا: {with} مع التغيير مقابل {without} بدونه (الفرق: {diff}).', c117_wi_debt_line: 'الديون: بالدفعة الإضافية تتحرر في {whenNew} ({monthsNew})؛ وبدفعتك الحالية في {whenBase} ({monthsBase}). الفائدة الموفَّرة: {saved}.', c117_wi_debt_blocked: 'بدفعتك الحالية لا ينخفض رصيد الدين أبدًا؛ وبالدفعة الإضافية ينخفض: تخرج في {when} ({months}).', c117_wi_scen_cat: 'السيناريو: إنفاق {amount} {word} كل شهر على {cat}.', c117_wi_scen_income: 'السيناريو: دخل إضافي قدره {amount} كل شهر.', c117_wi_scen_debt: 'السيناريو: دفعة إضافية قدرها {amount} كل شهر على ديونك.', c117_wi_ai_btn: '✨ دع الذكاء الاصطناعي يشرحه', c117_wi_working: 'الذكاء الاصطناعي يقرأ إسقاطك…', c117_wi_none: 'لم يُعد الذكاء الاصطناعي شرحًا هذه المرة. إسقاطك في الأعلى كما هو.', c117_wi_bad_amount: 'اكتب مبلغًا صالحًا أكبر من الصفر.', c117_ba_title: '🧾 ميزانية تلقائية بالذكاء الاصطناعي', c117_ba_note: 'ميزة من PETO Pro. يجمع التطبيق مصروفاتك الحقيقية لآخر ~90 يومًا حسب الفئة ويقترح الذكاء الاصطناعي ميزانيتك الشهرية الكاملة. الاقتراح قابل للتحرير ولا يُطبَّق أي شيء حتى تضغط «تطبيق». يقترح حدود إنفاق فقط: لا يسجّل مدخرات نيابة عنك أبدًا.', c117_ba_btn: '✨ أنشئ ميزانيتي بالذكاء الاصطناعي', c117_ba_working: 'الذكاء الاصطناعي يبني ميزانيتك من مصروفاتك الحقيقية…', c117_ba_empty: 'لا يوجد سجل كافٍ بعد: يلزم مصروفات مسجلة في شهرين مختلفين على الأقل (نحو 8 مخارج في ~90 يومًا). واصل التسجيل وارجع.', c117_ba_none: 'لم يُعد الذكاء الاصطناعي اقتراحًا هذه المرة. حدودك الحالية لم تُمس.', c117_ba_prop_title: 'اقتراحك — حرّره قبل التطبيق', c117_ba_avg_line: 'المتوسط الحقيقي: {amount}/شهر', c117_ba_current_line: 'الحد الحالي: {amount}/شهر', c117_ba_total_line: 'مجموع الحدود المقترحة: {amount} كل شهر.', c117_ba_apply_btn: 'تطبيق الميزانية', c117_ba_ignore_btn: 'تجاهل', c117_ba_applied: 'تم تطبيق الميزانية: حدودك الآن هي الاقتراح.', c117_dg_title: '⚠️ شهر مكلف في الأفق', c117_dg_note: 'يراقب التطبيق أشهرَك المكلفة ببياناتك المحلية: قمم الإنفاق التاريخية للشهر نفسه في سنوات سابقة والتواريخ الخاصة التي تسجلها هنا. إذا كان أحدها على بعد 30 يومًا أو أقل، يحذّرك بالمبلغ الإضافي المقدَّر.', c117_dg_none: 'لم تُكتشف أنماط بعد: عندما يتكرر الشهر نفسه مكلفًا في سجلك، سيراقبه التطبيق من تلقاء نفسه.', c117_dg_ok: 'لا شيء خطير في الثلاثين يومًا القادمة.', c117_dg_alarm_hist: '🔔 {month} يصل بعد {days} يومًا: في ذلك الشهر تنفق عادة {extra} إضافية.', c117_dg_alarm_date: '🔔 {name} يصل بعد {days} يومًا ({date}).', c117_dg_extra_line: 'الإضافي المقدَّر: {amount}.', c117_dg_detected: 'الأشهر المكلفة المكتشفة: {months}.', c117_dg_ai_btn: '✨ دع الذكاء الاصطناعي يجهّزني', c117_dg_working: 'الذكاء الاصطناعي يكتب تنبيهك…', c117_dg_ai_none: 'لم يُعد الذكاء الاصطناعي تنبيهًا هذه المرة. الإنذار في الأعلى باقٍ.', c117_dg_dates_title: 'تواريخك الخاصة', c117_dg_dates_empty: 'لا تواريخ مسجلة. أضف أعياد ميلاد أو ذكرى سنوية أو ضرائب لمراقبتها كل عام.', c117_dg_name_ph: 'مثال: عيد ميلاد ابنتي', c117_dg_day_ph: 'اليوم', c117_dg_extra_ph: 'إضافي $ (اختياري)', c117_dg_add_btn: 'إضافة تاريخ',
+    c118_ch_title: '🏆 تحديات الادخار',
+    c118_ch_note: 'ميزة من PETO Pro. تحديات بتاريخ: ادّخر مبلغًا في 7 أو 30 يومًا، أو امضِ 7 أيام دون مصروف صغير. التقدم يُحسب فقط من الادخار الذي تسجّله بنفسك: التحدي لا يخلق ادخارًا من تلقاء نفسه أبدًا. وإن لم يكتمل، يُغلق دون أي عقوبة.',
+    c118_ch_type_label: 'نوع التحدي',
+    c118_ch_type_save7: 'ادخار مبلغ في 7 أيام',
+    c118_ch_type_save30: 'ادخار مبلغ في 30 يومًا',
+    c118_ch_type_noants: '7 أيام دون مصروف صغير',
+    c118_ch_target_label: 'المبلغ المراد ادخاره ($)',
+    c118_ch_start_btn: 'ابدأ التحدي',
+    c118_ch_active_save: 'تحدٍّ نشط: ادّخر {target} في {days} أيام',
+    c118_ch_active_noants: 'تحدٍّ نشط: {days} أيام دون مصروف صغير',
+    c118_ch_progress: 'لديك {have} من {target}',
+    c118_ch_days_line: 'اليوم {n} من {total} · تبقّى {left} أيام',
+    c118_ch_streak: '🔥 سلسلة: {n} أيام في التحدي',
+    c118_ch_noants_ok: 'ما زلت نظيفًا: {n} أيام دون مصروف صغير',
+    c118_ch_noants_def: 'المصروف الصغير = مصروف بقيمة {amount} أو أقل.',
+    c118_ch_done: '🏅 اكتمل التحدي!',
+    c118_ch_failed: 'لم يتم هذه المرة. دون عقوبة: ابدأ آخر متى شئت.',
+    c118_ch_dropped: 'تم ترك التحدي.',
+    c118_ch_abandon_btn: 'اترك التحدي',
+    c118_ch_abandon_confirm: 'تترك هذا التحدي؟ سيُغلق دون عقوبة ويبقى في سجلّك.',
+    c118_ch_history_title: 'تحدياتك السابقة',
+    c118_ch_history_empty: 'لم تُنهِ أي تحدٍّ بعد.',
+    c118_ch_bad_target: 'اكتب مبلغ التحدي، أكبر من صفر.',
+    c118_ch_name_save: 'ادخار {target} في {days} أيام',
+    c118_ch_name_noants: '7 أيام دون مصروف صغير',
+    c118_tr_title: '✈️ وضع السفر',
+    c118_tr_note: 'ميزة من PETO Pro. لكل رحلة ميزانيتها المنفصلة: عند تسجيل مصروف، علّمه برحلته فيُحتسب ضد تلك الميزانية. مصروفات الرحلة تُحسب في شهرك كأي مصروف (المال خرج بالقدر نفسه): الرحلة عدسة فوقها، لا نسخة منها.',
+    c118_tr_name_label: 'اسم الرحلة',
+    c118_tr_name_ph: 'مثال: سانتو دومينغو',
+    c118_tr_start_label: 'من',
+    c118_tr_end_label: 'إلى',
+    c118_tr_budget_label: 'ميزانية الرحلة ($)',
+    c118_tr_create_btn: 'أنشئ الرحلة',
+    c118_tr_empty: 'لا رحلات بعد. أنشئ الأولى وعلّم مصروفاتها عند تسجيلها.',
+    c118_tr_spent_line: '{spent} من {budget}',
+    c118_tr_over: '⚠️ تجاوزت بمقدار {amount}.',
+    c118_tr_perday: 'المتوسط: {amount} في اليوم',
+    c118_tr_close_btn: 'أغلق الرحلة',
+    c118_tr_close_confirm: 'تغلق «{name}»؟ يبقى ملخصها النهائي؛ ومصروفاتها لا تُمسّ.',
+    c118_tr_closed: 'مغلقة',
+    c118_tr_open: 'جارية',
+    c118_tr_final: 'الملخص النهائي: {spent} من {budget} في {days} أيام · {perday} في اليوم.',
+    c118_tr_delete_btn: 'احذف',
+    c118_tr_delete_confirm: 'تحذف الرحلة «{name}»؟ مصروفاتها لن تُحذف: تفقد علامة الرحلة فقط.',
+    c118_tr_form_label: 'الرحلة (اختياري)',
+    c118_tr_none: 'دون رحلة',
+    c118_tr_bad: 'راجع الرحلة: اسم، وتواريخ (لا يمكن أن يكون الانتهاء قبل البدء) وميزانية أكبر من صفر.',
+    c118_pro_btn: 'عرض PETO Pro',
+    c118_share_btn: '📤 شارك الإنجاز',
+    c118_card_goal_head: 'تم تحقيق الهدف!',
+    c118_card_chal_head: 'اكتمل التحدي!',
+    c118_card_saved: 'تم ادخاره',
   pro_tag: 'PRO',
   adv_title: 'التقرير المتقدّم',
   adv_note: 'ميزة من PETO Pro: هذا الشهر مقابل السابق، كل فئة وتصدير CSV للشهر.',
@@ -15821,6 +16492,7 @@ function resetExpenseForm() {
   setExpensePhoto(null);
   fillCategorySelect();
   fillSourceSelect('exp-source', 'exp');
+  fillTripSelect118('');
   document.getElementById('exp-more').checked = false;
   document.getElementById('exp-more-box').hidden = true;
   expCatTouched = false;
@@ -15838,6 +16510,7 @@ function openExpenseEdit(item) {
   fillCategorySelect();
   document.getElementById('exp-category').value = item.category;
   setSourceSelect('exp-source', item, false);
+  fillTripSelect118(item.tripId118 || '');
   document.getElementById('exp-date').value = item.date;
   document.getElementById('exp-note').value = item.note;
   document.getElementById('exp-biz').checked = item.biz === true;
@@ -15854,6 +16527,7 @@ function renderExpenses() {
   updateVoiceButtons();
   renderAiUsage();
   renderDupBanner99();
+  renderTrips118();
   const titleEl = document.getElementById('expense-form-title');
   if (titleEl) titleEl.textContent =
     document.getElementById('exp-id').value ? t('exp_edit') : t('exp_new');
@@ -15919,6 +16593,10 @@ function renderExpenses() {
     if (item.roundUpCents > 0) {
       li.appendChild(el('div', 'item-sub exp-line2', '🔺 ' + t('c116_roundup_line', { amount: fmt(item.roundUpCents) })));
     }
+    if (item.tripId118) {
+      const trip118 = db.trips118.find((tr) => tr && tr.id === item.tripId118);
+      if (trip118) li.appendChild(el('div', 'item-sub exp-trip89', '✈️ ' + trip118.name));
+    }
     if (item.photo) {
       const thumb = document.createElement('img');
       thumb.className = 'receipt-thumb';
@@ -15980,9 +16658,9 @@ function onExpenseSubmit(ev) {
        movimiento era una transferencia del banco, la marca se
        quita y pasa a contar como gasto normal — manda la
        decisión de la persona. */
-    if (found) { found.amountCents = fx116.amountCents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; found.transfer = false; found.currency = fx116.currency; found.origCents = fx116.origCents; found.rate116 = fx116.rate116; savedItem = found; if (prevCat96 && prevCat96 !== category) learnCategory96(note, category); }
+    if (found) { found.amountCents = fx116.amountCents; found.category = category; found.date = date; found.note = note; found.photo = expPhotoData; found.biz = document.getElementById('exp-biz').checked === true; found.accountId = expSrc.accountId; found.fromSavings = expSrc.savings; found.src = expSrc.src; found.transfer = false; found.currency = fx116.currency; found.origCents = fx116.origCents; found.rate116 = fx116.rate116; found.tripId118 = isPro() ? readTrip118() : found.tripId118; savedItem = found; if (prevCat96 && prevCat96 !== category) learnCategory96(note, category); }
   } else {
-    savedItem = { id: uid(), amountCents: fx116.amountCents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings, src: expSrc.src, currency: fx116.currency, origCents: fx116.origCents, rate116: fx116.rate116, roundUpCents: 0 };
+    savedItem = { id: uid(), amountCents: fx116.amountCents, category, date, note, photo: expPhotoData, biz: document.getElementById('exp-biz').checked === true, accountId: expSrc.accountId, fromSavings: expSrc.savings, src: expSrc.src, currency: fx116.currency, origCents: fx116.origCents, rate116: fx116.rate116, roundUpCents: 0, tripId118: isPro() ? readTrip118() : null };
     db.expenses.push(savedItem);
     const ruleCat96 = userRuleCategory(note);
     if (ruleCat96 && ruleCat96 !== category) learnCategory96(note, category);
@@ -16464,6 +17142,7 @@ function renderSavings() {
   renderGoal();
   renderChallenge();
   renderGoals();
+  renderChallenges118();
   fillSavingsGoalSelect();
   /* Compilación 51: las cuentas de ahorro del banco, de solo
      lectura, con su saldo actual (la sección se oculta sola
@@ -23356,7 +24035,13 @@ function renderGoals() {
     if (plan115 && plan115[g.id] > 0 && acc < g.targetCents) {
       card.appendChild(el('p', 'item-sub', '🧭 ' + t('c115_plan_line', { amount: fmt(plan115[g.id]) })));
     }
-    if (acc >= g.targetCents) card.appendChild(el('p', 'goal-done', t('goal_done')));
+    if (acc >= g.targetCents) {
+      card.appendChild(el('p', 'goal-done', t('goal_done')));
+      /* Compilación 118: la tarjeta de logro de la meta cumplida. */
+      const shareBtn118 = actionButton(t('c118_share_btn'), 'btn ghost small', function () { shareGoal118(g); });
+      shareBtn118.classList.add('goal-share118');
+      card.appendChild(shareBtn118);
+    }
     const row = el('div', 'form-actions');
     const amt = document.createElement('input');
     amt.type = 'number'; amt.min = '0.01'; amt.step = '0.01'; amt.placeholder = '0.00';
@@ -31553,6 +32238,452 @@ async function onDangerAi117() {
   renderDanger117();
 }
 
+
+/* ================= Compilación 118 · «Motivación y viajes» =================
+   Tres funciones nuevas, TODAS del área Pro y 100 % locales
+   (sin servidor): desafíos de ahorro con fecha (#16), modo
+   viaje con presupuesto aparte (#17) y tarjeta de logro
+   para compartir (#18). Puerta única: isPro() en el pintado
+   y requirePro() en cada acción. La regla de oro manda: el
+   reto solo MIDE los aportes reales que la persona anota
+   (savingsBetween, el mismo criterio del reto semanal); el
+   gasto de viaje cuenta en el mes como siempre (su
+   amountCents no se toca) y ADEMÁS se acumula contra el
+   presupuesto del viaje — el viaje es una lupa sobre los
+   mismos gastos, no una copia. */
+
+const CHAL118_ANT_CENTS = 500; /* gasto hormiga: $5.00 o menos */
+
+/* Día en que el acumulado de aportes reales llega a la meta
+   del reto (o null). Se recorre día a día desde el inicio:
+   un reto dura como mucho 30 días, así que es barato y
+   exacto. */
+function challenge118DoneDate(ch) {
+  let d = ch.startDate;
+  for (let i = 0; i <= ch.days; i++) {
+    if (savingsBetween(ch.startDate, d) >= ch.targetCents) return d;
+    d = addDaysStr(d, 1);
+  }
+  return null;
+}
+
+/* Primer gasto hormiga de la ventana (o null). Cuenta el
+   gasto tal como lo ve el mes: contado y no transferencia. */
+function challenge118FirstAnt(ch) {
+  let best = null;
+  for (const e of db.expenses) {
+    if (!e || isTransferMov(e)) continue;
+    if (e.date < ch.startDate || e.date > ch.endDate) continue;
+    if (e.amountCents <= CHAL118_ANT_CENTS && (!best || e.date < best.date)) best = e;
+  }
+  return best;
+}
+
+/* Estado DERIVADO del reto (no se persiste nada salvo el
+   abandono): {state, progressCents, dayN, daysLeft, streak,
+   doneDate, failDate}. 'today' inyectable para las pruebas.
+   La racha: en los retos de guardar, los días que el reto
+   lleva en pie hasta hoy (o hasta el día en que se
+   cumplió); en el sin-hormiga, los días limpios seguidos. */
+function challenge118State(ch, today) {
+  const t = today || todayStr();
+  const upto = t < ch.endDate ? t : ch.endDate;
+  const dayN = Math.min(ch.days, Math.max(1, daysBetweenStr(ch.startDate, upto) + 1));
+  const base = { state: 'active', progressCents: 0, dayN: dayN,
+    daysLeft: Math.max(0, daysBetweenStr(t, ch.endDate)), streak: dayN,
+    doneDate: null, failDate: null };
+  if (ch.type === 'noants') {
+    const ant = challenge118FirstAnt(ch);
+    if (ant) {
+      base.state = 'failed'; base.failDate = ant.date;
+      base.streak = Math.max(0, daysBetweenStr(ch.startDate, ant.date));
+      return base;
+    }
+    if (t > ch.endDate) { base.state = 'done'; base.doneDate = ch.endDate; base.streak = ch.days; }
+    return base;
+  }
+  base.progressCents = savingsBetween(ch.startDate, upto);
+  const doneDate = challenge118DoneDate(ch);
+  if (doneDate && doneDate <= upto) {
+    base.state = 'done'; base.doneDate = doneDate;
+    base.streak = daysBetweenStr(ch.startDate, doneDate) + 1;
+    return base;
+  }
+  if (t > ch.endDate) { base.state = 'failed'; base.streak = ch.days; }
+  return base;
+}
+
+/* El reto activo de verdad: marcado activo Y con el estado
+   derivado aún en curso. Un reto activo a la vez. */
+function challenge118Active() {
+  for (const ch of db.challenges118) {
+    if (!ch || ch.status !== 'active') continue;
+    if (challenge118State(ch).state === 'active') return ch;
+  }
+  return null;
+}
+
+function challenge118Name(ch) {
+  if (ch.type === 'noants') return t('c118_ch_name_noants');
+  return t('c118_ch_name_save', { target: fmt(ch.targetCents), days: ch.days });
+}
+
+function renderChallenges118() {
+  const wrap = document.getElementById('challenges118-list');
+  if (!wrap) return;
+  clearNode(wrap);
+  const locked = document.getElementById('challenges118-locked');
+  const form = document.getElementById('challenges118-form');
+  const hist = document.getElementById('challenges118-history');
+  const pro = isPro();
+  const active = pro ? challenge118Active() : null;
+  if (locked) locked.hidden = pro;
+  if (form) form.hidden = !pro || !!active;
+  if (hist) { clearNode(hist); hist.hidden = !pro; }
+  if (!pro) return;
+  if (active) {
+    const st = challenge118State(active);
+    const card = el('div', 'chal118-active');
+    if (active.type === 'noants') {
+      card.appendChild(el('p', 'chal118-head', t('c118_ch_active_noants', { days: active.days })));
+      card.appendChild(el('p', '', t('c118_ch_noants_ok', { n: st.streak })));
+    } else {
+      card.appendChild(el('p', 'chal118-head', t('c118_ch_active_save', { target: fmt(active.targetCents), days: active.days })));
+      card.appendChild(el('p', '', t('c118_ch_progress', { have: fmt(st.progressCents), target: fmt(active.targetCents) })));
+    }
+    card.appendChild(el('p', 'chal118-days', t('c118_ch_days_line', { n: st.dayN, total: active.days, left: st.daysLeft })));
+    card.appendChild(el('p', 'chal118-streak', t('c118_ch_streak', { n: st.streak })));
+    if (active.type === 'noants') card.appendChild(el('p', 'chal118-note', t('c118_ch_noants_def', { amount: fmt(CHAL118_ANT_CENTS) })));
+    const ab = actionButton(t('c118_ch_abandon_btn'), 'btn ghost small', function () { abandonChallenge118(active.id); });
+    ab.id = 'chal118-abandon';
+    card.appendChild(ab);
+    wrap.appendChild(card);
+  }
+  if (hist) {
+    const activeId = active ? active.id : null;
+    const past = [];
+    for (const ch of db.challenges118) {
+      if (!ch || ch.id === activeId) continue;
+      past.push({ ch: ch, st: ch.status === 'dropped' ? null : challenge118State(ch) });
+    }
+    past.sort(function (a, b) { return a.ch.startDate < b.ch.startDate ? 1 : -1; });
+    hist.appendChild(el('h3', 'chal118-hist-title', t('c118_ch_history_title')));
+    if (!past.length) hist.appendChild(el('p', 'chal118-empty', t('c118_ch_history_empty')));
+    for (const p of past) {
+      const row = el('div', 'chal118-row');
+      let mark;
+      if (p.ch.status === 'dropped') mark = t('c118_ch_dropped');
+      else if (p.st.state === 'done') mark = t('c118_ch_done');
+      else mark = t('c118_ch_failed');
+      row.appendChild(el('p', '', mark + ' · ' + challenge118Name(p.ch) + ' · ' + prettyDate(p.ch.startDate)));
+      if (p.ch.status !== 'dropped' && p.st.state === 'done') {
+        const sb = actionButton(t('c118_share_btn'), 'btn ghost small', (function (ch, st) {
+          return function () { shareChallenge118(ch, st); };
+        })(p.ch, p.st));
+        sb.classList.add('chal118-share');
+        row.appendChild(sb);
+      }
+      hist.appendChild(row);
+    }
+  }
+}
+
+function startChallenge118() {
+  if (!requirePro()) return;
+  const errId = 'chal118-error';
+  showError(errId, '');
+  const typeEl = document.getElementById('chal118-type');
+  const targetEl = document.getElementById('chal118-target');
+  const kind = typeEl ? typeEl.value : 'save7';
+  const days = kind === 'save30' ? 30 : 7;
+  let targetCents = 0;
+  if (kind !== 'noants') {
+    targetCents = parseAmount(targetEl ? targetEl.value : '', false) || 0;
+    if (!(targetCents > 0)) { showError(errId, t('c118_ch_bad_target')); return; }
+  }
+  if (challenge118Active()) return; /* un reto activo a la vez */
+  const start = todayStr();
+  beginUndo();
+  db.challenges118.push({ id: uid(), type: kind === 'noants' ? 'noants' : 'save', days: days,
+    targetCents: targetCents, startDate: start, endDate: addDaysStr(start, days - 1), status: 'active' });
+  save();
+  if (targetEl) targetEl.value = '';
+  renderSavings();
+  showUndoToast();
+}
+
+function abandonChallenge118(id) {
+  if (!requirePro()) return;
+  const ch = db.challenges118.find(function (c) { return c && c.id === id; });
+  if (!ch || ch.status !== 'active') return;
+  if (!window.confirm(t('c118_ch_abandon_confirm'))) return;
+  beginUndo();
+  ch.status = 'dropped';
+  save();
+  renderSavings();
+  showUndoToast();
+}
+
+/* Lo gastado en un viaje: los gastos marcados con su id,
+   contados y no transferencias. Cada gasto suma por su
+   amountCents, que ya va SIEMPRE en USD (la multimoneda de
+   la Comp. 116 convierte al guardar): un gasto en RD$ suma
+   al viaje convertido, sin tocar nada más. */
+function tripSpent118(tr) {
+  let s = 0;
+  for (const e of db.expenses) {
+    if (e && e.tripId118 === tr.id && !isTransferMov(e)) s += e.amountCents;
+  }
+  return s;
+}
+
+/* Días que cuentan para el promedio: si el viaje sigue
+   abierto, los transcurridos hasta hoy (sin pasar del fin);
+   si está cerrado, su duración completa. */
+function tripDays118(tr, today) {
+  const t = today || todayStr();
+  const end = tr.closed ? tr.endDate : (t < tr.endDate ? t : tr.endDate);
+  if (end < tr.startDate) return 1;
+  return daysBetweenStr(tr.startDate, end) + 1;
+}
+
+function renderTrips118() {
+  const wrap = document.getElementById('trips118-list');
+  if (!wrap) return;
+  clearNode(wrap);
+  const locked = document.getElementById('trips118-locked');
+  const form = document.getElementById('trips118-form');
+  const pro = isPro();
+  if (locked) locked.hidden = pro;
+  if (form) form.hidden = !pro;
+  fillTripSelect118();
+  if (!pro) return;
+  if (!db.trips118.length) {
+    wrap.appendChild(el('p', 'trip118-empty', t('c118_tr_empty')));
+    return;
+  }
+  const sorted = db.trips118.slice().sort(function (a, b) { return a.startDate < b.startDate ? 1 : -1; });
+  for (const tr of sorted) {
+    if (!tr) continue;
+    const spent = tripSpent118(tr);
+    const days = tripDays118(tr);
+    const card = el('div', 'trip118-card');
+    card.appendChild(el('p', 'trip118-head', '✈️ ' + tr.name + ' · ' + (tr.closed ? t('c118_tr_closed') : t('c118_tr_open'))));
+    card.appendChild(el('p', 'trip118-dates', prettyDate(tr.startDate) + ' → ' + prettyDate(tr.endDate)));
+    if (tr.closed) {
+      card.appendChild(el('p', 'trip118-final', t('c118_tr_final', { spent: fmt(spent), budget: fmt(tr.budgetCents), days: days, perday: fmt(Math.round(spent / days)) })));
+    } else {
+      card.appendChild(el('p', '', t('c118_tr_spent_line', { spent: fmt(spent), budget: fmt(tr.budgetCents) })));
+      if (spent > tr.budgetCents) card.appendChild(el('p', 'trip118-over', t('c118_tr_over', { amount: fmt(spent - tr.budgetCents) })));
+      card.appendChild(el('p', 'trip118-perday', t('c118_tr_perday', { amount: fmt(Math.round(spent / days)) })));
+      const cb = actionButton(t('c118_tr_close_btn'), 'btn ghost small', (function (id) {
+        return function () { closeTrip118(id); };
+      })(tr.id));
+      cb.classList.add('trip118-close');
+      card.appendChild(cb);
+    }
+    const del = actionButton(t('c118_tr_delete_btn'), 'btn ghost small', (function (id) {
+      return function () { deleteTrip118(id); };
+    })(tr.id));
+    del.classList.add('trip118-del');
+    card.appendChild(del);
+    wrap.appendChild(card);
+  }
+}
+
+/* Selector de viaje del formulario de gasto: los viajes
+   abiertos (y el ya elegido, aunque se haya cerrado, para
+   no perderlo al editar). Conserva la elección en curso. */
+function fillTripSelect118(selected) {
+  const sel = document.getElementById('exp-trip118');
+  if (!sel) return;
+  const keep = selected !== undefined ? selected : sel.value;
+  clearNode(sel);
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = t('c118_tr_none');
+  sel.appendChild(none);
+  /* Sin Pro no se ofrecen viajes: la marca es de la función
+     Pro (las marcas ya guardadas se conservan al editar). */
+  if (!isPro()) { sel.value = ''; return; }
+  for (const tr of db.trips118) {
+    if (!tr) continue;
+    if (tr.closed && tr.id !== keep) continue;
+    const o = document.createElement('option');
+    o.value = tr.id;
+    o.textContent = '✈️ ' + tr.name;
+    sel.appendChild(o);
+  }
+  sel.value = keep || '';
+  if (sel.value !== (keep || '')) sel.value = '';
+}
+
+function readTrip118() {
+  const sel = document.getElementById('exp-trip118');
+  const v = sel ? sel.value : '';
+  if (!v) return null;
+  return db.trips118.some(function (tr) { return tr && tr.id === v; }) ? v : null;
+}
+
+function createTrip118() {
+  if (!requirePro()) return;
+  const errId = 'trip118-error';
+  showError(errId, '');
+  const nameEl = document.getElementById('trip118-name');
+  const startEl = document.getElementById('trip118-start');
+  const endEl = document.getElementById('trip118-end');
+  const budgetEl = document.getElementById('trip118-budget');
+  const name = cleanText(nameEl ? nameEl.value : '', 60);
+  const start = cleanDate(startEl ? startEl.value : '');
+  const end = cleanDate(endEl ? endEl.value : '');
+  const budgetCents = parseAmount(budgetEl ? budgetEl.value : '', false) || 0;
+  if (!name || !start || !end || end < start || !(budgetCents > 0)) {
+    showError(errId, t('c118_tr_bad'));
+    return;
+  }
+  beginUndo();
+  db.trips118.push({ id: uid(), name: name, startDate: start, endDate: end,
+    budgetCents: budgetCents, closed: false, closedDate: null });
+  save();
+  if (nameEl) nameEl.value = '';
+  if (budgetEl) budgetEl.value = '';
+  renderExpenses();
+  showUndoToast();
+}
+
+function closeTrip118(id) {
+  if (!requirePro()) return;
+  const tr = db.trips118.find(function (x) { return x && x.id === id; });
+  if (!tr || tr.closed) return;
+  if (!window.confirm(t('c118_tr_close_confirm', { name: tr.name }))) return;
+  beginUndo();
+  tr.closed = true;
+  tr.closedDate = todayStr();
+  save();
+  renderExpenses();
+  showUndoToast();
+}
+
+function deleteTrip118(id) {
+  if (!requirePro()) return;
+  const tr = db.trips118.find(function (x) { return x && x.id === id; });
+  if (!tr) return;
+  if (!window.confirm(t('c118_tr_delete_confirm', { name: tr.name }))) return;
+  beginUndo();
+  db.trips118 = db.trips118.filter(function (x) { return x && x.id !== id; });
+  for (const e of db.expenses) if (e && e.tripId118 === id) e.tripId118 = null;
+  save();
+  renderExpenses();
+  showUndoToast();
+}
+
+function wrap118(ctx, text, maxWidth) {
+  const words = String(text || '').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (line && ctx.measureText(test).width > maxWidth) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  return lines.length ? lines : [''];
+}
+
+/* Tarjeta de logro (#18): imagen 800×1000 con la marca —
+   fondo marino y ámbar de la paleta, la P de PETO dibujada
+   con sus barras — y SOLO el nombre del logro, la cifra y
+   la fecha. Nada de saldos totales ni de cuentas. */
+function buildAchieveCanvas118(a) {
+  const W = 800, H = 1000;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const pal = canvasPalette();
+  ctx.fillStyle = pal.bg; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = pal.accent; ctx.fillRect(0, 0, W, 14);
+  try {
+    ctx.fillStyle = pal.accent;
+    ctx.fillRect(70, 84, 26, 150);
+    ctx.fillRect(70, 84, 92, 26);
+    ctx.fillRect(136, 84, 26, 76);
+    ctx.fillRect(70, 134, 92, 26);
+    ctx.font = '700 44px system-ui, sans-serif';
+    ctx.fillStyle = pal.text;
+    ctx.fillText('PETO', 190, 150);
+    ctx.font = '400 25px system-ui, sans-serif';
+    ctx.fillStyle = pal.muted;
+    ctx.fillText(t('rep_subtitle'), 190, 192);
+  } catch (e) { /* la cabecera de marca es decorativa */ }
+  ctx.textAlign = 'center';
+  ctx.fillStyle = pal.accent;
+  ctx.font = '700 58px system-ui, sans-serif';
+  ctx.fillText(a.head, W / 2, 400);
+  ctx.fillStyle = pal.text;
+  ctx.font = '600 40px system-ui, sans-serif';
+  let nameLines;
+  try { nameLines = wrap118(ctx, a.name, W - 140); }
+  catch (e) { nameLines = [String(a.name || '')]; }
+  let y = 500;
+  for (const ln of nameLines.slice(0, 3)) { ctx.fillText(ln, W / 2, y); y += 52; }
+  ctx.fillStyle = pal.muted;
+  ctx.font = '400 30px system-ui, sans-serif';
+  ctx.fillText(t('c118_card_saved'), W / 2, y + 30);
+  ctx.fillStyle = pal.accent;
+  ctx.font = '800 92px system-ui, sans-serif';
+  ctx.fillText(fmt(a.amountCents), W / 2, y + 140);
+  ctx.fillStyle = pal.text;
+  ctx.font = '400 32px system-ui, sans-serif';
+  ctx.fillText(prettyDate(a.dateStr), W / 2, y + 210);
+  ctx.fillStyle = pal.muted;
+  ctx.font = '400 24px system-ui, sans-serif';
+  ctx.fillText(t('rep_promo_footer'), W / 2, H - 56);
+  ctx.textAlign = 'left';
+  return cv;
+}
+
+/* Compartir con el MISMO mecanismo del informe mensual:
+   Filesystem + Share nativos (Android e iOS); en la web,
+   Web Share con archivos y, si no, descarga de la imagen. */
+async function shareAchieve118(a) {
+  if (!requirePro()) return;
+  const cv = buildAchieveCanvas118(a);
+  const name = 'peto-logro.png';
+  const FS = capPlugin('Filesystem');
+  const SH = capPlugin('Share');
+  if (FS && SH) {
+    try {
+      const dataUrl = cv.toDataURL('image/png');
+      const base64 = dataUrl.split(',')[1] || '';
+      const w = await FS.writeFile({ path: name, data: base64, directory: 'CACHE' });
+      await SH.share({ title: 'PETO', text: a.name, url: (w && w.uri) || undefined, dialogTitle: 'PETO' });
+      return;
+    } catch (e) { /* sigue con la vía web */ }
+  }
+  try {
+    const blob = await new Promise(function (res) { cv.toBlob(res, 'image/png'); });
+    if (blob && navigator.canShare) {
+      const file = new File([blob], name, { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'PETO', text: a.name });
+        return;
+      }
+    }
+  } catch (e) { /* sigue con la descarga */ }
+  downloadReportPng(cv, name);
+}
+
+function shareGoal118(g) {
+  shareAchieve118({ head: t('c118_card_goal_head'), name: g.name,
+    amountCents: g.targetCents, dateStr: todayStr() });
+}
+
+function shareChallenge118(ch, st) {
+  shareAchieve118({ head: t('c118_card_chal_head'), name: challenge118Name(ch),
+    amountCents: ch.type === 'noants' ? savingsBetween(ch.startDate, ch.endDate) : ch.targetCents,
+    dateStr: (st && st.doneDate) || ch.endDate });
+}
+
 /* ---------------- Compilación 98 · Fase F (7) · Entrevista inicial con IA ----
    La configuración inicial por formularios gana su reemplazo
    conversacional: la acción 'onboarding-interview' conversa en
@@ -33261,6 +34392,20 @@ function wireEvents() {
   if (dangerAiBtn117) dangerAiBtn117.addEventListener('click', onDangerAi117);
   const dangerForm117 = document.getElementById('danger117-form');
   if (dangerForm117) dangerForm117.addEventListener('submit', onDangerAdd117);
+  /* Compilación 118 · Desafíos de ahorro y modo viaje */
+  const chal118Start = document.getElementById('chal118-start');
+  if (chal118Start) chal118Start.addEventListener('click', startChallenge118);
+  const chal118Pro = document.getElementById('chal118-pro');
+  if (chal118Pro) chal118Pro.addEventListener('click', function () { requirePro(); });
+  const trip118Create = document.getElementById('trip118-create');
+  if (trip118Create) trip118Create.addEventListener('click', createTrip118);
+  const trip118Pro = document.getElementById('trip118-pro');
+  if (trip118Pro) trip118Pro.addEventListener('click', function () { requirePro(); });
+  const chal118Form = document.getElementById('challenges118-form');
+  if (chal118Form) chal118Form.addEventListener('submit', function (ev) { ev.preventDefault(); startChallenge118(); });
+  const trip118Form = document.getElementById('trips118-form');
+  if (trip118Form) trip118Form.addEventListener('submit', function (ev) { ev.preventDefault(); createTrip118(); });
+
   /* Compilación 98: predicción de flujo con IA y botón de la
      entrevista en la bienvenida. */
   const flowAiBtn98 = document.getElementById('flow-ai98-btn');
